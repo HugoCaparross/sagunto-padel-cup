@@ -1,4 +1,4 @@
-// Ruta: src/lib/email/resend.ts
+// Ruta: src/lib/email/resend.ts — sustituye entero al archivo actual
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -43,5 +43,31 @@ export async function sendWaitlistPromotedEmail(params: {
     to,
     subject: `¡Ya tienes plaza! — ${torneoNombre}`,
     html: `<div style="font-family: sans-serif; font-size: 15px; color: #0D1B2A;">Hola ${nombre},<br/><br/>Se ha liberado una plaza y ya estás confirmado/a en <strong>${torneoNombre}</strong>.</div>`,
+  });
+}
+
+export async function sendPartnerInviteEmail(params: {
+  to: string;
+  invitadoPorNombre: string;
+  torneoNombre: string;
+  signupUrl: string;
+}) {
+  const { to, invitadoPorNombre, torneoNombre, signupUrl } = params;
+
+  return resend.emails.send({
+    from: FROM,
+    to,
+    subject: `${invitadoPorNombre} te ha invitado a jugar — ${torneoNombre}`,
+    html: `
+      <div style="font-family: sans-serif; font-size: 15px; color: #0D1B2A;">
+        Hola,<br/><br/>
+        <strong>${invitadoPorNombre}</strong> te ha invitado a formar pareja en
+        <strong>${torneoNombre}</strong>.<br/><br/>
+        Crea tu cuenta con este mismo email (${to}) para completar la pareja:<br/><br/>
+        <a href="${signupUrl}" style="background:#F0443A;color:#E6E6E6;padding:12px 20px;border-radius:8px;text-decoration:none;display:inline-block;">
+          Crear mi cuenta
+        </a>
+      </div>
+    `,
   });
 }

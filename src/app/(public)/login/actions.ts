@@ -1,4 +1,4 @@
-// Ruta: src/app/login/actions.ts
+// Ruta: src/app/login/actions.ts — sustituye entero al archivo actual
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
@@ -19,4 +19,10 @@ export async function login(formData: unknown) {
   }
 
   redirect("/app");
+}
+
+export async function logout() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect("/");
 }

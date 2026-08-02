@@ -1,4 +1,4 @@
-// Ruta: src/app/registro/actions.ts
+// Ruta: src/app/registro/actions.ts — sustituye entero al archivo actual
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
@@ -14,9 +14,12 @@ export async function signup(formData: unknown) {
   const { nombre, apellidos, email, telefono, password } = parsed.data;
 
   const supabase = await createClient();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password,
+    options: { emailRedirectTo: `${siteUrl}/app` },
   });
 
   if (authError || !authData.user) {
@@ -37,6 +40,11 @@ export async function signup(formData: unknown) {
 
   if (playerError) {
     return { ok: false, error: "No se ha podido crear tu perfil de jugador" };
+  }
+
+  // Con verificación de email activada, signUp no crea sesión todavía
+  if (!authData.session) {
+    redirect("/registro/confirma");
   }
 
   redirect("/app");

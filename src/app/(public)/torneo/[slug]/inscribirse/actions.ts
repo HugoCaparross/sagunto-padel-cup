@@ -1,10 +1,13 @@
-// Ruta: src/app/(public)/torneo/[slug]/inscribirse/actions.ts
+// Ruta: src/app/(public)/torneo/[slug]/inscribirse/actions.ts — sustituye entero al archivo actual
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { registrationSchema } from "@/lib/validations/registration";
-import { sendRegistrationConfirmedEmail } from "@/lib/email/resend";
+import {
+  sendRegistrationConfirmedEmail,
+  sendPartnerInviteEmail,
+} from "@/lib/email/resend";
 
 export async function registerPair(
   torneoSlug: string,
@@ -48,7 +51,7 @@ export async function registerPair(
   }
 
   // Compañero: si da su email y ya está registrado, se vincula directamente.
-  // Si no existe todavía, la pareja queda "incompleta" hasta que se registre.
+  // Si no existe todavía, la pareja queda "incompleta" y se le invita por email.
   let player2Id: string | null = null;
   if (data.compañero_email) {
     const { data: partner } = await admin
@@ -125,6 +128,17 @@ export async function registerPair(
     torneoNombre: tournament.nombre,
     estado: estadoFinal === "lista_espera" ? "lista_espera" : "confirmada",
   });
+
+  // Compañero invitado que aún no tiene cuenta: email automático de invitación
+  if (data.compañero_email && !player2Id) {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+    await sendPartnerInviteEmail({
+      to: data.compañero_email,
+      invitadoPorNombre: player.nombre,
+      torneoNombre: tournament.nombre,
+      signupUrl: `${siteUrl}/registro`,
+    });
+  }
 
   return { ok: true, estado: estadoFinal };
 }

@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { signupSchema, type SignupFormValues } from "@/lib/validations/auth";
-import { signup } from "@/app/registro/actions";
+import { signup } from "@/app/(public)/registro/actions";
 
 export default function SignupForm() {
   const [error, setError] = useState<string | null>(null);

@@ -1,11 +1,21 @@
-/* Ruta: src/app/globals.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Ruta: src/app/globals.css — sustituye entero el archivo actual */
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
-:root {
-  --font-display: "Anton", sans-serif;
-  --font-body: "Montserrat", sans-serif;
+@theme {
+  --color-coral: #F0443A;
+  --color-coral-dark: #C7362D;
+  --color-navy: #0D1B2A;
+  --color-navy-light: #16283D;
+  --color-sage: #A7C4A0;
+  --color-sage-dark: #87A880;
+  --color-offwhite: #E6E6E6;
+  --radius-card: 1rem;
+}
+
+@theme inline {
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
 }
 
 html {
@@ -13,21 +23,24 @@ html {
 }
 
 body {
-  @apply bg-offwhite text-navy font-body;
+  background-color: var(--color-offwhite);
+  color: var(--color-navy);
+  font-family: var(--font-body);
 }
 
 h1, h2, h3, .display {
-  @apply font-display uppercase tracking-wide text-navy;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--color-navy);
 }
 
-/* Áreas táctiles grandes para uso en móvil, al aire libre */
 button, a.btn, input[type="submit"] {
   min-height: 44px;
 }
 
-/* Foco de teclado visible (accesibilidad) */
 :focus-visible {
-  outline: 3px solid theme("colors.coral.DEFAULT");
+  outline: 3px solid var(--color-coral);
   outline-offset: 2px;
 }
 

@@ -1,11 +1,11 @@
-// Ruta en el proyecto: src/middleware.ts
-// Refresca la sesión de Supabase Auth en cada petición y protege
-// las rutas privadas (/app/*) y de admin (/admin/*)
+// Ruta: src/proxy.ts
+// Este archivo SUSTITUYE a src/middleware.ts — borra middleware.ts
+// Next.js 16 renombró "middleware" a "proxy" (mismo comportamiento, nuevo nombre)
 
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -41,9 +41,6 @@ export async function middleware(request: NextRequest) {
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
-
-  // Nota: la comprobación de "es admin" (solo Hugo) se hace además
-  // a nivel de base de datos con RLS, esto es solo la primera barrera
 
   return response;
 }
