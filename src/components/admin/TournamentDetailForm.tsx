@@ -1,13 +1,15 @@
-// Ruta: src/components/admin/TournamentDetailForm.tsx
+// Ruta: src/components/admin/TournamentDetailForm.tsx — sustituye entero al archivo actual
 "use client";
 
 import { useState } from "react";
 import {
   updateTournamentEstado,
+  updateTournamentClub,
   setTournamentCategory,
 } from "@/app/(admin)/admin/torneos/[id]/actions";
 
 type Categoria = { id: string; nombre: string };
+type Club = { id: string; nombre: string };
 type CategoriaActiva = {
   categoria_id: string;
   cupo_minimo: number;
@@ -26,15 +28,20 @@ const ESTADOS = [
 export default function TournamentDetailForm({
   torneoId,
   estadoActual,
+  clubActualId,
+  clubs,
   categorias,
   categoriasActivas,
 }: {
   torneoId: string;
   estadoActual: string;
+  clubActualId: string | null;
+  clubs: Club[];
   categorias: Categoria[];
   categoriasActivas: CategoriaActiva[];
 }) {
   const [estado, setEstado] = useState(estadoActual);
+  const [clubId, setClubId] = useState(clubActualId ?? "");
   const [activas, setActivas] = useState<Record<string, CategoriaActiva | null>>(
     Object.fromEntries(
       categorias.map((c) => [
@@ -49,16 +56,15 @@ export default function TournamentDetailForm({
     await updateTournamentEstado(torneoId, nuevo);
   }
 
+  async function cambiarClub(nuevo: string) {
+    setClubId(nuevo);
+    await updateTournamentClub(torneoId, nuevo);
+  }
+
   async function toggleCategoria(categoriaId: string, activa: boolean) {
     const cupo = activas[categoriaId] ?? { categoria_id: categoriaId, cupo_minimo: 6, cupo_maximo: 12 };
     setActivas((prev) => ({ ...prev, [categoriaId]: activa ? cupo : null }));
-    await setTournamentCategory(
-      torneoId,
-      categoriaId,
-      activa,
-      cupo.cupo_minimo,
-      cupo.cupo_maximo
-    );
+    await setTournamentCategory(torneoId, categoriaId, activa, cupo.cupo_minimo, cupo.cupo_maximo);
   }
 
   async function cambiarCupo(
@@ -70,13 +76,7 @@ export default function TournamentDetailForm({
     if (!actual) return;
     const nuevo = { ...actual, [campo]: valor };
     setActivas((prev) => ({ ...prev, [categoriaId]: nuevo }));
-    await setTournamentCategory(
-      torneoId,
-      categoriaId,
-      true,
-      nuevo.cupo_minimo,
-      nuevo.cupo_maximo
-    );
+    await setTournamentCategory(torneoId, categoriaId, true, nuevo.cupo_minimo, nuevo.cupo_maximo);
   }
 
   return (
@@ -97,17 +97,31 @@ export default function TournamentDetailForm({
       </div>
 
       <div>
-        <label className="block font-semibold mb-3">
-          Categorías disputadas
-        </label>
+        <label className="block font-semibold mb-1">Club / sede</label>
+        <select
+          value={clubId}
+          onChange={(e) => cambiarClub(e.target.value)}
+          className="w-full rounded-card border border-offwhite/20 bg-navy px-4 py-3"
+        >
+          <option value="">Sin asignar</option>
+          {clubs.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.nombre}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-offwhite/50 mt-1">
+          Si el club no existe todavía, créalo primero en Ajustes.
+        </p>
+      </div>
+
+      <div>
+        <label className="block font-semibold mb-3">Categorías disputadas</label>
         <div className="space-y-4">
           {categorias.map((c) => {
             const activa = activas[c.id];
             return (
-              <div
-                key={c.id}
-                className="rounded-card bg-navy-light px-4 py-3"
-              >
+              <div key={c.id} className="rounded-card bg-navy-light px-4 py-3">
                 <label className="flex items-center gap-3">
                   <input
                     type="checkbox"
@@ -123,9 +137,7 @@ export default function TournamentDetailForm({
                       <input
                         type="number"
                         value={activa.cupo_minimo}
-                        onChange={(e) =>
-                          cambiarCupo(c.id, "cupo_minimo", Number(e.target.value))
-                        }
+                        onChange={(e) => cambiarCupo(c.id, "cupo_minimo", Number(e.target.value))}
                         className="w-16 ml-2 rounded border border-offwhite/20 bg-navy px-2 py-1"
                       />
                     </label>
@@ -134,9 +146,7 @@ export default function TournamentDetailForm({
                       <input
                         type="number"
                         value={activa.cupo_maximo}
-                        onChange={(e) =>
-                          cambiarCupo(c.id, "cupo_maximo", Number(e.target.value))
-                        }
+                        onChange={(e) => cambiarCupo(c.id, "cupo_maximo", Number(e.target.value))}
                         className="w-16 ml-2 rounded border border-offwhite/20 bg-navy px-2 py-1"
                       />
                     </label>

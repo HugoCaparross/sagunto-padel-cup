@@ -1,4 +1,4 @@
-// Ruta: src/app/(admin)/admin/torneos/[id]/actions.ts
+// Ruta: src/app/(admin)/admin/torneos/[id]/actions.ts — sustituye entero al archivo actual
 "use server";
 
 import { requireAdmin } from "@/lib/admin";
@@ -17,6 +17,17 @@ export async function updateTournamentEstado(
     .eq("id", torneoId);
 
   if (error) return { ok: false, error: "No se ha podido cambiar el estado" };
+  revalidatePath(`/admin/torneos/${torneoId}`);
+  return { ok: true };
+}
+
+export async function updateTournamentClub(torneoId: string, clubId: string) {
+  await requireAdmin();
+  const admin = createAdminClient();
+  await admin
+    .from("tournaments")
+    .update({ club_id: clubId || null })
+    .eq("id", torneoId);
   revalidatePath(`/admin/torneos/${torneoId}`);
   return { ok: true };
 }

@@ -1,4 +1,4 @@
-// Ruta: src/app/(admin)/admin/torneos/[id]/page.tsx
+// Ruta: src/app/(admin)/admin/torneos/[id]/page.tsx — sustituye entero al archivo actual
 import { createAdminClient } from "@/lib/supabase/admin";
 import TournamentDetailForm from "@/components/admin/TournamentDetailForm";
 import { notFound } from "next/navigation";
@@ -13,7 +13,7 @@ export default async function AdminTorneoDetailPage({
 
   const { data: torneo } = await admin
     .from("tournaments")
-    .select("id, nombre, estado")
+    .select("id, nombre, estado, club_id")
     .eq("id", id)
     .single();
 
@@ -29,12 +29,16 @@ export default async function AdminTorneoDetailPage({
     .select("categoria_id, cupo_minimo, cupo_maximo")
     .eq("tournament_id", id);
 
+  const { data: clubs } = await admin.from("clubs").select("id, nombre").order("nombre");
+
   return (
     <main className="max-w-3xl mx-auto px-5 py-12">
       <h1 className="font-display text-3xl mb-8">{torneo.nombre}</h1>
       <TournamentDetailForm
         torneoId={torneo.id}
         estadoActual={torneo.estado}
+        clubActualId={torneo.club_id}
+        clubs={clubs ?? []}
         categorias={categorias ?? []}
         categoriasActivas={categoriasActivas ?? []}
       />

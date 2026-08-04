@@ -1,4 +1,4 @@
-// Ruta: src/components/Header.tsx
+// Ruta: src/components/Header.tsx — sustituye entero al archivo actual
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/(public)/login/actions";
@@ -8,6 +8,8 @@ export default async function Header() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const esAdmin = user?.email === process.env.ADMIN_EMAIL;
 
   return (
     <header className="bg-navy text-offwhite px-5 py-4 flex items-center justify-between flex-wrap gap-3">
@@ -26,6 +28,14 @@ export default async function Header() {
             <Link href="/app" className="text-sage">
               Mi cuenta
             </Link>
+            {esAdmin && (
+              <Link
+                href="/admin/torneos"
+                className="rounded-card bg-coral px-3 py-1 font-semibold"
+              >
+                Panel admin
+              </Link>
+            )}
             <form action={logout}>
               <button type="submit" className="underline">
                 Salir

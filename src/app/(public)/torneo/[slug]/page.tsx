@@ -1,4 +1,4 @@
-// Ruta: src/app/(public)/torneo/[slug]/page.tsx
+// Ruta: src/app/(public)/torneo/[slug]/page.tsx — sustituye entero al archivo actual
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
@@ -65,6 +65,9 @@ export default async function TorneoPage({
       <nav className="mt-10 flex flex-wrap gap-4 text-sm">
         <Link href={`/torneo/${slug}/participantes`} className="underline">
           Participantes
+        </Link>
+        <Link href={`/torneo/${slug}/grupos`} className="underline">
+          Grupos
         </Link>
         <Link href={`/torneo/${slug}/horarios`} className="underline">
           Horarios

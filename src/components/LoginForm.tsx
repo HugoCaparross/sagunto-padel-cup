@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { loginSchema, type LoginFormValues } from "@/lib/validations/auth";
-import { login } from "@/app/login/actions";
+import { login } from "@/app/(public)/login/actions";
 
 export default function LoginForm() {
   const [error, setError] = useState<string | null>(null);
