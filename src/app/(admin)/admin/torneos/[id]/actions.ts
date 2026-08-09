@@ -5,17 +5,10 @@ import { requireAdmin } from "@/lib/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 
-export async function updateTournamentEstado(
-  torneoId: string,
-  estado: string
-) {
+export async function updateTournamentEstado(torneoId: string, estado: string) {
   await requireAdmin();
   const admin = createAdminClient();
-  const { error } = await admin
-    .from("tournaments")
-    .update({ estado })
-    .eq("id", torneoId);
-
+  const { error } = await admin.from("tournaments").update({ estado }).eq("id", torneoId);
   if (error) return { ok: false, error: "No se ha podido cambiar el estado" };
   revalidatePath(`/admin/torneos/${torneoId}`);
   return { ok: true };
@@ -24,9 +17,20 @@ export async function updateTournamentEstado(
 export async function updateTournamentClub(torneoId: string, clubId: string) {
   await requireAdmin();
   const admin = createAdminClient();
+  await admin.from("tournaments").update({ club_id: clubId || null }).eq("id", torneoId);
+  revalidatePath(`/admin/torneos/${torneoId}`);
+  return { ok: true };
+}
+
+export async function updateTournamentInfo(
+  torneoId: string,
+  data: { precio_texto: string; descripcion: string }
+) {
+  await requireAdmin();
+  const admin = createAdminClient();
   await admin
     .from("tournaments")
-    .update({ club_id: clubId || null })
+    .update({ precio_texto: data.precio_texto || null, descripcion: data.descripcion || null })
     .eq("id", torneoId);
   revalidatePath(`/admin/torneos/${torneoId}`);
   return { ok: true };
@@ -53,12 +57,7 @@ export async function setTournamentCategory(
   }
 
   const { error } = await admin.from("tournament_categories").upsert(
-    {
-      tournament_id: torneoId,
-      categoria_id: categoriaId,
-      cupo_minimo: cupoMinimo,
-      cupo_maximo: cupoMaximo,
-    },
+    { tournament_id: torneoId, categoria_id: categoriaId, cupo_minimo: cupoMinimo, cupo_maximo: cupoMaximo },
     { onConflict: "tournament_id,categoria_id" }
   );
 

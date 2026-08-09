@@ -1,4 +1,4 @@
-// Ruta: src/components/OnboardingModal.tsx
+// Ruta: src/components/OnboardingModal.tsx — sustituye entero al archivo actual
 "use client";
 
 import { useState } from "react";
@@ -7,15 +7,15 @@ import { marcarOnboardingCompletado } from "@/app/(private)/app/onboarding-actio
 const PASOS = [
   {
     titulo: "Bienvenido a Sagunto Padel Cup",
-    texto: "Aquí verás tu ranking, tus torneos y todo lo que necesitas para seguir el circuito.",
+    texto: "Consulta tus torneos, sigue tus resultados, suma puntos y lucha por el Master Final.",
   },
   {
     titulo: "El ranking es móvil",
     texto: "Cada torneo suma puntos durante 12 meses. Cuantos más torneos juegues, más alto llegas.",
   },
   {
-    titulo: "Race to Master",
-    texto: "Las 6 mejores parejas de cada categoría con mínimo 2 torneos jugados clasifican directas al Master Final.",
+    titulo: "Master Final",
+    texto: "Todos los jugadores pueden participar en el Master si cumplen los requisitos de la temporada. Las 4 mejores parejas de cada categoría acceden directas al cuadro final; el resto juega una fase previa.",
   },
   {
     titulo: "Tu categoría puede cambiar",

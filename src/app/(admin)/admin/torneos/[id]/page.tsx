@@ -13,22 +13,17 @@ export default async function AdminTorneoDetailPage({
 
   const { data: torneo } = await admin
     .from("tournaments")
-    .select("id, nombre, estado, club_id")
+    .select("id, nombre, estado, club_id, precio_texto, descripcion")
     .eq("id", id)
     .single();
 
   if (!torneo) notFound();
 
-  const { data: categorias } = await admin
-    .from("categories")
-    .select("id, nombre")
-    .order("nivel_orden");
-
+  const { data: categorias } = await admin.from("categories").select("id, nombre").order("nivel_orden");
   const { data: categoriasActivas } = await admin
     .from("tournament_categories")
     .select("categoria_id, cupo_minimo, cupo_maximo")
     .eq("tournament_id", id);
-
   const { data: clubs } = await admin.from("clubs").select("id, nombre").order("nombre");
 
   return (
@@ -41,6 +36,8 @@ export default async function AdminTorneoDetailPage({
         clubs={clubs ?? []}
         categorias={categorias ?? []}
         categoriasActivas={categoriasActivas ?? []}
+        precioInicial={torneo.precio_texto ?? ""}
+        descripcionInicial={torneo.descripcion ?? ""}
       />
     </main>
   );

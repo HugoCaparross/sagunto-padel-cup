@@ -1,7 +1,6 @@
 // Ruta: src/lib/ranking.ts — sustituye entero al archivo actual
 import { SupabaseClient } from "@supabase/supabase-js";
 import { puntosPara, resultadoClave } from "@/lib/points-table";
-import { evaluarInsignias } from "@/lib/badges";
 
 export async function intentarCalcularRanking(
   admin: SupabaseClient,
@@ -41,8 +40,6 @@ export async function intentarCalcularRanking(
     .eq("categoria_id", categoriaId)
     .limit(1);
   if (yaCalculado?.length) return;
-
-  const jugadoresAfectados = new Set<string>();
 
   for (const bracket of existentes) {
     const { data: partidos } = await admin
@@ -92,12 +89,7 @@ export async function intentarCalcularRanking(
           ronda_alcanzada: clave,
           fecha: torneo?.fecha_inicio ?? new Date().toISOString().slice(0, 10),
         });
-        jugadoresAfectados.add(playerId);
       }
     }
-  }
-
-  for (const playerId of jugadoresAfectados) {
-    await evaluarInsignias(admin, playerId);
   }
 }
