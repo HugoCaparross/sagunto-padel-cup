@@ -1,10 +1,8 @@
-// Ruta: src/lib/ranking.ts
+// Ruta: src/lib/ranking.ts — sustituye entero al archivo actual
 import { SupabaseClient } from "@supabase/supabase-js";
 import { puntosPara, resultadoClave } from "@/lib/points-table";
+import { evaluarInsignias } from "@/lib/badges";
 
-// Se llama justo después de que se complete la final de un tramo.
-// Si las 3 finales (Oro/Plata/Bronce) de la categoría ya están
-// resueltas, calcula y reparte los puntos de ranking de golpe.
 export async function intentarCalcularRanking(
   admin: SupabaseClient,
   torneoId: string,
@@ -20,7 +18,7 @@ export async function intentarCalcularRanking(
   const existentes = brackets?.filter((b) => tramos.includes(b.tramo as typeof tramos[number])) ?? [];
 
   if (!existentes.length || existentes.some((b) => !b.campeon_pair_id)) {
-    return; // aún no están las 3 finales resueltas
+    return;
   }
 
   const { data: categoria } = await admin
@@ -36,7 +34,6 @@ export async function intentarCalcularRanking(
     .eq("id", torneoId)
     .single();
 
-  // Evita duplicar puntos si esto se vuelve a disparar
   const { data: yaCalculado } = await admin
     .from("ranking_points")
     .select("id")
@@ -44,6 +41,8 @@ export async function intentarCalcularRanking(
     .eq("categoria_id", categoriaId)
     .limit(1);
   if (yaCalculado?.length) return;
+
+  const jugadoresAfectados = new Set<string>();
 
   for (const bracket of existentes) {
     const { data: partidos } = await admin
@@ -93,7 +92,12 @@ export async function intentarCalcularRanking(
           ronda_alcanzada: clave,
           fecha: torneo?.fecha_inicio ?? new Date().toISOString().slice(0, 10),
         });
+        jugadoresAfectados.add(playerId);
       }
     }
+  }
+
+  for (const playerId of jugadoresAfectados) {
+    await evaluarInsignias(admin, playerId);
   }
 }

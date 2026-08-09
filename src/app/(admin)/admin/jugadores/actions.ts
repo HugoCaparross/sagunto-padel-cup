@@ -1,4 +1,4 @@
-// Ruta: src/app/(admin)/admin/jugadores/actions.ts
+// Ruta: src/app/(admin)/admin/jugadores/actions.ts — sustituye entero al archivo actual
 "use server";
 
 import { requireAdmin } from "@/lib/admin";
@@ -37,6 +37,29 @@ export async function cambiarCategoria(
     canal: "in_app",
     contenido: motivo || "Se ha actualizado tu categoría",
   });
+
+  // Insignia de ascenso: solo si el nuevo nivel_orden es menor (más alto en el circuito)
+  if (jugador?.categoria_actual_id) {
+    const { data: categorias } = await admin
+      .from("categories")
+      .select("id, nivel_orden")
+      .in("id", [jugador.categoria_actual_id, categoriaNuevaId]);
+
+    const anterior = categorias?.find((c) => c.id === jugador.categoria_actual_id);
+    const nueva = categorias?.find((c) => c.id === categoriaNuevaId);
+
+    if (anterior && nueva && nueva.nivel_orden < anterior.nivel_orden) {
+      const { data: existente } = await admin
+        .from("badges")
+        .select("id")
+        .eq("player_id", playerId)
+        .eq("tipo", "ascenso_categoria")
+        .maybeSingle();
+      if (!existente) {
+        await admin.from("badges").insert({ player_id: playerId, tipo: "ascenso_categoria" });
+      }
+    }
+  }
 
   revalidatePath("/admin/jugadores");
   return { ok: true };

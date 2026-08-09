@@ -1,4 +1,6 @@
-// Ruta: src/app/(public)/torneo/[slug]/cuadros/page.tsx
+// Ruta: src/app/(public)/torneo/[slug]/cuadros/page.tsx — sustituye entero al archivo actual
+export const dynamic = "force-dynamic";
+
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 

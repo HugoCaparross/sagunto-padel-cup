@@ -1,7 +1,10 @@
-// Ruta: src/app/(private)/app/page.tsx
+// Ruta: src/app/(private)/app/page.tsx — sustituye entero al archivo actual
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import OnboardingModal from "@/components/OnboardingModal";
+import { obtenerNivelJugador } from "@/lib/gamification";
+import NivelBadge from "@/components/NivelBadge";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -13,7 +16,7 @@ export default async function DashboardPage() {
 
   const { data: player } = await supabase
     .from("players")
-    .select("id, nombre, categoria_actual_id, categories(nombre)")
+    .select("id, nombre, categoria_actual_id, categories(nombre), onboarding_completado")
     .eq("auth_user_id", user.id)
     .single();
 
@@ -25,6 +28,7 @@ export default async function DashboardPage() {
     .gte("fecha_caducidad", hoy);
 
   const totalPuntos = puntos?.reduce((sum, p) => sum + p.puntos_obtenidos, 0) ?? 0;
+  const nivel = player ? await obtenerNivelJugador(supabase, player.id) : null;
 
   const { data: inscripciones } = await supabase
     .from("pairs")
@@ -33,16 +37,21 @@ export default async function DashboardPage() {
 
   return (
     <main className="max-w-2xl mx-auto px-5 py-12">
+      {!player?.onboarding_completado && <OnboardingModal />}
+
       <h1 className="font-display text-3xl mb-1">Hola, {player?.nombre}</h1>
       <p className="text-navy/70 mb-8">
         {(player?.categories as unknown as { nombre: string })?.nombre ?? "Sin categoría asignada"}
       </p>
 
-      <div className="grid sm:grid-cols-2 gap-4 mb-10">
+      <div className="flex flex-wrap gap-4 mb-10">
         <div className="rounded-card bg-navy text-offwhite p-5">
           <p className="text-sage text-sm uppercase mb-1">Puntos de ranking</p>
           <p className="font-display text-3xl">{totalPuntos}</p>
         </div>
+        {nivel && (
+          <NivelBadge etiqueta={nivel.etiqueta} xp={nivel.xp} siguienteUmbral={nivel.siguienteUmbral} />
+        )}
         <Link
           href="/calendario"
           className="rounded-card bg-coral text-offwhite p-5 flex flex-col justify-center"
