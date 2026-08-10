@@ -1,25 +1,24 @@
 // Ruta: src/components/CookieConsent.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { getConsent, setConsent, type ConsentValue } from "@/lib/consent";
 import { Analytics } from "@vercel/analytics/react";
 
 export default function CookieConsent() {
-  const [consent, setConsentState] = useState<ConsentValue | null>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const stored = getConsent();
-    setConsentState(stored);
-    setVisible(stored === null);
-  }, []);
+  const [selection, setSelection] = useState<ConsentValue | null>(null);
+  const storedConsent = useSyncExternalStore(
+    () => () => {},
+    getConsent,
+    () => null
+  );
+  const consent = selection ?? storedConsent;
+  const visible = consent === null;
 
   function handle(value: ConsentValue) {
     setConsent(value);
-    setConsentState(value);
-    setVisible(false);
+    setSelection(value);
   }
 
   return (

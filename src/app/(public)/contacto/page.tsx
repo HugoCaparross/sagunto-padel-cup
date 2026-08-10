@@ -5,14 +5,14 @@ import { useState } from "react";
 import { enviarContacto } from "./actions";
 
 export default function ContactoPage() {
-  const [form, setForm] = useState({ nombre: "", email: "", mensaje: "" });
+  const [form, setForm] = useState({ nombre: "", email: "", mensaje: "", empresa: "" });
   const [estado, setEstado] = useState<"idle" | "enviando" | "ok" | "error">("idle");
 
   async function enviar() {
     setEstado("enviando");
     const res = await enviarContacto(form);
     setEstado(res.ok ? "ok" : "error");
-    if (res.ok) setForm({ nombre: "", email: "", mensaje: "" });
+    if (res.ok) setForm({ nombre: "", email: "", mensaje: "", empresa: "" });
   }
 
   return (
@@ -24,7 +24,7 @@ export default function ContactoPage() {
           Mensaje enviado. Te responderemos lo antes posible.
         </p>
       ) : (
-        <div className="space-y-4">
+        <form className="space-y-4" onSubmit={(event) => { event.preventDefault(); void enviar(); }}>
           <input
             placeholder="Nombre"
             value={form.nombre}
@@ -45,19 +45,27 @@ export default function ContactoPage() {
             rows={5}
             className="w-full rounded-card border border-navy/20 px-4 py-3"
           />
+          <input
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="hidden"
+            value={form.empresa}
+            onChange={(e) => setForm((f) => ({ ...f, empresa: e.target.value }))}
+          />
           {estado === "error" && (
             <p className="text-coral font-semibold">
               Algo ha fallado, inténtalo de nuevo.
             </p>
           )}
           <button
-            onClick={enviar}
+            type="submit"
             disabled={estado === "enviando"}
             className="w-full rounded-card bg-coral text-offwhite font-display text-lg py-4 disabled:opacity-50"
           >
             {estado === "enviando" ? "Enviando..." : "Enviar"}
           </button>
-        </div>
+        </form>
       )}
     </main>
   );

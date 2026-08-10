@@ -126,7 +126,7 @@ export default function RegistrationForm({
         <label className="flex items-center gap-3">
           <input type="checkbox" {...register("quiere_bolsa_pareja")} />
           <span>
-            Aún no tengo pareja, apúntame a la bolsa de "busco pareja"
+            Aún no tengo pareja, apúntame a la bolsa de &quot;busco pareja&quot;
           </span>
         </label>
       )}

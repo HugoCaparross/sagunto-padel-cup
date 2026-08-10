@@ -1,5 +1,6 @@
 // Ruta: src/app/(public)/torneo/[slug]/page.tsx — sustituye entero al archivo actual
 import Link from "next/link";
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { ESTADO_TORNEO, ESTADO_TORNEO_BADGE, formatearFecha } from "@/lib/estados";
@@ -15,11 +16,39 @@ import {
   Gift,
 } from "lucide-react";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+type TournamentPageProps = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: TournamentPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const supabase = await createClient();
+  const { data: torneo } = await supabase
+    .from("tournaments")
+    .select("nombre, estado, fecha_inicio, fecha_fin, descripcion")
+    .eq("slug", slug)
+    .single();
+
+  if (!torneo || torneo.estado === "borrador") {
+    return { robots: { index: false, follow: false } };
+  }
+
+  const description =
+    torneo.descripcion ||
+    `${torneo.nombre}: torneo de pádel amateur en Sagunto. Consulta fechas, categorías e inscripción.`;
+  const url = `/torneo/${slug}`;
+
+  return {
+    title: torneo.nombre,
+    description,
+    alternates: { canonical: url },
+    openGraph: { title: torneo.nombre, description, url, type: "website" },
+  };
+}
+
 export default async function TorneoPage({
   params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+}: TournamentPageProps) {
   const { slug } = await params;
   const supabase = await createClient();
 
@@ -48,6 +77,37 @@ export default async function TorneoPage({
 
   const estadoTexto = ESTADO_TORNEO[torneo.estado] ?? torneo.estado;
   const estadoBadge = ESTADO_TORNEO_BADGE[torneo.estado] ?? "pending";
+  const eventSchema = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: torneo.nombre,
+    description: torneo.descripcion || `${torneo.nombre}, torneo de pádel amateur en Sagunto.`,
+    startDate: torneo.fecha_inicio,
+    endDate: torneo.fecha_fin ?? torneo.fecha_inicio,
+    eventStatus: "https://schema.org/EventScheduled",
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    url: `${siteUrl}/torneo/${slug}`,
+    organizer: {
+      "@type": "Organization",
+      name: "Sagunto Padel Cup",
+      url: siteUrl,
+    },
+    ...(club
+      ? {
+          location: {
+            "@type": "Place",
+            name: club.nombre,
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: club.direccion || undefined,
+              addressLocality: "Sagunto",
+              addressRegion: "Valencia",
+              addressCountry: "ES",
+            },
+          },
+        }
+      : {}),
+  };
 
   // Navegación dinámica: no mostrar pestañas vacías según la fase del torneo
   const antesDelTorneo = ["publicado", "inscripciones_abiertas"].includes(torneo.estado);
@@ -67,6 +127,10 @@ export default async function TorneoPage({
 
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventSchema).replace(/</g, "\\u003c") }}
+      />
       <div className="hero-gradient text-offwhite px-5 py-12">
         <div className="max-w-3xl mx-auto">
           <StatusBadge texto={estadoTexto} tipo={estadoBadge} />

@@ -25,6 +25,8 @@ html {
 body {
   background-color: var(--color-offwhite);
   color: var(--color-navy);
+  --font-display: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  --font-body: Arial, Helvetica, sans-serif;
   font-family: var(--font-body);
 }
 
@@ -57,12 +59,12 @@ h1, h2, h3, .display {
            disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-primary {
-    @apply btn bg-coral text-offwhite shadow-[0_4px_14px_rgba(240,68,58,0.35)]
+    @apply inline-flex items-center justify-center gap-2 rounded-card font-display px-6 py-3 text-base transition-all duration-150 min-h-[44px] disabled:opacity-50 disabled:pointer-events-none bg-coral text-offwhite shadow-[0_4px_14px_rgba(240,68,58,0.35)]
            hover:bg-coral-dark hover:shadow-[0_6px_20px_rgba(240,68,58,0.45)]
            active:scale-[0.97];
   }
   .btn-secondary {
-    @apply btn bg-transparent text-navy border-2 border-navy/20
+    @apply inline-flex items-center justify-center gap-2 rounded-card font-display px-6 py-3 text-base transition-all duration-150 min-h-[44px] disabled:opacity-50 disabled:pointer-events-none bg-transparent text-navy border-2 border-navy/20
            hover:border-navy hover:bg-navy/5 active:scale-[0.97];
   }
   .btn-tertiary {
@@ -70,7 +72,7 @@ h1, h2, h3, .display {
            hover:underline;
   }
   .btn-danger {
-    @apply btn bg-transparent text-coral border-2 border-coral/30
+    @apply inline-flex items-center justify-center gap-2 rounded-card font-display px-6 py-3 text-base transition-all duration-150 min-h-[44px] disabled:opacity-50 disabled:pointer-events-none bg-transparent text-coral border-2 border-coral/30
            hover:bg-coral/10 active:scale-[0.97];
   }
 
@@ -91,16 +93,16 @@ h1, h2, h3, .display {
     @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide;
   }
   .badge-open {
-    @apply badge bg-sage/25 text-sage-dark;
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide bg-sage/25 text-sage-dark;
   }
   .badge-live {
-    @apply badge bg-coral/15 text-coral;
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide bg-coral/15 text-coral;
   }
   .badge-closed {
-    @apply badge bg-navy/10 text-navy/60;
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide bg-navy/10 text-navy/60;
   }
   .badge-pending {
-    @apply badge bg-navy/5 text-navy/40;
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide bg-navy/5 text-navy/40;
   }
 
   /* Inputs */

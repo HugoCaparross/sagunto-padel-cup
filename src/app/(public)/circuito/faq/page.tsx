@@ -22,6 +22,14 @@ const FAQ = [
     q: "¿Cómo se paga la inscripción?",
     a: "El pago se realiza físicamente el día del torneo, no hay pago online en la plataforma.",
   },
+  {
+    q: "¿Quién puede jugar el Master Final?",
+    a: "Todos los jugadores que cumplan los requisitos de la temporada pueden participar. El ranking individual determina el acceso y la posición.",
+  },
+  {
+    q: "¿Qué ventaja tienen las mejores parejas en el Master?",
+    a: "Las 4 mejores parejas de cada categoría acceden directamente al cuadro final. El resto de parejas elegibles comienza en la fase previa.",
+  },
 ];
 
 export default function FaqPage() {

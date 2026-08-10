@@ -31,8 +31,17 @@ export async function cancelarInscripcion(pairId: string) {
     return { ok: false, error: "No autorizado" };
   }
 
-  await admin.from("pairs").update({ estado: "incompleta" }).eq("id", pairId);
-  await admin.from("registrations").update({ estado: "cancelada" }).eq("pair_id", pairId);
+  const { error: pairError } = await admin
+    .from("pairs")
+    .update({ estado: "incompleta" })
+    .eq("id", pairId);
+  if (pairError) return { ok: false, error: "No se ha podido cancelar la pareja" };
+
+  const { error: registrationError } = await admin
+    .from("registrations")
+    .update({ estado: "cancelada" })
+    .eq("pair_id", pairId);
+  if (registrationError) return { ok: false, error: "No se ha podido cancelar la inscripción" };
 
   revalidatePath("/app/torneos");
   return { ok: true };

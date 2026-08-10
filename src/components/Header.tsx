@@ -45,6 +45,9 @@ export default async function Header() {
         <Link href="/circuito" className="hover:text-sage transition-colors">
           El Circuito
         </Link>
+        <Link href="/circuito/faq" className="hover:text-sage transition-colors">
+          FAQ
+        </Link>
         <Link href="/noticias" className="hover:text-sage transition-colors">
           Noticias
         </Link>

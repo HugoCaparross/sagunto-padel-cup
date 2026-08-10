@@ -10,6 +10,11 @@ export async function cambiarPassword(nuevaPassword: string) {
     return { ok: false, error: "Mínimo 6 caracteres" };
   }
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "No has iniciado sesión" };
+
   const { error } = await supabase.auth.updateUser({ password: nuevaPassword });
   if (error) return { ok: false, error: "No se ha podido cambiar la contraseña" };
   return { ok: true };
@@ -23,7 +28,11 @@ export async function darseDeBaja() {
   if (!user) return { ok: false, error: "No has iniciado sesión" };
 
   const admin = createAdminClient();
-  await admin.from("players").update({ estado: "baja" }).eq("auth_user_id", user.id);
+  const { error } = await admin
+    .from("players")
+    .update({ estado: "baja" })
+    .eq("auth_user_id", user.id);
+  if (error) return { ok: false, error: "No se ha podido tramitar la baja" };
 
   await supabase.auth.signOut();
   redirect("/");

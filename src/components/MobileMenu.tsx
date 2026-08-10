@@ -37,6 +37,8 @@ export default function MobileMenu({
     { href: "/ranking", label: "Ranking" },
     { href: "/master-final", label: "Master Final" },
     { href: "/circuito", label: "El Circuito" },
+    { href: "/circuito/faq", label: "FAQ" },
+    { href: "/contacto", label: "Contacto" },
     { href: "/noticias", label: "Noticias" },
   ];
 

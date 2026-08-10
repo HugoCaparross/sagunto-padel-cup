@@ -10,10 +10,11 @@ export async function marcarOnboardingCompletado() {
   } = await supabase.auth.getUser();
   if (!user) return { ok: false };
 
-  await supabase
+  const { error } = await supabase
     .from("players")
     .update({ onboarding_completado: true })
     .eq("auth_user_id", user.id);
 
+  if (error) return { ok: false };
   return { ok: true };
 }

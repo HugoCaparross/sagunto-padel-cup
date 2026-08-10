@@ -1,19 +1,7 @@
 // Ruta: src/app/layout.tsx
 import type { Metadata } from "next";
-import { Anton, Montserrat } from "next/font/google";
 import "./globals.css";
 import CookieConsent from "@/components/CookieConsent";
-
-const anton = Anton({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-display",
-});
-
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  variable: "--font-body",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
@@ -28,6 +16,12 @@ export const metadata: Metadata = {
     locale: "es_ES",
     siteName: "Sagunto Padel Cup",
   },
+  twitter: {
+    card: "summary_large_image",
+  },
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function RootLayout({
@@ -35,7 +29,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es">
-      <body className={`${anton.variable} ${montserrat.variable}`}>
+      <body>
         {children}
         <CookieConsent />
       </body>

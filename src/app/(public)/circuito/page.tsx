@@ -86,10 +86,11 @@ export default function CircuitoPage() {
       <div>
         <h2 className="font-display text-xl mb-2">Master Final</h2>
         <p className="text-sm text-navy/80">
-          Las 6 mejores parejas del ranking de cada categoría que hayan
-          jugado un mínimo de 2 torneos del circuito pasan directamente a la
-          fase final del Master; el resto de inscritos juega la fase de
-          grupos. Hay un Master Final por categoría.
+          Todos los jugadores que cumplan los requisitos de la temporada pueden
+          participar en el Master. El ranking individual determina el acceso y
+          la posición, y las 4 mejores parejas de cada categoría acceden
+          directamente al cuadro final. El resto de parejas elegibles disputa
+          una fase previa. Hay un Master Final por categoría.
         </p>
       </div>
     </main>

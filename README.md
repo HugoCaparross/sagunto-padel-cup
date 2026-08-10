@@ -1,3 +1,25 @@
+# Sagunto Padel Cup
+
+Plataforma de gestión e información pública del circuito amateur de pádel de Sagunto: torneos, inscripciones, resultados, ranking, Master Final y administración.
+
+## Desarrollo
+
+1. Copia `.env.example` a `.env.local` y completa los valores locales.
+2. Instala dependencias con `npm install`.
+3. Ejecuta `npm run dev`.
+
+Comprobaciones disponibles:
+
+```bash
+npm run lint
+npm run typecheck
+npm run build
+```
+
+La preparación de Supabase, Vercel, dominio, SMTP y el checklist de salida están en [docs/production-setup.md](docs/production-setup.md). La auditoría inicial del repositorio está en [docs/production-audit.md](docs/production-audit.md).
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
