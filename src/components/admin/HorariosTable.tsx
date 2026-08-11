@@ -1,4 +1,5 @@
 // Ruta: src/components/admin/HorariosTable.tsx
+
 "use client";
 
 import { useState } from "react";
@@ -7,52 +8,156 @@ import { actualizarHorario } from "@/app/(admin)/admin/torneos/[id]/horarios/act
 type Fila = {
   id: string;
   pista: string;
-  horaProgramada: string; // formato datetime-local, ej. 2026-09-12T09:00
+  horaProgramada: string;
   jugadores: string;
 };
 
-export default function HorariosTable({
-  torneoId,
-  filas,
-}: {
+interface HorariosTableProps {
   torneoId: string;
   filas: Fila[];
-}) {
-  const [datos, setDatos] = useState(filas);
+}
 
-  async function actualizar(id: string, campo: "pista" | "horaProgramada", valor: string) {
-    setDatos((prev) => prev.map((f) => (f.id === id ? { ...f, [campo]: valor } : f)));
-    const fila = datos.find((f) => f.id === id);
-    if (!fila) return;
-    await actualizarHorario(
-      torneoId,
-      id,
-      campo === "pista" ? valor : fila.pista,
-      campo === "horaProgramada" ? valor : fila.horaProgramada
-    );
+export default function HorariosTable({ torneoId, filas }: HorariosTableProps) {
+  const [datos, setDatos] = useState<Fila[]>(filas);
+
+  const [guardandoId, setGuardandoId] = useState<string | null>(null);
+
+  const [error, setError] = useState<string | null>(null);
+
+  async function actualizar(
+    id: string,
+    campo: "pista" | "horaProgramada",
+    valor: string,
+  ) {
+    const fila = datos.find((item) => item.id === id);
+
+    if (!fila) {
+      return;
+    }
+
+    const nuevosValores = {
+      pista: campo === "pista" ? valor : fila.pista,
+      horaProgramada: campo === "horaProgramada" ? valor : fila.horaProgramada,
+    };
+
+    setGuardandoId(id);
+    setError(null);
+
+    try {
+      const resultado = await actualizarHorario(
+        torneoId,
+        id,
+        nuevosValores.pista,
+        nuevosValores.horaProgramada,
+      );
+
+      if (!resultado?.ok) {
+        setError(resultado?.error ?? "No se ha podido actualizar el horario.");
+        return;
+      }
+
+      setDatos((prev) =>
+        prev.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                ...nuevosValores,
+              }
+            : item,
+        ),
+      );
+    } catch (actionError) {
+      console.error("[HorariosTable] Error actualizando horario:", actionError);
+
+      setError("Ha ocurrido un error inesperado al actualizar el horario.");
+    } finally {
+      setGuardandoId(null);
+    }
   }
 
   return (
     <div className="space-y-2">
-      {datos.map((f) => (
-        <div key={f.id} className="rounded-card bg-navy-light px-4 py-3 flex flex-wrap items-center gap-3 justify-between">
-          <span className="text-sm">{f.jugadores}</span>
-          <div className="flex items-center gap-2">
-            <input
-              value={f.pista}
-              onChange={(e) => actualizar(f.id, "pista", e.target.value)}
-              className="w-24 rounded-card border border-offwhite/20 bg-navy px-2 py-1 text-sm"
-            />
-            <input
-              type="datetime-local"
-              value={f.horaProgramada}
-              onChange={(e) => actualizar(f.id, "horaProgramada", e.target.value)}
-              className="rounded-card border border-offwhite/20 bg-navy px-2 py-1 text-sm"
-            />
+      {error ? (
+        <p role="alert" className="mb-3 text-sm text-coral">
+          {error}
+        </p>
+      ) : null}
+
+      {datos.map((fila) => {
+        const guardando = guardandoId === fila.id;
+
+        return (
+          <div
+            key={fila.id}
+            className="flex flex-wrap items-center justify-between gap-3 rounded-card bg-navy-light px-4 py-3"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm">{fila.jugadores}</p>
+
+              {guardando ? (
+                <p className="mt-1 text-[11px] text-sage">Guardando...</p>
+              ) : null}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <label className="sr-only">Pista</label>
+
+              <input
+                value={fila.pista}
+                onChange={(event) =>
+                  setDatos((prev) =>
+                    prev.map((item) =>
+                      item.id === fila.id
+                        ? {
+                            ...item,
+                            pista: event.target.value,
+                          }
+                        : item,
+                    ),
+                  )
+                }
+                onBlur={(event) =>
+                  actualizar(fila.id, "pista", event.target.value)
+                }
+                disabled={guardando}
+                aria-label={`Pista de ${fila.jugadores}`}
+                className="w-24 rounded-card border border-offwhite/20 bg-navy px-2 py-1.5 text-sm outline-none transition focus:border-coral disabled:opacity-50"
+              />
+
+              <label className="sr-only">Hora programada</label>
+
+              <input
+                type="datetime-local"
+                value={fila.horaProgramada}
+                onChange={(event) =>
+                  setDatos((prev) =>
+                    prev.map((item) =>
+                      item.id === fila.id
+                        ? {
+                            ...item,
+                            horaProgramada: event.target.value,
+                          }
+                        : item,
+                    ),
+                  )
+                }
+                onBlur={(event) =>
+                  actualizar(fila.id, "horaProgramada", event.target.value)
+                }
+                disabled={guardando}
+                aria-label={`Hora de ${fila.jugadores}`}
+                className="rounded-card border border-offwhite/20 bg-navy px-2 py-1.5 text-sm outline-none transition focus:border-coral disabled:opacity-50"
+              />
+            </div>
           </div>
-        </div>
-      ))}
-      {!datos.length && <p className="text-offwhite/60 text-sm">No hay partidos generados todavía.</p>}
+        );
+      })}
+
+      {!datos.length ? (
+        <p className="text-sm text-offwhite/60">
+          No hay partidos generados todavía.
+        </p>
+      ) : null}
     </div>
   );
 }

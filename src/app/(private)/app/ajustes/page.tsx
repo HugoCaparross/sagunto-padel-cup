@@ -1,66 +1,196 @@
 // Ruta: src/app/(private)/app/ajustes/page.tsx
+
 "use client";
 
 import { useState } from "react";
 import { cambiarPassword, darseDeBaja } from "./actions";
 
+type Estado = "idle" | "enviando" | "ok" | "error";
+
 export default function AjustesPage() {
   const [password, setPassword] = useState("");
-  const [estado, setEstado] = useState<"idle" | "enviando" | "ok" | "error">("idle");
-  const [error, setError] = useState<string | null>(null);
+
+  const [estadoPassword, setEstadoPassword] = useState<Estado>("idle");
+
+  const [errorPassword, setErrorPassword] = useState<string | null>(null);
+
+  const [bajaAbierta, setBajaAbierta] = useState(false);
+
+  const [bajaEnviando, setBajaEnviando] = useState(false);
+
+  const [errorBaja, setErrorBaja] = useState<string | null>(null);
 
   async function guardarPassword() {
-    setEstado("enviando");
-    setError(null);
-    const res = await cambiarPassword(password);
-    if (res.ok) {
-      setEstado("ok");
+    setEstadoPassword("enviando");
+    setErrorPassword(null);
+
+    const resultado = await cambiarPassword(password);
+
+    if (resultado.ok) {
+      setEstadoPassword("ok");
       setPassword("");
-    } else {
-      setEstado("error");
-      setError(res.error ?? "Error");
+      return;
     }
+
+    setEstadoPassword("error");
+    setErrorPassword(
+      resultado.error ?? "No se ha podido cambiar la contraseña",
+    );
   }
 
   async function confirmarBaja() {
-    if (confirm("¿Seguro que quieres darte de baja? Esta acción no se puede deshacer desde la web.")) {
+    setBajaEnviando(true);
+    setErrorBaja(null);
+
+    try {
       await darseDeBaja();
+    } catch (error) {
+      console.error("[app/ajustes] Error tramitando baja:", error);
+
+      setBajaEnviando(false);
+      setErrorBaja("No se ha podido tramitar la baja. Inténtalo de nuevo.");
     }
   }
 
   return (
-    <main className="max-w-md mx-auto px-5 py-12 space-y-10">
-      <h1 className="font-display text-3xl">Ajustes</h1>
-
-      <div>
-        <h2 className="font-display text-lg mb-3">Cambiar contraseña</h2>
-        <input
-          type="password"
-          placeholder="Nueva contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-card border border-navy/20 px-4 py-3 mb-3"
-        />
-        {error && <p className="text-coral text-sm mb-2">{error}</p>}
-        {estado === "ok" && <p className="text-sm text-sage mb-2">Contraseña actualizada.</p>}
-        <button
-          onClick={guardarPassword}
-          disabled={estado === "enviando"}
-          className="rounded-card bg-coral text-offwhite font-display px-6 py-3 disabled:opacity-50"
-        >
-          {estado === "enviando" ? "Guardando..." : "Guardar"}
-        </button>
-      </div>
-
-      <div>
-        <h2 className="font-display text-lg mb-3">Baja de cuenta</h2>
-        <p className="text-sm text-navy/70 mb-3">
-          Puedes darte de baja en cualquier momento. Tus datos se anonimizarán
-          pasados 12 meses según nuestra política de privacidad.
+    <main className="mx-auto min-h-screen w-full max-w-2xl px-5 py-8 md:px-8 md:py-10">
+      <header className="mb-10">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-sage">
+          Mi cuenta
         </p>
-        <button onClick={confirmarBaja} className="text-coral underline text-sm">
-          Darme de baja
-        </button>
+
+        <h1 className="font-display text-3xl tracking-tight md:text-4xl">
+          Ajustes
+        </h1>
+
+        <p className="mt-2 text-sm leading-6 text-navy/65">
+          Gestiona la seguridad y el estado de tu cuenta.
+        </p>
+      </header>
+
+      <div className="space-y-10">
+        <section aria-labelledby="password-title">
+          <div className="mb-4">
+            <h2 id="password-title" className="font-display text-xl">
+              Cambiar contraseña
+            </h2>
+
+            <p className="mt-1 text-sm leading-6 text-navy/60">
+              Utiliza una contraseña de al menos 8 caracteres.
+            </p>
+          </div>
+
+          <div className="max-w-md">
+            <label
+              htmlFor="nueva-password"
+              className="mb-2 block text-sm font-semibold"
+            >
+              Nueva contraseña
+            </label>
+
+            <input
+              id="nueva-password"
+              type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              disabled={estadoPassword === "enviando"}
+              className="mb-3 w-full rounded-card border border-navy/20 bg-offwhite px-4 py-3 outline-none transition focus:border-coral focus:ring-2 focus:ring-coral/20 disabled:opacity-50"
+            />
+
+            {errorPassword ? (
+              <p role="alert" className="mb-3 text-sm text-coral">
+                {errorPassword}
+              </p>
+            ) : null}
+
+            {estadoPassword === "ok" ? (
+              <p role="status" className="mb-3 text-sm text-sage">
+                Contraseña actualizada correctamente.
+              </p>
+            ) : null}
+
+            <button
+              type="button"
+              onClick={guardarPassword}
+              disabled={estadoPassword === "enviando" || password.length === 0}
+              className="rounded-card bg-coral px-6 py-3 font-display text-sm text-offwhite transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {estadoPassword === "enviando"
+                ? "Guardando..."
+                : "Guardar contraseña"}
+            </button>
+          </div>
+        </section>
+
+        <section
+          aria-labelledby="baja-title"
+          className="border-t border-navy/10 pt-10"
+        >
+          <div className="max-w-xl">
+            <h2 id="baja-title" className="font-display text-xl">
+              Baja de cuenta
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-navy/65">
+              Puedes solicitar la baja de tu cuenta en cualquier momento. La
+              cuenta dejará de estar activa y se aplicará el tratamiento de
+              datos previsto en la política de privacidad.
+            </p>
+
+            {errorBaja ? (
+              <p role="alert" className="mt-3 text-sm text-coral">
+                {errorBaja}
+              </p>
+            ) : null}
+
+            {!bajaAbierta ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setErrorBaja(null);
+                  setBajaAbierta(true);
+                }}
+                className="mt-5 text-sm font-semibold text-coral underline underline-offset-4"
+              >
+                Solicitar baja de cuenta
+              </button>
+            ) : (
+              <div className="mt-5 border border-coral/30 bg-coral/5 p-5">
+                <h3 className="text-sm font-semibold">¿Quieres continuar?</h3>
+
+                <p className="mt-2 text-sm leading-6 text-navy/65">
+                  Esta acción cerrará tu sesión y marcará tu cuenta como dada de
+                  baja. Comprueba que realmente quieres continuar antes de
+                  confirmarlo.
+                </p>
+
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={confirmarBaja}
+                    disabled={bajaEnviando}
+                    className="rounded-card bg-coral px-5 py-2.5 text-sm font-semibold text-offwhite disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {bajaEnviando ? "Tramitando..." : "Confirmar baja"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBajaAbierta(false);
+                      setErrorBaja(null);
+                    }}
+                    disabled={bajaEnviando}
+                    className="rounded-card border border-navy/15 px-5 py-2.5 text-sm font-semibold disabled:opacity-50"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
       </div>
     </main>
   );
