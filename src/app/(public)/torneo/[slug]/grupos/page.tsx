@@ -3,17 +3,11 @@ export const dynamic = "force-dynamic";
 
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
+import { ordenarClasificacionGrupo, type Standing } from "@/lib/grupos";
 
 type PlayerName = { nombre: string; apellidos: string } | null;
-type StandingRow = {
+type StandingRow = Standing & {
   group_id: string;
-  puntos: number;
-  victorias: number;
-  derrotas: number;
-  sets_favor: number;
-  sets_contra: number;
-  juegos_favor: number;
-  juegos_contra: number;
   pair: { player1: PlayerName; player2: PlayerName } | null;
 };
 
@@ -53,9 +47,16 @@ export default async function GruposPage({
   const { data: standings } = await supabase
     .from("group_standings")
     .select(
-      "group_id, puntos, victorias, derrotas, sets_favor, sets_contra, juegos_favor, juegos_contra, pair:pairs(player1:players!pairs_player_1_id_fkey(nombre, apellidos), player2:players!pairs_player_2_id_fkey(nombre, apellidos))"
+      "group_id, pair_id, puntos, victorias, derrotas, sets_favor, sets_contra, juegos_favor, juegos_contra, pair:pairs(player1:players!pairs_player_1_id_fkey(nombre, apellidos), player2:players!pairs_player_2_id_fkey(nombre, apellidos))"
     )
     .returns<StandingRow[]>();
+
+  const { data: partidos } = await supabase
+    .from("matches")
+    .select("group_id, pair_1_id, pair_2_id, resultado_json")
+    .eq("tournament_id", torneo.id)
+    .eq("fase", "grupos")
+    .eq("estado", "finalizado");
 
   return (
     <main className="max-w-3xl mx-auto px-5 py-12">
@@ -71,14 +72,9 @@ export default async function GruposPage({
           {grupos
             ?.filter((g) => g.categoria_id === cat.categoria_id)
             .map((g) => {
-              const filas = standings
-                ?.filter((s) => s.group_id === g.id)
-                .sort((a, b) => {
-                  if (b.puntos !== a.puntos) return b.puntos - a.puntos;
-                  const diffA = a.sets_favor - a.sets_contra;
-                  const diffB = b.sets_favor - b.sets_contra;
-                  return diffB - diffA;
-                });
+              const filasGrupo = standings?.filter((s) => s.group_id === g.id) ?? [];
+              const partidosGrupo = partidos?.filter((p) => p.group_id === g.id) ?? [];
+              const orden = ordenarClasificacionGrupo(filasGrupo, partidosGrupo);
 
               return (
                 <div key={g.id} className="mb-4 overflow-x-auto">
@@ -94,21 +90,24 @@ export default async function GruposPage({
                       </tr>
                     </thead>
                     <tbody>
-                      {filas?.map((f, i) => (
-                        <tr key={i} className="border-b border-navy/5">
-                          <td className="py-2">{nombrePareja(f.pair)}</td>
-                          <td className="py-2 text-center font-semibold">{f.puntos}</td>
-                          <td className="py-2 text-center">
-                            {f.victorias}-{f.derrotas}
-                          </td>
-                          <td className="py-2 text-center">
-                            {f.sets_favor}-{f.sets_contra}
-                          </td>
-                          <td className="py-2 text-center">
-                            {f.juegos_favor}-{f.juegos_contra}
-                          </td>
-                        </tr>
-                      ))}
+                      {orden.map((f, i) => {
+                        const fila = filasGrupo.find((s) => s.pair_id === f.pair_id);
+                        return (
+                          <tr key={i} className="border-b border-navy/5">
+                            <td className="py-2">{nombrePareja((fila as StandingRow)?.pair)}</td>
+                            <td className="py-2 text-center font-semibold">{f.puntos}</td>
+                            <td className="py-2 text-center">
+                              {(fila as StandingRow)?.victorias}-{(fila as StandingRow)?.derrotas}
+                            </td>
+                            <td className="py-2 text-center">
+                              {f.sets_favor}-{f.sets_contra}
+                            </td>
+                            <td className="py-2 text-center">
+                              {f.juegos_favor}-{f.juegos_contra}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

@@ -5,36 +5,8 @@ import { requireAdmin } from "@/lib/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { nextPow2, FASE_POR_NUM_PARTIDOS } from "@/lib/bracket";
 import { advanceWinner } from "@/lib/advance";
+import { ordenarClasificacionGrupo } from "@/lib/grupos";
 import { revalidatePath } from "next/cache";
-
-type Standing = {
-  pair_id: string;
-  puntos: number;
-  sets_favor: number;
-  sets_contra: number;
-  juegos_favor: number;
-  juegos_contra: number;
-};
-
-function ordenarGrupo(
-  standings: Standing[],
-  headToHead: (a: string, b: string) => number
-) {
-  return [...standings].sort((a, b) => {
-    if (b.puntos !== a.puntos) return b.puntos - a.puntos;
-    const empatados = standings.filter((s) => s.puntos === a.puntos);
-    if (empatados.length === 2) {
-      const h2h = headToHead(a.pair_id, b.pair_id);
-      if (h2h !== 0) return h2h;
-    }
-    const diffSetsA = a.sets_favor - a.sets_contra;
-    const diffSetsB = b.sets_favor - b.sets_contra;
-    if (diffSetsB !== diffSetsA) return diffSetsB - diffSetsA;
-    const diffJuegosA = a.juegos_favor - a.juegos_contra;
-    const diffJuegosB = b.juegos_favor - b.juegos_contra;
-    return diffJuegosB - diffJuegosA;
-  });
-}
 
 export async function generarFaseFinal(torneoId: string, categoriaId: string) {
   await requireAdmin();
@@ -70,20 +42,7 @@ export async function generarFaseFinal(torneoId: string, categoriaId: string) {
       .eq("group_id", grupo.id)
       .eq("estado", "finalizado");
 
-    const headToHead = (a: string, b: string) => {
-      const partido = partidosGrupo?.find(
-        (m) =>
-          (m.pair_1_id === a && m.pair_2_id === b) ||
-          (m.pair_1_id === b && m.pair_2_id === a)
-      );
-      if (!partido) return 0;
-      const ganador = (partido.resultado_json as { ganador_id?: string })?.ganador_id;
-      if (ganador === a) return -1;
-      if (ganador === b) return 1;
-      return 0;
-    };
-
-    const orden = ordenarGrupo(standings, headToHead);
+    const orden = ordenarClasificacionGrupo(standings, partidosGrupo ?? []);
     const tamano = orden.length;
 
     orden.forEach((s, idx) => {
@@ -128,8 +87,6 @@ export async function generarFaseFinal(torneoId: string, categoriaId: string) {
     const totalSlots = nextPow2(parejas.length);
     const numRondas = Math.log2(totalSlots);
 
-    // Construye el árbol desde la final hacia atrás, enlazando cada
-    // partido con el de la siguiente ronda (siguiente_match_id/slot)
     let rondaActual: string[] = [];
 
     const { data: final } = await admin
@@ -170,7 +127,6 @@ export async function generarFaseFinal(torneoId: string, categoriaId: string) {
       rondaActual = nuevaRonda;
     }
 
-    // rondaActual = partidos de la primera ronda real (huecos vacíos)
     const numByes = totalSlots - parejas.length;
     const byes = parejas.slice(0, numByes);
     const resto = parejas.slice(numByes);

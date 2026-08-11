@@ -1,9 +1,8 @@
-// Ruta: src/app/(private)/app/torneos/actions.ts
+// Ruta: src/app/(private)/app/torneos/actions.ts — sustituye entero al archivo actual
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { revalidatePath } from "next/cache";
 
 export async function cancelarInscripcion(pairId: string) {
   const supabase = await createClient();
@@ -14,7 +13,6 @@ export async function cancelarInscripcion(pairId: string) {
 
   const admin = createAdminClient();
 
-  // Comprueba que el jugador pertenece a esa pareja antes de cancelar
   const { data: player } = await admin
     .from("players")
     .select("id")
@@ -31,18 +29,8 @@ export async function cancelarInscripcion(pairId: string) {
     return { ok: false, error: "No autorizado" };
   }
 
-  const { error: pairError } = await admin
-    .from("pairs")
-    .update({ estado: "incompleta" })
-    .eq("id", pairId);
-  if (pairError) return { ok: false, error: "No se ha podido cancelar la pareja" };
+  const { error } = await admin.rpc("cancelar_inscripcion", { p_pair_id: pairId });
+  if (error) return { ok: false, error: "No se ha podido cancelar la inscripción" };
 
-  const { error: registrationError } = await admin
-    .from("registrations")
-    .update({ estado: "cancelada" })
-    .eq("pair_id", pairId);
-  if (registrationError) return { ok: false, error: "No se ha podido cancelar la inscripción" };
-
-  revalidatePath("/app/torneos");
   return { ok: true };
 }

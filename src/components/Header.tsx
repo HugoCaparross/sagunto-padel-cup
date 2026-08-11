@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/(public)/login/actions";
+import { esAdmin } from "@/lib/admin";
 import MobileMenu from "@/components/MobileMenu";
 
 export default async function Header() {
@@ -10,9 +11,8 @@ export default async function Header() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const esAdmin = user?.email === process.env.ADMIN_EMAIL;
+  const admin = await esAdmin(user?.id);
 
-  // CTA "Inscríbete": apunta al próximo torneo con inscripciones abiertas, si existe
   const { data: torneoAbierto } = await supabase
     .from("tournaments")
     .select("slug")
@@ -31,7 +31,6 @@ export default async function Header() {
         Sagunto Padel Cup
       </Link>
 
-      {/* Navegación desktop */}
       <nav className="hidden sm:flex items-center gap-6 text-sm">
         <Link href="/calendario" className="hover:text-sage transition-colors">
           Calendario
@@ -45,9 +44,6 @@ export default async function Header() {
         <Link href="/circuito" className="hover:text-sage transition-colors">
           El Circuito
         </Link>
-        <Link href="/circuito/faq" className="hover:text-sage transition-colors">
-          FAQ
-        </Link>
         <Link href="/noticias" className="hover:text-sage transition-colors">
           Noticias
         </Link>
@@ -59,7 +55,7 @@ export default async function Header() {
             <Link href="/app" className="text-sage font-semibold">
               Mi cuenta
             </Link>
-            {esAdmin && (
+            {admin && (
               <Link href="/admin" className="btn-secondary border-offwhite/30 text-offwhite !py-2 !px-4">
                 Panel admin
               </Link>
@@ -82,7 +78,7 @@ export default async function Header() {
         )}
       </nav>
 
-      <MobileMenu esAdmin={esAdmin} autenticado={!!user} cerrarSesion={logout} />
+      <MobileMenu esAdmin={admin} autenticado={!!user} cerrarSesion={logout} />
     </header>
   );
 }

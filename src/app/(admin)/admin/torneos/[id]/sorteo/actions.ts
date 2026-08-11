@@ -7,6 +7,7 @@ import { generateGroups, roundRobin } from "@/lib/sorteo";
 import { revalidatePath } from "next/cache";
 
 const LETRAS = "ABCDEFGHIJKLMNOP".split("");
+const DURACION_GRUPOS_MIN = 40; // minutos por partido de grupos, con cambio de pista
 
 export async function generarSorteo(torneoId: string, categoriaId: string) {
   await requireAdmin();
@@ -23,7 +24,6 @@ export async function generarSorteo(torneoId: string, categoriaId: string) {
     return { ok: false, error: "Hacen falta al menos 3 parejas confirmadas" };
   }
 
-  // Borra sorteo y partidos de grupos anteriores de esta categoría
   const { data: gruposAnteriores } = await admin
     .from("groups")
     .select("id")
@@ -48,10 +48,9 @@ export async function generarSorteo(torneoId: string, categoriaId: string) {
       .eq("categoria_id", categoriaId);
   }
 
-  // Nº de pistas disponibles, para repartir los partidos
   const { data: torneo } = await admin
     .from("tournaments")
-    .select("club_id")
+    .select("club_id, fecha_inicio")
     .eq("id", torneoId)
     .single();
 
@@ -64,6 +63,11 @@ export async function generarSorteo(torneoId: string, categoriaId: string) {
       .single();
     numPistas = club?.num_pistas ?? 4;
   }
+
+  // Hora de inicio: 09:00 del día del torneo, en la zona horaria del servidor.
+  // Cada pista tiene su propio "siguiente hueco libre" y avanza independiente.
+  const inicioBase = new Date(`${torneo?.fecha_inicio ?? new Date().toISOString().slice(0, 10)}T09:00:00`);
+  const siguienteHuecoPorPista: Date[] = Array.from({ length: numPistas }, () => new Date(inicioBase));
 
   const grupos = generateGroups(pairs);
   let contadorPista = 0;
@@ -87,7 +91,12 @@ export async function generarSorteo(torneoId: string, categoriaId: string) {
 
     const partidos = roundRobin(grupos[i]);
     for (const [pair1, pair2] of partidos) {
-      const pista = `Pista ${(contadorPista % numPistas) + 1}`;
+      const pistaIndex = contadorPista % numPistas;
+      const pista = `Pista ${pistaIndex + 1}`;
+      const horaProgramada = new Date(siguienteHuecoPorPista[pistaIndex]);
+      siguienteHuecoPorPista[pistaIndex] = new Date(
+        horaProgramada.getTime() + DURACION_GRUPOS_MIN * 60000
+      );
       contadorPista++;
 
       await admin.from("matches").insert({
@@ -98,6 +107,7 @@ export async function generarSorteo(torneoId: string, categoriaId: string) {
         pair_1_id: pair1,
         pair_2_id: pair2,
         pista,
+        hora_programada: horaProgramada.toISOString(),
         estado: "pendiente",
       });
     }
@@ -105,5 +115,7 @@ export async function generarSorteo(torneoId: string, categoriaId: string) {
 
   revalidatePath(`/admin/torneos/${torneoId}/sorteo`);
   revalidatePath(`/admin/torneos/${torneoId}/resultados`);
+  revalidatePath(`/admin/torneos/${torneoId}/horarios`);
+  revalidatePath(`/torneo/${torneoId}/horarios`);
   return { ok: true };
 }

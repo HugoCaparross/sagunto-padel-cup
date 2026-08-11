@@ -1,8 +1,8 @@
-// Ruta: src/app/registro/actions.ts — sustituye entero al archivo actual
+// Ruta: src/app/(public)/registro/actions.ts — sustituye entero al archivo actual
+// (si aún tienes este archivo en src/app/registro/actions.ts sin mover, sustitúyelo ahí)
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { signupSchema } from "@/lib/validations/auth";
 import { redirect } from "next/navigation";
 
@@ -16,10 +16,16 @@ export async function signup(formData: unknown) {
   const supabase = await createClient();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
+  // El jugador ya NO se crea aquí a mano: lo crea automáticamente
+  // el trigger on_auth_user_created en la misma transacción que el
+  // alta en Supabase Auth, así nunca queda un usuario sin jugador.
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password,
-    options: { emailRedirectTo: `${siteUrl}/app` },
+    options: {
+      emailRedirectTo: `${siteUrl}/app`,
+      data: { nombre, apellidos, telefono },
+    },
   });
 
   if (authError || !authData.user) {
@@ -29,20 +35,6 @@ export async function signup(formData: unknown) {
     };
   }
 
-  const admin = createAdminClient();
-  const { error: playerError } = await admin.from("players").insert({
-    auth_user_id: authData.user.id,
-    nombre,
-    apellidos,
-    email,
-    telefono,
-  });
-
-  if (playerError) {
-    return { ok: false, error: "No se ha podido crear tu perfil de jugador" };
-  }
-
-  // Con verificación de email activada, signUp no crea sesión todavía
   if (!authData.session) {
     redirect("/registro/confirma");
   }
