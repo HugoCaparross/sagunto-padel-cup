@@ -10,20 +10,38 @@ import { login } from "@/app/(public)/login/actions";
 
 export default function LoginForm() {
   const [error, setError] = useState<string | null>(null);
+
   const [enviando, setEnviando] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
 
   async function onSubmit(values: LoginFormValues) {
+    if (enviando) {
+      return;
+    }
+
     setEnviando(true);
     setError(null);
-    const res = await login(values);
-    if (res && !res.ok) setError(res.error);
-    setEnviando(false);
+
+    try {
+      const res = await login(values);
+
+      if (res && !res.ok) {
+        setError(res.error ?? "No se ha podido iniciar sesión.");
+      }
+    } catch (actionError) {
+      console.error("[LoginForm] Error iniciando sesión:", actionError);
+
+      setError("Ha ocurrido un error inesperado al iniciar sesión.");
+    } finally {
+      setEnviando(false);
+    }
   }
 
   return (
@@ -32,14 +50,21 @@ export default function LoginForm() {
         <label className="block font-semibold mb-1" htmlFor="email">
           Email
         </label>
+
         <input
           id="email"
           type="email"
+          autoComplete="email"
           {...register("email")}
-          className="w-full rounded-card border border-navy/20 px-4 py-3"
+          disabled={enviando}
+          aria-invalid={errors.email ? true : undefined}
+          className="w-full rounded-card border border-navy/20 px-4 py-3 disabled:opacity-50"
         />
+
         {errors.email && (
-          <p className="text-coral text-sm mt-1">{errors.email.message}</p>
+          <p role="alert" className="text-coral text-sm mt-1">
+            {errors.email.message}
+          </p>
         )}
       </div>
 
@@ -47,18 +72,29 @@ export default function LoginForm() {
         <label className="block font-semibold mb-1" htmlFor="password">
           Contraseña
         </label>
+
         <input
           id="password"
           type="password"
+          autoComplete="current-password"
           {...register("password")}
-          className="w-full rounded-card border border-navy/20 px-4 py-3"
+          disabled={enviando}
+          aria-invalid={errors.password ? true : undefined}
+          className="w-full rounded-card border border-navy/20 px-4 py-3 disabled:opacity-50"
         />
+
         {errors.password && (
-          <p className="text-coral text-sm mt-1">{errors.password.message}</p>
+          <p role="alert" className="text-coral text-sm mt-1">
+            {errors.password.message}
+          </p>
         )}
       </div>
 
-      {error && <p className="text-coral font-semibold">{error}</p>}
+      {error && (
+        <p role="alert" aria-live="polite" className="text-coral font-semibold">
+          {error}
+        </p>
+      )}
 
       <button
         type="submit"

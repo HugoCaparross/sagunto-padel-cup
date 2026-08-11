@@ -1,4 +1,5 @@
 // Ruta: src/components/SignupForm.tsx
+
 "use client";
 
 import { useState } from "react";
@@ -10,32 +11,91 @@ import { signup } from "@/app/(public)/registro/actions";
 
 export default function SignupForm() {
   const [error, setError] = useState<string | null>(null);
+
   const [enviando, setEnviando] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SignupFormValues>({ resolver: zodResolver(signupSchema) });
+  } = useForm<SignupFormValues>({
+    resolver: zodResolver(signupSchema),
+  });
 
   async function onSubmit(values: SignupFormValues) {
+    if (enviando) {
+      return;
+    }
+
     setEnviando(true);
     setError(null);
-    const res = await signup(values);
-    if (res && !res.ok) setError(res.error);
-    setEnviando(false);
+
+    try {
+      const res = await signup(values);
+
+      if (res && !res.ok) {
+        setError(res.error ?? "No se ha podido crear la cuenta.");
+      }
+    } catch (actionError) {
+      /*
+       * signup() puede ejecutar redirect() cuando el registro
+       * termina correctamente. Ese flujo no debe convertirse
+       * en un mensaje de error de usuario.
+       */
+      if (
+        actionError &&
+        typeof actionError === "object" &&
+        "digest" in actionError &&
+        typeof actionError.digest === "string" &&
+        actionError.digest.startsWith("NEXT_REDIRECT")
+      ) {
+        throw actionError;
+      }
+
+      console.error("[SignupForm] Error creando cuenta:", actionError);
+
+      setError("Ha ocurrido un error inesperado al crear la cuenta.");
+    } finally {
+      setEnviando(false);
+    }
   }
 
   const campos: {
     id: keyof SignupFormValues;
     label: string;
     type: string;
+    autoComplete?: string;
   }[] = [
-    { id: "nombre", label: "Nombre", type: "text" },
-    { id: "apellidos", label: "Apellidos", type: "text" },
-    { id: "email", label: "Email", type: "email" },
-    { id: "telefono", label: "Teléfono", type: "tel" },
-    { id: "password", label: "Contraseña", type: "password" },
+    {
+      id: "nombre",
+      label: "Nombre",
+      type: "text",
+      autoComplete: "given-name",
+    },
+    {
+      id: "apellidos",
+      label: "Apellidos",
+      type: "text",
+      autoComplete: "family-name",
+    },
+    {
+      id: "email",
+      label: "Email",
+      type: "email",
+      autoComplete: "email",
+    },
+    {
+      id: "telefono",
+      label: "Teléfono",
+      type: "tel",
+      autoComplete: "tel",
+    },
+    {
+      id: "password",
+      label: "Contraseña",
+      type: "password",
+      autoComplete: "new-password",
+    },
   ];
 
   return (
@@ -45,21 +105,30 @@ export default function SignupForm() {
           <label className="block font-semibold mb-1" htmlFor={campo.id}>
             {campo.label}
           </label>
+
           <input
             id={campo.id}
             type={campo.type}
+            autoComplete={campo.autoComplete}
             {...register(campo.id)}
-            className="w-full rounded-card border border-navy/20 px-4 py-3"
+            disabled={enviando}
+            aria-invalid={errors[campo.id] ? true : undefined}
+            className="w-full rounded-card border border-navy/20 px-4 py-3 disabled:opacity-50"
           />
+
           {errors[campo.id] && (
-            <p className="text-coral text-sm mt-1">
+            <p role="alert" className="text-coral text-sm mt-1">
               {errors[campo.id]?.message}
             </p>
           )}
         </div>
       ))}
 
-      {error && <p className="text-coral font-semibold">{error}</p>}
+      {error ? (
+        <p role="alert" aria-live="polite" className="text-coral font-semibold">
+          {error}
+        </p>
+      ) : null}
 
       <button
         type="submit"

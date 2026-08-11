@@ -1,4 +1,5 @@
 // Ruta: src/components/StatusBadge.tsx
+
 const ESTILOS = {
   open: "badge-open",
   live: "badge-live",
@@ -6,12 +7,21 @@ const ESTILOS = {
   pending: "badge-pending",
 } as const;
 
-export default function StatusBadge({
-  texto,
-  tipo,
-}: {
+type StatusBadgeTipo = keyof typeof ESTILOS;
+
+interface StatusBadgeProps {
   texto: string;
-  tipo: "open" | "live" | "closed" | "pending";
-}) {
-  return <span className={ESTILOS[tipo]}>{texto}</span>;
+  tipo: StatusBadgeTipo;
+}
+
+export default function StatusBadge({ texto, tipo }: StatusBadgeProps) {
+  return (
+    <span
+      className={ESTILOS[tipo]}
+      role="status"
+      aria-label={`Estado: ${texto}`}
+    >
+      {texto}
+    </span>
+  );
 }

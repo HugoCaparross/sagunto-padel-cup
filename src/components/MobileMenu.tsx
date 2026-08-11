@@ -15,39 +15,88 @@ export default function MobileMenu({
   cerrarSesion: () => void;
 }) {
   const [abierto, setAbierto] = useState(false);
+
   const primerEnlaceRef = useRef<HTMLAnchorElement>(null);
+
+  const botonAbrirRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") setAbierto(false);
+      if (e.key === "Escape") {
+        setAbierto(false);
+      }
     }
+
     if (abierto) {
       document.addEventListener("keydown", onKeyDown);
-      primerEnlaceRef.current?.focus();
+
       document.body.style.overflow = "hidden";
+
+      requestAnimationFrame(() => {
+        primerEnlaceRef.current?.focus();
+      });
     }
+
     return () => {
       document.removeEventListener("keydown", onKeyDown);
+
       document.body.style.overflow = "";
     };
   }, [abierto]);
 
+  function cerrarMenu() {
+    setAbierto(false);
+
+    requestAnimationFrame(() => {
+      botonAbrirRef.current?.focus();
+    });
+  }
+
+  function salir() {
+    setAbierto(false);
+    cerrarSesion();
+  }
+
   const enlaces = [
-    { href: "/calendario", label: "Calendario" },
-    { href: "/ranking", label: "Ranking" },
-    { href: "/master-final", label: "Master Final" },
-    { href: "/circuito", label: "El Circuito" },
-    { href: "/circuito/faq", label: "FAQ" },
-    { href: "/contacto", label: "Contacto" },
-    { href: "/noticias", label: "Noticias" },
+    {
+      href: "/calendario",
+      label: "Calendario",
+    },
+    {
+      href: "/ranking",
+      label: "Ranking",
+    },
+    {
+      href: "/master-final",
+      label: "Master Final",
+    },
+    {
+      href: "/circuito",
+      label: "El Circuito",
+    },
+    {
+      href: "/circuito/faq",
+      label: "FAQ",
+    },
+    {
+      href: "/contacto",
+      label: "Contacto",
+    },
+    {
+      href: "/noticias",
+      label: "Noticias",
+    },
   ];
 
   return (
     <div className="sm:hidden">
       <button
+        ref={botonAbrirRef}
+        type="button"
         onClick={() => setAbierto(true)}
         aria-label="Abrir menú"
         aria-expanded={abierto}
+        aria-controls="mobile-navigation"
         className="p-2"
       >
         <Menu size={26} aria-hidden="true" />
@@ -55,6 +104,7 @@ export default function MobileMenu({
 
       {abierto && (
         <div
+          id="mobile-navigation"
           role="dialog"
           aria-modal="true"
           aria-label="Menú de navegación"
@@ -62,12 +112,18 @@ export default function MobileMenu({
         >
           <div className="flex justify-between items-center mb-8">
             <span className="font-display text-lg">Menú</span>
-            <button onClick={() => setAbierto(false)} aria-label="Cerrar menú" className="p-2">
+
+            <button
+              type="button"
+              onClick={cerrarMenu}
+              aria-label="Cerrar menú"
+              className="p-2"
+            >
               <X size={26} aria-hidden="true" />
             </button>
           </div>
 
-          <nav className="flex flex-col gap-1">
+          <nav aria-label="Navegación móvil" className="flex flex-col gap-1">
             {enlaces.map((e, i) => (
               <Link
                 key={e.href}
@@ -91,6 +147,7 @@ export default function MobileMenu({
                 >
                   Mi cuenta
                 </Link>
+
                 {esAdmin && (
                   <Link
                     href="/admin"
@@ -100,11 +157,10 @@ export default function MobileMenu({
                     Panel de administración
                   </Link>
                 )}
+
                 <button
-                  onClick={() => {
-                    setAbierto(false);
-                    cerrarSesion();
-                  }}
+                  type="button"
+                  onClick={salir}
                   className="text-sm underline text-offwhite/60 w-full text-center py-2"
                 >
                   Salir
@@ -119,6 +175,7 @@ export default function MobileMenu({
                 >
                   Entrar
                 </Link>
+
                 <Link
                   href="/registro"
                   onClick={() => setAbierto(false)}
