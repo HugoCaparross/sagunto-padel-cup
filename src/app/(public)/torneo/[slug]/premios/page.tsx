@@ -1,4 +1,5 @@
 // Ruta: src/app/(public)/torneo/[slug]/premios/page.tsx
+
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 
@@ -7,29 +8,40 @@ type PremioRow = {
   tramo: string | null;
   posicion: string | null;
   descripcion: string;
-  categorias: { nombre: string } | null;
-  sponsors: { nombre: string } | null;
+  categorias: {
+    nombre: string;
+  } | null;
+  sponsors: {
+    nombre: string;
+  } | null;
 };
 
 export default async function PremiosPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{
+    slug: string;
+  }>;
 }) {
   const { slug } = await params;
+
   const supabase = await createClient();
 
   const { data: torneo } = await supabase
     .from("tournaments")
     .select("id, nombre")
     .eq("slug", slug)
-    .single();
+    .maybeSingle();
 
-  if (!torneo) notFound();
+  if (!torneo) {
+    notFound();
+  }
 
   const { data: premios } = await supabase
     .from("premios")
-    .select("id, tramo, posicion, descripcion, categorias:categories(nombre), sponsors(nombre)")
+    .select(
+      "id, tramo, posicion, descripcion, categorias:categories(nombre), sponsors(nombre)",
+    )
     .eq("tournament_id", torneo.id)
     .eq("visible", true)
     .returns<PremioRow[]>();
@@ -37,20 +49,25 @@ export default async function PremiosPage({
   return (
     <main className="max-w-2xl mx-auto px-5 py-12">
       <h1 className="font-display text-3xl mb-2">Premios</h1>
+
       <p className="text-navy/70 mb-8">{torneo.nombre}</p>
 
       <ul className="space-y-3">
-        {premios?.map((p) => (
-          <li key={p.id} className="rounded-card bg-navy/5 px-5 py-4">
+        {premios?.map((premio) => (
+          <li key={premio.id} className="rounded-card bg-navy/5 px-5 py-4">
             <p className="text-xs text-sage uppercase mb-1">
-              {p.categorias?.nombre}
-              {p.tramo && ` · ${p.tramo}`}
-              {p.posicion && ` · ${p.posicion.replace(/_/g, " ")}`}
+              {premio.categorias?.nombre}
+
+              {premio.tramo && ` · ${premio.tramo}`}
+
+              {premio.posicion && ` · ${premio.posicion.replace(/_/g, " ")}`}
             </p>
-            <p>{p.descripcion}</p>
-            {p.sponsors?.nombre && (
+
+            <p>{premio.descripcion}</p>
+
+            {premio.sponsors?.nombre && (
               <p className="text-sm text-navy/60 mt-1">
-                Cortesía de {p.sponsors.nombre}
+                Cortesía de {premio.sponsors.nombre}
               </p>
             )}
           </li>
@@ -59,7 +76,8 @@ export default async function PremiosPage({
 
       {!premios?.length && (
         <p className="text-navy/70">
-          Los premios se irán desvelando a medida que se acerque el torneo. ¡Sorpresa!
+          Los premios se irán desvelando a medida que se acerque el torneo.
+          ¡Sorpresa!
         </p>
       )}
     </main>
