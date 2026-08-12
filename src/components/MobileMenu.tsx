@@ -1,56 +1,116 @@
-// Ruta: src/components/MobileMenu.tsx
-
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
+
+type MobileMenuProps = {
+  esAdmin: boolean;
+  autenticado: boolean;
+  cerrarSesion: () => void;
+};
+
+const enlaces = [
+  {
+    href: "/circuito",
+    label: "Circuito",
+    description: "Descubre cómo funciona el circuito.",
+  },
+  {
+    href: "/calendario",
+    label: "Calendario",
+    description: "Consulta las próximas pruebas.",
+  },
+  {
+    href: "/ranking",
+    label: "Ranking",
+    description: "Comprueba tu posición.",
+  },
+  {
+    href: "/master-final",
+    label: "Máster Final",
+    description: "La gran cita de la temporada.",
+  },
+  {
+    href: "/jugadores",
+    label: "Jugadores",
+    description: "Conoce a los jugadores del circuito.",
+  },
+  {
+    href: "/noticias",
+    label: "Noticias",
+    description: "Toda la actualidad del circuito.",
+  },
+  {
+    href: "/contacto",
+    label: "Contacto",
+    description: "Ponte en contacto con la organización.",
+  },
+] as const;
 
 export default function MobileMenu({
   esAdmin,
   autenticado,
   cerrarSesion,
-}: {
-  esAdmin: boolean;
-  autenticado: boolean;
-  cerrarSesion: () => void;
-}) {
+}: MobileMenuProps) {
   const [abierto, setAbierto] = useState(false);
 
   const primerEnlaceRef = useRef<HTMLAnchorElement>(null);
 
   const botonAbrirRef = useRef<HTMLButtonElement>(null);
 
+  /* ==========================================================
+     KEYBOARD / BODY SCROLL
+     ========================================================== */
+
   useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") {
+    if (!abierto) {
+      return;
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
         setAbierto(false);
       }
     }
 
-    if (abierto) {
-      document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("keydown", onKeyDown);
 
-      document.body.style.overflow = "hidden";
+    const previousOverflow = document.body.style.overflow;
 
-      requestAnimationFrame(() => {
-        primerEnlaceRef.current?.focus();
-      });
-    }
+    document.body.style.overflow = "hidden";
+
+    const timeoutId = window.setTimeout(() => {
+      primerEnlaceRef.current?.focus();
+    }, 50);
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
 
-      document.body.style.overflow = "";
+      window.clearTimeout(timeoutId);
+
+      document.body.style.overflow = previousOverflow;
     };
   }, [abierto]);
+
+  /* ==========================================================
+     OPEN / CLOSE
+     ========================================================== */
+
+  function abrirMenu() {
+    setAbierto(true);
+  }
 
   function cerrarMenu() {
     setAbierto(false);
 
-    requestAnimationFrame(() => {
+    window.setTimeout(() => {
       botonAbrirRef.current?.focus();
-    });
+    }, 0);
+  }
+
+  function navegar() {
+    setAbierto(false);
   }
 
   function salir() {
@@ -58,137 +118,156 @@ export default function MobileMenu({
     cerrarSesion();
   }
 
-  const enlaces = [
-    {
-      href: "/calendario",
-      label: "Calendario",
-    },
-    {
-      href: "/ranking",
-      label: "Ranking",
-    },
-    {
-      href: "/master-final",
-      label: "Master Final",
-    },
-    {
-      href: "/circuito",
-      label: "El Circuito",
-    },
-    {
-      href: "/circuito/faq",
-      label: "FAQ",
-    },
-    {
-      href: "/contacto",
-      label: "Contacto",
-    },
-    {
-      href: "/noticias",
-      label: "Noticias",
-    },
-  ];
-
   return (
-    <div className="sm:hidden">
+    <div className="mobile-menu">
+      {/* ======================================================
+          OPEN BUTTON
+          ====================================================== */}
+
       <button
         ref={botonAbrirRef}
         type="button"
-        onClick={() => setAbierto(true)}
-        aria-label="Abrir menú"
+        onClick={abrirMenu}
+        aria-label="Abrir menú de navegación"
         aria-expanded={abierto}
         aria-controls="mobile-navigation"
-        className="p-2"
+        className="mobile-menu__button"
       >
-        <Menu size={26} aria-hidden="true" />
+        <Menu size={24} strokeWidth={2} aria-hidden="true" />
       </button>
 
-      {abierto && (
+      {/* ======================================================
+          MOBILE NAVIGATION
+          ====================================================== */}
+
+      {abierto ? (
         <div
           id="mobile-navigation"
           role="dialog"
           aria-modal="true"
           aria-label="Menú de navegación"
-          className="fixed inset-0 z-50 bg-navy text-offwhite flex flex-col p-6"
+          className="mobile-menu__panel"
         >
-          <div className="flex justify-between items-center mb-8">
-            <span className="font-display text-lg">Menú</span>
+          {/* TOP */}
+
+          <div className="mobile-menu__top">
+            <Link
+              href="/"
+              className="site-brand"
+              aria-label="Sagunto Padel Cup — Inicio"
+              onClick={navegar}
+            >
+              <span className="site-brand__mark" aria-hidden="true">
+                <span />
+              </span>
+
+              <span className="site-brand__text">
+                <strong>SAGUNTO</strong>
+
+                <span>PADEL CUP</span>
+              </span>
+            </Link>
 
             <button
               type="button"
               onClick={cerrarMenu}
-              aria-label="Cerrar menú"
-              className="p-2"
+              aria-label="Cerrar menú de navegación"
+              className="mobile-menu__button"
             >
-              <X size={26} aria-hidden="true" />
+              <X size={24} strokeWidth={2} aria-hidden="true" />
             </button>
           </div>
 
-          <nav aria-label="Navegación móvil" className="flex flex-col gap-1">
-            {enlaces.map((e, i) => (
+          {/* NAVIGATION */}
+
+          <nav aria-label="Navegación móvil" className="mobile-menu__nav">
+            {enlaces.map((enlace, index) => (
               <Link
-                key={e.href}
-                href={e.href}
-                ref={i === 0 ? primerEnlaceRef : undefined}
-                onClick={() => setAbierto(false)}
-                className="py-3 text-lg border-b border-offwhite/10"
+                key={enlace.href}
+                href={enlace.href}
+                ref={index === 0 ? primerEnlaceRef : undefined}
+                onClick={navegar}
               >
-                {e.label}
+                <span className="mobile-menu__link-content">
+                  <strong>{enlace.label}</strong>
+
+                  <small>{enlace.description}</small>
+                </span>
+
+                <ArrowRight size={19} strokeWidth={2} aria-hidden="true" />
               </Link>
             ))}
           </nav>
 
-          <div className="mt-auto space-y-3 pt-6">
+          {/* ACCOUNT */}
+
+          <div className="mobile-menu__account">
             {autenticado ? (
               <>
                 <Link
                   href="/app"
-                  onClick={() => setAbierto(false)}
-                  className="btn-secondary w-full border-offwhite/30 text-offwhite justify-center"
+                  onClick={navegar}
+                  className="mobile-menu__account-button mobile-menu__account-button--primary"
                 >
-                  Mi cuenta
+                  <span>Mi cuenta</span>
+
+                  <ArrowRight size={17} aria-hidden="true" />
                 </Link>
 
-                {esAdmin && (
+                {esAdmin ? (
                   <Link
                     href="/admin"
-                    onClick={() => setAbierto(false)}
-                    className="btn-primary w-full justify-center"
+                    onClick={navegar}
+                    className="mobile-menu__account-button mobile-menu__account-button--secondary"
                   >
-                    Panel de administración
+                    <span>Administración</span>
+
+                    <ArrowRight size={17} aria-hidden="true" />
                   </Link>
-                )}
+                ) : null}
 
                 <button
                   type="button"
                   onClick={salir}
-                  className="text-sm underline text-offwhite/60 w-full text-center py-2"
+                  className="mobile-menu__logout"
                 >
-                  Salir
+                  Cerrar sesión
                 </button>
               </>
             ) : (
               <>
                 <Link
                   href="/login"
-                  onClick={() => setAbierto(false)}
-                  className="btn-secondary w-full border-offwhite/30 text-offwhite justify-center"
+                  onClick={navegar}
+                  className="mobile-menu__account-button mobile-menu__account-button--secondary"
                 >
-                  Entrar
+                  <span>Iniciar sesión</span>
+
+                  <ArrowRight size={17} aria-hidden="true" />
                 </Link>
 
                 <Link
                   href="/registro"
-                  onClick={() => setAbierto(false)}
-                  className="btn-primary w-full justify-center"
+                  onClick={navegar}
+                  className="mobile-menu__account-button mobile-menu__account-button--primary"
                 >
-                  Inscríbete
+                  <span>Inscribirse</span>
+
+                  <ArrowRight size={17} aria-hidden="true" />
                 </Link>
               </>
             )}
           </div>
+
+          {/* FOOTER */}
+
+          <div className="mobile-menu__footer">
+            <span>SAGUNTO PADEL CUP</span>
+
+            <span>Circuito amateur de pádel</span>
+          </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

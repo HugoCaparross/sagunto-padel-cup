@@ -230,11 +230,11 @@ export default async function TorneoPage({ params }: TournamentPageProps) {
         }}
       />
 
-      <div className="hero-gradient px-5 py-12 text-offwhite">
-        <div className="mx-auto max-w-3xl">
+      <div className="hero-surface px-5 py-12 text-offwhite sm:py-14">
+        <div className="mx-auto max-w-7xl">
           <StatusBadge texto={estadoTexto} tipo={estadoBadge} />
 
-          <h1 className="mt-3 mb-2 font-display text-3xl sm:text-4xl">
+          <h1 className="mt-3 mb-2 max-w-4xl font-display text-4xl font-semibold tracking-tight sm:text-5xl">
             {torneo.nombre}
           </h1>
 
@@ -295,9 +295,9 @@ export default async function TorneoPage({ params }: TournamentPageProps) {
 
       <nav
         aria-label="Navegación del torneo"
-        className="sticky top-[64px] z-30 overflow-x-auto border-b border-navy/10 bg-white"
+        className="sticky top-16 z-30 overflow-x-auto border-b border-navy/10 bg-offwhite"
       >
-        <div className="mx-auto flex min-w-max max-w-3xl gap-1 px-5">
+        <div className="mx-auto flex min-w-max max-w-7xl gap-1 px-5">
           {tabs.map((tab) => {
             const Icon = tab.icon;
 
@@ -305,7 +305,7 @@ export default async function TorneoPage({ params }: TournamentPageProps) {
               <Link
                 key={tab.label}
                 href={`/torneo/${slug}${tab.href}`}
-                className="flex items-center gap-1.5 whitespace-nowrap border-b-2 border-transparent px-3 py-3 text-sm text-navy/70 transition-colors hover:border-coral hover:text-coral"
+                className="flex items-center gap-1.5 whitespace-nowrap border-b-2 border-transparent px-3 py-3 text-sm font-medium text-navy/70 transition-colors hover:border-coral hover:text-coral"
               >
                 <Icon size={15} aria-hidden="true" />
                 {tab.label}
@@ -315,11 +315,11 @@ export default async function TorneoPage({ params }: TournamentPageProps) {
         </div>
       </nav>
 
-      <div className="mx-auto max-w-3xl space-y-6 px-5 py-10">
+      <div className="mx-auto max-w-7xl space-y-6 px-5 py-10">
         {cancelado ? (
           <section
             role="status"
-            className="rounded-card border border-coral/20 bg-coral/5 p-5"
+            className="border-l-2 border-coral bg-coral/5 p-5"
           >
             <h2 className="font-semibold">Torneo cancelado</h2>
             <p className="mt-1 text-sm text-navy/70">
@@ -368,7 +368,7 @@ export default async function TorneoPage({ params }: TournamentPageProps) {
         {!categorias?.length ? (
           <section
             role="status"
-            className="rounded-card bg-navy/5 p-5 text-sm text-navy/70"
+            className="border border-navy/10 bg-white p-5 text-sm text-navy/70"
           >
             Las categorías del torneo todavía están pendientes de configuración.
           </section>

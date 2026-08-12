@@ -106,16 +106,21 @@ export default async function ParticipantesPage({
   const limpiarHref = `/torneo/${slug}/participantes`;
 
   return (
-    <main className="mx-auto max-w-4xl px-5 py-12">
-      <header className="mb-8">
-        <h1 className="font-display text-3xl">Participantes</h1>
+    <main className="mx-auto max-w-7xl px-5 py-12 sm:py-14">
+      <header className="mb-8 border-b border-navy/10 pb-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-navy/45">
+          Torneo
+        </p>
+        <h1 className="mt-1 font-display text-4xl font-semibold">
+          Participantes
+        </h1>
 
         <p className="mt-2 text-navy/70">{torneo.nombre}</p>
       </header>
 
       <form
         method="get"
-        className="mb-8 grid gap-4 rounded-card bg-navy/5 p-4 sm:grid-cols-[1fr_auto]"
+        className="mb-8 grid gap-4 border-y border-navy/10 py-5 sm:grid-cols-[1fr_auto]"
       >
         <div>
           <label
@@ -131,7 +136,7 @@ export default async function ParticipantesPage({
             type="search"
             defaultValue={filters.q ?? ""}
             placeholder="Nombre o apellidos"
-            className="w-full rounded-card border border-navy/15 bg-white px-3 py-2 text-sm outline-none focus:border-coral"
+            className="input"
           />
         </div>
 
@@ -221,7 +226,7 @@ export default async function ParticipantesPage({
                       return (
                         <li
                           key={pareja.id}
-                          className="rounded-card bg-navy/5 px-4 py-3"
+                          className="border-b border-navy/10 px-1 py-4"
                         >
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <div className="min-w-0">
@@ -286,7 +291,7 @@ export default async function ParticipantesPage({
       ) : (
         <section
           role="status"
-          className="rounded-card bg-navy/5 p-6 text-sm text-navy/70"
+          className="border border-dashed border-navy/15 p-6 text-sm text-navy/70"
         >
           {parejas?.length
             ? "No hay participantes que coincidan con los filtros seleccionados."

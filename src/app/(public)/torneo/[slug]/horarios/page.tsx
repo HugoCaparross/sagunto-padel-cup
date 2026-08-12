@@ -191,15 +191,18 @@ export default async function HorariosPage({
   });
 
   return (
-    <main className="mx-auto max-w-4xl px-5 py-12">
-      <header className="mb-8">
-        <h1 className="font-display text-3xl">Horarios</h1>
+    <main className="mx-auto max-w-7xl px-5 py-12 sm:py-14">
+      <header className="mb-8 border-b border-navy/10 pb-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-navy/45">
+          Competición
+        </p>
+        <h1 className="mt-1 font-display text-4xl font-semibold">Horarios</h1>
         <p className="mt-2 text-navy/70">{torneo.nombre}</p>
       </header>
 
       <form
         method="get"
-        className="mb-8 grid gap-4 rounded-card bg-navy/5 p-4 md:grid-cols-3"
+        className="mb-8 grid gap-4 border-y border-navy/10 py-5 md:grid-cols-3"
       >
         <div>
           <label
@@ -212,7 +215,7 @@ export default async function HorariosPage({
             id="horarios-categoria"
             name="categoria"
             defaultValue={filters.categoria ?? ""}
-            className="w-full rounded-card border border-navy/15 bg-white px-3 py-2 text-sm"
+            className="input"
           >
             <option value="">Todas</option>
             {categorias?.map((categoria) => {
@@ -241,7 +244,7 @@ export default async function HorariosPage({
             id="horarios-dia"
             name="dia"
             defaultValue={filters.dia ?? ""}
-            className="w-full rounded-card border border-navy/15 bg-white px-3 py-2 text-sm"
+            className="input"
           >
             <option value="">Todos</option>
             {dias.map((dia) => (
@@ -263,7 +266,7 @@ export default async function HorariosPage({
             id="horarios-pista"
             name="pista"
             defaultValue={filters.pista ?? ""}
-            className="w-full rounded-card border border-navy/15 bg-white px-3 py-2 text-sm"
+            className="input"
           >
             <option value="">Todas</option>
             {pistas.map((pista) => (
@@ -288,14 +291,14 @@ export default async function HorariosPage({
       {!partidos?.length ? (
         <section
           role="status"
-          className="rounded-card bg-navy/5 p-6 text-sm text-navy/70"
+          className="border border-dashed border-navy/15 p-6 text-sm text-navy/70"
         >
           Los horarios aún no están publicados.
         </section>
       ) : !partidosFiltrados.length ? (
         <section
           role="status"
-          className="rounded-card bg-navy/5 p-6 text-sm text-navy/70"
+          className="border border-dashed border-navy/15 p-6 text-sm text-navy/70"
         >
           No hay partidos que coincidan con los filtros seleccionados.
         </section>
@@ -304,7 +307,7 @@ export default async function HorariosPage({
           <section key={dia} className="mb-8" aria-labelledby={`dia-${dia}`}>
             <h2
               id={`dia-${dia}`}
-              className="mb-3 font-display text-xl capitalize"
+              className="mb-3 border-b border-navy/10 pb-3 font-display text-xl font-semibold capitalize"
             >
               {dia === "sin-fecha"
                 ? "Fecha por confirmar"

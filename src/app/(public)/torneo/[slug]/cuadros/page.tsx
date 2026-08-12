@@ -123,9 +123,12 @@ export default async function CuadrosPublicosPage({
   );
 
   return (
-    <main className="mx-auto max-w-6xl px-5 py-12">
-      <header className="mb-8">
-        <h1 className="font-display text-3xl">Cuadros</h1>
+    <main className="mx-auto max-w-7xl px-5 py-12 sm:py-14">
+      <header className="mb-8 border-b border-navy/10 pb-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-navy/45">
+          Competición
+        </p>
+        <h1 className="mt-1 font-display text-4xl font-semibold">Cuadros</h1>
         <p className="mt-2 text-navy/70">{torneo.nombre}</p>
       </header>
 
@@ -224,7 +227,7 @@ export default async function CuadrosPublicosPage({
       {!partidosFiltrados.length ? (
         <section
           role="status"
-          className="rounded-card bg-navy/5 p-6 text-sm text-navy/70"
+          className="border border-dashed border-navy/15 p-6 text-sm text-navy/70"
         >
           El cuadro todavía no se ha generado o no hay partidos que coincidan
           con el filtro.
@@ -318,7 +321,7 @@ export default async function CuadrosPublicosPage({
                                           <article
                                             key={partido.id}
                                             id={`partido-${partido.id}`}
-                                            className="rounded-card border border-navy/10 bg-white p-3 shadow-sm"
+                                            className="rounded-card border border-navy/10 bg-white p-3"
                                           >
                                             <div className="space-y-2 text-sm">
                                               <Link
@@ -365,7 +368,7 @@ export default async function CuadrosPublicosPage({
                                         );
                                       })
                                     ) : (
-                                      <div className="rounded-card border border-dashed border-navy/10 p-3 text-xs text-navy/40">
+                                      <div className="rounded-card border border-dashed border-navy/15 p-3 text-xs text-navy/45">
                                         Sin partidos publicados.
                                       </div>
                                     )}

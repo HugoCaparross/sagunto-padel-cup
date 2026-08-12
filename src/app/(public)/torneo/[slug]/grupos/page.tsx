@@ -79,9 +79,14 @@ export default async function GruposPage({
   );
 
   return (
-    <main className="mx-auto max-w-3xl px-5 py-12">
-      <header className="mb-8">
-        <h1 className="font-display mb-2 text-3xl">Clasificación de grupos</h1>
+    <main className="mx-auto max-w-7xl px-5 py-12 sm:py-14">
+      <header className="mb-8 border-b border-navy/10 pb-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-navy/45">
+          Competición
+        </p>
+        <h1 className="mt-1 font-display text-4xl font-semibold">
+          Clasificación de grupos
+        </h1>
 
         <p className="text-navy/70">{torneo.nombre}</p>
       </header>
@@ -123,29 +128,49 @@ export default async function GruposPage({
               );
 
               return (
-                <div key={grupo.id} className="mb-4 overflow-x-auto">
-                  <p className="mb-2 font-semibold">{grupo.nombre}</p>
+                <div
+                  key={grupo.id}
+                  className="mb-6 overflow-x-auto border-t border-navy/10 pt-4"
+                >
+                  <p className="mb-3 font-display text-lg font-semibold">
+                    {grupo.nombre}
+                  </p>
 
                   <table className="w-full border-collapse text-sm">
                     <thead>
                       <tr className="border-b border-navy/10 text-left text-navy/60">
-                        <th scope="col" className="py-2 pr-4">
+                        <th
+                          scope="col"
+                          className="py-3 pr-4 text-xs uppercase tracking-[0.08em] text-navy/50"
+                        >
                           Pareja
                         </th>
 
-                        <th scope="col" className="py-2 text-center">
+                        <th
+                          scope="col"
+                          className="py-3 text-center text-xs uppercase tracking-[0.08em] text-navy/50"
+                        >
                           Pts
                         </th>
 
-                        <th scope="col" className="py-2 text-center">
+                        <th
+                          scope="col"
+                          className="py-3 text-center text-xs uppercase tracking-[0.08em] text-navy/50"
+                        >
                           V-D
                         </th>
 
-                        <th scope="col" className="py-2 text-center">
+                        <th
+                          scope="col"
+                          className="py-3 text-center text-xs uppercase tracking-[0.08em] text-navy/50"
+                        >
                           Sets
                         </th>
 
-                        <th scope="col" className="py-2 text-center">
+                        <th
+                          scope="col"
+                          className="py-3 text-center text-xs uppercase tracking-[0.08em] text-navy/50"
+                        >
                           Juegos
                         </th>
                       </tr>
@@ -166,23 +191,23 @@ export default async function GruposPage({
                             key={fila.pair_id}
                             className="border-b border-navy/5"
                           >
-                            <td className="py-2 pr-4">
+                            <td className="py-3 pr-4">
                               {nombrePareja(standing.pair)}
                             </td>
 
-                            <td className="py-2 text-center font-semibold">
+                            <td className="py-3 text-center font-semibold tabular-nums">
                               {fila.puntos}
                             </td>
 
-                            <td className="py-2 text-center">
+                            <td className="py-3 text-center tabular-nums">
                               {standing.victorias}-{standing.derrotas}
                             </td>
 
-                            <td className="py-2 text-center">
+                            <td className="py-3 text-center tabular-nums">
                               {fila.sets_favor}-{fila.sets_contra}
                             </td>
 
-                            <td className="py-2 text-center">
+                            <td className="py-3 text-center tabular-nums">
                               {fila.juegos_favor}-{fila.juegos_contra}
                             </td>
                           </tr>
@@ -197,7 +222,9 @@ export default async function GruposPage({
       ))}
 
       {!grupos?.length ? (
-        <p className="text-navy/70">Aún no se ha generado el sorteo.</p>
+        <p className="border border-dashed border-navy/15 p-6 text-sm text-navy/70">
+          Aún no se ha generado el sorteo.
+        </p>
       ) : null}
     </main>
   );

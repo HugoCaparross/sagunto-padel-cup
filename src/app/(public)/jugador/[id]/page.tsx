@@ -85,10 +85,10 @@ export default async function JugadorPage({
   } | null;
 
   return (
-    <main className="mx-auto max-w-3xl px-5 py-12">
+    <main className="mx-auto max-w-5xl px-5 py-12 sm:py-14">
       <header className="border-b border-navy/10 pb-6">
         <p className="text-sm text-navy/55">Perfil público de jugador</p>
-        <h1 className="mt-1 font-display text-3xl">
+        <h1 className="mt-1 font-display text-4xl font-semibold">
           {jugador.nombre} {jugador.apellidos}
         </h1>
         <p className="mt-2 text-navy/70">
@@ -98,7 +98,7 @@ export default async function JugadorPage({
 
       <section
         aria-label="Resumen competitivo"
-        className="grid gap-px border border-navy/10 bg-navy/10 sm:grid-cols-3"
+        className="grid gap-px border-y border-navy/10 bg-navy/10 sm:grid-cols-3"
       >
         <div className="bg-offwhite p-5">
           <p className="text-xs uppercase tracking-[0.08em] text-navy/50">
@@ -180,7 +180,7 @@ export default async function JugadorPage({
             {badges.map((badge) => (
               <li
                 key={badge.tipo}
-                className="rounded-card border border-navy/10 px-3 py-2 text-sm"
+                className="rounded-full border border-navy/10 px-3 py-1.5 text-sm"
               >
                 {badge.tipo.replace(/_/g, " ")}
               </li>

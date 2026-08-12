@@ -34,7 +34,7 @@ export default async function InscripcionCompletadaPage({
   const { data: pareja } = await supabase
     .from("pairs")
     .select(
-      "estado, fecha_inscripcion, categories(nombre), player1:players!pairs_player_1_id_fkey(nombre), player2:players!pairs_player_2_id_fkey(nombre)"
+      "estado, fecha_inscripcion, categories(nombre), player1:players!pairs_player_1_id_fkey(nombre), player2:players!pairs_player_2_id_fkey(nombre)",
     )
     .eq("tournament_id", torneo.id)
     .or(`player_1_id.eq.${player?.id ?? ""},player_2_id.eq.${player?.id ?? ""}`)
@@ -48,9 +48,15 @@ export default async function InscripcionCompletadaPage({
   const p2 = (pareja.player2 as unknown as { nombre: string } | null)?.nombre;
 
   return (
-    <main className="max-w-md mx-auto px-5 py-16 text-center">
-      <CheckCircle2 size={56} className="text-sage mx-auto mb-4" aria-hidden="true" />
-      <h1 className="font-display text-2xl mb-8">Inscripción realizada correctamente</h1>
+    <main className="mx-auto max-w-xl px-5 py-16 text-center sm:py-20">
+      <CheckCircle2
+        size={56}
+        className="mx-auto mb-4 text-sage"
+        aria-hidden="true"
+      />
+      <h1 className="mb-8 font-display text-3xl font-semibold">
+        Inscripción realizada correctamente
+      </h1>
 
       <div className="card text-left space-y-3">
         <div>
@@ -65,7 +71,10 @@ export default async function InscripcionCompletadaPage({
         </div>
         <div>
           <p className="text-xs text-navy/50 uppercase">Pareja</p>
-          <p className="font-semibold">{p1}{p2 ? ` / ${p2}` : " / Pendiente de compañero"}</p>
+          <p className="font-semibold">
+            {p1}
+            {p2 ? ` / ${p2}` : " / Pendiente de compañero"}
+          </p>
         </div>
         <div>
           <p className="text-xs text-navy/50 uppercase">Estado</p>
@@ -75,13 +84,15 @@ export default async function InscripcionCompletadaPage({
         </div>
         <div>
           <p className="text-xs text-navy/50 uppercase">Fecha de inscripción</p>
-          <p className="font-semibold">{formatearFecha(pareja.fecha_inscripcion)}</p>
+          <p className="font-semibold">
+            {formatearFecha(pareja.fecha_inscripcion)}
+          </p>
         </div>
       </div>
 
       <p className="text-sm text-navy/60 mt-6 mb-6">
-        Te hemos enviado un email con los detalles. El pago de la inscripción
-        se realiza el día del torneo, en el propio club.
+        Te hemos enviado un email con los detalles. El pago de la inscripción se
+        realiza el día del torneo, en el propio club.
       </p>
 
       <Link href="/app/torneos" className="btn-primary w-full">

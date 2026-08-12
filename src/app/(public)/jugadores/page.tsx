@@ -37,16 +37,22 @@ export default async function JugadoresPage({ searchParams }: Props) {
   });
 
   return (
-    <main className="mx-auto max-w-4xl px-5 py-12">
-      <header className="mb-8">
-        <h1 className="font-display text-3xl">Jugadores</h1>
+    <main className="mx-auto max-w-7xl px-5 py-12 sm:py-14">
+      <header className="mb-8 border-b border-navy/10 pb-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-navy/45">
+          Directorio
+        </p>
+        <h1 className="mt-1 font-display text-4xl font-semibold">Jugadores</h1>
         <p className="mt-2 text-sm text-navy/65">
           Busca participantes y abre su perfil público para consultar su
           trayectoria competitiva.
         </p>
       </header>
 
-      <form method="get" className="mb-8 flex flex-col gap-3 sm:flex-row">
+      <form
+        method="get"
+        className="mb-8 flex flex-col gap-3 border-y border-navy/10 py-5 sm:flex-row"
+      >
         <div className="min-w-0 flex-1">
           <label
             htmlFor="jugadores-busqueda"
@@ -60,14 +66,11 @@ export default async function JugadoresPage({ searchParams }: Props) {
             type="search"
             defaultValue={query}
             placeholder="Nombre o apellidos"
-            className="w-full rounded-card border border-navy/20 bg-offwhite px-4 py-3 outline-none focus:border-coral"
+            className="input"
           />
         </div>
         <div className="flex items-end gap-3">
-          <button
-            type="submit"
-            className="rounded-card bg-coral px-5 py-3 font-semibold text-offwhite"
-          >
+          <button type="submit" className="btn-primary">
             Buscar
           </button>
           {query ? (

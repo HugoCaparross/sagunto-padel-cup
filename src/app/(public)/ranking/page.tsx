@@ -98,9 +98,12 @@ export default async function RankingPage({ searchParams }: Props) {
   );
 
   return (
-    <main className="mx-auto max-w-4xl px-5 py-12">
-      <header className="mb-8">
-        <h1 className="font-display text-3xl">Ranking</h1>
+    <main className="mx-auto max-w-7xl px-5 py-12 sm:py-14">
+      <header className="mb-8 border-b border-navy/10 pb-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-navy/45">
+          Clasificación individual
+        </p>
+        <h1 className="mt-1 font-display text-4xl font-semibold">Ranking</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-navy/65">
           Clasificación individual derivada de los resultados y puntos vigentes
           dentro de la ventana móvil de 365 días.
@@ -109,7 +112,7 @@ export default async function RankingPage({ searchParams }: Props) {
 
       <form
         method="get"
-        className="mb-8 grid gap-4 rounded-card border border-navy/10 p-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
+        className="mb-8 grid gap-4 border-y border-navy/10 py-5 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
       >
         <div>
           <label
@@ -122,7 +125,7 @@ export default async function RankingPage({ searchParams }: Props) {
             id="ranking-categoria"
             name="categoria"
             defaultValue={categoria}
-            className="w-full rounded-card border border-navy/20 bg-offwhite px-3 py-2.5"
+            className="input"
           >
             <option value="">Todas</option>
             {(categorias ?? []).map((item) => (
@@ -146,19 +149,16 @@ export default async function RankingPage({ searchParams }: Props) {
             type="search"
             defaultValue={params.q ?? ""}
             placeholder="Nombre o apellidos"
-            className="w-full rounded-card border border-navy/20 bg-offwhite px-3 py-2.5"
+            className="input"
           />
         </div>
 
-        <button
-          type="submit"
-          className="rounded-card bg-coral px-5 py-2.5 font-semibold text-offwhite"
-        >
+        <button type="submit" className="btn-primary">
           Filtrar
         </button>
       </form>
 
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-navy/10 pb-4">
         <p className="text-sm text-navy/60">
           {categoriaSeleccionada
             ? `Categoría: ${categoriaSeleccionada.nombre}`
@@ -213,7 +213,7 @@ export default async function RankingPage({ searchParams }: Props) {
                 >
                   <th
                     scope="row"
-                    className="px-3 py-4 text-left font-display tabular-nums"
+                    className="px-3 py-4 text-left font-display text-lg tabular-nums"
                   >
                     #{index + 1}
                   </th>

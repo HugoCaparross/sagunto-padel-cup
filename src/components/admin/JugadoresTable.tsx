@@ -182,7 +182,7 @@ export default function JugadoresTable({
               id="jugadores-busqueda"
               value={busqueda}
               onChange={(event) => setBusqueda(event.target.value)}
-              className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none focus:border-coral"
+              className="w-full rounded-card border border-offwhite/20 bg-transparent px-3 py-2 text-sm outline-none focus:border-coral"
             />
           </div>
           <div>
@@ -196,7 +196,7 @@ export default function JugadoresTable({
               id="jugadores-estado"
               value={estadoFiltro}
               onChange={(event) => setEstadoFiltro(event.target.value)}
-              className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none focus:border-coral"
+              className="w-full rounded-card border border-offwhite/20 bg-transparent px-3 py-2 text-sm outline-none focus:border-coral"
             >
               <option value="todos">Todos</option>
               <option value="activo">Activo</option>
@@ -241,7 +241,7 @@ export default function JugadoresTable({
                         seleccionarCategoria(jugador, event.target.value)
                       }
                       disabled={actualizando}
-                      className="rounded-card border border-offwhite/20 bg-navy px-3 py-2 outline-none focus:border-coral disabled:opacity-50"
+                      className="rounded-card border border-offwhite/20 bg-transparent px-3 py-2 outline-none focus:border-coral disabled:opacity-50"
                     >
                       <option value="">Sin categoría</option>
                       {categorias.map((categoria) => (
@@ -291,14 +291,14 @@ export default function JugadoresTable({
                           rows={3}
                           maxLength={500}
                           disabled={actualizando}
-                          className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none focus:border-coral disabled:opacity-50"
+                          className="w-full rounded-card border border-offwhite/20 bg-transparent px-3 py-2 text-sm outline-none focus:border-coral disabled:opacity-50"
                         />
                         <div className="mt-3 flex gap-2">
                           <button
                             type="button"
                             onClick={() => confirmarCambioCategoria(jugador.id)}
                             disabled={actualizando}
-                            className="rounded-card bg-coral px-4 py-2 text-xs font-semibold text-offwhite disabled:opacity-50"
+                            className="rounded-card bg-coral px-4 py-2 text-xs font-semibold text-offwhite transition-colors hover:bg-coral-dark disabled:opacity-50"
                           >
                             {actualizando ? "Guardando..." : "Confirmar cambio"}
                           </button>

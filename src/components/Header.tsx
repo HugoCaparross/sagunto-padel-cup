@@ -1,9 +1,10 @@
-// Ruta: src/components/Header.tsx — sustituye entero al archivo actual
-
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/(public)/login/actions";
 import { esAdmin } from "@/lib/admin";
+
 import MobileMenu from "@/components/MobileMenu";
 
 export default async function Header() {
@@ -15,11 +16,18 @@ export default async function Header() {
 
   const admin = await esAdmin(user?.id);
 
+  /*
+   * Buscamos únicamente la primera prueba con
+   * inscripciones abiertas para convertir el CTA
+   * principal del Header en una acción útil.
+   */
   const { data: torneoAbierto } = await supabase
     .from("tournaments")
-    .select("slug")
+    .select("slug, nombre, fecha_inicio")
     .eq("estado", "inscripciones_abiertas")
-    .order("fecha_inicio")
+    .order("fecha_inicio", {
+      ascending: true,
+    })
     .limit(1)
     .maybeSingle();
 
@@ -28,85 +36,95 @@ export default async function Header() {
     : "/calendario";
 
   return (
-    <header className="bg-navy text-offwhite px-5 py-4 flex items-center justify-between sticky top-0 z-40 shadow-md shadow-navy/20">
-      <Link
-        href="/"
-        className="font-display text-lg tracking-wide"
-        aria-label="Sagunto Padel Cup — Inicio"
-      >
-        Sagunto Padel Cup
-      </Link>
-
-      <nav
-        aria-label="Navegación principal"
-        className="hidden sm:flex items-center gap-6 text-sm"
-      >
-        <Link href="/calendario" className="hover:text-sage transition-colors">
-          Calendario
-        </Link>
-
-        <Link href="/ranking" className="hover:text-sage transition-colors">
-          Ranking
-        </Link>
+    <header className="site-header">
+      <div className="site-header__inner">
+        {/* ==================================================
+            LOGO / WORDMARK
+            ================================================== */}
 
         <Link
-          href="/master-final"
-          className="hover:text-sage transition-colors"
+          href="/"
+          className="site-brand"
+          aria-label="Sagunto Padel Cup — Inicio"
         >
-          Master Final
+          <span className="site-brand__mark" aria-hidden="true">
+            <span />
+          </span>
+
+          <span className="site-brand__text">
+            <strong>SAGUNTO</strong>
+            <span>PADEL CUP</span>
+          </span>
         </Link>
 
-        <Link href="/circuito" className="hover:text-sage transition-colors">
-          El Circuito
-        </Link>
+        {/* ==================================================
+            NAVEGACIÓN PRINCIPAL
+            ================================================== */}
 
-        <Link href="/noticias" className="hover:text-sage transition-colors">
-          Noticias
-        </Link>
+        <nav aria-label="Navegación principal" className="site-nav">
+          <Link href="/circuito">Circuito</Link>
 
-        <span aria-hidden="true" className="w-px h-5 bg-offwhite/20 mx-1" />
+          <Link href="/calendario">Calendario</Link>
 
-        {user ? (
-          <>
-            <Link href="/app" className="text-sage font-semibold">
-              Mi cuenta
-            </Link>
+          <Link href="/ranking">Ranking</Link>
 
-            {admin && (
-              <Link
-                href="/admin"
-                className="btn-secondary border-offwhite/30 text-offwhite !py-2 !px-4"
-              >
-                Panel admin
+          <Link href="/master-final">Máster</Link>
+
+          <Link href="/jugadores">Jugadores</Link>
+
+          <Link href="/noticias">Noticias</Link>
+
+          <Link href="/contacto">Contacto</Link>
+        </nav>
+
+        {/* ==================================================
+            ACCIONES
+            ================================================== */}
+
+        <div className="site-header__actions">
+          {user ? (
+            <>
+              <Link href="/app" className="site-account-link">
+                Mi cuenta
               </Link>
-            )}
 
-            <form action={logout}>
-              <button
-                type="submit"
-                className="underline text-offwhite/60 text-sm"
-              >
-                Salir
-              </button>
-            </form>
-          </>
-        ) : (
-          <>
-            <Link href="/login" className="hover:text-sage transition-colors">
-              Entrar
-            </Link>
+              {admin ? (
+                <Link href="/admin" className="site-account-link">
+                  Admin
+                </Link>
+              ) : null}
 
-            <Link
-              href={hrefInscribete}
-              className="btn-primary !py-2 !px-5 text-sm"
-            >
-              Inscríbete
-            </Link>
-          </>
-        )}
-      </nav>
+              <form action={logout}>
+                <button type="submit" className="site-account-link">
+                  Salir
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="site-login">
+                Iniciar sesión
+              </Link>
 
-      <MobileMenu esAdmin={admin} autenticado={!!user} cerrarSesion={logout} />
+              <Link href={hrefInscribete} className="site-register">
+                <span>Inscribirse</span>
+
+                <ArrowRight size={15} strokeWidth={2.2} aria-hidden="true" />
+              </Link>
+            </>
+          )}
+        </div>
+
+        {/* ==================================================
+            MOBILE MENU
+            ================================================== */}
+
+        <MobileMenu
+          esAdmin={admin}
+          autenticado={!!user}
+          cerrarSesion={logout}
+        />
+      </div>
     </header>
   );
 }

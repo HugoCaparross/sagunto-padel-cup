@@ -1,16 +1,19 @@
-// Ruta: src/app/(public)/layout.tsx — sustituye entero al archivo actual
+import type { ReactNode } from "react";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-export default function PublicLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+type PublicLayoutProps = {
+  children: ReactNode;
+};
+
+export default function PublicLayout({ children }: PublicLayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="public-site">
       <Header />
-      <div className="flex-1">{children}</div>
+
+      <div className="public-site__content">{children}</div>
+
       <Footer />
     </div>
   );

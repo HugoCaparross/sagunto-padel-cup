@@ -61,7 +61,7 @@ export default async function ResumenTorneoPage({
     resultado?.ronda_alcanzada?.replace(/_/g, " ") ?? "Participante";
 
   return (
-    <main className="min-h-screen bg-navy px-5 py-16 text-offwhite">
+    <main className="min-h-screen bg-navy px-5 py-16 text-offwhite sm:py-20">
       <div className="mx-auto w-full max-w-xl">
         <header className="mb-8 text-center">
           <p className="text-sm uppercase tracking-widest text-sage">
@@ -77,7 +77,7 @@ export default async function ResumenTorneoPage({
 
         <section
           aria-labelledby="resumen-jugador"
-          className="rounded-card bg-navy-light p-6 sm:p-8"
+          className="border-y border-offwhite/15 py-6 sm:py-8"
         >
           <h2 id="resumen-jugador" className="sr-only">
             Resultado de {jugador.nombre} {jugador.apellidos}
@@ -91,8 +91,8 @@ export default async function ResumenTorneoPage({
             {rondaLegible}
           </p>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-card border border-offwhite/10 p-4 text-center">
+          <div className="mt-8 grid gap-px border border-offwhite/15 bg-offwhite/15 sm:grid-cols-2">
+            <div className="bg-navy p-4 text-center">
               <p className="text-xs uppercase tracking-wide text-offwhite/45">
                 Puntos obtenidos
               </p>
@@ -102,7 +102,7 @@ export default async function ResumenTorneoPage({
               </p>
             </div>
 
-            <div className="rounded-card border border-offwhite/10 p-4 text-center">
+            <div className="bg-navy p-4 text-center">
               <p className="text-xs uppercase tracking-wide text-offwhite/45">
                 Ranking móvil
               </p>
@@ -112,7 +112,7 @@ export default async function ResumenTorneoPage({
             </div>
           </div>
 
-          <div className="mt-4 rounded-card border border-offwhite/10 p-4 text-center">
+          <div className="mt-4 border border-offwhite/15 p-4 text-center">
             <p className="text-xs uppercase tracking-wide text-offwhite/45">
               Nivel
             </p>
@@ -123,21 +123,21 @@ export default async function ResumenTorneoPage({
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link
             href={`/jugador/${playerId}`}
-            className="rounded-card border border-offwhite/20 px-4 py-2 text-sm font-semibold hover:border-coral hover:text-coral"
+            className="rounded-card border border-offwhite/20 px-4 py-2 text-sm font-semibold transition-colors hover:border-coral hover:text-coral"
           >
             Ver perfil
           </Link>
 
           <Link
             href={`/torneo/${slug}/resultados`}
-            className="rounded-card border border-offwhite/20 px-4 py-2 text-sm font-semibold hover:border-coral hover:text-coral"
+            className="rounded-card border border-offwhite/20 px-4 py-2 text-sm font-semibold transition-colors hover:border-coral hover:text-coral"
           >
             Ver resultados
           </Link>
 
           <Link
             href={`/torneo/${slug}`}
-            className="rounded-card border border-offwhite/20 px-4 py-2 text-sm font-semibold hover:border-coral hover:text-coral"
+            className="rounded-card border border-offwhite/20 px-4 py-2 text-sm font-semibold transition-colors hover:border-coral hover:text-coral"
           >
             Volver al torneo
           </Link>

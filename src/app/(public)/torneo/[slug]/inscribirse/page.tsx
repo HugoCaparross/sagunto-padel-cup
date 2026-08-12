@@ -37,27 +37,30 @@ export default async function InscribirsePage({
   const { data: bolsa } = user
     ? await supabase
         .from("partner_pool")
-        .select(
-          "id, categorias:categories(nombre), players(nombre, apellidos, email)",
-        )
+        .select("id, categorias:categories(nombre), players(nombre, apellidos)")
         .eq("tournament_id", tournament.id)
         .eq("disponible", true)
     : { data: null };
 
   return (
-    <main className="max-w-3xl mx-auto px-5 py-12">
-      <h1 className="font-display text-3xl mb-2">Inscripción</h1>
+    <main className="mx-auto max-w-4xl px-5 py-12 sm:py-14">
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-navy/45">
+        Torneo
+      </p>
+      <h1 className="mt-1 font-display text-4xl font-semibold mb-2">
+        Inscripción
+      </h1>
 
-      <p className="text-navy/70 mb-8">{tournament.nombre}</p>
+      <p className="text-navy/65 mb-8">{tournament.nombre}</p>
 
       {tournament.estado !== "inscripciones_abiertas" ? (
-        <p className="rounded-card bg-navy/5 p-6">
+        <p className="border border-navy/10 bg-white p-6">
           Las inscripciones para este torneo no están abiertas ahora mismo.
         </p>
       ) : (
         <>
           {user && !!bolsa?.length && (
-            <div className="mb-10 rounded-card bg-sage/20 border border-sage p-5">
+            <div className="mb-10 border border-sage/30 bg-sage/10 p-5">
               <p className="font-semibold mb-2">Jugadores buscando pareja</p>
 
               <ul className="text-sm space-y-1">
@@ -65,7 +68,6 @@ export default async function InscribirsePage({
                   const jugador = b.players as unknown as {
                     nombre: string;
                     apellidos: string;
-                    email: string;
                   } | null;
 
                   const categoria = b.categorias as unknown as {
@@ -79,13 +81,7 @@ export default async function InscribirsePage({
                   return (
                     <li key={b.id}>
                       {jugador.nombre} {jugador.apellidos} —{" "}
-                      {categoria?.nombre ?? "Categoría pendiente"} —{" "}
-                      <a
-                        href={`mailto:${jugador.email}`}
-                        className="underline text-coral"
-                      >
-                        {jugador.email}
-                      </a>
+                      {categoria?.nombre ?? "Categoría pendiente"}
                     </li>
                   );
                 })}
