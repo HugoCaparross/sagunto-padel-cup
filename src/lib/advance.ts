@@ -5,7 +5,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export type AdvanceWinnerResult =
   | {
       ok: true;
-      tipo: "campeon" | "avance";
+      tipo: "avance" | "campeon";
       siguienteMatchId?: string;
     }
   | {
@@ -15,8 +15,8 @@ export type AdvanceWinnerResult =
 
 // Empuja al ganador de un partido de cuadro a la siguiente ronda,
 // o lo declara campeón del tramo si no hay siguiente partido.
-// La operación es idempotente: volver a registrar el mismo ganador
-// no debe sobrescribir una pareja distinta que ya haya avanzado.
+// La operación es idempotente para evitar duplicar o sobrescribir
+// avances cuando un resultado se reprocesa.
 export async function advanceWinner(
   admin: SupabaseClient,
   matchId: string,
@@ -29,20 +29,16 @@ export async function advanceWinner(
     };
   }
 
-  const { data: match, error: matchError } =
-    await admin
-      .from("matches")
-      .select(
-        "pair_1_id, pair_2_id, siguiente_match_id, siguiente_slot, tournament_id, categoria_id, tramo",
-      )
-      .eq("id", matchId)
-      .maybeSingle();
+  const { data: match, error: matchError } = await admin
+    .from("matches")
+    .select(
+      "pair_1_id, pair_2_id, siguiente_match_id, siguiente_slot, tournament_id, categoria_id, tramo",
+    )
+    .eq("id", matchId)
+    .maybeSingle();
 
   if (matchError) {
-    console.error(
-      "[advanceWinner] Error obteniendo partido:",
-      matchError,
-    );
+    console.error("[advanceWinner] Error obteniendo partido:", matchError);
 
     return {
       ok: false,
@@ -51,38 +47,44 @@ export async function advanceWinner(
   }
 
   if (!match) {
-    console.error(
-      "[advanceWinner] Partido no encontrado:",
-      matchId,
-    );
-
     return {
       ok: false,
       error: "El partido no existe.",
     };
   }
 
-  const ganadorPerteneceAlPartido =
-    match.pair_1_id === ganadorId ||
-    match.pair_2_id === ganadorId;
-
-  if (!ganadorPerteneceAlPartido) {
-    console.error(
-      "[advanceWinner] El ganador indicado no pertenece al partido:",
-      {
-        matchId,
-        ganadorId,
-      },
-    );
-
+  if (match.pair_1_id !== ganadorId && match.pair_2_id !== ganadorId) {
     return {
       ok: false,
-      error:
-        "La pareja seleccionada no pertenece a este partido.",
+      error: "La pareja seleccionada no pertenece al partido.",
     };
   }
 
   if (!match.siguiente_match_id) {
+    const { data: bracket, error: bracketError } = await admin
+      .from("brackets")
+      .select("campeon_pair_id")
+      .eq("tournament_id", match.tournament_id)
+      .eq("categoria_id", match.categoria_id)
+      .eq("tramo", match.tramo)
+      .maybeSingle();
+
+    if (bracketError) {
+      console.error("[advanceWinner] Error consultando campeón:", bracketError);
+
+      return {
+        ok: false,
+        error: "No se ha podido consultar el estado del cuadro.",
+      };
+    }
+
+    if (bracket?.campeon_pair_id && bracket.campeon_pair_id !== ganadorId) {
+      return {
+        ok: false,
+        error: "El cuadro ya tiene otro campeón registrado.",
+      };
+    }
+
     const { error } = await admin
       .from("brackets")
       .update({
@@ -100,8 +102,7 @@ export async function advanceWinner(
 
       return {
         ok: false,
-        error:
-          "No se ha podido guardar el campeón del tramo.",
+        error: "No se ha podido guardar el campeón del tramo.",
       };
     }
 
@@ -111,137 +112,78 @@ export async function advanceWinner(
     };
   }
 
-  if (
-    match.siguiente_slot !== 1 &&
-    match.siguiente_slot !== 2
-  ) {
-    console.error(
-      "[advanceWinner] Slot de siguiente partido inválido:",
-      {
-        matchId,
-        siguienteMatchId:
-          match.siguiente_match_id,
-        siguienteSlot:
-          match.siguiente_slot,
-      },
-    );
-
+  if (match.siguiente_slot !== 1 && match.siguiente_slot !== 2) {
     return {
       ok: false,
-      error:
-        "La posición del siguiente partido no es válida.",
+      error: "La posición del siguiente partido no es válida.",
     };
   }
 
-  const siguienteCampo =
-    match.siguiente_slot === 1
-      ? "pair_1_id"
-      : "pair_2_id";
+  const campo = match.siguiente_slot === 1 ? "pair_1_id" : "pair_2_id";
 
-  const {
-    data: siguiente,
-    error: siguienteError,
-  } = await admin
+  const { data: siguiente, error: siguienteError } = await admin
     .from("matches")
     .select("pair_1_id, pair_2_id")
-    .eq(
-      "id",
-      match.siguiente_match_id,
-    )
+    .eq("id", match.siguiente_match_id)
     .maybeSingle();
 
   if (siguienteError) {
     console.error(
-      "[advanceWinner] Error obteniendo siguiente partido:",
+      "[advanceWinner] Error consultando siguiente partido:",
       siguienteError,
     );
 
     return {
       ok: false,
-      error:
-        "No se ha podido consultar el siguiente partido.",
+      error: "No se ha podido consultar el siguiente partido.",
     };
   }
 
   if (!siguiente) {
     return {
       ok: false,
-      error:
-        "El siguiente partido no existe.",
+      error: "El siguiente partido no existe.",
     };
   }
 
-  const valorActual =
-    siguienteCampo === "pair_1_id"
-      ? siguiente.pair_1_id
-      : siguiente.pair_2_id;
+  const actual =
+    campo === "pair_1_id" ? siguiente.pair_1_id : siguiente.pair_2_id;
 
-  if (
-    valorActual &&
-    valorActual !== ganadorId
-  ) {
-    console.error(
-      "[advanceWinner] El slot siguiente ya está ocupado por otra pareja:",
-      {
-        matchId,
-        siguienteMatchId:
-          match.siguiente_match_id,
-        siguienteSlot:
-          match.siguiente_slot,
-        valorActual,
-        ganadorId,
-      },
-    );
-
-    return {
-      ok: false,
-      error:
-        "El siguiente partido ya tiene una pareja asignada en esa posición.",
-    };
-  }
-
-  if (
-    valorActual === ganadorId
-  ) {
+  if (actual === ganadorId) {
     return {
       ok: true,
       tipo: "avance",
-      siguienteMatchId:
-        match.siguiente_match_id,
+      siguienteMatchId: match.siguiente_match_id,
+    };
+  }
+
+  if (actual) {
+    return {
+      ok: false,
+      error: "El siguiente partido ya tiene ocupada esa posición.",
     };
   }
 
   const { error } = await admin
     .from("matches")
     .update({
-      [siguienteCampo]: ganadorId,
+      [campo]: ganadorId,
     })
-    .eq(
-      "id",
-      match.siguiente_match_id,
-    )
-    .eq(
-      siguienteCampo,
-      null,
-    );
+    .eq("id", match.siguiente_match_id)
+    .is(campo, null);
 
   if (error) {
-    console.error(
-      "[advanceWinner] Error avanzando ganador:",
-      error,
-    );
+    console.error("[advanceWinner] Error avanzando ganador:", error);
 
     return {
       ok: false,
-      error:
-        "No se ha podido avanzar al ganador.",
+      error: "No se ha podido avanzar al ganador.",
     };
   }
 
   return {
     ok: true,
     tipo: "avance",
-    siguienteMatchId:
-      match.siguiente_match_id,
+    siguienteMatchId: match.siguiente_match_id,
   };
 }

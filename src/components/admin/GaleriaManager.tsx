@@ -2,17 +2,14 @@
 
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  subirFoto,
   borrarFoto,
+  subirFoto,
 } from "@/app/(admin)/admin/torneos/[id]/galeria/actions";
 
-type Foto = {
-  id: string;
-  url: string;
-};
+type Foto = { id: string; url: string };
 
 interface GaleriaManagerProps {
   torneoId: string;
@@ -24,72 +21,51 @@ export default function GaleriaManager({
   fotosIniciales,
 }: GaleriaManagerProps) {
   const router = useRouter();
-
-  const [fotos, setFotos] = useState<Foto[]>(fotosIniciales);
-
+  const [fotos, setFotos] = useState(fotosIniciales);
   const [subiendo, setSubiendo] = useState(false);
-
   const [borrandoId, setBorrandoId] = useState<string | null>(null);
-
+  const [fotoAEliminar, setFotoAEliminar] = useState<Foto | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   async function subir(formData: FormData) {
     setSubiendo(true);
     setError(null);
-
     try {
       const res = await subirFoto(torneoId, formData);
-
       if (!res.ok) {
         setError(res.error ?? "No se ha podido subir la fotografía.");
         return;
       }
-
+      if (inputRef.current) inputRef.current.value = "";
       router.refresh();
     } catch (actionError) {
       console.error("[GaleriaManager] Error subiendo fotografía:", actionError);
-
       setError("Ha ocurrido un error inesperado al subir la fotografía.");
     } finally {
       setSubiendo(false);
     }
   }
 
-  async function borrar(id: string) {
-    const foto = fotos.find((item) => item.id === id);
-
-    if (!foto) {
-      return;
-    }
-
-    const confirmado = window.confirm(
-      "¿Quieres eliminar esta fotografía de la galería?",
-    );
-
-    if (!confirmado) {
-      return;
-    }
-
-    setBorrandoId(id);
+  async function confirmarBorrado() {
+    if (!fotoAEliminar || borrandoId) return;
+    const foto = fotoAEliminar;
+    setBorrandoId(foto.id);
     setError(null);
-
     try {
-      const res = await borrarFoto(torneoId, id);
-
+      const res = await borrarFoto(torneoId, foto.id);
       if (!res.ok) {
         setError(res.error ?? "No se ha podido eliminar la fotografía.");
         return;
       }
-
-      setFotos((prev) => prev.filter((item) => item.id !== id));
-
+      setFotos((prev) => prev.filter((item) => item.id !== foto.id));
+      setFotoAEliminar(null);
       router.refresh();
     } catch (actionError) {
       console.error(
         "[GaleriaManager] Error eliminando fotografía:",
         actionError,
       );
-
       setError("Ha ocurrido un error inesperado al eliminar la fotografía.");
     } finally {
       setBorrandoId(null);
@@ -97,10 +73,20 @@ export default function GaleriaManager({
   }
 
   return (
-    <div className="space-y-6">
+    <section aria-labelledby="galeria-title" className="space-y-6">
+      <div>
+        <h2 id="galeria-title" className="font-display text-xl">
+          Galería
+        </h2>
+        <p className="mt-1 text-sm text-offwhite/55">
+          Sube, revisa y elimina material del torneo. La eliminación requiere
+          confirmación.
+        </p>
+      </div>
+
       <form
         action={subir}
-        className="flex flex-col gap-3 sm:flex-row sm:items-center"
+        className="flex flex-col gap-3 border-b border-offwhite/10 pb-6 sm:flex-row sm:items-end"
       >
         <div className="flex-1">
           <label
@@ -109,8 +95,8 @@ export default function GaleriaManager({
           >
             Fotografía
           </label>
-
           <input
+            ref={inputRef}
             id="galeria-foto"
             type="file"
             name="foto"
@@ -119,16 +105,14 @@ export default function GaleriaManager({
             disabled={subiendo}
             className="block w-full text-sm text-offwhite/70 file:mr-3 file:rounded-card file:border-0 file:bg-navy-light file:px-3 file:py-2 file:text-xs file:font-semibold file:text-offwhite"
           />
-
           <p className="mt-1 text-[11px] text-offwhite/40">
             JPG, PNG o WebP · máximo 10 MB.
           </p>
         </div>
-
         <button
           type="submit"
           disabled={subiendo}
-          className="rounded-card bg-coral px-4 py-2 text-sm font-semibold text-offwhite transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-card bg-coral px-4 py-2 text-sm font-semibold text-offwhite disabled:opacity-50"
         >
           {subiendo ? "Subiendo..." : "Subir foto"}
         </button>
@@ -140,40 +124,84 @@ export default function GaleriaManager({
         </p>
       ) : null}
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-        {fotos.map((foto) => {
-          const eliminando = borrandoId === foto.id;
+      {fotos.length ? (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+          {fotos.map((foto) => {
+            const eliminando = borrandoId === foto.id;
+            return (
+              <figure
+                key={foto.id}
+                className="overflow-hidden rounded-card bg-navy-light"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={foto.url}
+                  alt="Fotografía del torneo"
+                  loading="lazy"
+                  className="aspect-square w-full object-cover"
+                />
+                <figcaption className="flex items-center justify-between gap-2 p-2">
+                  <span className="text-xs text-offwhite/45">
+                    Material del torneo
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setFotoAEliminar(foto)}
+                    disabled={borrandoId !== null}
+                    className="text-xs text-coral underline underline-offset-4 disabled:opacity-50"
+                  >
+                    {eliminando ? "Eliminando..." : "Eliminar"}
+                  </button>
+                </figcaption>
+              </figure>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="border border-dashed border-offwhite/15 px-5 py-8">
+          <p className="text-sm font-medium">Aún no hay fotografías.</p>
+          <p className="mt-1 text-sm text-offwhite/50">
+            El material subido aparecerá aquí para revisión.
+          </p>
+        </div>
+      )}
 
-          return (
-            <div
-              key={foto.id}
-              className="group relative overflow-hidden rounded-card bg-navy-light"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={foto.url}
-                alt=""
-                loading="lazy"
-                className="aspect-square w-full object-cover"
-              />
-
+      {fotoAEliminar ? (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-navy/75 p-4 sm:items-center"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="eliminar-foto-title"
+        >
+          <div className="w-full max-w-md rounded-card bg-navy-light p-5">
+            <h2 id="eliminar-foto-title" className="font-display text-xl">
+              Eliminar fotografía
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-offwhite/65">
+              Esta acción retirará la fotografía de la galería del torneo.
+              ¿Quieres continuar?
+            </p>
+            <div className="mt-6 flex justify-end gap-2">
               <button
                 type="button"
-                onClick={() => borrar(foto.id)}
-                disabled={borrandoId !== null}
-                aria-label={`Eliminar fotografía ${foto.id}`}
-                className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-navy/90 text-sm text-offwhite transition hover:bg-coral disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={() => setFotoAEliminar(null)}
+                disabled={Boolean(borrandoId)}
+                className="rounded-card border border-offwhite/20 px-4 py-2 text-sm"
               >
-                {eliminando ? "…" : "×"}
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={confirmarBorrado}
+                disabled={Boolean(borrandoId)}
+                className="rounded-card bg-coral px-4 py-2 text-sm font-semibold text-offwhite disabled:opacity-50"
+              >
+                {borrandoId ? "Eliminando..." : "Eliminar fotografía"}
               </button>
             </div>
-          );
-        })}
-      </div>
-
-      {!fotos.length ? (
-        <p className="text-sm text-offwhite/60">Aún no hay fotos.</p>
+          </div>
+        </div>
       ) : null}
-    </div>
+    </section>
   );
 }

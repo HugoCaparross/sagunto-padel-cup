@@ -1,12 +1,7 @@
 // Ruta: src/lib/bracket.ts
 
-export function nextPow2(
-  n: number,
-): number {
-  if (
-    !Number.isFinite(n) ||
-    n <= 0
-  ) {
+export function nextPow2(n: number): number {
+  if (!Number.isFinite(n) || n <= 0) {
     return 1;
   }
 
@@ -19,111 +14,68 @@ export function nextPow2(
   return p;
 }
 
-export const FASE_POR_NUM_PARTIDOS:
-  Record<number, string> = {
-    8: "octavos",
-    4: "cuartos",
-    2: "semis",
-    1: "final",
-  };
+export const FASE_POR_NUM_PARTIDOS: Record<number, string> = {
+  8: "octavos",
+  4: "cuartos",
+  2: "semis",
+  1: "final",
+};
 
 export type FirstRound = {
   fase: string;
   byes: string[];
-  enfrentamientos: [
-    string,
-    string,
-  ][];
+  enfrentamientos: [string, string][];
 };
 
-// pairsSeeded: parejas ya ordenadas de mejor a peor seed.
-// Los mejores seeds reciben bye si sobran huecos.
-export function buildFirstRound(
-  pairsSeeded: string[],
-): FirstRound {
-  const parejas =
-    Array.from(
-      new Set(
-        pairsSeeded.filter(
-          (
-            id,
-          ): id is string =>
-            typeof id ===
-              "string" &&
-            id.trim().length >
-              0,
-        ),
+// pairsSeeded debe llegar ordenado de mejor a peor seed.
+// Los mejores seeds reciben los byes cuando el cuadro no es potencia de 2.
+export function buildFirstRound(pairsSeeded: string[]): FirstRound {
+  const parejas = Array.from(
+    new Set(
+      pairsSeeded.filter(
+        (id): id is string => typeof id === "string" && id.trim().length > 0,
       ),
-    );
+    ),
+  );
 
-  if (parejas.length <= 1) {
+  if (parejas.length === 0) {
     return {
       fase: "final",
-      byes: parejas,
+      byes: [],
       enfrentamientos: [],
     };
   }
 
-  const total =
-    nextPow2(
-      parejas.length,
-    );
+  if (parejas.length === 1) {
+    return {
+      fase: "final",
+      byes: [parejas[0]],
+      enfrentamientos: [],
+    };
+  }
 
-  const numByes =
-    total - parejas.length;
+  const total = nextPow2(parejas.length);
 
-  const byes =
-    parejas.slice(
-      0,
-      numByes,
-    );
+  const numByes = total - parejas.length;
 
-  const resto =
-    parejas.slice(
-      numByes,
-    );
+  const byes = parejas.slice(0, numByes);
 
-  const enfrentamientos:
-    [
-      string,
-      string,
-    ][] = [];
+  const resto = parejas.slice(numByes);
 
-  for (
-    let i = 0;
-    i < resto.length / 2;
-    i += 1
-  ) {
-    const izquierda =
-      resto[i];
+  const enfrentamientos: [string, string][] = [];
 
-    const derecha =
-      resto[
-        resto.length -
-          1 -
-          i
-      ];
+  for (let i = 0; i < resto.length / 2; i += 1) {
+    const izquierda = resto[i];
+    const derecha = resto[resto.length - 1 - i];
 
-    if (
-      !izquierda ||
-      !derecha ||
-      izquierda ===
-        derecha
-    ) {
+    if (!izquierda || !derecha || izquierda === derecha) {
       continue;
     }
 
-    enfrentamientos.push([
-      izquierda,
-      derecha,
-    ]);
+    enfrentamientos.push([izquierda, derecha]);
   }
 
-  const fase =
-    FASE_POR_NUM_PARTIDOS[
-      enfrentamientos.length
-    ] ??
-    "octavos";
+  const fase = FASE_POR_NUM_PARTIDOS[enfrentamientos.length] ?? "octavos";
 
   return {
     fase,

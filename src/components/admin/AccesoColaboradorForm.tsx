@@ -16,13 +16,11 @@ export default function AccesoColaboradorForm({
   torneoId,
 }: AccesoColaboradorFormProps) {
   const [nombre, setNombre] = useState("");
-
   const [dias, setDias] = useState(14);
-
   const [url, setUrl] = useState<string | null>(null);
-
   const [enviando, setEnviando] = useState(false);
-
+  const [copiando, setCopiando] = useState(false);
+  const [copiado, setCopiado] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function crear() {
@@ -30,17 +28,20 @@ export default function AccesoColaboradorForm({
 
     if (!nombreNormalizado) {
       setError("Introduce el nombre del colaborador.");
+      setCopiado(false);
       return;
     }
 
     if (!Number.isInteger(dias) || dias < MIN_DIAS || dias > MAX_DIAS) {
       setError(`La validez debe estar entre ${MIN_DIAS} y ${MAX_DIAS} días.`);
+      setCopiado(false);
       return;
     }
 
     setEnviando(true);
     setError(null);
     setUrl(null);
+    setCopiado(false);
 
     try {
       const res = await crearAccesoColaborador(
@@ -62,30 +63,52 @@ export default function AccesoColaboradorForm({
       }
 
       setUrl(`${window.location.origin}/subir/${res.token}`);
-
       setNombre("");
     } catch (actionError) {
       console.error(
         "[AccesoColaboradorForm] Error creando acceso:",
         actionError,
       );
-
       setError("Ha ocurrido un error inesperado al generar el acceso.");
     } finally {
       setEnviando(false);
     }
   }
 
+  async function copiarEnlace() {
+    if (!url || copiando) {
+      return;
+    }
+
+    setCopiando(true);
+    setError(null);
+
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiado(true);
+    } catch (copyError) {
+      console.error(
+        "[AccesoColaboradorForm] Error copiando enlace:",
+        copyError,
+      );
+      setError("No se ha podido copiar el enlace. Cópialo manualmente.");
+    } finally {
+      setCopiando(false);
+    }
+  }
+
   return (
-    <div className="max-w-md space-y-4 rounded-card bg-navy-light p-4">
+    <section
+      aria-labelledby="acceso-colaborador-title"
+      className="max-w-md space-y-4 rounded-card bg-navy-light p-4"
+    >
       <div>
-        <h2 className="text-sm font-semibold">
+        <h2 id="acceso-colaborador-title" className="text-sm font-semibold">
           Acceso para fotógrafo/videógrafo externo
         </h2>
-
         <p className="mt-1 text-xs leading-5 text-offwhite/55">
-          Genera un enlace temporal para que un colaborador pueda subir material
-          al torneo.
+          Genera un enlace temporal limitado al torneo para que un colaborador
+          pueda subir material sin acceder al resto de la administración.
         </p>
       </div>
 
@@ -97,11 +120,9 @@ export default function AccesoColaboradorForm({
           >
             Nombre del colaborador
           </label>
-
           <input
             id="nombre-colaborador"
             type="text"
-            placeholder="Nombre del colaborador"
             value={nombre}
             onChange={(event) => setNombre(event.target.value)}
             disabled={enviando}
@@ -116,9 +137,8 @@ export default function AccesoColaboradorForm({
             htmlFor="dias-validez"
             className="mb-1.5 block text-xs font-semibold text-offwhite/70"
           >
-            Validez
+            Validez (días)
           </label>
-
           <input
             id="dias-validez"
             type="number"
@@ -126,20 +146,17 @@ export default function AccesoColaboradorForm({
             max={MAX_DIAS}
             step={1}
             value={dias}
-            onChange={(event) => {
-              const value = Number(event.target.value);
-
-              setDias(Number.isFinite(value) ? value : MIN_DIAS);
-            }}
+            onChange={(event) => setDias(Number(event.target.value))}
             disabled={enviando}
-            className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none transition focus:border-coral disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none transition focus:border-coral disabled:opacity-50"
           />
-
-          <span className="mt-1 block text-[11px] text-offwhite/40">
-            1–90 días
-          </span>
         </div>
       </div>
+
+      <p className="text-[11px] leading-5 text-offwhite/40">
+        El enlace caduca automáticamente y no concede permisos de edición sobre
+        resultados, cuadros, horarios ni datos competitivos.
+      </p>
 
       {error ? (
         <p role="alert" className="text-sm text-coral">
@@ -157,20 +174,36 @@ export default function AccesoColaboradorForm({
       </button>
 
       {url ? (
-        <div role="status" className="border border-sage/20 bg-sage/5 p-3">
+        <div
+          role="status"
+          aria-live="polite"
+          className="border border-sage/20 bg-sage/5 p-3"
+        >
           <p className="text-xs font-semibold text-sage">
             Enlace generado correctamente
           </p>
-
           <p className="mt-1 break-all text-xs leading-5 text-offwhite/70">
             {url}
           </p>
-
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={copiarEnlace}
+              disabled={copiando}
+              className="rounded-card border border-offwhite/20 px-3 py-2 text-xs font-semibold disabled:opacity-50"
+            >
+              {copiando
+                ? "Copiando..."
+                : copiado
+                  ? "Enlace copiado"
+                  : "Copiar enlace"}
+            </button>
+          </div>
           <p className="mt-2 text-[11px] text-offwhite/45">
-            Compártelo con el colaborador por el canal que corresponda.
+            Compártelo únicamente con el colaborador asignado al torneo.
           </p>
         </div>
       ) : null}
-    </div>
+    </section>
   );
 }

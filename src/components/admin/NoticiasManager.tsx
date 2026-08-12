@@ -5,22 +5,18 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  actualizarNoticia,
+  borrarNoticia,
   crearNoticia,
   togglePublicarNoticia,
-  borrarNoticia,
 } from "@/app/(admin)/admin/noticias/actions";
 
-type Noticia = {
-  id: string;
-  titulo: string;
-  estado: string;
-};
-
+type Noticia = { id: string; titulo: string; estado: string };
 interface NoticiasManagerProps {
   noticiasIniciales: Noticia[];
 }
 
-const INITIAL_FORM = {
+const EMPTY_FORM = {
   titulo: "",
   contenido: "",
   imagen_destacada: "",
@@ -31,169 +27,138 @@ export default function NoticiasManager({
   noticiasIniciales,
 }: NoticiasManagerProps) {
   const router = useRouter();
-
-  const [noticias, setNoticias] = useState<Noticia[]>(noticiasIniciales);
-
-  const [form, setForm] = useState(INITIAL_FORM);
-
+  const [noticias, setNoticias] = useState(noticiasIniciales);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [editandoId, setEditandoId] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
-
   const [actualizandoId, setActualizandoId] = useState<string | null>(null);
-
+  const [confirmacion, setConfirmacion] = useState<{
+    id: string;
+    accion: "publicar" | "despublicar" | "borrar";
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function crear(publicar: boolean) {
+  function iniciarEdicion(noticia: Noticia) {
+    setEditandoId(noticia.id);
+    setForm({
+      titulo: noticia.titulo,
+      contenido: "",
+      imagen_destacada: "",
+      categoria: "",
+    });
+    setError(
+      "Para editar completamente una noticia se debe cargar su contenido actual desde el editor de detalle.",
+    );
+  }
+
+  function cancelarEdicion() {
+    setEditandoId(null);
+    setForm(EMPTY_FORM);
+    setError(null);
+  }
+
+  async function guardar(publicar: boolean) {
     const titulo = form.titulo.trim();
     const contenido = form.contenido.trim();
-
     if (!titulo) {
       setError("El título es obligatorio.");
       return;
     }
-
     if (!contenido) {
       setError("El contenido es obligatorio.");
       return;
     }
-
     setEnviando(true);
     setError(null);
-
     try {
-      const resultado = await crearNoticia({
-        ...form,
-        titulo,
-        contenido,
-        imagen_destacada: form.imagen_destacada.trim(),
-        publicar,
-      });
-
+      const resultado = editandoId
+        ? await actualizarNoticia(editandoId, {
+            ...form,
+            titulo,
+            contenido,
+            imagen_destacada: form.imagen_destacada.trim(),
+          })
+        : await crearNoticia({
+            ...form,
+            titulo,
+            contenido,
+            imagen_destacada: form.imagen_destacada.trim(),
+            publicar,
+          });
       if (!resultado?.ok) {
-        setError(resultado?.error ?? "No se ha podido crear la noticia.");
+        setError(resultado?.error ?? "No se ha podido guardar la noticia.");
         return;
       }
-
-      setForm(INITIAL_FORM);
+      setForm(EMPTY_FORM);
+      setEditandoId(null);
       router.refresh();
     } catch (actionError) {
-      console.error("[NoticiasManager] Error creando noticia:", actionError);
-
-      setError("Ha ocurrido un error inesperado al crear la noticia.");
+      console.error("[NoticiasManager] Error guardando noticia:", actionError);
+      setError("Ha ocurrido un error inesperado al guardar la noticia.");
     } finally {
       setEnviando(false);
     }
   }
 
-  async function togglePublicar(id: string, publicar: boolean) {
-    const noticia = noticias.find((item) => item.id === id);
-
-    if (!noticia) {
-      return;
-    }
-
+  async function ejecutarConfirmacion() {
+    if (!confirmacion || actualizandoId) return;
+    const { id, accion } = confirmacion;
     setActualizandoId(id);
     setError(null);
-
-    const estadoAnterior = noticia.estado;
-
-    setNoticias((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              estado: publicar ? "publicado" : "borrador",
-            }
-          : item,
-      ),
-    );
-
     try {
-      const resultado = await togglePublicarNoticia(id, publicar);
-
-      if (!resultado?.ok) {
+      if (accion === "borrar") {
+        const resultado = await borrarNoticia(id);
+        if (!resultado?.ok) {
+          setError(resultado?.error ?? "No se ha podido eliminar la noticia.");
+          return;
+        }
+        setNoticias((prev) => prev.filter((item) => item.id !== id));
+      } else {
+        const resultado = await togglePublicarNoticia(
+          id,
+          accion === "publicar",
+        );
+        if (!resultado?.ok) {
+          setError(
+            resultado?.error ?? "No se ha podido cambiar la publicación.",
+          );
+          return;
+        }
         setNoticias((prev) =>
           prev.map((item) =>
             item.id === id
               ? {
                   ...item,
-                  estado: estadoAnterior,
+                  estado: accion === "publicar" ? "publicado" : "borrador",
                 }
               : item,
           ),
         );
-
-        setError(
-          resultado?.error ??
-            "No se ha podido cambiar el estado de la noticia.",
-        );
       }
+      setConfirmacion(null);
     } catch (actionError) {
-      console.error("[NoticiasManager] Error publicando noticia:", actionError);
-
-      setNoticias((prev) =>
-        prev.map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                estado: estadoAnterior,
-              }
-            : item,
-        ),
-      );
-
-      setError("Ha ocurrido un error inesperado al publicar la noticia.");
-    } finally {
-      setActualizandoId(null);
-    }
-  }
-
-  async function borrar(id: string) {
-    const noticia = noticias.find((item) => item.id === id);
-
-    if (!noticia) {
-      return;
-    }
-
-    const confirmado = window.confirm(
-      `¿Quieres eliminar la noticia "${noticia.titulo}"?`,
-    );
-
-    if (!confirmado) {
-      return;
-    }
-
-    setActualizandoId(id);
-    setError(null);
-
-    try {
-      const resultado = await borrarNoticia(id);
-
-      if (!resultado?.ok) {
-        setError(resultado?.error ?? "No se ha podido eliminar la noticia.");
-        return;
-      }
-
-      setNoticias((prev) => prev.filter((item) => item.id !== id));
-    } catch (actionError) {
-      console.error("[NoticiasManager] Error eliminando noticia:", actionError);
-
-      setError("Ha ocurrido un error inesperado al eliminar la noticia.");
+      console.error("[NoticiasManager] Error ejecutando acción:", actionError);
+      setError("Ha ocurrido un error inesperado.");
     } finally {
       setActualizandoId(null);
     }
   }
 
   return (
-    <div className="max-w-xl space-y-6">
-      <div className="space-y-3 rounded-card bg-navy-light p-4">
+    <section
+      aria-labelledby="noticias-manager-title"
+      className="max-w-2xl space-y-6"
+    >
+      <div className="space-y-4 rounded-card bg-navy-light p-4">
         <div>
-          <h2 className="text-sm font-semibold">Nueva noticia</h2>
-
-          <p className="mt-1 text-xs text-offwhite/50">
-            Crea un borrador o publica directamente la noticia.
+          <h2 id="noticias-manager-title" className="text-sm font-semibold">
+            {editandoId ? "Editar noticia" : "Nueva noticia"}
+          </h2>
+          <p className="mt-1 text-xs leading-5 text-offwhite/50">
+            Los estados borrador y publicado deben ser explícitos antes de hacer
+            cambios editoriales.
           </p>
         </div>
-
         <div>
           <label
             htmlFor="noticia-titulo"
@@ -201,24 +166,17 @@ export default function NoticiasManager({
           >
             Título
           </label>
-
           <input
             id="noticia-titulo"
-            type="text"
-            placeholder="Título"
             value={form.titulo}
             onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                titulo: event.target.value,
-              }))
+              setForm((current) => ({ ...current, titulo: event.target.value }))
             }
             disabled={enviando}
-            maxLength={200}
+            maxLength={180}
             className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none focus:border-coral disabled:opacity-50"
           />
         </div>
-
         <div>
           <label
             htmlFor="noticia-contenido"
@@ -226,11 +184,8 @@ export default function NoticiasManager({
           >
             Contenido
           </label>
-
           <textarea
             id="noticia-contenido"
-            placeholder="Contenido"
-            rows={6}
             value={form.contenido}
             onChange={(event) =>
               setForm((current) => ({
@@ -239,22 +194,20 @@ export default function NoticiasManager({
               }))
             }
             disabled={enviando}
+            rows={8}
             className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none focus:border-coral disabled:opacity-50"
           />
         </div>
-
         <div>
           <label
             htmlFor="noticia-imagen"
             className="mb-1.5 block text-xs font-semibold text-offwhite/70"
           >
-            Imagen destacada
+            URL de imagen destacada (opcional)
           </label>
-
           <input
             id="noticia-imagen"
             type="url"
-            placeholder="URL imagen destacada"
             value={form.imagen_destacada}
             onChange={(event) =>
               setForm((current) => ({
@@ -266,7 +219,6 @@ export default function NoticiasManager({
             className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none focus:border-coral disabled:opacity-50"
           />
         </div>
-
         <div>
           <label
             htmlFor="noticia-categoria"
@@ -274,7 +226,6 @@ export default function NoticiasManager({
           >
             Categoría
           </label>
-
           <select
             id="noticia-categoria"
             value={form.categoria}
@@ -287,87 +238,154 @@ export default function NoticiasManager({
             disabled={enviando}
             className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none focus:border-coral disabled:opacity-50"
           >
-            <option value="">Categoría</option>
+            <option value="">Sin categoría</option>
             <option value="cronica">Crónica</option>
             <option value="entrevista">Entrevista</option>
             <option value="anuncio">Anuncio</option>
           </select>
         </div>
-
         {error ? (
           <p role="alert" className="text-sm text-coral">
             {error}
           </p>
         ) : null}
-
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => crear(false)}
+            onClick={() => guardar(false)}
             disabled={enviando}
-            className="rounded-card border border-offwhite/30 px-4 py-2 text-sm transition hover:bg-offwhite/5 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-card border border-offwhite/20 px-4 py-2 text-sm disabled:opacity-50"
           >
-            {enviando ? "Guardando..." : "Guardar borrador"}
+            {enviando
+              ? "Guardando..."
+              : editandoId
+                ? "Guardar cambios"
+                : "Guardar borrador"}
           </button>
-
-          <button
-            type="button"
-            onClick={() => crear(true)}
-            disabled={enviando}
-            className="rounded-card bg-coral px-4 py-2 text-sm font-semibold text-offwhite transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {enviando ? "Publicando..." : "Publicar"}
-          </button>
+          {!editandoId ? (
+            <button
+              type="button"
+              onClick={() => guardar(true)}
+              disabled={enviando}
+              className="rounded-card bg-coral px-4 py-2 text-sm font-semibold text-offwhite disabled:opacity-50"
+            >
+              Publicar
+            </button>
+          ) : null}
+          {editandoId ? (
+            <button
+              type="button"
+              onClick={cancelarEdicion}
+              disabled={enviando}
+              className="rounded-card border border-offwhite/20 px-4 py-2 text-sm"
+            >
+              Cancelar
+            </button>
+          ) : null}
         </div>
       </div>
 
       <div>
-        <h2 className="mb-3 text-sm font-semibold">Noticias existentes</h2>
-
-        <ul className="space-y-2">
-          {noticias.map((noticia) => {
-            const actualizando = actualizandoId === noticia.id;
-
-            return (
-              <li
-                key={noticia.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-card bg-navy-light px-4 py-3"
-              >
-                <span className="min-w-0 flex-1 text-sm">{noticia.titulo}</span>
-
-                <div className="flex items-center gap-3">
-                  <label className="flex items-center gap-1 text-xs">
-                    <input
-                      type="checkbox"
-                      checked={noticia.estado === "publicado"}
-                      onChange={(event) =>
-                        togglePublicar(noticia.id, event.target.checked)
-                      }
-                      disabled={actualizando}
-                    />
-                    Publicado
-                  </label>
-
-                  <button
-                    type="button"
-                    onClick={() => borrar(noticia.id)}
-                    disabled={actualizando}
-                    className="text-xs text-coral underline underline-offset-4 disabled:opacity-50"
-                  >
-                    Borrar
-                  </button>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-
+        <h2 className="mb-3 font-display text-xl">Noticias existentes</h2>
+        <div className="divide-y divide-offwhite/10 border-y border-offwhite/10">
+          {noticias.map((noticia) => (
+            <div
+              key={noticia.id}
+              className="grid gap-3 py-4 md:grid-cols-[1fr_auto] md:items-center"
+            >
+              <div>
+                <p className="text-sm font-medium">{noticia.titulo}</p>
+                <p className="mt-1 text-xs text-offwhite/45">
+                  Estado: {noticia.estado}
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => iniciarEdicion(noticia)}
+                  disabled={actualizandoId !== null}
+                  className="text-xs underline underline-offset-4 disabled:opacity-50"
+                >
+                  Editar
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setConfirmacion({
+                      id: noticia.id,
+                      accion:
+                        noticia.estado === "publicado"
+                          ? "despublicar"
+                          : "publicar",
+                    })
+                  }
+                  disabled={actualizandoId !== null}
+                  className="text-xs underline underline-offset-4 disabled:opacity-50"
+                >
+                  {noticia.estado === "publicado" ? "Despublicar" : "Publicar"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setConfirmacion({ id: noticia.id, accion: "borrar" })
+                  }
+                  disabled={
+                    actualizandoId !== null || noticia.estado === "publicado"
+                  }
+                  className="text-xs text-coral underline underline-offset-4 disabled:opacity-40"
+                >
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
         {!noticias.length ? (
           <p className="mt-4 text-sm text-offwhite/50">
             No hay noticias creadas todavía.
           </p>
         ) : null}
       </div>
-    </div>
+
+      {confirmacion ? (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-navy/75 p-4 sm:items-center"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirmar-noticia-title"
+        >
+          <div className="w-full max-w-md rounded-card bg-navy-light p-5">
+            <h2 id="confirmar-noticia-title" className="font-display text-xl">
+              Confirmar acción
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-offwhite/65">
+              {confirmacion.accion === "borrar"
+                ? "La noticia se eliminará y dejará de estar disponible en el backoffice."
+                : confirmacion.accion === "publicar"
+                  ? "La noticia pasará a estado publicado y podrá mostrarse públicamente."
+                  : "La noticia dejará de estar publicada."}
+            </p>
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setConfirmacion(null)}
+                disabled={Boolean(actualizandoId)}
+                className="rounded-card border border-offwhite/20 px-4 py-2 text-sm"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={ejecutarConfirmacion}
+                disabled={Boolean(actualizandoId)}
+                className="rounded-card bg-coral px-4 py-2 text-sm font-semibold text-offwhite disabled:opacity-50"
+              >
+                {actualizandoId ? "Procesando..." : "Confirmar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </section>
   );
 }

@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { crearClub } from "@/app/(admin)/admin/ajustes/actions";
+import { actualizarClub, crearClub } from "@/app/(admin)/admin/ajustes/actions";
 
 interface ClubFormState {
   nombre: string;
@@ -13,25 +13,40 @@ interface ClubFormState {
   telefono: string;
 }
 
-const INITIAL_FORM: ClubFormState = {
+export interface ClubFormInitialData extends ClubFormState {
+  id: string;
+}
+
+const EMPTY_FORM: ClubFormState = {
   nombre: "",
   direccion: "",
   num_pistas: 4,
   telefono: "",
 };
 
-export default function ClubForm() {
+export default function ClubForm({
+  clubInicial = null,
+}: {
+  clubInicial?: ClubFormInitialData | null;
+}) {
   const router = useRouter();
-
-  const [form, setForm] = useState<ClubFormState>(INITIAL_FORM);
-
+  const [form, setForm] = useState<ClubFormState>(
+    clubInicial
+      ? {
+          nombre: clubInicial.nombre,
+          direccion: clubInicial.direccion,
+          num_pistas: clubInicial.num_pistas,
+          telefono: clubInicial.telefono,
+        }
+      : EMPTY_FORM,
+  );
   const [enviando, setEnviando] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
-
   const [exito, setExito] = useState(false);
 
-  async function crear() {
+  const esEdicion = Boolean(clubInicial);
+
+  async function guardar() {
     const nombre = form.nombre.trim();
 
     if (!nombre) {
@@ -55,38 +70,50 @@ export default function ClubForm() {
     setExito(false);
 
     try {
-      const resultado = await crearClub({
+      const payload = {
         nombre,
         direccion: form.direccion.trim(),
         num_pistas: form.num_pistas,
         telefono: form.telefono.trim(),
-      });
+      };
+
+      const resultado =
+        esEdicion && clubInicial
+          ? await actualizarClub({ clubId: clubInicial.id, ...payload })
+          : await crearClub(payload);
 
       if (!resultado.ok) {
-        setError(resultado.error ?? "No se ha podido crear el club.");
+        setError(resultado.error ?? "No se ha podido guardar el club.");
         return;
       }
 
-      setForm(INITIAL_FORM);
-      setExito(true);
+      if (!esEdicion) {
+        setForm(EMPTY_FORM);
+      }
 
+      setExito(true);
       router.refresh();
     } catch (actionError) {
-      console.error("[ClubForm] Error creando club:", actionError);
-
-      setError("Ha ocurrido un error inesperado al crear el club.");
+      console.error("[ClubForm] Error guardando club:", actionError);
+      setError("Ha ocurrido un error inesperado al guardar el club.");
     } finally {
       setEnviando(false);
     }
   }
 
   return (
-    <div className="max-w-md space-y-3 rounded-card bg-navy-light p-4">
+    <section
+      aria-labelledby="club-form-title"
+      className="max-w-md space-y-3 rounded-card bg-navy-light p-4"
+    >
       <div>
-        <h2 className="text-sm font-semibold">Nuevo club</h2>
-
-        <p className="mt-1 text-xs text-offwhite/50">
-          Añade un club y configura sus pistas.
+        <h2 id="club-form-title" className="text-sm font-semibold">
+          {esEdicion ? "Editar club" : "Nuevo club"}
+        </h2>
+        <p className="mt-1 text-xs leading-5 text-offwhite/50">
+          {esEdicion
+            ? "Actualiza los datos operativos de la sede."
+            : "Añade una sede y configura sus pistas."}
         </p>
       </div>
 
@@ -97,21 +124,16 @@ export default function ClubForm() {
         >
           Nombre
         </label>
-
         <input
           id="club-nombre"
           type="text"
-          placeholder="Nombre del club"
           value={form.nombre}
           onChange={(event) =>
-            setForm((current) => ({
-              ...current,
-              nombre: event.target.value,
-            }))
+            setForm((current) => ({ ...current, nombre: event.target.value }))
           }
           disabled={enviando}
           maxLength={120}
-          className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none transition focus:border-coral disabled:opacity-50"
+          className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none focus:border-coral disabled:opacity-50"
         />
       </div>
 
@@ -122,11 +144,9 @@ export default function ClubForm() {
         >
           Dirección
         </label>
-
         <input
           id="club-direccion"
           type="text"
-          placeholder="Dirección"
           value={form.direccion}
           onChange={(event) =>
             setForm((current) => ({
@@ -136,7 +156,7 @@ export default function ClubForm() {
           }
           disabled={enviando}
           maxLength={250}
-          className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none transition focus:border-coral disabled:opacity-50"
+          className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none focus:border-coral disabled:opacity-50"
         />
       </div>
 
@@ -148,7 +168,6 @@ export default function ClubForm() {
           >
             Nº de pistas
           </label>
-
           <input
             id="club-pistas"
             type="number"
@@ -159,14 +178,13 @@ export default function ClubForm() {
             onChange={(event) =>
               setForm((current) => ({
                 ...current,
-                num_pistas: Number(event.target.value) || 0,
+                num_pistas: Number(event.target.value),
               }))
             }
             disabled={enviando}
-            className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none transition focus:border-coral disabled:opacity-50"
+            className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none focus:border-coral disabled:opacity-50"
           />
         </div>
-
         <div>
           <label
             htmlFor="club-telefono"
@@ -174,11 +192,9 @@ export default function ClubForm() {
           >
             Teléfono
           </label>
-
           <input
             id="club-telefono"
             type="tel"
-            placeholder="Teléfono"
             value={form.telefono}
             onChange={(event) =>
               setForm((current) => ({
@@ -188,7 +204,7 @@ export default function ClubForm() {
             }
             disabled={enviando}
             maxLength={30}
-            className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none transition focus:border-coral disabled:opacity-50"
+            className="w-full rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none focus:border-coral disabled:opacity-50"
           />
         </div>
       </div>
@@ -198,21 +214,26 @@ export default function ClubForm() {
           {error}
         </p>
       ) : null}
-
       {exito ? (
         <p role="status" className="text-sm text-sage">
-          Club creado correctamente.
+          {esEdicion
+            ? "Club actualizado correctamente."
+            : "Club creado correctamente."}
         </p>
       ) : null}
 
       <button
         type="button"
-        onClick={crear}
+        onClick={guardar}
         disabled={enviando}
-        className="rounded-card bg-coral px-4 py-2 text-sm font-semibold text-offwhite transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+        className="rounded-card bg-coral px-4 py-2 text-sm font-semibold text-offwhite disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {enviando ? "Creando..." : "Crear club"}
+        {enviando
+          ? "Guardando..."
+          : esEdicion
+            ? "Guardar cambios"
+            : "Crear club"}
       </button>
-    </div>
+    </section>
   );
 }
