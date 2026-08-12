@@ -1,22 +1,29 @@
-// Ruta: src/app/(public)/torneo/[slug]/grupos/page.tsx — sustituye entero al archivo actual
+// Ruta: src/app/(public)/torneo/[slug]/grupos/page.tsx
+
 export const dynamic = "force-dynamic";
 
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
-import { ordenarClasificacionGrupo, type Standing } from "@/lib/grupos";
+import {
+  ordenarClasificacionGrupo,
+  type Standing,
+  type PartidoResuelto,
+} from "@/lib/grupos";
 
-type PlayerName = { nombre: string; apellidos: string } | null;
+type PlayerName = {
+  nombre: string;
+  apellidos: string;
+} | null;
+
 type StandingRow = Standing & {
   group_id: string;
-  pair: { player1: PlayerName; player2: PlayerName } | null;
+  victorias: number;
+  derrotas: number;
+  pair: {
+    player1: PlayerName;
+    player2: PlayerName;
+  } | null;
 };
-
-function nombrePareja(p: StandingRow["pair"]) {
-  if (!p) return "?";
-  const n1 = p.player1 ? `${p.player1.nombre} ${p.player1.apellidos}` : "?";
-  const n2 = p.player2 ? ` / ${p.player2.nombre} ${p.player2.apellidos}` : "";
-  return n1 + n2;
-}
 
 export default async function GruposPage({
   params,
@@ -24,6 +31,7 @@ export default async function GruposPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+
   const supabase = await createClient();
 
   const { data: torneo } = await supabase
@@ -32,7 +40,9 @@ export default async function GruposPage({
     .eq("slug", slug)
     .single();
 
-  if (!torneo) notFound();
+  if (!torneo) {
+    notFound();
+  }
 
   const { data: categorias } = await supabase
     .from("tournament_categories")
@@ -47,7 +57,7 @@ export default async function GruposPage({
   const { data: standings } = await supabase
     .from("group_standings")
     .select(
-      "group_id, pair_id, puntos, victorias, derrotas, sets_favor, sets_contra, juegos_favor, juegos_contra, pair:pairs(player1:players!pairs_player_1_id_fkey(nombre, apellidos), player2:players!pairs_player_2_id_fkey(nombre, apellidos))"
+      "group_id, pair_id, puntos, victorias, derrotas, sets_favor, sets_contra, juegos_favor, juegos_contra, pair:pairs(player1:players!pairs_player_1_id_fkey(nombre, apellidos), player2:players!pairs_player_2_id_fkey(nombre, apellidos))",
     )
     .returns<StandingRow[]>();
 
@@ -58,52 +68,122 @@ export default async function GruposPage({
     .eq("fase", "grupos")
     .eq("estado", "finalizado");
 
+  const partidosResueltos: PartidoResuelto[] = (partidos ?? []).map(
+    (partido) => ({
+      pair_1_id: partido.pair_1_id,
+      pair_2_id: partido.pair_2_id,
+      resultado_json: partido.resultado_json as {
+        ganador_id?: string;
+      } | null,
+    }),
+  );
+
   return (
-    <main className="max-w-3xl mx-auto px-5 py-12">
-      <h1 className="font-display text-3xl mb-2">Clasificación de grupos</h1>
-      <p className="text-navy/70 mb-8">{torneo.nombre}</p>
+    <main className="mx-auto max-w-3xl px-5 py-12">
+      <header className="mb-8">
+        <h1 className="font-display mb-2 text-3xl">Clasificación de grupos</h1>
+
+        <p className="text-navy/70">{torneo.nombre}</p>
+      </header>
 
       {categorias?.map((cat) => (
-        <div key={cat.categoria_id} className="mb-10">
-          <h2 className="font-display text-xl mb-3">
-            {(cat.categories as unknown as { nombre: string })?.nombre}
+        <section key={cat.categoria_id} className="mb-10">
+          <h2 className="font-display mb-3 text-xl">
+            {
+              (
+                cat.categories as unknown as {
+                  nombre: string;
+                }
+              )?.nombre
+            }
           </h2>
 
           {grupos
-            ?.filter((g) => g.categoria_id === cat.categoria_id)
-            .map((g) => {
-              const filasGrupo = standings?.filter((s) => s.group_id === g.id) ?? [];
-              const partidosGrupo = partidos?.filter((p) => p.group_id === g.id) ?? [];
-              const orden = ordenarClasificacionGrupo(filasGrupo, partidosGrupo);
+            ?.filter((grupo) => grupo.categoria_id === cat.categoria_id)
+            .map((grupo) => {
+              const filasGrupo =
+                standings?.filter(
+                  (standing) => standing.group_id === grupo.id,
+                ) ?? [];
+
+              const partidosGrupo = partidosResueltos.filter((partido) => {
+                const partidoOriginal = partidos?.find(
+                  (item) =>
+                    item.pair_1_id === partido.pair_1_id &&
+                    item.pair_2_id === partido.pair_2_id &&
+                    item.group_id === grupo.id,
+                );
+
+                return partidoOriginal?.group_id === grupo.id;
+              });
+
+              const orden = ordenarClasificacionGrupo(
+                filasGrupo,
+                partidosGrupo,
+              );
 
               return (
-                <div key={g.id} className="mb-4 overflow-x-auto">
-                  <p className="font-semibold mb-2">{g.nombre}</p>
-                  <table className="w-full text-sm border-collapse">
+                <div key={grupo.id} className="mb-4 overflow-x-auto">
+                  <p className="mb-2 font-semibold">{grupo.nombre}</p>
+
+                  <table className="w-full border-collapse text-sm">
                     <thead>
-                      <tr className="text-left text-navy/60 border-b border-navy/10">
-                        <th className="py-2">Pareja</th>
-                        <th className="py-2 text-center">Pts</th>
-                        <th className="py-2 text-center">V-D</th>
-                        <th className="py-2 text-center">Sets</th>
-                        <th className="py-2 text-center">Juegos</th>
+                      <tr className="border-b border-navy/10 text-left text-navy/60">
+                        <th scope="col" className="py-2 pr-4">
+                          Pareja
+                        </th>
+
+                        <th scope="col" className="py-2 text-center">
+                          Pts
+                        </th>
+
+                        <th scope="col" className="py-2 text-center">
+                          V-D
+                        </th>
+
+                        <th scope="col" className="py-2 text-center">
+                          Sets
+                        </th>
+
+                        <th scope="col" className="py-2 text-center">
+                          Juegos
+                        </th>
                       </tr>
                     </thead>
+
                     <tbody>
-                      {orden.map((f, i) => {
-                        const fila = filasGrupo.find((s) => s.pair_id === f.pair_id);
+                      {orden.map((fila) => {
+                        const standing = filasGrupo.find(
+                          (item) => item.pair_id === fila.pair_id,
+                        );
+
+                        if (!standing) {
+                          return null;
+                        }
+
                         return (
-                          <tr key={i} className="border-b border-navy/5">
-                            <td className="py-2">{nombrePareja((fila as StandingRow)?.pair)}</td>
-                            <td className="py-2 text-center font-semibold">{f.puntos}</td>
-                            <td className="py-2 text-center">
-                              {(fila as StandingRow)?.victorias}-{(fila as StandingRow)?.derrotas}
+                          <tr
+                            key={fila.pair_id}
+                            className="border-b border-navy/5"
+                          >
+                            <td className="py-2 pr-4">
+                              {nombrePareja(standing.pair)}
                             </td>
-                            <td className="py-2 text-center">
-                              {f.sets_favor}-{f.sets_contra}
+
+                            <td className="py-2 text-center font-semibold">
+                              {fila.puntos}
                             </td>
+
                             <td className="py-2 text-center">
-                              {f.juegos_favor}-{f.juegos_contra}
+                              {standing.victorias}-{standing.derrotas}
+                            </td>
+
+                            <td className="py-2 text-center">
+                              {fila.sets_favor}-{fila.sets_contra}
+                            </td>
+
+                            <td className="py-2 text-center">
+                              {fila.juegos_favor}-{fila.juegos_contra}
                             </td>
                           </tr>
                         );
@@ -113,12 +193,28 @@ export default async function GruposPage({
                 </div>
               );
             })}
-        </div>
+        </section>
       ))}
 
-      {!grupos?.length && (
+      {!grupos?.length ? (
         <p className="text-navy/70">Aún no se ha generado el sorteo.</p>
-      )}
+      ) : null}
     </main>
   );
+}
+
+function nombrePareja(pair: StandingRow["pair"]): string {
+  if (!pair) {
+    return "?";
+  }
+
+  const nombre1 = pair.player1
+    ? `${pair.player1.nombre} ${pair.player1.apellidos}`
+    : "?";
+
+  const nombre2 = pair.player2
+    ? ` / ${pair.player2.nombre} ${pair.player2.apellidos}`
+    : "";
+
+  return `${nombre1}${nombre2}`;
 }

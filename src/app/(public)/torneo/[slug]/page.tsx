@@ -19,6 +19,7 @@ import {
   Grid3x3,
   ListChecks,
   Gift,
+  CircleHelp,
 } from "lucide-react";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -149,15 +150,19 @@ export default async function TorneoPage({ params }: TournamentPageProps) {
       : {}),
   };
 
-  const antesDelTorneo = ["publicado", "inscripciones_abiertas"].includes(
-    torneo.estado,
-  );
+  const estadoAntes =
+    torneo.estado === "publicado" || torneo.estado === "inscripciones_abiertas";
 
-  const enJuegoOFinalizado = ["en_juego", "finalizado", "archivado"].includes(
-    torneo.estado,
-  );
+  const estadoActivo =
+    torneo.estado === "en_preparacion" ||
+    torneo.estado === "en_juego" ||
+    torneo.estado === "finalizado" ||
+    torneo.estado === "archivado";
 
-  const finalizado = ["finalizado", "archivado"].includes(torneo.estado);
+  const finalizado =
+    torneo.estado === "finalizado" || torneo.estado === "archivado";
+
+  const cancelado = torneo.estado === "cancelado";
 
   const tabs = [
     {
@@ -176,25 +181,31 @@ export default async function TorneoPage({ params }: TournamentPageProps) {
       href: "/horarios",
       label: "Horarios",
       icon: Calendar,
-      show: enJuegoOFinalizado,
+      show: estadoActivo,
     },
     {
       href: "/grupos",
       label: "Grupos",
       icon: ListChecks,
-      show: enJuegoOFinalizado,
+      show: estadoActivo,
     },
     {
       href: "/cuadros",
       label: "Cuadros",
       icon: Grid3x3,
-      show: enJuegoOFinalizado,
+      show: estadoActivo,
     },
     {
       href: "/resultados",
       label: "Resultados",
       icon: Trophy,
-      show: enJuegoOFinalizado,
+      show: estadoActivo,
+    },
+    {
+      href: "/quiniela",
+      label: "Quiniela",
+      icon: CircleHelp,
+      show: torneo.estado === "en_juego" || torneo.estado === "finalizado",
     },
     {
       href: "/premios",
@@ -219,39 +230,37 @@ export default async function TorneoPage({ params }: TournamentPageProps) {
         }}
       />
 
-      <div className="hero-gradient text-offwhite px-5 py-12">
-        <div className="max-w-3xl mx-auto">
+      <div className="hero-gradient px-5 py-12 text-offwhite">
+        <div className="mx-auto max-w-3xl">
           <StatusBadge texto={estadoTexto} tipo={estadoBadge} />
 
-          <h1 className="font-display text-3xl sm:text-4xl mt-3 mb-2">
+          <h1 className="mt-3 mb-2 font-display text-3xl sm:text-4xl">
             {torneo.nombre}
           </h1>
 
-          <div className="flex flex-wrap gap-x-6 gap-y-1 text-offwhite/80 text-sm mb-6">
+          <div className="mb-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-offwhite/80">
             <span className="flex items-center gap-1.5">
               <Calendar size={16} aria-hidden="true" />
-
               {formatearFecha(torneo.fecha_inicio)}
             </span>
 
-            {club && (
+            {club ? (
               <span className="flex items-center gap-1.5">
                 <MapPin size={16} aria-hidden="true" />
-
                 {club.nombre}
               </span>
-            )}
+            ) : null}
 
-            {typeof inscritas === "number" && (
+            {typeof inscritas === "number" ? (
               <span className="flex items-center gap-1.5">
                 <Users size={16} aria-hidden="true" />
                 {inscritas} parejas inscritas
               </span>
-            )}
+            ) : null}
           </div>
 
-          {!!categorias?.length && (
-            <div className="flex flex-wrap gap-2 mb-6">
+          {!!categorias?.length ? (
+            <div className="mb-6 flex flex-wrap gap-2" aria-label="Categorías">
               {categorias.map((categoria, index) => {
                 const categoriaData = categoria.categories as unknown as {
                   nombre: string;
@@ -271,18 +280,24 @@ export default async function TorneoPage({ params }: TournamentPageProps) {
                 );
               })}
             </div>
-          )}
+          ) : null}
 
-          {torneo.estado === "inscripciones_abiertas" && (
-            <Link href={`/torneo/${slug}/inscribirse`} className="btn-primary">
+          {torneo.estado === "inscripciones_abiertas" ? (
+            <Link
+              href={`/torneo/${slug}/inscribirse`}
+              className="btn-primary inline-flex"
+            >
               Inscribirme
             </Link>
-          )}
+          ) : null}
         </div>
       </div>
 
-      <nav className="border-b border-navy/10 bg-white/50 sticky top-[64px] z-30 overflow-x-auto">
-        <div className="max-w-3xl mx-auto flex gap-1 px-5">
+      <nav
+        aria-label="Navegación del torneo"
+        className="sticky top-[64px] z-30 overflow-x-auto border-b border-navy/10 bg-white"
+      >
+        <div className="mx-auto flex min-w-max max-w-3xl gap-1 px-5">
           {tabs.map((tab) => {
             const Icon = tab.icon;
 
@@ -290,10 +305,9 @@ export default async function TorneoPage({ params }: TournamentPageProps) {
               <Link
                 key={tab.label}
                 href={`/torneo/${slug}${tab.href}`}
-                className="flex items-center gap-1.5 px-3 py-3 text-sm text-navy/70 hover:text-coral whitespace-nowrap border-b-2 border-transparent hover:border-coral transition-colors"
+                className="flex items-center gap-1.5 whitespace-nowrap border-b-2 border-transparent px-3 py-3 text-sm text-navy/70 transition-colors hover:border-coral hover:text-coral"
               >
                 <Icon size={15} aria-hidden="true" />
-
                 {tab.label}
               </Link>
             );
@@ -301,25 +315,41 @@ export default async function TorneoPage({ params }: TournamentPageProps) {
         </div>
       </nav>
 
-      <div className="max-w-3xl mx-auto px-5 py-10 space-y-6">
-        {(torneo.precio_texto || torneo.descripcion) && (
-          <div className="card">
-            {torneo.precio_texto && (
-              <p className="font-semibold mb-2">{torneo.precio_texto}</p>
-            )}
+      <div className="mx-auto max-w-3xl space-y-6 px-5 py-10">
+        {cancelado ? (
+          <section
+            role="status"
+            className="rounded-card border border-coral/20 bg-coral/5 p-5"
+          >
+            <h2 className="font-semibold">Torneo cancelado</h2>
+            <p className="mt-1 text-sm text-navy/70">
+              Esta prueba ha sido cancelada. Consulta la información publicada
+              por la organización si necesitas asistencia.
+            </p>
+          </section>
+        ) : null}
 
-            {torneo.descripcion && (
-              <p className="text-sm text-navy/70 whitespace-pre-line">
+        {torneo.precio_texto || torneo.descripcion ? (
+          <section aria-labelledby="informacion-torneo" className="card">
+            <h2 id="informacion-torneo" className="sr-only">
+              Información del torneo
+            </h2>
+
+            {torneo.precio_texto ? (
+              <p className="mb-2 font-semibold">{torneo.precio_texto}</p>
+            ) : null}
+
+            {torneo.descripcion ? (
+              <p className="whitespace-pre-line text-sm text-navy/70">
                 {torneo.descripcion}
               </p>
-            )}
-          </div>
-        )}
+            ) : null}
+          </section>
+        ) : null}
 
-        {antesDelTorneo && (
+        {estadoAntes ? (
           <p className="text-navy/70">
-            Toda la información de horarios, grupos y cuadros se publicará
-            cuando arranque el torneo. Mientras tanto, consulta los{" "}
+            La prueba todavía está en fase previa. Puedes consultar los{" "}
             <Link
               href={`/torneo/${slug}/participantes`}
               className="btn-tertiary"
@@ -330,9 +360,19 @@ export default async function TorneoPage({ params }: TournamentPageProps) {
             <Link href={`/torneo/${slug}/premios`} className="btn-tertiary">
               premios
             </Link>
-            .
+            . Los horarios, grupos, cuadros y resultados se mostrarán cuando
+            estén disponibles.
           </p>
-        )}
+        ) : null}
+
+        {!categorias?.length ? (
+          <section
+            role="status"
+            className="rounded-card bg-navy/5 p-5 text-sm text-navy/70"
+          >
+            Las categorías del torneo todavía están pendientes de configuración.
+          </section>
+        ) : null}
       </div>
     </main>
   );

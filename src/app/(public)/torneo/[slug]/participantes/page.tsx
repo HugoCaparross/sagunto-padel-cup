@@ -1,5 +1,7 @@
 // Ruta: src/app/(public)/torneo/[slug]/participantes/page.tsx
 
+import Link from "next/link";
+import type { ReactNode } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 
@@ -8,6 +10,12 @@ const ESTADO_LABEL: Record<string, string> = {
   lista_espera: "Lista de espera",
   incompleta: "Falta compañero/a",
   pendiente_pago: "Pendiente de pago",
+  cancelada: "Cancelada",
+};
+
+type SearchParams = {
+  categoria?: string;
+  q?: string;
 };
 
 type PairRow = {
@@ -15,10 +23,12 @@ type PairRow = {
   categoria_id: string;
   estado: string;
   player1: {
+    id: string;
     nombre: string;
     apellidos: string;
   } | null;
   player2: {
+    id: string;
     nombre: string;
     apellidos: string;
   } | null;
@@ -26,12 +36,13 @@ type PairRow = {
 
 export default async function ParticipantesPage({
   params,
+  searchParams,
 }: {
-  params: Promise<{
-    slug: string;
-  }>;
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<SearchParams>;
 }) {
   const { slug } = await params;
+  const filters = await searchParams;
 
   const supabase = await createClient();
 
@@ -53,54 +64,234 @@ export default async function ParticipantesPage({
   const { data: parejas } = await supabase
     .from("pairs")
     .select(
-      "id, categoria_id, estado, player1:players!pairs_player_1_id_fkey(nombre, apellidos), player2:players!pairs_player_2_id_fkey(nombre, apellidos)",
+      "id, categoria_id, estado, player1:players!pairs_player_1_id_fkey(id, nombre, apellidos), player2:players!pairs_player_2_id_fkey(id, nombre, apellidos)",
     )
     .eq("tournament_id", torneo.id)
+    .neq("estado", "cancelada")
     .returns<PairRow[]>();
 
+  const query = filters.q?.trim().toLocaleLowerCase("es-ES") ?? "";
+  const categoriaActiva = filters.categoria?.trim() ?? "";
+
+  const parejasFiltradas = (parejas ?? []).filter((pareja) => {
+    if (categoriaActiva && pareja.categoria_id !== categoriaActiva) {
+      return false;
+    }
+
+    if (!query) {
+      return true;
+    }
+
+    const nombres = [pareja.player1, pareja.player2]
+      .filter(Boolean)
+      .map((player) => `${player?.nombre ?? ""} ${player?.apellidos ?? ""}`)
+      .join(" ")
+      .toLocaleLowerCase("es-ES");
+
+    return nombres.includes(query);
+  });
+
+  const buildHref = (categoria: string) => {
+    const params = new URLSearchParams();
+
+    params.set("categoria", categoria);
+
+    if (filters.q?.trim()) {
+      params.set("q", filters.q.trim());
+    }
+
+    return `/torneo/${slug}/participantes?${params.toString()}`;
+  };
+
+  const limpiarHref = `/torneo/${slug}/participantes`;
+
   return (
-    <main className="max-w-3xl mx-auto px-5 py-12">
-      <h1 className="font-display text-3xl mb-2">Participantes</h1>
+    <main className="mx-auto max-w-4xl px-5 py-12">
+      <header className="mb-8">
+        <h1 className="font-display text-3xl">Participantes</h1>
 
-      <p className="text-navy/70 mb-8">{torneo.nombre}</p>
+        <p className="mt-2 text-navy/70">{torneo.nombre}</p>
+      </header>
 
-      {categorias?.map((categoria) => {
-        const deLaCategoria =
-          parejas?.filter((pareja) => pareja.categoria_id === categoria.id) ??
-          [];
+      <form
+        method="get"
+        className="mb-8 grid gap-4 rounded-card bg-navy/5 p-4 sm:grid-cols-[1fr_auto]"
+      >
+        <div>
+          <label
+            htmlFor="buscar-participantes"
+            className="mb-1.5 block text-sm font-semibold"
+          >
+            Buscar jugador
+          </label>
 
-        if (!deLaCategoria.length) {
-          return null;
-        }
+          <input
+            id="buscar-participantes"
+            name="q"
+            type="search"
+            defaultValue={filters.q ?? ""}
+            placeholder="Nombre o apellidos"
+            className="w-full rounded-card border border-navy/15 bg-white px-3 py-2 text-sm outline-none focus:border-coral"
+          />
+        </div>
 
-        return (
-          <div key={categoria.id} className="mb-8">
-            <h2 className="font-display text-xl mb-3">{categoria.nombre}</h2>
+        <div className="flex items-end gap-2">
+          <button type="submit" className="btn-primary">
+            Buscar
+          </button>
 
-            <ul className="space-y-2">
-              {deLaCategoria.map((pareja) => (
-                <li
-                  key={pareja.id}
-                  className="flex justify-between items-center rounded-card bg-navy/5 px-4 py-3"
-                >
-                  <span>
-                    {pareja.player1?.nombre} {pareja.player1?.apellidos}
-                    {pareja.player2 &&
-                      ` / ${pareja.player2.nombre} ${pareja.player2.apellidos}`}
-                  </span>
+          <Link href={limpiarHref} className="btn-secondary">
+            Limpiar
+          </Link>
+        </div>
+      </form>
 
-                  <span className="text-sm text-navy/60">
-                    {ESTADO_LABEL[pareja.estado] ?? pareja.estado}
-                  </span>
-                </li>
-              ))}
-            </ul>
+      {categorias?.length ? (
+        <nav
+          aria-label="Filtrar por categoría"
+          className="mb-8 overflow-x-auto"
+        >
+          <div className="flex min-w-max gap-2">
+            <Link
+              href={
+                filters.q?.trim()
+                  ? `${limpiarHref}?q=${encodeURIComponent(filters.q.trim())}`
+                  : limpiarHref
+              }
+              className={`rounded-full px-3 py-2 text-sm ${
+                !categoriaActiva
+                  ? "bg-navy text-offwhite"
+                  : "bg-navy/5 text-navy/70"
+              }`}
+            >
+              Todas
+            </Link>
+
+            {categorias.map((categoria) => (
+              <Link
+                key={categoria.id}
+                href={buildHref(categoria.id)}
+                className={`rounded-full px-3 py-2 text-sm ${
+                  categoriaActiva === categoria.id
+                    ? "bg-navy text-offwhite"
+                    : "bg-navy/5 text-navy/70"
+                }`}
+              >
+                {categoria.nombre}
+              </Link>
+            ))}
           </div>
-        );
-      })}
+        </nav>
+      ) : null}
 
-      {!parejas?.length && (
-        <p className="text-navy/70">Aún no hay inscripciones.</p>
+      {parejasFiltradas.length ? (
+        <div className="space-y-8">
+          {categorias
+            ?.filter(
+              (categoria) =>
+                !categoriaActiva || categoria.id === categoriaActiva,
+            )
+            .map((categoria) => {
+              const deLaCategoria = parejasFiltradas.filter(
+                (pareja) => pareja.categoria_id === categoria.id,
+              );
+
+              if (!deLaCategoria.length) {
+                return null;
+              }
+
+              return (
+                <section
+                  key={categoria.id}
+                  aria-labelledby={`categoria-${categoria.id}`}
+                >
+                  <h2
+                    id={`categoria-${categoria.id}`}
+                    className="mb-3 font-display text-xl"
+                  >
+                    {categoria.nombre}
+                  </h2>
+
+                  <ul className="space-y-2">
+                    {deLaCategoria.map((pareja) => {
+                      const jugadores = [pareja.player1, pareja.player2].filter(
+                        Boolean,
+                      );
+
+                      return (
+                        <li
+                          key={pareja.id}
+                          className="rounded-card bg-navy/5 px-4 py-3"
+                        >
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="min-w-0">
+                              <p className="font-semibold">
+                                {jugadores
+                                  .map((jugador) => (
+                                    <span key={jugador?.id}>
+                                      {jugador?.id ? (
+                                        <Link
+                                          href={`/jugador/${jugador.id}`}
+                                          className="underline decoration-transparent underline-offset-4 hover:text-coral hover:decoration-coral"
+                                        >
+                                          {jugador?.nombre} {jugador?.apellidos}
+                                        </Link>
+                                      ) : null}
+                                    </span>
+                                  ))
+                                  .reduce(
+                                    (resultado, elemento, index) =>
+                                      index === 0
+                                        ? [elemento]
+                                        : [
+                                            ...resultado,
+                                            <span
+                                              key={`sep-${index}`}
+                                              className="text-navy/40"
+                                            >
+                                              {" "}
+                                              /{" "}
+                                            </span>,
+                                            elemento,
+                                          ],
+                                    [] as ReactNode[],
+                                  )}
+                              </p>
+
+                              {!pareja.player2 ? (
+                                <p className="mt-1 text-xs text-navy/55">
+                                  Pendiente de compañero/a
+                                </p>
+                              ) : null}
+                            </div>
+
+                            <span
+                              className={`shrink-0 text-xs ${
+                                pareja.estado === "lista_espera"
+                                  ? "text-coral"
+                                  : "text-navy/60"
+                              }`}
+                            >
+                              {ESTADO_LABEL[pareja.estado]}
+                            </span>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </section>
+              );
+            })}
+        </div>
+      ) : (
+        <section
+          role="status"
+          className="rounded-card bg-navy/5 p-6 text-sm text-navy/70"
+        >
+          {parejas?.length
+            ? "No hay participantes que coincidan con los filtros seleccionados."
+            : "Aún no hay participantes confirmados para este torneo."}
+        </section>
       )}
     </main>
   );
