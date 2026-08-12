@@ -59,6 +59,7 @@ export default function RegistrationForm({
 
       if (res.ok) {
         router.push(`/torneo/${torneoSlug}/inscribirse/completada`);
+
         return;
       }
 

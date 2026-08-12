@@ -1,4 +1,5 @@
 // Ruta: src/components/Header.tsx — sustituye entero al archivo actual
+
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/(public)/login/actions";

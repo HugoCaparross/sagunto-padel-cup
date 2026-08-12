@@ -59,7 +59,9 @@ export default function PerfilForm({ inicial }: { inicial: Datos }) {
 
       if (!resultado.ok) {
         setEstado("idle");
+
         setError(resultado.error ?? "No se ha podido guardar el perfil.");
+
         return;
       }
 
@@ -68,6 +70,7 @@ export default function PerfilForm({ inicial }: { inicial: Datos }) {
       console.error("[PerfilForm] Error actualizando perfil:", actionError);
 
       setEstado("idle");
+
       setError(
         "Ha ocurrido un error inesperado. Tus cambios siguen en el formulario.",
       );

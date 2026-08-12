@@ -193,8 +193,11 @@ export default function InscripcionesTable({
                 className="rounded-card border border-offwhite/20 bg-navy px-3 py-2 text-sm outline-none transition focus:border-coral disabled:opacity-50"
               >
                 <option value="confirmada">Confirmada</option>
+
                 <option value="lista_espera">Lista de espera</option>
+
                 <option value="incompleta">Incompleta</option>
+
                 <option value="cancelada">Cancelada</option>
               </select>
 

@@ -5,23 +5,40 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 async function otorgar(
   admin: SupabaseClient,
   playerId: string,
-  tipo: string
+  tipo: string,
 ) {
+  const tipoNormalizado =
+    tipo.trim();
+
+  if (
+    !playerId ||
+    !tipoNormalizado
+  ) {
+    return;
+  }
+
   const {
     data: existente,
     error: consultaError,
   } = await admin
     .from("badges")
     .select("id")
-    .eq("player_id", playerId)
-    .eq("tipo", tipo)
+    .eq(
+      "player_id",
+      playerId,
+    )
+    .eq(
+      "tipo",
+      tipoNormalizado,
+    )
     .maybeSingle();
 
   if (consultaError) {
     console.error(
       "[badges] Error comprobando insignia:",
-      consultaError
+      consultaError,
     );
+
     return;
   }
 
@@ -30,85 +47,106 @@ async function otorgar(
   }
 
   const { error: insertError } =
-    await admin.from("badges").insert({
-      player_id: playerId,
-      tipo,
-    });
+    await admin
+      .from("badges")
+      .insert({
+        player_id: playerId,
+        tipo: tipoNormalizado,
+      });
 
   if (insertError) {
-    /*
-     * Si existe una restricción única y otro proceso ha
-     * creado la insignia entre la comprobación y el insert,
-     * no debemos generar una segunda notificación.
-     */
-    if (insertError.code === "23505") {
+    if (
+      insertError.code ===
+      "23505"
+    ) {
       return;
     }
 
     console.error(
       "[badges] Error creando insignia:",
-      insertError
+      insertError,
     );
 
     return;
   }
 
-  const { error: notificationError } =
-    await admin
-      .from("notifications")
-      .insert({
-        player_id: playerId,
-        tipo: "insignia",
-        canal: "in_app",
-        contenido: `Has desbloqueado la insignia "${tipo.replace(
-          /_/g,
-          " "
-        )}"`,
-      });
+  const {
+    error: notificationError,
+  } = await admin
+    .from("notifications")
+    .insert({
+      player_id: playerId,
+      tipo: "insignia",
+      canal: "in_app",
+      contenido: `Has desbloqueado la insignia "${tipoNormalizado.replace(
+        /_/g,
+        " ",
+      )}"`,
+    });
 
   if (notificationError) {
     console.error(
       "[badges] Error creando notificación de insignia:",
-      notificationError
+      notificationError,
     );
   }
 }
 
-// Revisa las insignias basadas en actividad
-// (torneos, partidos, victorias y títulos)
-// y otorga las que falten.
-// Se llama tras cerrar un torneo.
 export async function evaluarInsignias(
   admin: SupabaseClient,
-  playerId: string
+  playerId: string,
 ) {
+  if (!playerId) {
+    return;
+  }
+
   const {
     data: torneosJugados,
     error: torneosError,
   } = await admin
     .from("ranking_points")
-    .select("tournament_id")
-    .eq("player_id", playerId);
+    .select(
+      "tournament_id",
+    )
+    .eq(
+      "player_id",
+      playerId,
+    );
 
   if (torneosError) {
     console.error(
       "[badges] Error obteniendo torneos jugados:",
-      torneosError
+      torneosError,
     );
+
     return;
   }
 
-  const numTorneos = new Set(
-    torneosJugados?.map(
-      (t) => t.tournament_id
-    )
-  ).size;
+  const numTorneos =
+    new Set(
+      (
+        torneosJugados ??
+        []
+      )
+        .map(
+          (torneo) =>
+            torneo.tournament_id,
+        )
+        .filter(
+          (
+            id,
+          ): id is string =>
+            typeof id ===
+              "string" &&
+            id.length > 0,
+        ),
+    ).size;
 
   if (numTorneos >= 1) {
     await otorgar(
       admin,
       playerId,
-      "primer_torneo"
+      "primer_torneo",
     );
   }
 
@@ -119,19 +157,39 @@ export async function evaluarInsignias(
     .from("pairs")
     .select("id")
     .or(
-      `player_1_id.eq.${playerId},player_2_id.eq.${playerId}`
+      `player_1_id.eq.${playerId},player_2_id.eq.${playerId}`,
     );
 
   if (pairsError) {
     console.error(
       "[badges] Error obteniendo parejas:",
-      pairsError
+      pairsError,
     );
+
     return;
   }
 
   const pairIds =
-    pairs?.map((p) => p.id) ?? [];
+    Array.from(
+      new Set(
+        (
+          pairs ??
+          []
+        )
+          .map(
+            (pair) =>
+              pair.id,
+          )
+          .filter(
+            (
+              id,
+            ): id is string =>
+              typeof id ===
+                "string" &&
+              id.length > 0,
+          ),
+      ),
+    );
 
   if (pairIds.length > 0) {
     const {
@@ -139,42 +197,47 @@ export async function evaluarInsignias(
       error: partidosError,
     } = await admin
       .from("matches")
-      .select("resultado_json")
-      .eq("estado", "finalizado")
+      .select(
+        "resultado_json",
+      )
+      .eq(
+        "estado",
+        "finalizado",
+      )
       .or(
-        `pair_1_id.in.(${pairIds.join(
-          ","
-        )}),pair_2_id.in.(${pairIds.join(
-          ","
-        )})`
+        `pair_1_id.in.(${pairIds.join(",")}),pair_2_id.in.(${pairIds.join(",")})`,
       );
 
     if (partidosError) {
       console.error(
         "[badges] Error obteniendo partidos:",
-        partidosError
+        partidosError,
       );
     } else {
       const jugados =
-        partidos?.length ?? 0;
+        partidos?.length ??
+        0;
 
       const victorias =
-        partidos?.filter((p) => {
-          const resultado =
-            p.resultado_json as {
-              ganador_id?: string;
-            } | null;
+        partidos?.filter(
+          (partido) => {
+            const resultado =
+              partido.resultado_json as {
+                ganador_id?: string;
+              } | null;
 
-          return pairIds.includes(
-            resultado?.ganador_id ?? ""
-          );
-        }).length ?? 0;
+            return pairIds.includes(
+              resultado?.ganador_id ??
+                "",
+            );
+          },
+        ).length ?? 0;
 
       if (jugados >= 50) {
         await otorgar(
           admin,
           playerId,
-          "50_partidos"
+          "50_partidos",
         );
       }
 
@@ -182,7 +245,7 @@ export async function evaluarInsignias(
         await otorgar(
           admin,
           playerId,
-          "10_victorias"
+          "10_victorias",
         );
       }
     }
@@ -193,26 +256,40 @@ export async function evaluarInsignias(
     error: campeonatosError,
   } = await admin
     .from("ranking_points")
-    .select("ronda_alcanzada")
-    .eq("player_id", playerId)
+    .select(
+      "ronda_alcanzada",
+    )
+    .eq(
+      "player_id",
+      playerId,
+    )
     .like(
       "ronda_alcanzada",
-      "campeon_%"
+      "campeon_%",
     );
 
   if (campeonatosError) {
     console.error(
       "[badges] Error comprobando títulos:",
-      campeonatosError
+      campeonatosError,
     );
+
     return;
   }
 
-  if (campeonatos?.length) {
+  if (
+    (
+      campeonatos ??
+      []
+    ).some(
+      (item) =>
+        item.ronda_alcanzada,
+    )
+  ) {
     await otorgar(
       admin,
       playerId,
-      "campeon"
+      "campeon",
     );
   }
 }

@@ -37,6 +37,7 @@ export default function HorariosTable({ torneoId, filas }: HorariosTableProps) {
 
     const nuevosValores = {
       pista: campo === "pista" ? valor : fila.pista,
+
       horaProgramada: campo === "horaProgramada" ? valor : fila.horaProgramada,
     };
 

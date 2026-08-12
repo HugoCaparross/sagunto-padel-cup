@@ -1,13 +1,10 @@
 // Ruta: src/lib/grupos.ts
 //
-// Única fuente de verdad para el criterio de desempate:
-// 1.º enfrentamiento directo
+// Criterio de desempate:
+// 1.º enfrentamiento directo cuando resuelve un empate de dos parejas
 // 2.º diferencia de sets
 // 3.º diferencia de juegos
-//
-// En empates de 3 o más parejas, el enfrentamiento directo
-// se utiliza únicamente cuando puede resolver la comparación;
-// si no, se continúa con la cascada de respaldo.
+// 4.º orden original como último desempate estable
 
 export type Standing = {
   pair_id: string;
@@ -29,27 +26,27 @@ export type PartidoResuelto = {
 function obtenerEnfrentamiento(
   a: string,
   b: string,
-  partidos: PartidoResuelto[]
+  partidos: PartidoResuelto[],
 ) {
   return partidos.find(
     (partido) =>
       (partido.pair_1_id === a &&
         partido.pair_2_id === b) ||
       (partido.pair_1_id === b &&
-        partido.pair_2_id === a)
+        partido.pair_2_id === a),
   );
 }
 
 function resultadoHeadToHead(
   a: string,
   b: string,
-  partidos: PartidoResuelto[]
+  partidos: PartidoResuelto[],
 ): number {
   const partido =
     obtenerEnfrentamiento(
       a,
       b,
-      partidos
+      partidos,
     );
 
   if (!partido) {
@@ -71,94 +68,120 @@ function resultadoHeadToHead(
   return 0;
 }
 
+function diferenciaSets(
+  standing: Standing,
+): number {
+  return (
+    standing.sets_favor -
+    standing.sets_contra
+  );
+}
+
+function diferenciaJuegos(
+  standing: Standing,
+): number {
+  return (
+    standing.juegos_favor -
+    standing.juegos_contra
+  );
+}
+
 export function ordenarClasificacionGrupo(
   standings: Standing[],
-  partidosDelGrupo: PartidoResuelto[]
+  partidosDelGrupo: PartidoResuelto[],
 ): Standing[] {
-  return [...standings].sort(
-    (a, b) => {
-      if (
-        b.puntos !==
+  const ordenOriginal =
+    new Map(
+      standings.map(
+        (
+          standing,
+          index,
+        ) => [
+          standing.pair_id,
+          index,
+        ],
+      ),
+    );
+
+  return [
+    ...standings,
+  ].sort((a, b) => {
+    if (
+      b.puntos !==
+      a.puntos
+    ) {
+      return (
+        b.puntos -
         a.puntos
-      ) {
-        return (
-          b.puntos -
-          a.puntos
-        );
-      }
-
-      /*
-       * El enfrentamiento directo es resolutivo
-       * cuando el empate afecta a dos parejas.
-       *
-       * En empates múltiples no forzamos una
-       * comparación parcial que pueda generar un
-       * orden incoherente; continuamos con la
-       * diferencia de sets.
-       */
-      const empatados =
-        standings.filter(
-          (standing) =>
-            standing.puntos ===
-            a.puntos
-        );
-
-      if (
-        empatados.length === 2
-      ) {
-        const h2h =
-          resultadoHeadToHead(
-            a.pair_id,
-            b.pair_id,
-            partidosDelGrupo
-          );
-
-        if (h2h !== 0) {
-          return h2h;
-        }
-      }
-
-      const diffSetsA =
-        a.sets_favor -
-        a.sets_contra;
-
-      const diffSetsB =
-        b.sets_favor -
-        b.sets_contra;
-
-      if (
-        diffSetsB !==
-        diffSetsA
-      ) {
-        return (
-          diffSetsB -
-          diffSetsA
-        );
-      }
-
-      const diffJuegosA =
-        a.juegos_favor -
-        a.juegos_contra;
-
-      const diffJuegosB =
-        b.juegos_favor -
-        b.juegos_contra;
-
-      if (
-        diffJuegosB !==
-        diffJuegosA
-      ) {
-        return (
-          diffJuegosB -
-          diffJuegosA
-        );
-      }
-
-      /*
-       * Si todas las métricas son iguales,
-       * conservamos el orden original.
-       */
-      return 0;
+      );
     }
-  );
+
+    const empatados =
+      standings.filter(
+        (standing) =>
+          standing.puntos ===
+          a.puntos,
+      );
+
+    if (
+      empatados.length ===
+      2
+    ) {
+      const h2h =
+        resultadoHeadToHead(
+          a.pair_id,
+          b.pair_id,
+          partidosDelGrupo,
+        );
+
+      if (h2h !== 0) {
+        return h2h;
+      }
+    }
+
+    const diffSetsA =
+      diferenciaSets(a);
+
+    const diffSetsB =
+      diferenciaSets(b);
+
+    if (
+      diffSetsB !==
+      diffSetsA
+    ) {
+      return (
+        diffSetsB -
+        diffSetsA
+      );
+    }
+
+    const diffJuegosA =
+      diferenciaJuegos(a);
+
+    const diffJuegosB =
+      diferenciaJuegos(b);
+
+    if (
+      diffJuegosB !==
+      diffJuegosA
+    ) {
+      return (
+        diffJuegosB -
+        diffJuegosA
+      );
+    }
+
+    return (
+      (
+        ordenOriginal.get(
+          a.pair_id,
+        ) ?? 0
+      ) -
+      (
+        ordenOriginal.get(
+          b.pair_id,
+        ) ?? 0
+      )
+    );
+  });
 }

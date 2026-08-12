@@ -5,14 +5,8 @@
 // 1 = 3ª
 // 2 = 4ª
 // 3 = Iniciación
-//
-// El nivel_orden de categories debe utilizar
-// exactamente esta correspondencia.
 
-export const TABLA_PUNTOS: Record<
-  string,
-  [number, number, number, number]
-> = {
+export const TABLA_PUNTOS = {
   campeon_oro: [
     100,
     82,
@@ -110,22 +104,18 @@ export const TABLA_PUNTOS: Record<
     8,
     6,
   ],
-};
+} as const;
+
+export type ResultadoRanking =
+  keyof typeof TABLA_PUNTOS;
 
 export function puntosPara(
   resultado: string,
-  nivelOrden: number
+  nivelOrden: number,
 ): number {
-  const fila =
-    TABLA_PUNTOS[resultado];
-
-  if (!fila) {
-    return 0;
-  }
-
   if (
     !Number.isInteger(
-      nivelOrden
+      nivelOrden,
     ) ||
     nivelOrden < 1 ||
     nivelOrden > 4
@@ -133,16 +123,24 @@ export function puntosPara(
     return 0;
   }
 
+  const fila =
+    TABLA_PUNTOS[
+      resultado as ResultadoRanking
+    ];
+
+  if (!fila) {
+    return 0;
+  }
+
   return (
-    fila[nivelOrden - 1] ??
-    0
+    fila[
+      nivelOrden - 1
+    ] ?? 0
   );
 }
 
-const RONDA_A_ETIQUETA: Record<
-  string,
-  string
-> = {
+const RONDA_A_ETIQUETA:
+  Record<string, string> = {
   final: "subcampeon",
   semis: "semifinalista",
   cuartos: "cuartofinalista",
@@ -150,10 +148,13 @@ const RONDA_A_ETIQUETA: Record<
 };
 
 export function resultadoClave(
-  tramo: string,
+  tramo:
+    | "oro"
+    | "plata"
+    | "bronce",
   esCampeon: boolean,
-  rondaEliminado?: string
-) {
+  rondaEliminado?: string,
+): string {
   if (esCampeon) {
     return `campeon_${tramo}`;
   }

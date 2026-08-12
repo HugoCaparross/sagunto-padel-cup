@@ -38,9 +38,10 @@ export default function SignupForm() {
       }
     } catch (actionError) {
       /*
-       * signup() puede ejecutar redirect() cuando el registro
-       * termina correctamente. Ese flujo no debe convertirse
-       * en un mensaje de error de usuario.
+       * signup() puede ejecutar redirect()
+       * cuando el registro termina correctamente.
+       * Ese flujo no debe convertirse en un mensaje
+       * de error de usuario.
        */
       if (
         actionError &&

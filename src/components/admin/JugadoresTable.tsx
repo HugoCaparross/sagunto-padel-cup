@@ -71,6 +71,7 @@ export default function JugadoresTable({
       }
 
       setMotivoAbierto(null);
+
       setMotivo("");
     } catch (actionError) {
       console.error("[JugadoresTable] Error cambiando categoría:", actionError);
@@ -118,6 +119,7 @@ export default function JugadoresTable({
     );
 
     setMotivoAbierto(null);
+
     setMotivo("");
   }
 

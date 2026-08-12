@@ -5,18 +5,75 @@ export type SorteoPareja = {
   cabeza_de_serie: boolean;
 };
 
+function randomUint32(): number {
+  const valores =
+    new Uint32Array(1);
+
+  globalThis.crypto.getRandomValues(
+    valores,
+  );
+
+  return (
+    valores[0] ?? 0
+  );
+}
+
+function shuffle<T>(
+  arr: T[],
+): T[] {
+  const resultado = [
+    ...arr,
+  ];
+
+  for (
+    let i =
+      resultado.length - 1;
+    i > 0;
+    i -= 1
+  ) {
+    const j =
+      randomUint32() %
+      (i + 1);
+
+    [
+      resultado[i],
+      resultado[j],
+    ] = [
+      resultado[j],
+      resultado[i],
+    ];
+  }
+
+  return resultado;
+}
+
 export function generateGroups(
-  pairs: SorteoPareja[]
+  pairs: SorteoPareja[],
 ): string[][] {
   const parejasValidas =
-    pairs.filter(
-      (pair): pair is SorteoPareja =>
-        Boolean(
-          pair &&
-            typeof pair.id ===
-              "string" &&
-            pair.id.length > 0
-        )
+    Array.from(
+      new Map(
+        pairs
+          .filter(
+            (
+              pair,
+            ): pair is SorteoPareja =>
+              Boolean(
+                pair &&
+                  typeof pair.id ===
+                    "string" &&
+                  pair.id
+                    .trim()
+                    .length > 0,
+              ),
+          )
+          .map(
+            (pair) => [
+              pair.id,
+              pair,
+            ],
+          ),
+      ).values(),
     );
 
   const n =
@@ -26,132 +83,106 @@ export function generateGroups(
     return [];
   }
 
-  /*
-   * Se mantienen aproximadamente 4 parejas
-   * por grupo.
-   *
-   * Ejemplos:
-   *  1-4  -> 1 grupo
-   *  5-8  -> 2 grupos
-   *  9-12 -> 3 grupos
-   */
-  const numGroups = Math.max(
-    1,
-    Math.ceil(n / 4)
-  );
+  const numGroups =
+    Math.max(
+      1,
+      Math.ceil(n / 4),
+    );
 
-  const groups: string[][] =
+  const groups:
+    string[][] =
     Array.from(
       {
-        length: numGroups,
+        length:
+          numGroups,
       },
-      () => []
+      () => [],
     );
 
   const cabezas =
-    parejasValidas.filter(
-      (pair) =>
-        pair.cabeza_de_serie
+    shuffle(
+      parejasValidas.filter(
+        (pair) =>
+          pair.cabeza_de_serie,
+      ),
     );
 
-  const resto = shuffle(
-    parejasValidas.filter(
-      (pair) =>
-        !pair.cabeza_de_serie
-    )
-  );
+  const resto =
+    shuffle(
+      parejasValidas.filter(
+        (pair) =>
+          !pair.cabeza_de_serie,
+      ),
+    );
 
-  /*
-   * Las cabezas de serie se distribuyen
-   * una por grupo antes de repartir el resto.
-   *
-   * Si hay más cabezas de serie que grupos,
-   * el reparto circular mantiene la distribución.
-   */
   cabezas.forEach(
-    (pair, index) => {
-      const groupIndex =
-        index % numGroups;
-
-      groups[groupIndex].push(
-        pair.id
-      );
-    }
+    (
+      pair,
+      index,
+    ) => {
+      groups[
+        index % numGroups
+      ].push(pair.id);
+    },
   );
 
-  /*
-   * El resto se asigna siempre al grupo
-   * actualmente más pequeño.
-   *
-   * En caso de empate, reduce conserva el
-   * primer grupo disponible, evitando introducir
-   * un segundo factor aleatorio innecesario.
-   */
-  resto.forEach((pair) => {
-    let objetivo = 0;
+  resto.forEach(
+    (pair) => {
+      let objetivo = 0;
 
-    for (
-      let index = 1;
-      index < groups.length;
-      index += 1
-    ) {
-      if (
-        groups[index].length <
-        groups[objetivo].length
+      for (
+        let index = 1;
+        index <
+          groups.length;
+        index += 1
       ) {
-        objetivo = index;
+        if (
+          groups[index]
+            .length <
+          groups[
+            objetivo
+          ].length
+        ) {
+          objetivo =
+            index;
+        }
       }
-    }
 
-    groups[objetivo].push(
-      pair.id
-    );
-  });
+      groups[
+        objetivo
+      ].push(pair.id);
+    },
+  );
 
   return groups;
 }
 
-function shuffle<T>(
-  arr: T[]
-): T[] {
-  const a = [...arr];
-
-  for (
-    let i = a.length - 1;
-    i > 0;
-    i -= 1
-  ) {
-    const j = Math.floor(
-      Math.random() *
-        (i + 1)
+export function roundRobin(
+  pairIds: string[],
+): [
+  string,
+  string,
+][] {
+  const ids =
+    Array.from(
+      new Set(
+        pairIds.filter(
+          (
+            id,
+          ): id is string =>
+            typeof id ===
+              "string" &&
+            id.trim()
+              .length > 0,
+        ),
+      ),
     );
 
-    [a[i], a[j]] = [
-      a[j],
-      a[i],
-    ];
-  }
-
-  return a;
-}
-
-// Genera todos los cruces "todos contra todos"
-// dentro de un grupo.
-export function roundRobin(
-  pairIds: string[]
-): [string, string][] {
-  const ids = pairIds.filter(
-    (
-      id
-    ): id is string =>
-      typeof id === "string" &&
-      id.length > 0
-  );
-
-  const partidos: [
-    string,
-    string
-  ][] = [];
+  const partidos:
+    [
+      string,
+      string,
+    ][] = [];
 
   for (
     let i = 0;
@@ -163,8 +194,11 @@ export function roundRobin(
       j < ids.length;
       j += 1
     ) {
-      const pair1 = ids[i];
-      const pair2 = ids[j];
+      const pair1 =
+        ids[i];
+
+      const pair2 =
+        ids[j];
 
       if (
         !pair1 ||

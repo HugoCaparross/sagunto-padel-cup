@@ -16,9 +16,13 @@ export default function AccesoColaboradorForm({
   torneoId,
 }: AccesoColaboradorFormProps) {
   const [nombre, setNombre] = useState("");
+
   const [dias, setDias] = useState(14);
+
   const [url, setUrl] = useState<string | null>(null);
+
   const [enviando, setEnviando] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
 
   async function crear() {
@@ -58,6 +62,7 @@ export default function AccesoColaboradorForm({
       }
 
       setUrl(`${window.location.origin}/subir/${res.token}`);
+
       setNombre("");
     } catch (actionError) {
       console.error(

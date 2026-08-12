@@ -11,23 +11,46 @@ export default function NivelBadge({
   xp,
   siguienteUmbral,
 }: NivelBadgeProps) {
-  const xpActual = Math.max(0, Number.isFinite(xp) ? xp : 0);
+  const xpActual = Math.max(
+    0,
+    Number.isFinite(xp)
+      ? xp
+      : 0,
+  );
 
   const umbral = Math.max(
     0,
-    Number.isFinite(siguienteUmbral) ? siguienteUmbral : 0,
+    Number.isFinite(
+      siguienteUmbral,
+    )
+      ? siguienteUmbral
+      : 0,
   );
 
   const progreso =
     umbral <= 0
       ? 100
-      : Math.min(100, Math.max(0, Math.round((xpActual / umbral) * 100)));
+      : Math.min(
+          100,
+          Math.max(
+            0,
+            Math.round(
+              (xpActual /
+                umbral) *
+                100,
+            ),
+          ),
+        );
 
   return (
     <div className="rounded-card bg-navy text-offwhite p-4 inline-block min-w-[220px]">
-      <p className="text-sage text-xs uppercase mb-1">Nivel</p>
+      <p className="text-sage text-xs uppercase mb-1">
+        Nivel
+      </p>
 
-      <p className="font-display text-xl mb-2">{etiqueta}</p>
+      <p className="font-display text-xl mb-2">
+        {etiqueta}
+      </p>
 
       <div
         className="h-2 bg-offwhite/20 rounded-full overflow-hidden"

@@ -5,31 +5,71 @@ import { Resend } from "resend";
 const FROM =
   "Sagunto Padel Cup <torneos@saguntopadelcup.com>";
 
-function getResend() {
+function getResend(): Resend {
   const apiKey =
     process.env.RESEND_API_KEY;
 
   if (!apiKey) {
     throw new Error(
-      "RESEND_API_KEY no está configurada."
+      "RESEND_API_KEY no está configurada.",
     );
   }
 
-  return new Resend(apiKey);
+  return new Resend(
+    apiKey,
+  );
 }
 
 function escapeHtml(
-  value: string
+  value: string,
 ): string {
   return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
+    .replaceAll(
+      "&",
+      "&amp;",
+    )
+    .replaceAll(
+      "<",
+      "&lt;",
+    )
+    .replaceAll(
+      ">",
+      "&gt;",
+    )
+    .replaceAll(
+      '"',
+      "&quot;",
+    )
     .replaceAll(
       "'",
-      "&#039;"
+      "&#039;",
     );
+}
+
+function normalizarEmail(
+  value: string,
+): string {
+  return value
+    .trim()
+    .toLowerCase();
+}
+
+function validarEmail(
+  value: string,
+): void {
+  const email =
+    normalizarEmail(value);
+
+  if (
+    !email ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+      email,
+    )
+  ) {
+    throw new Error(
+      "Dirección de email no válida.",
+    );
+  }
 }
 
 export async function sendRegistrationConfirmedEmail(
@@ -40,41 +80,45 @@ export async function sendRegistrationConfirmedEmail(
     estado:
       | "confirmada"
       | "lista_espera";
-  }
+  },
 ) {
-  const {
-    to,
-    nombre,
-    torneoNombre,
-    estado,
-  } = params;
+  const to =
+    normalizarEmail(
+      params.to,
+    );
+
+  validarEmail(to);
 
   const nombreSeguro =
-    escapeHtml(nombre);
+    escapeHtml(
+      params.nombre.trim(),
+    );
 
   const torneoSeguro =
-    escapeHtml(torneoNombre);
+    escapeHtml(
+      params.torneoNombre.trim(),
+    );
 
   const asunto =
-    estado === "confirmada"
-      ? `Inscripción confirmada — ${torneoNombre}`
-      : `Estás en lista de espera — ${torneoNombre}`;
+    params.estado ===
+    "confirmada"
+      ? `Inscripción confirmada — ${params.torneoNombre}`
+      : `Estás en lista de espera — ${params.torneoNombre}`;
 
   const cuerpo =
-    estado === "confirmada"
+    params.estado ===
+    "confirmada"
       ? `Hola ${nombreSeguro},<br/><br/>Tu inscripción en <strong>${torneoSeguro}</strong> está confirmada. Nos vemos en la pista.`
       : `Hola ${nombreSeguro},<br/><br/>Tu categoría está completa por ahora, así que has entrado en la lista de espera de <strong>${torneoSeguro}</strong>. Si se libera una plaza, te avisamos automáticamente.`;
 
-  return getResend().emails.send({
-    from: FROM,
-    to,
-    subject: asunto,
-    html: `
-      <div style="font-family:sans-serif;font-size:15px;color:#0D1B2A;">
-        ${cuerpo}
-      </div>
-    `,
-  });
+  return getResend().emails.send(
+    {
+      from: FROM,
+      to,
+      subject: asunto,
+      html: `<div style="font-family:sans-serif;font-size:15px;line-height:1.6;color:#0D1B2A;">${cuerpo}</div>`,
+    },
+  );
 }
 
 export async function sendWaitlistPromotedEmail(
@@ -82,32 +126,39 @@ export async function sendWaitlistPromotedEmail(
     to: string;
     nombre: string;
     torneoNombre: string;
-  }
+  },
 ) {
-  const {
-    to,
-    nombre,
-    torneoNombre,
-  } = params;
+  const to =
+    normalizarEmail(
+      params.to,
+    );
+
+  validarEmail(to);
 
   const nombreSeguro =
-    escapeHtml(nombre);
+    escapeHtml(
+      params.nombre.trim(),
+    );
 
   const torneoSeguro =
-    escapeHtml(torneoNombre);
+    escapeHtml(
+      params.torneoNombre.trim(),
+    );
 
-  return getResend().emails.send({
-    from: FROM,
-    to,
-    subject: `¡Ya tienes plaza! — ${torneoNombre}`,
-    html: `
-      <div style="font-family:sans-serif;font-size:15px;color:#0D1B2A;">
+  return getResend().emails.send(
+    {
+      from: FROM,
+      to,
+      subject: `¡Ya tienes plaza! — ${params.torneoNombre}`,
+      html: `
+      <div style="font-family:sans-serif;font-size:15px;line-height:1.6;color:#0D1B2A;">
         Hola ${nombreSeguro},<br/><br/>
         Se ha liberado una plaza y ya estás confirmado/a en
         <strong>${torneoSeguro}</strong>.
       </div>
     `,
-  });
+    },
+  );
 }
 
 export async function sendPartnerInviteEmail(
@@ -116,50 +167,70 @@ export async function sendPartnerInviteEmail(
     invitadoPorNombre: string;
     torneoNombre: string;
     signupUrl: string;
-  }
+  },
 ) {
-  const {
-    to,
-    invitadoPorNombre,
-    torneoNombre,
-    signupUrl,
-  } = params;
+  const to =
+    normalizarEmail(
+      params.to,
+    );
+
+  validarEmail(to);
+
+  let signupUrl: URL;
+
+  try {
+    signupUrl =
+      new URL(
+        params.signupUrl,
+      );
+  } catch {
+    throw new Error(
+      "URL de registro no válida.",
+    );
+  }
+
+  if (
+    signupUrl.protocol !==
+      "https:" &&
+    signupUrl.hostname !==
+      "localhost"
+  ) {
+    throw new Error(
+      "La URL de registro debe utilizar HTTPS.",
+    );
+  }
 
   const nombreSeguro =
     escapeHtml(
-      invitadoPorNombre
+      params.invitadoPorNombre.trim(),
     );
 
   const torneoSeguro =
-    escapeHtml(torneoNombre);
-
-  const emailSeguro =
-    escapeHtml(to);
+    escapeHtml(
+      params.torneoNombre.trim(),
+    );
 
   const signupUrlSeguro =
-    escapeHtml(signupUrl);
+    escapeHtml(
+      signupUrl.toString(),
+    );
 
-  return getResend().emails.send({
-    from: FROM,
-    to,
-    subject: `${invitadoPorNombre} te ha invitado a jugar — ${torneoNombre}`,
-    html: `
-      <div style="font-family:sans-serif;font-size:15px;color:#0D1B2A;">
+  return getResend().emails.send(
+    {
+      from: FROM,
+      to,
+      subject: `${params.invitadoPorNombre} te ha invitado a jugar — ${params.torneoNombre}`,
+      html: `
+      <div style="font-family:sans-serif;font-size:15px;line-height:1.6;color:#0D1B2A;">
         Hola,<br/><br/>
-
         <strong>${nombreSeguro}</strong> te ha invitado a formar pareja en
         <strong>${torneoSeguro}</strong>.<br/><br/>
-
-        Crea tu cuenta con este mismo email
-        (${emailSeguro}) para completar la pareja:<br/><br/>
-
-        <a
-          href="${signupUrlSeguro}"
-          style="background:#F0443A;color:#E6E6E6;padding:12px 20px;border-radius:8px;text-decoration:none;display:inline-block;"
-        >
+        Crea tu cuenta con este mismo email para completar la pareja:<br/><br/>
+        <a href="${signupUrlSeguro}" style="background:#F0443A;color:#E6E6E6;padding:12px 20px;border-radius:8px;text-decoration:none;display:inline-block;">
           Crear mi cuenta
         </a>
       </div>
     `,
-  });
+    },
+  );
 }

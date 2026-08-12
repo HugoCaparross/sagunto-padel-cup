@@ -2,8 +2,6 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-// XP acumulado necesario para alcanzar cada nivel.
-// Índice 0 = nivel 1.
 const UMBRALES = [
   0,
   50,
@@ -25,7 +23,7 @@ const UMBRALES = [
   7630,
   8900,
   10320,
-];
+] as const;
 
 const INCREMENTO_DIAMANTE_PLUS =
   1500;
@@ -51,12 +49,12 @@ const TRAMOS = [
     desde: 16,
     hasta: 20,
   },
-];
+] as const;
 
 function numeroSeguro(
   value: number,
-  minimo = 0
-) {
+  minimo = 0,
+): number {
   if (
     !Number.isFinite(value)
   ) {
@@ -65,55 +63,61 @@ function numeroSeguro(
 
   return Math.max(
     minimo,
-    value
+    value,
   );
 }
 
 export function calcularXP(
   puntosRankingMovil: number,
   torneosJugadosHistorico: number,
-  porcentajeVictorias: number
+  porcentajeVictorias: number,
 ): number {
-  const puntos = numeroSeguro(
-    puntosRankingMovil
-  );
-
-  const torneos = Math.floor(
+  const puntos =
     numeroSeguro(
-      torneosJugadosHistorico
-    )
-  );
+      puntosRankingMovil,
+    );
 
-  const porcentaje = Math.min(
-    100,
-    numeroSeguro(
-      porcentajeVictorias
-    )
-  );
+  const torneos =
+    Math.floor(
+      numeroSeguro(
+        torneosJugadosHistorico,
+      ),
+    );
+
+  const porcentaje =
+    Math.min(
+      100,
+      numeroSeguro(
+        porcentajeVictorias,
+      ),
+    );
 
   const base =
-    puntos + torneos * 20;
+    puntos +
+    torneos * 20;
 
   const multiplicador =
-    1 + porcentaje / 200;
+    1 +
+    porcentaje / 200;
 
   return Math.max(
     0,
     Math.round(
-      base * multiplicador
-    )
+      base * multiplicador,
+    ),
   );
 }
 
 export function nivelDesdeXP(
-  xp: number
+  xp: number,
 ) {
-  const xpSeguro = Math.max(
-    0,
-    Math.floor(
-      numeroSeguro(xp)
-    )
-  );
+  const xpSeguro =
+    Math.max(
+      0,
+      Math.floor(
+        numeroSeguro(xp),
+      ),
+    );
 
   const ultimoUmbral =
     UMBRALES[
@@ -121,17 +125,19 @@ export function nivelDesdeXP(
     ];
 
   if (
-    xpSeguro >= ultimoUmbral
+    xpSeguro >=
+    ultimoUmbral
   ) {
     const nivelesExtra =
       Math.floor(
         (xpSeguro -
           ultimoUmbral) /
-          INCREMENTO_DIAMANTE_PLUS
+          INCREMENTO_DIAMANTE_PLUS,
       );
 
     const nivel =
-      20 + nivelesExtra;
+      20 +
+      nivelesExtra;
 
     const etiqueta =
       nivelesExtra === 0
@@ -168,11 +174,14 @@ export function nivelDesdeXP(
     }
   }
 
-  const tramo = TRAMOS.find(
-    (t) =>
-      nivel >= t.desde &&
-      nivel <= t.hasta
-  );
+  const tramo =
+    TRAMOS.find(
+      (item) =>
+        nivel >=
+          item.desde &&
+        nivel <=
+          item.hasta,
+    );
 
   if (!tramo) {
     return {
@@ -205,12 +214,14 @@ export function nivelDesdeXP(
   };
 }
 
-// Calcula el XP y nivel de un jugador
-// a partir de sus datos en Supabase.
 export async function obtenerNivelJugador(
   supabase: SupabaseClient,
-  playerId: string
+  playerId: string,
 ) {
+  if (!playerId) {
+    return nivelDesdeXP(0);
+  }
+
   const hoy =
     new Date()
       .toISOString()
@@ -222,18 +233,21 @@ export async function obtenerNivelJugador(
   } = await supabase
     .from("ranking_points")
     .select(
-      "puntos_obtenidos, tournament_id"
+      "puntos_obtenidos, tournament_id",
     )
-    .eq("player_id", playerId)
+    .eq(
+      "player_id",
+      playerId,
+    )
     .gte(
       "fecha_caducidad",
-      hoy
+      hoy,
     );
 
   if (puntosVivosError) {
     console.error(
       "[gamification] Error obteniendo ranking móvil:",
-      puntosVivosError
+      puntosVivosError,
     );
   }
 
@@ -242,31 +256,54 @@ export async function obtenerNivelJugador(
     error: puntosHistoricosError,
   } = await supabase
     .from("ranking_points")
-    .select("tournament_id")
-    .eq("player_id", playerId);
+    .select(
+      "tournament_id",
+    )
+    .eq(
+      "player_id",
+      playerId,
+    );
 
-  if (puntosHistoricosError) {
+  if (
+    puntosHistoricosError
+  ) {
     console.error(
       "[gamification] Error obteniendo historial de ranking:",
-      puntosHistoricosError
+      puntosHistoricosError,
     );
   }
 
   const puntosRankingMovil =
     puntosVivos?.reduce(
-      (suma, punto) =>
+      (
+        suma,
+        punto,
+      ) =>
         suma +
         numeroSeguro(
-          punto.puntos_obtenidos
+          punto.puntos_obtenidos,
         ),
-      0
+      0,
     ) ?? 0;
 
   const torneosJugados =
     new Set(
-      puntosHistoricos?.map(
-        (p) => p.tournament_id
+      (
+        puntosHistoricos ??
+        []
       )
+        .map(
+          (punto) =>
+            punto.tournament_id,
+        )
+        .filter(
+          (
+            id,
+          ): id is string =>
+            typeof id ===
+              "string" &&
+            id.length > 0,
+        ),
     ).size;
 
   const {
@@ -276,56 +313,98 @@ export async function obtenerNivelJugador(
     .from("pairs")
     .select("id")
     .or(
-      `player_1_id.eq.${playerId},player_2_id.eq.${playerId}`
+      `player_1_id.eq.${playerId},player_2_id.eq.${playerId}`,
     );
 
   if (pairsError) {
     console.error(
       "[gamification] Error obteniendo parejas:",
-      pairsError
+      pairsError,
     );
   }
 
   const pairIds =
-    pairs?.map(
-      (p) => p.id
-    ) ?? [];
+    Array.from(
+      new Set(
+        (
+          pairs ??
+          []
+        )
+          .map(
+            (pair) =>
+              pair.id,
+          )
+          .filter(
+            (
+              id,
+            ): id is string =>
+              typeof id ===
+                "string" &&
+              id.length > 0,
+          ),
+      ),
+    );
 
   let victorias = 0;
   let jugados = 0;
 
-  if (pairIds.length > 0) {
+  if (
+    pairIds.length > 0
+  ) {
     const {
       data: partidos,
       error: partidosError,
     } = await supabase
       .from("matches")
       .select(
-        "resultado_json, pair_1_id, pair_2_id"
+        "id, resultado_json",
       )
       .eq(
         "estado",
-        "finalizado"
+        "finalizado",
       )
       .or(
-        `pair_1_id.in.(${pairIds.join(
-          ","
-        )}),pair_2_id.in.(${pairIds.join(
-          ","
-        )})`
+        `pair_1_id.in.(${pairIds.join(",")}),pair_2_id.in.(${pairIds.join(",")})`,
       );
 
     if (partidosError) {
       console.error(
         "[gamification] Error obteniendo partidos:",
-        partidosError
+        partidosError,
       );
     } else {
+      const partidosUnicos =
+        Array.from(
+          new Map(
+            (
+              partidos ??
+              []
+            )
+              .filter(
+                (
+                  partido,
+                ): partido is typeof partido & {
+                  id: string;
+                } =>
+                  typeof partido.id ===
+                  "string",
+              )
+              .map(
+                (
+                  partido,
+                ) => [
+                  partido.id,
+                  partido,
+                ],
+              ),
+          ).values(),
+        );
+
       jugados =
-        partidos?.length ?? 0;
+        partidosUnicos.length;
 
       victorias =
-        partidos?.filter(
+        partidosUnicos.filter(
           (partido) => {
             const resultado =
               partido.resultado_json as {
@@ -334,32 +413,30 @@ export async function obtenerNivelJugador(
 
             return pairIds.includes(
               resultado?.ganador_id ??
-                ""
+                "",
             );
-          }
-        ).length ?? 0;
+          },
+        ).length;
     }
   }
 
-  /*
-   * La especificación fija un mínimo de 3 partidos
-   * para que el porcentaje de victorias influya.
-   * Con menos de 3, el multiplicador debe ser x1.
-   */
   const porcentajeVictorias =
     jugados >= 3
       ? Math.round(
           (victorias /
             jugados) *
-            100
+            100,
         )
       : 0;
 
-  const xp = calcularXP(
-    puntosRankingMovil,
-    torneosJugados,
-    porcentajeVictorias
-  );
+  const xp =
+    calcularXP(
+      puntosRankingMovil,
+      torneosJugados,
+      porcentajeVictorias,
+    );
 
-  return nivelDesdeXP(xp);
+  return nivelDesdeXP(
+    xp,
+  );
 }
