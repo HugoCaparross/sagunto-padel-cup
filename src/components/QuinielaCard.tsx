@@ -62,21 +62,21 @@ export default function QuinielaCard({
   }
 
   return (
-    <div className="rounded-card bg-navy/5 p-4">
+    <div className="rounded-card bg-navy/5 p-4" aria-busy={enviando}>
       <div className="flex items-center justify-between gap-3">
         <button
           type="button"
           onClick={() => elegir(pareja1.id)}
           disabled={enviando}
           aria-pressed={voto === pareja1.id}
-          className={`flex-1 rounded-card px-3 py-2 text-sm text-left ${
+          className={`flex-1 rounded-card px-3 py-2 text-left text-sm ${
             voto === pareja1.id ? "bg-coral text-offwhite" : "bg-navy/10"
           } disabled:cursor-not-allowed disabled:opacity-60`}
         >
           {pareja1.nombre}
         </button>
 
-        <span className="text-navy/40 text-xs" aria-hidden="true">
+        <span className="text-xs text-navy/40" aria-hidden="true">
           vs
         </span>
 
@@ -85,7 +85,7 @@ export default function QuinielaCard({
           onClick={() => elegir(pareja2.id)}
           disabled={enviando}
           aria-pressed={voto === pareja2.id}
-          className={`flex-1 rounded-card px-3 py-2 text-sm text-right ${
+          className={`flex-1 rounded-card px-3 py-2 text-right text-sm ${
             voto === pareja2.id ? "bg-coral text-offwhite" : "bg-navy/10"
           } disabled:cursor-not-allowed disabled:opacity-60`}
         >
@@ -94,13 +94,17 @@ export default function QuinielaCard({
       </div>
 
       {enviando ? (
-        <p className="text-xs text-navy/50 mt-2 text-center">
+        <p className="mt-2 text-center text-xs text-navy/50">
           Guardando voto...
         </p>
       ) : null}
 
       {error ? (
-        <p role="alert" className="text-xs text-coral mt-2 text-center">
+        <p
+          role="alert"
+          aria-live="polite"
+          className="mt-2 text-center text-xs text-coral"
+        >
           {error}
         </p>
       ) : null}

@@ -100,33 +100,39 @@ export default function SignupForm() {
   ];
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 max-w-sm">
-      {campos.map((campo) => (
-        <div key={campo.id}>
-          <label className="block font-semibold mb-1" htmlFor={campo.id}>
-            {campo.label}
-          </label>
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-sm space-y-5">
+      {campos.map((campo) => {
+        const errorCampo = errors[campo.id];
+        const errorId = `${campo.id}-error`;
 
-          <input
-            id={campo.id}
-            type={campo.type}
-            autoComplete={campo.autoComplete}
-            {...register(campo.id)}
-            disabled={enviando}
-            aria-invalid={errors[campo.id] ? true : undefined}
-            className="w-full rounded-card border border-navy/20 px-4 py-3 disabled:opacity-50"
-          />
+        return (
+          <div key={campo.id}>
+            <label className="mb-1 block font-semibold" htmlFor={campo.id}>
+              {campo.label}
+            </label>
 
-          {errors[campo.id] && (
-            <p role="alert" className="text-coral text-sm mt-1">
-              {errors[campo.id]?.message}
-            </p>
-          )}
-        </div>
-      ))}
+            <input
+              id={campo.id}
+              type={campo.type}
+              autoComplete={campo.autoComplete}
+              {...register(campo.id)}
+              disabled={enviando}
+              aria-invalid={errorCampo ? true : undefined}
+              aria-describedby={errorCampo ? errorId : undefined}
+              className="w-full rounded-card border border-navy/20 px-4 py-3 disabled:opacity-50"
+            />
+
+            {errorCampo ? (
+              <p id={errorId} role="alert" className="mt-1 text-sm text-coral">
+                {errorCampo.message}
+              </p>
+            ) : null}
+          </div>
+        );
+      })}
 
       {error ? (
-        <p role="alert" aria-live="polite" className="text-coral font-semibold">
+        <p role="alert" aria-live="polite" className="font-semibold text-coral">
           {error}
         </p>
       ) : null}
@@ -134,14 +140,14 @@ export default function SignupForm() {
       <button
         type="submit"
         disabled={enviando}
-        className="w-full rounded-card bg-coral text-offwhite font-display text-lg py-4 disabled:opacity-50"
+        className="w-full rounded-card bg-coral py-4 font-display text-lg text-offwhite disabled:opacity-50"
       >
         {enviando ? "Creando cuenta..." : "Crear cuenta"}
       </button>
 
-      <p className="text-sm text-center">
+      <p className="text-center text-sm">
         ¿Ya tienes cuenta?{" "}
-        <Link href="/login" className="underline text-coral">
+        <Link href="/login" className="text-coral underline">
           Inicia sesión
         </Link>
       </p>

@@ -1,7 +1,7 @@
 // Ruta: src/lib/admin.ts
 
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 
 export type StaffRole = "admin" | "colaborador";
 
@@ -30,6 +30,7 @@ async function getStaffUser(): Promise<StaffUser | null> {
 
   if (error) {
     console.error("[admin] Error comprobando rol de usuario:", error);
+
     return null;
   }
 
@@ -82,6 +83,7 @@ export async function esAdmin(userId: string | undefined) {
 
   if (error) {
     console.error("[admin] Error comprobando administrador:", error);
+
     return false;
   }
 
@@ -103,6 +105,7 @@ export async function esStaff(userId: string | undefined) {
 
   if (error) {
     console.error("[admin] Error comprobando colaborador:", error);
+
     return false;
   }
 

@@ -75,7 +75,21 @@ export function buildFirstRound(pairsSeeded: string[]): FirstRound {
     enfrentamientos.push([izquierda, derecha]);
   }
 
-  const fase = FASE_POR_NUM_PARTIDOS[enfrentamientos.length] ?? "octavos";
+  /*
+   * La fase inicial depende del tamaño completo
+   * del cuadro, no del número de enfrentamientos
+   * efectivos.
+   *
+   * Ejemplo:
+   * - 3 parejas -> cuadro de 4 -> semifinales.
+   * - 5 parejas -> cuadro de 8 -> octavos.
+   *
+   * Si usamos enfrentamientos.length, los byes
+   * provocan una fase incorrecta.
+   */
+  const numPartidosPrimeraRonda = total / 2;
+
+  const fase = FASE_POR_NUM_PARTIDOS[numPartidosPrimeraRonda] ?? "octavos";
 
   return {
     fase,

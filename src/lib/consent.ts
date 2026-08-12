@@ -84,31 +84,30 @@ export function setConsentPreferences(preferences: ConsentPreferences): void {
     return;
   }
 
-  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  const secure = window.location.protocol === "https:" ? "Secure" : "";
 
-  document.cookie = [
-    `${CONSENT_KEY}=${encodeURIComponent(
-      preferences.analytics ? "accepted" : "rejected",
-    )}`,
+  const consentValue = preferences.analytics ? "accepted" : "rejected";
+
+  const cookieOptions = [
     "path=/",
     `max-age=${ONE_YEAR_SECONDS}`,
     "SameSite=Lax",
-    secure.replace(/^;\s*/, ""),
+    secure,
   ]
     .filter(Boolean)
     .join("; ");
+
+  document.cookie = [
+    `${CONSENT_KEY}=${encodeURIComponent(consentValue)}`,
+    cookieOptions,
+  ].join("; ");
 
   document.cookie = [
     `${CONSENT_PREFERENCES_KEY}=${encodeURIComponent(
       JSON.stringify(preferences),
     )}`,
-    "path=/",
-    `max-age=${ONE_YEAR_SECONDS}`,
-    "SameSite=Lax",
-    secure.replace(/^;\s*/, ""),
-  ]
-    .filter(Boolean)
-    .join("; ");
+    cookieOptions,
+  ].join("; ");
 }
 
 export function hasAnalyticsConsent(): boolean {

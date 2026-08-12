@@ -58,12 +58,12 @@ export default function RegistrationForm({
       const res = await registerPair(torneoSlug, values);
 
       if (res.ok) {
-        router.push(`/torneo/${torneoSlug}/inscribirse/completada`);
+        router.push(`/torneo/${torneoSlug}/completada`);
 
         return;
       }
 
-      setError(res.error ?? "No se ha podido completar la inscripción");
+      setError(res.error ?? "No se ha podido completar la inscripción.");
     } catch (actionError) {
       console.error(
         "[RegistrationForm] Error enviando inscripción:",
@@ -79,9 +79,9 @@ export default function RegistrationForm({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 max-w-md">
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-md space-y-5">
       <div>
-        <label className="block font-semibold mb-1" htmlFor="categoria_id">
+        <label className="mb-1 block font-semibold" htmlFor="categoria_id">
           Categoría
         </label>
 
@@ -89,26 +89,34 @@ export default function RegistrationForm({
           id="categoria_id"
           {...register("categoria_id")}
           disabled={enviando}
+          aria-invalid={errors.categoria_id ? true : undefined}
+          aria-describedby={
+            errors.categoria_id ? "categoria_id-error" : undefined
+          }
           className="input disabled:opacity-50"
         >
           <option value="">Selecciona tu categoría</option>
 
-          {categorias.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.nombre}
+          {categorias.map((categoria) => (
+            <option key={categoria.id} value={categoria.id}>
+              {categoria.nombre}
             </option>
           ))}
         </select>
 
-        {errors.categoria_id && (
-          <p role="alert" className="text-coral text-sm mt-1">
+        {errors.categoria_id ? (
+          <p
+            id="categoria_id-error"
+            role="alert"
+            className="mt-1 text-sm text-coral"
+          >
             {errors.categoria_id.message}
           </p>
-        )}
+        ) : null}
       </div>
 
       <div>
-        <label className="block font-semibold mb-1" htmlFor="talla_camiseta">
+        <label className="mb-1 block font-semibold" htmlFor="talla_camiseta">
           Talla de camiseta (Welcome Pack)
         </label>
 
@@ -116,26 +124,34 @@ export default function RegistrationForm({
           id="talla_camiseta"
           {...register("talla_camiseta")}
           disabled={enviando}
+          aria-invalid={errors.talla_camiseta ? true : undefined}
+          aria-describedby={
+            errors.talla_camiseta ? "talla_camiseta-error" : undefined
+          }
           className="input disabled:opacity-50"
         >
           <option value="">Selecciona tu talla</option>
 
-          {["XS", "S", "M", "L", "XL", "XXL"].map((t) => (
-            <option key={t} value={t}>
-              {t}
+          {["XS", "S", "M", "L", "XL", "XXL"].map((talla) => (
+            <option key={talla} value={talla}>
+              {talla}
             </option>
           ))}
         </select>
 
-        {errors.talla_camiseta && (
-          <p role="alert" className="text-coral text-sm mt-1">
+        {errors.talla_camiseta ? (
+          <p
+            id="talla_camiseta-error"
+            role="alert"
+            className="mt-1 text-sm text-coral"
+          >
             {errors.talla_camiseta.message}
           </p>
-        )}
+        ) : null}
       </div>
 
       <div>
-        <label className="block font-semibold mb-1" htmlFor="compañero_email">
+        <label className="mb-1 block font-semibold" htmlFor="compañero_email">
           Email de tu compañero/a (si ya lo tienes)
         </label>
 
@@ -146,29 +162,60 @@ export default function RegistrationForm({
           placeholder="compañero@email.com"
           {...register("compañero_email")}
           disabled={enviando}
+          aria-invalid={errors.compañero_email ? true : undefined}
+          aria-describedby={
+            errors.compañero_email ? "compañero_email-error" : undefined
+          }
           className="input disabled:opacity-50"
         />
 
-        {errors.compañero_email && (
-          <p role="alert" className="text-coral text-sm mt-1">
+        {errors.compañero_email ? (
+          <p
+            id="compañero_email-error"
+            role="alert"
+            className="mt-1 text-sm text-coral"
+          >
             {errors.compañero_email.message}
           </p>
-        )}
+        ) : null}
       </div>
 
-      {!tieneCompañero && (
-        <label className="flex items-center gap-3 text-sm">
-          <input
-            type="checkbox"
-            {...register("quiere_bolsa_pareja")}
-            disabled={enviando}
-          />
-          Aún no tengo pareja, apúntame a la bolsa de &quot;busco pareja&quot;
-        </label>
-      )}
+      {!tieneCompañero ? (
+        <div>
+          <label className="flex items-start gap-3 text-sm">
+            <input
+              type="checkbox"
+              {...register("quiere_bolsa_pareja")}
+              disabled={enviando}
+              aria-invalid={errors.quiere_bolsa_pareja ? true : undefined}
+              aria-describedby={
+                errors.quiere_bolsa_pareja
+                  ? "quiere_bolsa_pareja-error"
+                  : undefined
+              }
+              className="mt-1"
+            />
+
+            <span>
+              Aún no tengo pareja, apúntame a la bolsa de &quot;busco
+              pareja&quot;
+            </span>
+          </label>
+
+          {errors.quiere_bolsa_pareja ? (
+            <p
+              id="quiere_bolsa_pareja-error"
+              role="alert"
+              className="mt-1 text-sm text-coral"
+            >
+              {errors.quiere_bolsa_pareja.message}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       {error ? (
-        <p role="alert" aria-live="polite" className="text-coral font-semibold">
+        <p role="alert" aria-live="polite" className="font-semibold text-coral">
           {error}
         </p>
       ) : null}
@@ -182,7 +229,7 @@ export default function RegistrationForm({
       </button>
 
       {enviando ? (
-        <p className="text-xs text-navy/50 text-center">
+        <p className="text-center text-xs text-navy/50">
           No cierres esta ventana mientras procesamos la inscripción.
         </p>
       ) : null}

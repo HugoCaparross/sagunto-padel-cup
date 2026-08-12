@@ -80,10 +80,10 @@ export async function sendRegistrationConfirmedEmail(params: {
     to,
     subject: asunto,
     html: `
-      <div style="font-family:sans-serif;font-size:15px;line-height:1.6;color:#0D1B2A;">
-        ${cuerpo}
-      </div>
-    `,
+        <div style="font-family:sans-serif;font-size:15px;line-height:1.6;color:#0D1B2A;">
+          ${cuerpo}
+        </div>
+      `,
   });
 }
 
@@ -105,12 +105,12 @@ export async function sendWaitlistPromotedEmail(params: {
     to,
     subject: `¡Ya tienes plaza! — ${params.torneoNombre}`,
     html: `
-      <div style="font-family:sans-serif;font-size:15px;line-height:1.6;color:#0D1B2A;">
-        Hola ${nombreSeguro},<br/><br/>
-        Se ha liberado una plaza y ya estás confirmado/a en
-        <strong>${torneoSeguro}</strong>.
-      </div>
-    `,
+        <div style="font-family:sans-serif;font-size:15px;line-height:1.6;color:#0D1B2A;">
+          Hola ${nombreSeguro},<br/><br/>
+          Se ha liberado una plaza y ya estás confirmado/a en
+          <strong>${torneoSeguro}</strong>.
+        </div>
+      `,
   });
 }
 
@@ -139,22 +139,22 @@ export async function sendPartnerInviteEmail(params: {
     to,
     subject: `${params.invitadoPorNombre} te ha invitado a jugar — ${params.torneoNombre}`,
     html: `
-      <div style="font-family:sans-serif;font-size:15px;line-height:1.6;color:#0D1B2A;">
-        Hola,<br/><br/>
+        <div style="font-family:sans-serif;font-size:15px;line-height:1.6;color:#0D1B2A;">
+          Hola,<br/><br/>
 
-        <strong>${nombreSeguro}</strong> te ha invitado a formar pareja en
-        <strong>${torneoSeguro}</strong>.<br/><br/>
+          <strong>${nombreSeguro}</strong> te ha invitado a formar pareja en
+          <strong>${torneoSeguro}</strong>.<br/><br/>
 
-        Crea tu cuenta con este mismo email
-        (${emailSeguro}) para completar la pareja:<br/><br/>
+          Crea tu cuenta con este mismo email
+          (${emailSeguro}) para completar la pareja:<br/><br/>
 
-        <a
-          href="${signupUrlSeguro}"
-          style="background:#F0443A;color:#E6E6E6;padding:12px 20px;border-radius:8px;text-decoration:none;display:inline-block;"
-        >
-          Crear mi cuenta
-        </a>
-      </div>
-    `,
+          <a
+            href="${signupUrlSeguro}"
+            style="background:#F0443A;color:#E6E6E6;padding:12px 20px;border-radius:8px;text-decoration:none;display:inline-block;"
+          >
+            Crear mi cuenta
+          </a>
+        </div>
+      `,
   });
 }
