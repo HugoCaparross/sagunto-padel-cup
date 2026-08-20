@@ -56,7 +56,6 @@ export default function MobileMenu({
   const [abierto, setAbierto] = useState(false);
 
   const primerEnlaceRef = useRef<HTMLAnchorElement>(null);
-
   const botonAbrirRef = useRef<HTMLButtonElement>(null);
 
   /* ==========================================================
@@ -70,7 +69,7 @@ export default function MobileMenu({
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        setAbierto(false);
+        cerrarMenu();
       }
     }
 
@@ -133,7 +132,11 @@ export default function MobileMenu({
         aria-controls="mobile-navigation"
         className="mobile-menu__button"
       >
-        <Menu size={24} strokeWidth={2} aria-hidden="true" />
+        <Menu
+          size={24}
+          strokeWidth={2}
+          aria-hidden="true"
+        />
       </button>
 
       {/* ======================================================
@@ -148,7 +151,9 @@ export default function MobileMenu({
           aria-label="Menú de navegación"
           className="mobile-menu__panel"
         >
-          {/* TOP */}
+          {/* ==================================================
+              TOP
+              ================================================== */}
 
           <div className="mobile-menu__top">
             <Link
@@ -157,7 +162,10 @@ export default function MobileMenu({
               aria-label="Sagunto Padel Cup — Inicio"
               onClick={navegar}
             >
-              <span className="site-brand__mark" aria-hidden="true">
+              <span
+                className="site-brand__mark"
+                aria-hidden="true"
+              >
                 <span />
               </span>
 
@@ -174,18 +182,31 @@ export default function MobileMenu({
               aria-label="Cerrar menú de navegación"
               className="mobile-menu__button"
             >
-              <X size={24} strokeWidth={2} aria-hidden="true" />
+              <X
+                size={24}
+                strokeWidth={2}
+                aria-hidden="true"
+              />
             </button>
           </div>
 
-          {/* NAVIGATION */}
+          {/* ==================================================
+              NAVEGACIÓN
+              ================================================== */}
 
-          <nav aria-label="Navegación móvil" className="mobile-menu__nav">
+          <nav
+            aria-label="Navegación móvil"
+            className="mobile-menu__nav"
+          >
             {enlaces.map((enlace, index) => (
               <Link
                 key={enlace.href}
                 href={enlace.href}
-                ref={index === 0 ? primerEnlaceRef : undefined}
+                ref={
+                  index === 0
+                    ? primerEnlaceRef
+                    : undefined
+                }
                 onClick={navegar}
               >
                 <span className="mobile-menu__link-content">
@@ -194,16 +215,33 @@ export default function MobileMenu({
                   <small>{enlace.description}</small>
                 </span>
 
-                <ArrowRight size={19} strokeWidth={2} aria-hidden="true" />
+                <ArrowRight
+                  size={19}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
               </Link>
             ))}
           </nav>
 
-          {/* ACCOUNT */}
+          {/* ==================================================
+              CUENTA
+              ================================================== */}
 
           <div className="mobile-menu__account">
             {autenticado ? (
               <>
+                <div className="mobile-menu__account-intro">
+                  <span className="mobile-menu__account-label">
+                    Área privada
+                  </span>
+
+                  <p>
+                    Accede a tu información y a tu
+                    experiencia personalizada.
+                  </p>
+                </div>
+
                 <Link
                   href="/app"
                   onClick={navegar}
@@ -211,7 +249,10 @@ export default function MobileMenu({
                 >
                   <span>Mi cuenta</span>
 
-                  <ArrowRight size={17} aria-hidden="true" />
+                  <ArrowRight
+                    size={17}
+                    aria-hidden="true"
+                  />
                 </Link>
 
                 {esAdmin ? (
@@ -222,7 +263,10 @@ export default function MobileMenu({
                   >
                     <span>Administración</span>
 
-                    <ArrowRight size={17} aria-hidden="true" />
+                    <ArrowRight
+                      size={17}
+                      aria-hidden="true"
+                    />
                   </Link>
                 ) : null}
 
@@ -236,6 +280,31 @@ export default function MobileMenu({
               </>
             ) : (
               <>
+                <div className="mobile-menu__account-intro">
+                  <span className="mobile-menu__account-label">
+                    Área de jugador
+                  </span>
+
+                  <p>
+                    Crea una cuenta para poder
+                    inscribirte en las pruebas y
+                    acceder a contenido personalizado.
+                  </p>
+                </div>
+
+                <Link
+                  href="/registro"
+                  onClick={navegar}
+                  className="mobile-menu__account-button mobile-menu__account-button--primary"
+                >
+                  <span>Crear cuenta</span>
+
+                  <ArrowRight
+                    size={17}
+                    aria-hidden="true"
+                  />
+                </Link>
+
                 <Link
                   href="/login"
                   onClick={navegar}
@@ -243,23 +312,18 @@ export default function MobileMenu({
                 >
                   <span>Iniciar sesión</span>
 
-                  <ArrowRight size={17} aria-hidden="true" />
-                </Link>
-
-                <Link
-                  href="/registro"
-                  onClick={navegar}
-                  className="mobile-menu__account-button mobile-menu__account-button--primary"
-                >
-                  <span>Inscribirse</span>
-
-                  <ArrowRight size={17} aria-hidden="true" />
+                  <ArrowRight
+                    size={17}
+                    aria-hidden="true"
+                  />
                 </Link>
               </>
             )}
           </div>
 
-          {/* FOOTER */}
+          {/* ==================================================
+              FOOTER
+              ================================================== */}
 
           <div className="mobile-menu__footer">
             <span>SAGUNTO PADEL CUP</span>

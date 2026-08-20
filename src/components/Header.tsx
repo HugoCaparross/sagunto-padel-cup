@@ -1,10 +1,9 @@
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+// Ruta: src/components/Header.tsx
 
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/(public)/login/actions";
 import { esAdmin } from "@/lib/admin";
-
 import MobileMenu from "@/components/MobileMenu";
 
 export default async function Header() {
@@ -16,18 +15,11 @@ export default async function Header() {
 
   const admin = await esAdmin(user?.id);
 
-  /*
-   * Buscamos únicamente la primera prueba con
-   * inscripciones abiertas para convertir el CTA
-   * principal del Header en una acción útil.
-   */
   const { data: torneoAbierto } = await supabase
     .from("tournaments")
-    .select("slug, nombre, fecha_inicio")
+    .select("slug")
     .eq("estado", "inscripciones_abiertas")
-    .order("fecha_inicio", {
-      ascending: true,
-    })
+    .order("fecha_inicio")
     .limit(1)
     .maybeSingle();
 
@@ -36,95 +28,110 @@ export default async function Header() {
     : "/calendario";
 
   return (
-    <header className="site-header">
-      <div className="site-header__inner">
-        {/* ==================================================
-            LOGO / WORDMARK
-            ================================================== */}
+    <header className="bg-navy text-offwhite px-5 py-4 flex items-center justify-between sticky top-0 z-40 shadow-md shadow-navy/20">
+      <Link
+        href="/"
+        className="font-display text-lg tracking-wide"
+        aria-label="Sagunto Padel Cup — Inicio"
+      >
+        Sagunto Padel Cup
+      </Link>
 
+      <nav
+        aria-label="Navegación principal"
+        className="hidden sm:flex items-center gap-6 text-sm"
+      >
         <Link
-          href="/"
-          className="site-brand"
-          aria-label="Sagunto Padel Cup — Inicio"
+          href="/calendario"
+          className="text-sage font-semibold"
         >
-          <span className="site-brand__mark" aria-hidden="true">
-            <span />
-          </span>
-
-          <span className="site-brand__text">
-            <strong>SAGUNTO</strong>
-            <span>PADEL CUP</span>
-          </span>
+          Calendario
         </Link>
 
-        {/* ==================================================
-            NAVEGACIÓN PRINCIPAL
-            ================================================== */}
+        <Link
+          href="/ranking"
+          className="hover:text-sage transition-colors"
+        >
+          Ranking
+        </Link>
 
-        <nav aria-label="Navegación principal" className="site-nav">
-          <Link href="/circuito">Circuito</Link>
+        <Link
+          href="/master-final"
+          className="hover:text-sage transition-colors"
+        >
+          Master Final
+        </Link>
 
-          <Link href="/calendario">Calendario</Link>
+        <Link
+          href="/circuito"
+          className="hover:text-sage transition-colors"
+        >
+          El Circuito
+        </Link>
 
-          <Link href="/ranking">Ranking</Link>
+        <Link
+          href="/noticias"
+          className="hover:text-sage transition-colors"
+        >
+          Noticias
+        </Link>
 
-          <Link href="/master-final">Máster</Link>
-
-          <Link href="/jugadores">Jugadores</Link>
-
-          <Link href="/noticias">Noticias</Link>
-
-          <Link href="/contacto">Contacto</Link>
-        </nav>
-
-        {/* ==================================================
-            ACCIONES
-            ================================================== */}
-
-        <div className="site-header__actions">
-          {user ? (
-            <>
-              <Link href="/app" className="site-account-link">
-                Mi cuenta
-              </Link>
-
-              {admin ? (
-                <Link href="/admin" className="site-account-link">
-                  Admin
-                </Link>
-              ) : null}
-
-              <form action={logout}>
-                <button type="submit" className="site-account-link">
-                  Salir
-                </button>
-              </form>
-            </>
-          ) : (
-            <>
-              <Link href="/login" className="site-login">
-                Iniciar sesión
-              </Link>
-
-              <Link href={hrefInscribete} className="site-register">
-                <span>Inscribirse</span>
-
-                <ArrowRight size={15} strokeWidth={2.2} aria-hidden="true" />
-              </Link>
-            </>
-          )}
-        </div>
-
-        {/* ==================================================
-            MOBILE MENU
-            ================================================== */}
-
-        <MobileMenu
-          esAdmin={admin}
-          autenticado={!!user}
-          cerrarSesion={logout}
+        <span
+          aria-hidden="true"
+          className="w-px h-5 bg-offwhite/20 mx-1"
         />
-      </div>
+
+        {user ? (
+          <>
+            <Link
+              href="/app"
+              className="text-sage font-semibold"
+            >
+              Mi cuenta
+            </Link>
+
+            {admin && (
+              <Link
+                href="/admin"
+                className="btn-secondary border-offwhite/30 text-offwhite !py-2 !px-4"
+              >
+                Panel admin
+              </Link>
+            )}
+
+            <form action={logout}>
+              <button
+                type="submit"
+                className="underline text-offwhite/60 text-sm hover:text-offwhite transition-colors"
+              >
+                Salir
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+            <Link
+              href="/login"
+              className="hover:text-sage transition-colors"
+            >
+              Entrar
+            </Link>
+
+            <Link
+              href={hrefInscribete}
+              className="btn-primary !py-2 !px-5 text-sm"
+            >
+              Inscríbete
+            </Link>
+          </>
+        )}
+      </nav>
+
+      <MobileMenu
+        esAdmin={admin}
+        autenticado={!!user}
+        cerrarSesion={logout}
+      />
     </header>
   );
 }
