@@ -12,7 +12,8 @@ import {
 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
-import { ESTADO_TORNEO } from "@/lib/estados";
+import { ESTADO_TORNEO, ESTADO_TORNEO_BADGE } from "@/lib/estados";
+import StatusBadge from "@/components/StatusBadge";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -41,8 +42,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const nextEvent = torneo
     ? ` Próxima prueba: ${torneo.nombre}, ${formatDateShort(
-        torneo.fecha_inicio,
-      )}.`
+      torneo.fecha_inicio,
+    )}.`
     : "";
 
   return {
@@ -191,51 +192,12 @@ function formatDateRange(start: string, end: string | null) {
   }).format(endDate)}`;
 }
 
-function getStatusPresentation(status: string) {
-  switch (status) {
-    case "inscripciones_abiertas":
-      return {
-        label: "INSCRIPCIONES ABIERTAS",
-        className: "home-status home-status--success",
-      };
+function getStatusLabel(estado: string) {
+  return ESTADO_TORNEO[estado] ?? estado;
+}
 
-    case "inscripciones_cerradas":
-      return {
-        label: "INSCRIPCIONES CERRADAS",
-        className: "home-status home-status--muted",
-      };
-
-    case "en_juego":
-      return {
-        label: "EN JUEGO",
-        className: "home-status home-status--live",
-      };
-
-    case "en_preparacion":
-      return {
-        label: "EN PREPARACIÓN",
-        className: "home-status home-status--warning",
-      };
-
-    case "finalizado":
-      return {
-        label: "FINALIZADO",
-        className: "home-status home-status--muted",
-      };
-
-    case "cancelado":
-      return {
-        label: "CANCELADO",
-        className: "home-status home-status--danger",
-      };
-
-    default:
-      return {
-        label: ESTADO_TORNEO[status] ?? status,
-
-        className: "home-status home-status--muted",
-      };
-  }
+function getStatusBadgeType(estado: string) {
+  return ESTADO_TORNEO_BADGE[estado] ?? "pending";
 }
 
 function getNewsExcerpt(content: string) {
@@ -320,23 +282,23 @@ export default async function HomePage() {
 
   const [{ data: heroPhotos }, { data: sponsors }] = torneo
     ? await Promise.all([
-        supabase
-          .from("gallery_items")
-          .select("id, url, created_at")
-          .eq("tournament_id", torneo.id)
-          .order("created_at", {
-            ascending: false,
-          })
-          .limit(6),
+      supabase
+        .from("gallery_items")
+        .select("id, url, created_at")
+        .eq("tournament_id", torneo.id)
+        .order("created_at", {
+          ascending: false,
+        })
+        .limit(6),
 
-        supabase
-          .from("sponsors")
-          .select("id, nombre, logo_url, enlace, tipo")
-          .eq("tournament_id", torneo.id)
-          .order("orden", {
-            ascending: true,
-          }),
-      ])
+      supabase
+        .from("sponsors")
+        .select("id, nombre, logo_url, enlace, tipo")
+        .eq("tournament_id", torneo.id)
+        .order("orden", {
+          ascending: true,
+        }),
+    ])
     : [{ data: [] }, { data: [] }];
 
   /* ==========================================================
@@ -390,15 +352,21 @@ export default async function HomePage() {
 
   const latestPhotos = heroPhotos ?? [];
 
-  const heroImage = latestPhotos[0]?.url ?? null;
+  /*
+   * Imagen principal del Hero.
+   *
+   * Esta imagen es independiente de la galería de la próxima prueba.
+   * De esta forma el Hero no desaparece cuando la galería de Supabase
+   * todavía no tiene fotografías.
+   */
+  const heroImage = "/images/home/hero-padel.jpg";
 
-  const circuitImage = latestPhotos[1]?.url ?? latestPhotos[0]?.url ?? null;
+  const circuitImage =
+    latestPhotos[1]?.url ?? latestPhotos[0]?.url ?? null;
 
   const newsItems = (news ?? []) as NewsItem[];
 
   const sponsorItems = (sponsors ?? []) as Sponsor[];
-
-  const status = torneo ? getStatusPresentation(torneo.estado) : null;
 
   const registrationHref = torneo
     ? torneo.estado === "inscripciones_abiertas"
@@ -417,56 +385,57 @@ export default async function HomePage() {
 
   const eventSchema = torneo
     ? {
-        "@context": "https://schema.org",
+      "@context": "https://schema.org",
 
-        "@type": "SportsEvent",
+      "@type": "SportsEvent",
 
-        name: torneo.nombre,
+      name: torneo.nombre,
 
-        description:
-          torneo.descripcion ||
-          `${torneo.nombre}, prueba de Sagunto Padel Cup, circuito amateur de pádel en Sagunto.`,
+      description:
+        torneo.descripcion ||
+        `${torneo.nombre}, prueba de Sagunto Padel Cup, circuito amateur de pádel en Sagunto.`,
 
-        startDate: torneo.fecha_inicio,
+      startDate: torneo.fecha_inicio,
 
-        endDate: torneo.fecha_fin ?? torneo.fecha_inicio,
+      endDate: torneo.fecha_fin ?? torneo.fecha_inicio,
 
-        eventStatus: "https://schema.org/EventScheduled",
+      eventStatus: "https://schema.org/EventScheduled",
 
-        eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+      eventAttendanceMode:
+        "https://schema.org/OfflineEventAttendanceMode",
 
-        url: `${siteUrl}/torneo/${torneo.slug}`,
+      url: `${siteUrl}/torneo/${torneo.slug}`,
 
-        organizer: {
-          "@type": "Organization",
+      organizer: {
+        "@type": "Organization",
 
-          name: "Sagunto Padel Cup",
+        name: "Sagunto Padel Cup",
 
-          url: siteUrl,
-        },
+        url: siteUrl,
+      },
 
-        ...(torneo.clubs
-          ? {
-              location: {
-                "@type": "Place",
+      ...(torneo.clubs
+        ? {
+          location: {
+            "@type": "Place",
 
-                name: torneo.clubs.nombre,
+            name: torneo.clubs.nombre,
 
-                address: {
-                  "@type": "PostalAddress",
+            address: {
+              "@type": "PostalAddress",
 
-                  streetAddress: torneo.clubs.direccion ?? undefined,
+              streetAddress: torneo.clubs.direccion ?? undefined,
 
-                  addressLocality: "Sagunto",
+              addressLocality: "Sagunto",
 
-                  addressRegion: "Valencia",
+              addressRegion: "Valencia",
 
-                  addressCountry: "ES",
-                },
-              },
-            }
-          : {}),
-      }
+              addressCountry: "ES",
+            },
+          },
+        }
+        : {}),
+    }
     : null;
 
   const websiteSchema = {
@@ -619,8 +588,9 @@ export default async function HomePage() {
                   <span>PRÓXIMA PRUEBA</span>
 
                   <span className="home-event-card__round">
-                    {upcomingList.findIndex((item) => item.id === torneo.id) +
-                      1 || 1}
+                    {upcomingList.findIndex(
+                      (item) => item.id === torneo.id,
+                    ) + 1 || 1}
                     ª PRUEBA
                   </span>
                 </div>
@@ -635,7 +605,10 @@ export default async function HomePage() {
                     </dt>
 
                     <dd>
-                      {formatDateRange(torneo.fecha_inicio, torneo.fecha_fin)}
+                      {formatDateRange(
+                        torneo.fecha_inicio,
+                        torneo.fecha_fin,
+                      )}
                     </dd>
                   </div>
 
@@ -645,7 +618,9 @@ export default async function HomePage() {
                       Sede
                     </dt>
 
-                    <dd>{torneo.clubs?.nombre ?? "Club por confirmar"}</dd>
+                    <dd>
+                      {torneo.clubs?.nombre ?? "Club por confirmar"}
+                    </dd>
 
                     {torneo.clubs?.direccion ? (
                       <small>{torneo.clubs.direccion}</small>
@@ -666,14 +641,17 @@ export default async function HomePage() {
                   </div>
                 </dl>
 
-                {status ? (
-                  <div className={status.className}>
-                    <span aria-hidden="true" />
-                    {status.label}
-                  </div>
-                ) : null}
+                {/* MISMO STATUS BADGE QUE CALENDARIO */}
 
-                <Link href={registrationHref} className="home-event-card__cta">
+                <StatusBadge
+                  texto={getStatusLabel(torneo.estado)}
+                  tipo={getStatusBadgeType(torneo.estado)}
+                />
+
+                <Link
+                  href={registrationHref}
+                  className="home-event-card__cta"
+                >
                   {torneo.estado === "inscripciones_abiertas"
                     ? "INSCRIBIRSE AHORA"
                     : "VER TODA LA INFORMACIÓN"}
@@ -718,7 +696,9 @@ export default async function HomePage() {
       >
         <div className="home-shell home-intro__grid">
           <div className="home-intro__copy">
-            <p className="home-eyebrow">¿QUÉ ES SAGUNTO PADEL CUP?</p>
+            <p className="home-eyebrow">
+              ¿QUÉ ES SAGUNTO PADEL CUP?
+            </p>
 
             <h2 id="intro-title">
               Un circuito.
@@ -728,8 +708,8 @@ export default async function HomePage() {
 
             <p>
               Un circuito amateur formado por pruebas a lo largo de la
-              temporada. Suma puntos, mejora tu posición en el ranking y avanza
-              hacia el Máster Final.
+              temporada. Suma puntos, mejora tu posición en el ranking y
+              avanza hacia el Máster Final.
             </p>
 
             <Link href="/circuito" className="home-text-link">
@@ -755,7 +735,10 @@ export default async function HomePage() {
             )}
           </div>
 
-          <div className="home-stat-grid" aria-label="Datos del circuito">
+          <div
+            className="home-stat-grid"
+            aria-label="Datos del circuito"
+          >
             <div className="home-stat">
               <CalendarDays size={23} aria-hidden="true" />
 
@@ -763,7 +746,8 @@ export default async function HomePage() {
 
               <span>
                 Pruebas
-                <br />+ Máster Final
+                <br />
+                + Máster Final
               </span>
             </div>
 
@@ -798,7 +782,8 @@ export default async function HomePage() {
 
               <span>
                 En cada prueba
-                <br />y en el Máster
+                <br />
+                y en el Máster
               </span>
             </div>
           </div>
@@ -809,10 +794,15 @@ export default async function HomePage() {
           03 — CAMINO HACIA EL MÁSTER
           ====================================================== */}
 
-      <section className="home-circuit" aria-labelledby="circuit-title">
+      <section
+        className="home-circuit"
+        aria-labelledby="circuit-title"
+      >
         <div className="home-shell home-circuit__inner">
           <div className="home-circuit__intro">
-            <p className="home-eyebrow home-eyebrow--light">EL CIRCUITO</p>
+            <p className="home-eyebrow home-eyebrow--light">
+              EL CIRCUITO
+            </p>
 
             <h2 id="circuit-title">
               El camino
@@ -821,11 +811,14 @@ export default async function HomePage() {
             </h2>
 
             <p>
-              Compite en tus pruebas, suma puntos en el ranking y avanza hacia
-              el Máster Final.
+              Compite en tus pruebas, suma puntos en el ranking y avanza
+              hacia el Máster Final.
             </p>
 
-            <Link href="/circuito" className="home-button home-button--outline">
+            <Link
+              href="/circuito"
+              className="home-button home-button--outline"
+            >
               MÁS INFORMACIÓN
               <ArrowRight size={17} aria-hidden="true" />
             </Link>
@@ -840,12 +833,21 @@ export default async function HomePage() {
               ["05", "MÁSTER FINAL", "La gran cita del circuito"],
             ].map(([number, title, text], index) => (
               <li key={title}>
-                <div className="home-circuit-step__number">{number}</div>
+                <div className="home-circuit-step__number">
+                  {number}
+                </div>
 
-                <div className="home-circuit-step__media" aria-hidden="true">
+                <div
+                  className="home-circuit-step__media"
+                  aria-hidden="true"
+                >
                   {latestPhotos[index] ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={latestPhotos[index].url} alt="" loading="lazy" />
+                    <img
+                      src={latestPhotos[index].url}
+                      alt=""
+                      loading="lazy"
+                    />
                   ) : null}
                 </div>
 
@@ -869,15 +871,23 @@ export default async function HomePage() {
         <div className="home-shell home-competition__grid">
           {/* RANKING */}
 
-          <section className="home-panel" aria-labelledby="ranking-home-title">
+          <section
+            className="home-panel"
+            aria-labelledby="ranking-home-title"
+          >
             <div className="home-panel__header">
               <div>
                 <p className="home-eyebrow">TOP 5 RANKING</p>
 
-                <h2 id="ranking-home-title">Ranking individual</h2>
+                <h2 id="ranking-home-title">
+                  Ranking individual
+                </h2>
               </div>
 
-              <Link href="/ranking" className="home-panel__link">
+              <Link
+                href="/ranking"
+                className="home-panel__link"
+              >
                 Ver ranking completo
                 <ArrowRight size={15} aria-hidden="true" />
               </Link>
@@ -914,7 +924,6 @@ export default async function HomePage() {
 
                     <strong>
                       {player.puntos.toLocaleString("es-ES")}
-
                       <small> PTS</small>
                     </strong>
                   </li>
@@ -923,8 +932,8 @@ export default async function HomePage() {
             ) : (
               <div className="home-empty-state">
                 <p>
-                  El ranking se activará con los primeros resultados de la
-                  temporada.
+                  El ranking se activará con los primeros resultados de
+                  la temporada.
                 </p>
 
                 <Link href="/circuito#ranking">
@@ -937,7 +946,10 @@ export default async function HomePage() {
 
           {/* CALENDARIO */}
 
-          <section className="home-panel" aria-labelledby="calendar-home-title">
+          <section
+            className="home-panel"
+            aria-labelledby="calendar-home-title"
+          >
             <div className="home-panel__header">
               <div>
                 <p className="home-eyebrow">PRÓXIMAS FECHAS</p>
@@ -945,7 +957,10 @@ export default async function HomePage() {
                 <h2 id="calendar-home-title">Calendario</h2>
               </div>
 
-              <Link href="/calendario" className="home-panel__link">
+              <Link
+                href="/calendario"
+                className="home-panel__link"
+              >
                 Ver calendario
                 <ArrowRight size={15} aria-hidden="true" />
               </Link>
@@ -954,7 +969,7 @@ export default async function HomePage() {
             <ol className="home-calendar-list">
               {upcomingList.length ? (
                 upcomingList.map((item, index) => {
-                  const itemStatus = getStatusPresentation(item.estado);
+                  const itemStatus = getStatusLabel(item.estado);
 
                   return (
                     <li
@@ -968,7 +983,10 @@ export default async function HomePage() {
 
                       <div>
                         <Link href={`/torneo/${item.slug}`}>
-                          {formatDateRange(item.fecha_inicio, item.fecha_fin)}
+                          {formatDateRange(
+                            item.fecha_inicio,
+                            item.fecha_fin,
+                          )}
                         </Link>
 
                         <span>{item.nombre}</span>
@@ -981,7 +999,7 @@ export default async function HomePage() {
                             : "home-mini-status"
                         }
                       >
-                        {itemStatus.label}
+                        {itemStatus}
                       </span>
                     </li>
                   );
@@ -1004,10 +1022,15 @@ export default async function HomePage() {
               <div>
                 <p className="home-eyebrow">ACTUALIDAD</p>
 
-                <h2 id="news-home-title">Últimas noticias</h2>
+                <h2 id="news-home-title">
+                  Últimas noticias
+                </h2>
               </div>
 
-              <Link href="/noticias" className="home-panel__link">
+              <Link
+                href="/noticias"
+                className="home-panel__link"
+              >
                 Ver todas
                 <ArrowRight size={15} aria-hidden="true" />
               </Link>
@@ -1022,7 +1045,11 @@ export default async function HomePage() {
                   >
                     {item.imagen_destacada ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={item.imagen_destacada} alt="" loading="lazy" />
+                      <img
+                        src={item.imagen_destacada}
+                        alt=""
+                        loading="lazy"
+                      />
                     ) : (
                       <div
                         className="home-news-list__placeholder"
@@ -1038,7 +1065,9 @@ export default async function HomePage() {
                       </time>
 
                       <h3>
-                        <Link href={`/noticias/${item.slug}`}>
+                        <Link
+                          href={`/noticias/${item.slug}`}
+                        >
                           {item.titulo}
                         </Link>
                       </h3>
@@ -1051,7 +1080,10 @@ export default async function HomePage() {
                       className="home-news-list__arrow"
                       aria-label={`Leer ${item.titulo}`}
                     >
-                      <ChevronRight size={19} aria-hidden="true" />
+                      <ChevronRight
+                        size={19}
+                        aria-hidden="true"
+                      />
                     </Link>
                   </article>
                 ))}
@@ -1062,7 +1094,10 @@ export default async function HomePage() {
 
                 <Link href="/noticias">
                   Ver actualidad
-                  <ArrowRight size={15} aria-hidden="true" />
+                  <ArrowRight
+                    size={15}
+                    aria-hidden="true"
+                  />
                 </Link>
               </div>
             )}
@@ -1074,14 +1109,19 @@ export default async function HomePage() {
           05 — PATROCINADORES
           ====================================================== */}
 
-      <section className="home-sponsors" aria-labelledby="sponsors-title">
+      <section
+        className="home-sponsors"
+        aria-labelledby="sponsors-title"
+      >
         <div className="home-shell">
           <div className="home-section-heading home-section-heading--center">
             <p className="home-eyebrow home-eyebrow--light">
               EL APOYO QUE HACE POSIBLE EL CIRCUITO
             </p>
 
-            <h2 id="sponsors-title">Patrocinadores oficiales</h2>
+            <h2 id="sponsors-title">
+              Patrocinadores oficiales
+            </h2>
           </div>
 
           {sponsorItems.length ? (
@@ -1138,23 +1178,31 @@ export default async function HomePage() {
           06 — FINAL CTA
           ====================================================== */}
 
-      <section className="home-final-cta" aria-labelledby="final-cta-title">
+      <section
+        className="home-final-cta"
+        aria-labelledby="final-cta-title"
+      >
         <div className="home-shell home-final-cta__inner">
           <div>
             <p className="home-eyebrow home-eyebrow--light">
               SAGUNTO PADEL CUP
             </p>
 
-            <h2 id="final-cta-title">No te pierdas la próxima prueba.</h2>
+            <h2 id="final-cta-title">
+              No te pierdas la próxima prueba.
+            </h2>
 
             <p>
-              Consulta el calendario, descubre la competición y decide cuándo
-              vuelves a pista.
+              Consulta el calendario, descubre la competición y decide
+              cuándo vuelves a pista.
             </p>
           </div>
 
           <div className="home-final-cta__actions">
-            <Link href="/calendario" className="home-button home-button--solid">
+            <Link
+              href="/calendario"
+              className="home-button home-button--solid"
+            >
               VER CALENDARIO
               <ArrowRight size={17} aria-hidden="true" />
             </Link>
