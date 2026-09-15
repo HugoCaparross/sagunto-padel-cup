@@ -75,7 +75,7 @@ export type CreateMatchInput = {
     tramo?: Match["tramo"] | null;
 
     nextMatchId?: string | null;
-    nextSlot?: "pair1" | "pair2" | null;
+    nextSlot?: 1 | 2 | null;
 };
 
 export type UpdateMatchInput = {
@@ -93,7 +93,7 @@ export type UpdateMatchInput = {
     tramo?: Match["tramo"] | null;
 
     nextMatchId?: string | null;
-    nextSlot?: "pair1" | "pair2" | null;
+    nextSlot?: 1 | 2 | null;
 };
 
 export type EnterMatchResultInput = {
@@ -123,15 +123,15 @@ export type MatchOperationalSummary = {
 
 const MATCH_SELECT = `
     *,
-    pair1:pairs!matches_pair1_id_fkey(
+    pair1:pairs!matches_pair_1_id_fkey(
         *,
-        player1:players!pairs_player1_id_fkey(*),
-        player2:players!pairs_player2_id_fkey(*)
+        player1:players!pairs_player_1_id_fkey(*),
+        player2:players!pairs_player_2_id_fkey(*)
     ),
-    pair2:pairs!matches_pair2_id_fkey(
+    pair2:pairs!matches_pair_2_id_fkey(
         *,
-        player1:players!pairs_player1_id_fkey(*),
-        player2:players!pairs_player2_id_fkey(*)
+        player1:players!pairs_player_1_id_fkey(*),
+        player2:players!pairs_player_2_id_fkey(*)
     )
 `;
 
@@ -208,8 +208,8 @@ export async function getMatches(
         filters.pista !== "all"
     ) {
         query = query.eq(
-            "pista",
-            filters.pista,
+            "pista" as never,
+            String(filters.pista) as never,
         );
     }
 
@@ -343,15 +343,19 @@ export async function createMatch(
             categoria_id: input.categoryId,
             fase: input.fase,
             group_id: input.groupId ?? null,
-            pair1_id: input.pair1Id ?? null,
-            pair2_id: input.pair2Id ?? null,
-            pista: input.pista ?? null,
+            pair_1_id: input.pair1Id ?? null,
+            pair_2_id: input.pair2Id ?? null,
+            pista:
+                input.pista !== undefined &&
+                    input.pista !== null
+                    ? String(input.pista)
+                    : null,
             hora_programada: input.scheduledAt ?? null,
             hora_inicio_real: input.startedAt ?? null,
             hora_fin: null,
             estado: "pendiente",
             resultado_json: null,
-            entered_by: null,
+            introducido_por: null,
             fecha_modificacion: null,
             tramo: input.tramo ?? null,
             siguiente_match_id: input.nextMatchId ?? null,
@@ -411,7 +415,10 @@ export async function updateMatch(
     const payload: Partial<Match> = {};
 
     if (input.pista !== undefined) {
-        payload.pista = input.pista;
+        payload.pista =
+            input.pista !== null
+                ? String(input.pista)
+                : null;
     }
 
     if (input.scheduledAt !== undefined) {
@@ -431,11 +438,11 @@ export async function updateMatch(
     }
 
     if (input.pair1Id !== undefined) {
-        payload.pair1_id = input.pair1Id;
+        payload.pair_1_id = input.pair1Id;
     }
 
     if (input.pair2Id !== undefined) {
-        payload.pair2_id = input.pair2Id;
+        payload.pair_2_id = input.pair2Id;
     }
 
     if (input.tramo !== undefined) {
@@ -564,8 +571,8 @@ export async function startMatch(
     }
 
     if (
-        !match.pair1_id ||
-        !match.pair2_id
+        !match.pair_1_id ||
+        !match.pair_2_id
     ) {
         throw new Error(
             "No se puede comenzar un partido sin dos parejas.",
@@ -595,8 +602,8 @@ export async function validateMatchResultForDatabase(
     }
 
     if (
-        !match.pair1_id ||
-        !match.pair2_id
+        !match.pair_1_id ||
+        !match.pair_2_id
     ) {
         throw new Error(
             "El partido necesita dos parejas.",
@@ -610,8 +617,8 @@ export async function validateMatchResultForDatabase(
     const validation =
         validateMatchResult(
             resultado_json,
-            match.pair1_id,
-            match.pair2_id,
+            match.pair_1_id,
+            match.pair_2_id,
             format,
         );
 
@@ -656,8 +663,8 @@ export async function enterMatchResult(
     }
 
     if (
-        !match.pair1_id ||
-        !match.pair2_id
+        !match.pair_1_id ||
+        !match.pair_2_id
     ) {
         throw new Error(
             "El partido necesita dos parejas antes de introducir el resultado.",
@@ -671,8 +678,8 @@ export async function enterMatchResult(
     const validation =
         validateMatchResult(
             input.resultado_json,
-            match.pair1_id,
-            match.pair2_id,
+            match.pair_1_id,
+            match.pair_2_id,
             format,
         );
 
@@ -685,8 +692,8 @@ export async function enterMatchResult(
     const normalized =
         normalizeMatchResult(
             input.resultado_json,
-            match.pair1_id,
-            match.pair2_id,
+            match.pair_1_id,
+            match.pair_2_id,
             format,
         );
 
@@ -740,8 +747,8 @@ export async function markWalkover(
     }
 
     if (
-        winnerPairId !== match.pair1_id &&
-        winnerPairId !== match.pair2_id
+        winnerPairId !== match.pair_1_id &&
+        winnerPairId !== match.pair_2_id
     ) {
         throw new Error(
             "La pareja ganadora no pertenece al partido.",
@@ -768,9 +775,9 @@ export async function markWalkover(
                 super_tiebreak: null,
                 winner_pair_id: winnerPairId,
                 loser_pair_id:
-                    winnerPairId === match.pair1_id
-                        ? match.pair2_id
-                        : match.pair1_id,
+                    winnerPairId === match.pair_1_id
+                        ? match.pair_2_id
+                        : match.pair_1_id,
                 decided_by: "walkover",
                 notes:
                     reason?.trim() || null,
@@ -805,8 +812,8 @@ export async function markRetirement(
     }
 
     if (
-        winnerPairId !== match.pair1_id &&
-        winnerPairId !== match.pair2_id
+        winnerPairId !== match.pair_1_id &&
+        winnerPairId !== match.pair_2_id
     ) {
         throw new Error(
             "La pareja ganadora no pertenece al partido.",
@@ -833,9 +840,9 @@ export async function markRetirement(
                 super_tiebreak: null,
                 winner_pair_id: winnerPairId,
                 loser_pair_id:
-                    winnerPairId === match.pair1_id
-                        ? match.pair2_id
-                        : match.pair1_id,
+                    winnerPairId === match.pair_1_id
+                        ? match.pair_2_id
+                        : match.pair_1_id,
                 decided_by: "retirement",
                 notes:
                     reason?.trim() || null,
@@ -966,8 +973,8 @@ export async function propagateMatchWinner(
     }
 
     if (
-        winnerPairId !== match.pair1_id &&
-        winnerPairId !== match.pair2_id
+        winnerPairId !== match.pair_1_id &&
+        winnerPairId !== match.pair_2_id
     ) {
         throw new Error(
             "La pareja ganadora no pertenece al partido.",
@@ -984,13 +991,13 @@ export async function propagateMatchWinner(
         );
     }
 
-    if (match.siguiente_slot === "pair1") {
+    if (match.siguiente_slot === 1) {
         return updateMatch(nextMatch.id, {
             pair1Id: winnerPairId,
         });
     }
 
-    if (match.siguiente_slot === "pair2") {
+    if (match.siguiente_slot === 2) {
         return updateMatch(nextMatch.id, {
             pair2Id: winnerPairId,
         });
@@ -1095,8 +1102,8 @@ export async function correctMatchResult(
     }
 
     if (
-        !match.pair1_id ||
-        !match.pair2_id
+        !match.pair_1_id ||
+        !match.pair_2_id
     ) {
         throw new Error(
             "El partido no tiene dos parejas.",
@@ -1110,8 +1117,8 @@ export async function correctMatchResult(
     const validation =
         validateMatchResult(
             input.resultado_json,
-            match.pair1_id,
-            match.pair2_id,
+            match.pair_1_id,
+            match.pair_2_id,
             format,
         );
 
@@ -1124,8 +1131,8 @@ export async function correctMatchResult(
     const normalized =
         normalizeMatchResult(
             input.resultado_json,
-            match.pair1_id,
-            match.pair2_id,
+            match.pair_1_id,
+            match.pair_2_id,
             format,
         );
 

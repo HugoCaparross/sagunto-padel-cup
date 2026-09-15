@@ -232,7 +232,7 @@ export async function getPublishedTournaments() {
             "en_juego",
             "finalizado",
         ])
-        .order("start_date", {
+        .order("fecha_inicio", {
             ascending: false,
         });
 
@@ -281,7 +281,6 @@ export async function getRankingSnapshots(
         .from("ranking_snapshots")
         .select("*")
         .eq("season_id", seasonId)
-        .eq("categoria_id", categoryId)
         .order("posicion", {
             ascending: true,
         });
@@ -318,7 +317,18 @@ export async function getTournamentMatches(
         throw error;
     }
 
-    return data;
+    return (data ?? []).filter((snapshot) => {
+        const snapshotData = snapshot.data;
+        if (
+            typeof snapshotData === "object" &&
+            snapshotData !== null &&
+            !Array.isArray(snapshotData)
+        ) {
+            const category = (snapshotData as { categoria_id?: unknown }).categoria_id;
+            return category === undefined || category === categoryId;
+        }
+        return true;
+    });
 }
 
 // =============================================================================

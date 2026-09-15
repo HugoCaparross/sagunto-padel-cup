@@ -178,7 +178,7 @@ export type CreatePlayerInput = {
 
     categoria_actual_id?: string | null;
 
-    mano_dominante?: "derecha" | "izquierda" | null;
+    mano_dominante?: "diestro" | "zurdo" | null;
 
     pala?: string | null;
 
@@ -214,7 +214,7 @@ export type UpdatePlayerInput = {
 
     foto_url?: string | null;
 
-    mano_dominante?: "derecha" | "izquierda" | null;
+    mano_dominante?: "diestro" | "zurdo" | null;
 
     pala?: string | null;
 
@@ -585,7 +585,7 @@ export type PlayerSearchFilters = {
 
     city: string | "all";
 
-    estado: "all" | "activo" | "inactivo" | "suspendido";
+    estado: "all" | "activo" | "baja" | "suspendido";
 
     page: number;
 
@@ -613,7 +613,7 @@ export type PlayerAdminFilters = {
 
     categoria_id: string | "all";
 
-    estado: "all" | "activo" | "inactivo" | "suspendido";
+    estado: "all" | "activo" | "baja" | "suspendido";
 
     role: "all" | "player" | "admin";
 
@@ -683,7 +683,7 @@ export function isPlayerSuspended(
 export function isPlayerInactive(
     player: Player,
 ): boolean {
-    return player.estado === "inactivo";
+    return player.estado === "baja";
 }
 
 export function canPlayerCompete(
@@ -702,17 +702,17 @@ export function canPlayerCompete(
 export function getPlayerFullName(
     player: Player,
 ): string {
-    return `${player.name} ${player.surname}`.trim();
+    return `${player.nombre} ${player.apellidos ?? ""}`.trim();
 }
 
 export function getPlayerInitials(
     player: Player,
 ): string {
     const first =
-        player.name.trim().charAt(0);
+        player.nombre.trim().charAt(0);
 
     const last =
-        player.surname.trim().charAt(0);
+        (player.apellidos ?? "").trim().charAt(0);
 
     return `${first}${last}`.toUpperCase();
 }
@@ -748,7 +748,7 @@ export function canShowPlayerField(
 export function hasPendingCategoryChange(
     change: CategoryChange | null,
 ): boolean {
-    return change?.estado === "pendiente";
+    return change?.status === "pendiente";
 }
 
 export function canRequestCategoryChange(
@@ -842,7 +842,7 @@ export type PlayerProfileUpdate = {
 
     foto_url?: string | null;
 
-    mano_dominante?: "derecha" | "izquierda" | null;
+    mano_dominante?: "diestro" | "zurdo" | null;
 
     pala?: string | null;
 

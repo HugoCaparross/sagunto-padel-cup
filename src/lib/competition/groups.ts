@@ -1048,7 +1048,7 @@ export function toDatabaseStandings(
             juegos_contra:
                 standing.gamesAgainst,
 
-            puntos_obtenidos:
+            puntos:
                 standing.puntos_obtenidos,
 
             posicion:

@@ -146,7 +146,7 @@ function normalizeSlug(
 function getTournamentType(
     tournament: Tournament,
 ): TournamentType {
-    if (tournament.tournament_type) {
+    if (tournament.tournament_type === "master") {
         return "master";
     }
 
@@ -272,7 +272,7 @@ export async function getTournaments(
         `,
         )
         .order(
-            "start_date",
+            "fecha_inicio",
             {
                 ascending: true,
             },
@@ -302,8 +302,7 @@ export async function getTournaments(
     if (filters.tournamentType) {
         query = query.eq(
             "tournament_type",
-            filters.tournamentType ===
-            "master",
+            filters.tournamentType,
         );
     }
 
@@ -316,7 +315,7 @@ export async function getTournaments(
 
     if (filters.search?.trim()) {
         query = query.ilike(
-            "name",
+            "nombre",
             `%${filters.search.trim()}%`,
         );
     }
@@ -328,7 +327,7 @@ export async function getTournaments(
                 .slice(0, 10);
 
         query = query.gte(
-            "start_date",
+            "fecha_inicio",
             today,
         );
     }
@@ -479,7 +478,7 @@ export async function getPublicTournaments(
             ],
         )
         .order(
-            "start_date",
+            "fecha_inicio",
             {
                 ascending: true,
             },
@@ -502,8 +501,7 @@ export async function getPublicTournaments(
     if (filters.tournamentType) {
         query = query.eq(
             "tournament_type",
-            filters.tournamentType ===
-            "master",
+            filters.tournamentType,
         );
     }
 
@@ -516,7 +514,7 @@ export async function getPublicTournaments(
 
     if (filters.search?.trim()) {
         query = query.ilike(
-            "name",
+            "nombre",
             `%${filters.search.trim()}%`,
         );
     }
@@ -528,7 +526,7 @@ export async function getPublicTournaments(
                 .slice(0, 10);
 
         query = query.gte(
-            "start_date",
+            "fecha_inicio",
             today,
         );
     }
@@ -686,7 +684,7 @@ export async function createTournament(
         season_id:
             input.seasonId.trim(),
 
-        name:
+        nombre:
             input.name.trim(),
 
         slug:
@@ -697,21 +695,21 @@ export async function createTournament(
         club_id:
             input.clubId.trim(),
 
-        start_date:
+        fecha_inicio:
             input.startDate,
 
-        end_date:
+        fecha_fin:
             input.endDate,
 
         estado:
             input.estado ??
             "borrador",
 
-        price:
+        precio_texto:
             input.price?.trim() ||
             null,
 
-        description:
+        descripcion:
             input.description?.trim() ||
             null,
 
@@ -723,8 +721,7 @@ export async function createTournament(
             }),
 
         tournament_type:
-            tournamentType ===
-            "master",
+            tournamentType,
     };
 
     const {
@@ -772,11 +769,11 @@ export async function updateTournament(
 
     const startDate =
         input.startDate ??
-        current.start_date;
+        current.fecha_inicio;
 
     const endDate =
         input.endDate ??
-        current.end_date;
+        current.fecha_fin;
 
     if (
         !validateDateRange(
@@ -814,16 +811,16 @@ export async function updateTournament(
 
     const payload: {
         season_id?: string;
-        name?: string;
+        nombre?: string;
         slug?: string;
         club_id?: string;
-        start_date?: string;
-        end_date?: string;
+        fecha_inicio?: string;
+        fecha_fin?: string;
         estado?: Tournament["estado"];
-        price?: string | null;
-        description?: string | null;
+        precio_texto?: string | null;
+        descripcion?: string | null;
         settings?: Json;
-        tournament_type?: boolean;
+        tournament_type?: Tournament["tournament_type"];
     } = {};
 
     if (
@@ -853,7 +850,7 @@ export async function updateTournament(
             );
         }
 
-        payload.name = name;
+        payload.nombre = name;
     }
 
     if (
@@ -892,7 +889,7 @@ export async function updateTournament(
         input.startDate !==
         undefined
     ) {
-        payload.start_date =
+        payload.fecha_inicio =
             input.startDate;
     }
 
@@ -900,7 +897,7 @@ export async function updateTournament(
         input.endDate !==
         undefined
     ) {
-        payload.end_date =
+        payload.fecha_fin =
             input.endDate;
     }
 
@@ -916,7 +913,7 @@ export async function updateTournament(
         input.price !==
         undefined
     ) {
-        payload.price =
+        payload.precio_texto =
             input.price?.trim() ||
             null;
     }
@@ -925,7 +922,7 @@ export async function updateTournament(
         input.description !==
         undefined
     ) {
-        payload.description =
+        payload.descripcion =
             input.description?.trim() ||
             null;
     }
@@ -959,14 +956,13 @@ export async function updateTournament(
         undefined
     ) {
         payload.tournament_type =
-            input.isMaster;
+            input.isMaster ? "master" : "regular";
     } else if (
         input.tournamentType !==
         undefined
     ) {
         payload.tournament_type =
-            input.tournamentType ===
-            "master";
+            input.tournamentType;
     }
 
     if (

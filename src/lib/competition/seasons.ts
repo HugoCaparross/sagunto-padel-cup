@@ -195,8 +195,8 @@ export function createSeason(
                 )
                 : null,
 
-        estado:
-            "borrador" as SeasonStatus,
+        status:
+            "planificada" as SeasonStatus,
     };
 }
 
@@ -207,11 +207,11 @@ export function createSeason(
 export function canActivateSeason(
     season: Pick<
         Season,
-        "estado"
+        "status"
     >,
 ): boolean {
     return (
-        season.estado ===
+        season.status ===
         "borrador"
     );
 }
@@ -219,11 +219,11 @@ export function canActivateSeason(
 export function canCloseSeason(
     season: Pick<
         Season,
-        "estado"
+        "status"
     >,
 ): boolean {
     return (
-        season.estado ===
+        season.status ===
         "activa"
     );
 }
@@ -231,13 +231,13 @@ export function canCloseSeason(
 export function canArchiveSeason(
     season: Pick<
         Season,
-        "estado"
+        "status"
     >,
 ): boolean {
     return (
-        season.estado ===
+        season.status ===
         "finalizada" ||
-        season.estado ===
+        season.status ===
         "archivada"
     );
 }

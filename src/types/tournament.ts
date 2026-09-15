@@ -1103,7 +1103,7 @@ export type TournamentOperationResult = {
 export function isTournamentMaster(
     tournament: Tournament,
 ): boolean {
-    return tournament.tournament_type;
+    return tournament.tournament_type === "master";
 }
 
 export function isTournamentRegistrationOpen(

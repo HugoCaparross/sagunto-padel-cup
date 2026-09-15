@@ -108,8 +108,8 @@ type PlayerVisibilityObject =
 
 type MatchStatsRow = {
     id: string;
-    pair1_id: string | null;
-    pair2_id: string | null;
+    pair_1_id: string | null;
+    pair_2_id: string | null;
     estado: string;
     resultado_json: unknown;
 };
@@ -124,7 +124,7 @@ type TournamentPairRow = {
 
 type ChampionBracketRow = {
     tournament_id: string;
-    champion_pair_id: string | null;
+    campeon_pair_id: string | null;
 };
 
 /* -------------------------------------------------------------------------- */
@@ -393,13 +393,13 @@ export async function getPlayers(
             `,
         )
         .order(
-            "name",
+            "nombre",
             {
                 ascending: true,
             },
         )
         .order(
-            "surname",
+            "apellidos",
             {
                 ascending: true,
             },
@@ -428,7 +428,7 @@ export async function getPlayers(
 
     if (filters.city?.trim()) {
         query = query.ilike(
-            "city",
+            "ciudad",
             `%${filters.city.trim()}%`,
         );
     }
@@ -449,8 +449,8 @@ export async function getPlayers(
 
         query = query.or(
             [
-                `name.ilike.%${search}%`,
-                `surname.ilike.%${search}%`,
+                `nombre.ilike.%${search}%`,
+                `apellidos.ilike.%${search}%`,
                 `email.ilike.%${search}%`,
             ].join(","),
         );
@@ -664,8 +664,8 @@ export function toPublicPlayerProfile(
 
     return {
         id: player.id,
-        name: player.name,
-        surname: player.surname,
+        name: player.nombre,
+        surname: player.apellidos ?? "",
 
         foto_url:
             visibilidad_json.foto_url === false
@@ -675,7 +675,7 @@ export function toPublicPlayerProfile(
         currentCategory:
             player.category ?? null,
 
-        city: player.city,
+        city: player.ciudad,
 
         instagram:
             visibilidad_json.instagram === false
@@ -758,10 +758,10 @@ export async function createPlayer(
         auth_user_id:
             input.authUserId ?? null,
 
-        name:
+        nombre:
             input.name.trim(),
 
-        surname:
+        apellidos:
             input.surname.trim(),
 
         email:
@@ -785,7 +785,7 @@ export async function createPlayer(
         pala:
             normalizeText(input.pala),
 
-        city:
+        ciudad:
             normalizeText(input.city),
 
         instagram:
@@ -867,7 +867,7 @@ export async function updatePlayer(
             );
         }
 
-        payload.name = name;
+        payload.nombre = name;
     }
 
     if (
@@ -883,7 +883,7 @@ export async function updatePlayer(
             );
         }
 
-        payload.surname = surname;
+        payload.apellidos = surname;
     }
 
     if (
@@ -957,7 +957,7 @@ export async function updatePlayer(
         input.city !==
         undefined
     ) {
-        payload.city =
+        payload.ciudad =
             normalizeText(
                 input.city,
             );
@@ -1151,13 +1151,12 @@ export async function changePlayerCategory(
         categoria_nueva_id:
             input.toCategoryId,
 
-        reason:
-            normalizeText(
-                input.reason,
-            ),
+        motivo:
+            normalizeText(input.reason) ??
+            "Cambio de categoría",
 
-        estado:
-            "aprobado",
+        status:
+            "aprobada",
 
         fecha:
             new Date().toISOString(),
@@ -1259,7 +1258,7 @@ export async function deactivatePlayer(
     return updatePlayer(
         playerId,
         {
-            estado: "inactivo",
+            estado: "baja",
         },
     );
 }
@@ -1325,19 +1324,19 @@ export async function searchPlayers(
         )
         .or(
             [
-                `name.ilike.%${term}%`,
-                `surname.ilike.%${term}%`,
+                `nombre.ilike.%${term}%`,
+                `apellidos.ilike.%${term}%`,
                 `email.ilike.%${term}%`,
             ].join(","),
         )
         .order(
-            "name",
+            "nombre",
             {
                 ascending: true,
             },
         )
         .order(
-            "surname",
+            "apellidos",
             {
                 ascending: true,
             },
@@ -1453,8 +1452,8 @@ export async function getPlayerStats(
         .select(
             `
                 id,
-                pair1_id,
-                pair2_id,
+                pair_1_id,
+                pair_2_id,
                 estado,
                 resultado_json
             `,
@@ -1478,15 +1477,15 @@ export async function getPlayerStats(
         matches.filter(
             (match) =>
                 (
-                    match.pair1_id !== null &&
+                    match.pair_1_id !== null &&
                     pairIds.has(
-                        match.pair1_id,
+                        match.pair_1_id,
                     )
                 ) ||
                 (
-                    match.pair2_id !== null &&
+                    match.pair_2_id !== null &&
                     pairIds.has(
-                        match.pair2_id,
+                        match.pair_2_id,
                     )
                 ),
         );
@@ -1509,12 +1508,12 @@ export async function getPlayerStats(
             );
 
         const playerPairId =
-            match.pair1_id !== null &&
+            match.pair_1_id !== null &&
                 pairIds.has(
-                    match.pair1_id,
+                    match.pair_1_id,
                 )
-                ? match.pair1_id
-                : match.pair2_id;
+                ? match.pair_1_id
+                : match.pair_2_id;
 
         if (
             playerPairId &&
@@ -1536,7 +1535,7 @@ export async function getPlayerStats(
 
         const playerIsPair1 =
             playerPairId ===
-            match.pair1_id;
+            match.pair_1_id;
 
         for (
             const set of sets
@@ -1654,7 +1653,7 @@ export async function getPlayerStats(
         } = await supabase
             .from("brackets")
             .select(
-                "tournament_id, champion_pair_id",
+                "tournament_id, campeon_pair_id",
             )
             .in(
                 "tournament_id",
@@ -1680,9 +1679,9 @@ export async function getPlayerStats(
             const bracket of brackets
         ) {
             if (
-                bracket.champion_pair_id &&
+                bracket.campeon_pair_id &&
                 pairIds.has(
-                    bracket.champion_pair_id,
+                    bracket.campeon_pair_id,
                 )
             ) {
                 wonTournamentIds.add(
@@ -1816,27 +1815,20 @@ export async function requestCategoryChange(
         categoria_nueva_id:
             request.toCategoryId,
 
+        motivo:
+            normalizeText(request.reason) ??
+            "Solicitud de cambio de categoría",
+
+        status:
+            "pendiente",
+
         requested_at:
             new Date().toISOString(),
 
-        estado:
-            "pendiente",
-
-        requested_by:
+        reviewed_at:
             null,
 
-        reviewed_by:
-            null,
-
-        fecha:
-            null,
-
-        reason:
-            normalizeText(
-                request.reason,
-            ),
-
-        notes:
+        confirmado_por:
             null,
     };
 
@@ -1905,7 +1897,7 @@ export async function approveCategoryChange(
         rawChange as unknown as CategoryChange;
 
     if (
-        categoryChange.estado ===
+        categoryChange.status ===
         "aprobado"
     ) {
         const player =
@@ -1923,7 +1915,7 @@ export async function approveCategoryChange(
     }
 
     if (
-        categoryChange.estado ===
+        categoryChange.status ===
         "rechazado"
     ) {
         throw new Error(
@@ -1972,8 +1964,8 @@ export async function approveCategoryChange(
             "category_changes",
         )
         .update({
-            estado:
-                "aprobado",
+            status:
+                "aprobada",
 
             fecha:
                 new Date().toISOString(),
@@ -2025,7 +2017,7 @@ export function getPublicPlayerFields(
     return {
         id: player.id,
 
-        name: player.name,
+        name: player.nombre,
 
         surname:
             player.surname,

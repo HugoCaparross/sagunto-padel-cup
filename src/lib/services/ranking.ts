@@ -36,9 +36,32 @@ type RankingTier =
     | "plata"
     | "bronce";
 
+type RankingResultType =
+    | "campeon"
+    | "finalista"
+    | "semifinalista"
+    | "cuartos";
+
 /* -------------------------------------------------------------------------- */
 /* TYPES                                                                      */
 /* -------------------------------------------------------------------------- */
+
+function getRankingPointTier(point: RankingPoint): RankingTier | null {
+    const metadata = point.metadata;
+    if (
+        typeof metadata === "object" &&
+        metadata !== null &&
+        !Array.isArray(metadata)
+    ) {
+        const tier = (metadata as { tramo?: unknown }).tramo;
+        if (tier === "oro" || tier === "plata" || tier === "bronce") {
+            return tier;
+        }
+    }
+    return null;
+}
+
+
 
 export type RankingFilters = {
     seasonId?: string;
@@ -101,10 +124,7 @@ export type CreateRankingPointInput = {
     pairId?: string | null;
 
     resultType?:
-    | "campeon"
-    | "finalista"
-    | "semifinalista"
-    | "cuartos";
+    RankingResultType;
 
     tramo?: RankingTier | null;
 
@@ -247,8 +267,7 @@ function assertTier(
 }
 
 function assertResultType(
-    resultType:
-        RankingPoint["ronda_alcanzada"],
+    resultType: RankingResultType,
 ): void {
     if (
         !VALID_RESULT_TYPES.has(
@@ -267,7 +286,7 @@ function assertResultType(
 
 function resultTypeFromFinish(
     finish: RankingFinish,
-): RankingPoint["ronda_alcanzada"] {
+): RankingResultType {
     const posicion =
         getPositionFromFinish(
             finish,
@@ -586,6 +605,10 @@ export async function getActiveRankingEntries(
     for (
         const point of puntos_obtenidos
     ) {
+        if (!point.season_id) {
+            continue;
+        }
+
         const existing =
             grouped.get(
                 point.player_id,
@@ -929,14 +952,6 @@ export async function addRankingPoints(
         player_id:
             input.playerId,
 
-        pair_id:
-            input.pairId ??
-            null,
-
-        tramo:
-            input.tramo ??
-            null,
-
         ronda_alcanzada:
             input.resultType ??
             "campeon",
@@ -950,9 +965,11 @@ export async function addRankingPoints(
 
         source,
 
-        notes:
-            input.notes ??
-            null,
+        metadata: {
+            pair_id: input.pairId ?? null,
+            tramo: input.tramo ?? null,
+            notes: input.notes ?? null,
+        },
     };
 
     const {
@@ -1074,10 +1091,10 @@ export async function addTournamentFinishPoints(
             category:
                 input.category,
 
-            tramo:
+            tier:
                 input.tramo,
 
-            posicion:
+            position:
                 input.posicion,
         });
 
@@ -1113,7 +1130,7 @@ export async function addTournamentFinishPoints(
             null,
 
         puntos_obtenidos:
-            calculation.puntos_obtenidos,
+            calculation.points,
 
         resultType:
             resultTypeFromFinish(
@@ -1121,7 +1138,7 @@ export async function addTournamentFinishPoints(
             ),
 
         tramo:
-            calculation.tramo,
+            input.tramo,
 
         notes:
             input.notes ??
@@ -1262,13 +1279,6 @@ export async function addTournamentRankingPoints(
                 player_id:
                     allocation.playerId,
 
-                pair_id:
-                    allocation.pairId ??
-                    null,
-
-                tramo:
-                    allocation.tramo,
-
                 ronda_alcanzada:
                     allocation.resultType,
 
@@ -1281,9 +1291,11 @@ export async function addTournamentRankingPoints(
                 source:
                     "tournament",
 
-                notes:
-                    allocation.notes ??
-                    null,
+                metadata: {
+                    pair_id: allocation.pairId ?? null,
+                    tramo: allocation.tramo,
+                    notes: allocation.notes ?? null,
+                },
             }),
         );
 
@@ -1426,8 +1438,8 @@ export async function createRankingSnapshot(
                 season_id:
                     input.seasonId,
 
-                categoria_id:
-                    input.categoryId,
+                temporada:
+                    input.seasonId,
 
                 player_id:
                     entry.playerId,
@@ -1438,11 +1450,11 @@ export async function createRankingSnapshot(
                 puntos:
                     entry.totalPoints,
 
-                puntos_activos:
-                    entry.activePoints,
-
-                puntos_inactivos:
-                    entry.inactivePoints,
+                data: {
+                    categoria_id: input.categoryId,
+                    puntos_activos: entry.activePoints,
+                    puntos_inactivos: entry.inactivePoints,
+                },
 
                 fecha_snapshot:
                     snapshotDate,
@@ -1770,9 +1782,9 @@ export async function findInvalidRankingPoints(
             }
 
             if (
-                point.tramo &&
+                getRankingPointTier(point) &&
                 !VALID_TIERS.has(
-                    point.tramo,
+                    getRankingPointTier(point),
                 )
             ) {
                 return true;
@@ -2008,12 +2020,8 @@ export function validateStoredRankingPoint(
         return false;
     }
 
-    if (
-        point.tramo &&
-        !VALID_TIERS.has(
-            point.tramo,
-        )
-    ) {
+    const tier = getRankingPointTier(point);
+    if (tier && !VALID_TIERS.has(tier)) {
         return false;
     }
 
@@ -2068,14 +2076,15 @@ export function validateOfficialRankingAllocation(
             category:
                 input.category,
 
-            tramo:
+            tier:
                 input.tramo,
 
-            posicion,
+            position:
+                posicion,
         });
 
     return (
-        expected.puntos_obtenidos ===
+        expected.points ===
         input.puntos_obtenidos
     );
 }

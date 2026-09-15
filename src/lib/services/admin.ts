@@ -296,7 +296,7 @@ export async function getAdminDashboardSummary(
     const tournamentIds =
         seasonId
             ? tournaments.map(
-                (tournament) =>
+                (tournament: Tournament) =>
                     tournament.id,
             )
             : [];
@@ -304,7 +304,7 @@ export async function getAdminDashboardSummary(
     const scopedRegistrations =
         seasonId
             ? registrations.filter(
-                (registration) =>
+                (registration: import("@/types/database").Registration) =>
                     tournamentIds.includes(
                         registration.tournament_id,
                     ),
@@ -314,7 +314,7 @@ export async function getAdminDashboardSummary(
     const scopedMatches =
         seasonId
             ? matches.filter(
-                (match) =>
+                (match: Match) =>
                     tournamentIds.includes(
                         match.tournament_id,
                     ),
@@ -328,21 +328,21 @@ export async function getAdminDashboardSummary(
 
             open:
                 tournaments.filter(
-                    (tournament) =>
+                    (tournament: Tournament) =>
                         tournament.estado ===
                         "inscripciones_abiertas",
                 ).length,
 
             live:
                 tournaments.filter(
-                    (tournament) =>
+                    (tournament: Tournament) =>
                         tournament.estado ===
                         "en_juego",
                 ).length,
 
             finished:
                 tournaments.filter(
-                    (tournament) =>
+                    (tournament: Tournament) =>
                         tournament.estado ===
                         "finalizado",
                 ).length,
@@ -354,7 +354,7 @@ export async function getAdminDashboardSummary(
 
             active:
                 players.filter(
-                    (player) =>
+                    (player: Player) =>
                         player.estado ===
                         "activo",
                 ).length,
@@ -366,28 +366,28 @@ export async function getAdminDashboardSummary(
 
             pendingPayment:
                 scopedRegistrations.filter(
-                    (registration) =>
+                    (registration: import("@/types/database").Registration) =>
                         registration.estado ===
                         "pendiente_pago",
                 ).length,
 
             confirmed:
                 scopedRegistrations.filter(
-                    (registration) =>
+                    (registration: import("@/types/database").Registration) =>
                         registration.estado ===
                         "confirmada",
                 ).length,
 
             waitingList:
                 scopedRegistrations.filter(
-                    (registration) =>
+                    (registration: import("@/types/database").Registration) =>
                         registration.estado ===
                         "lista_espera",
                 ).length,
 
             checkedIn:
                 scopedRegistrations.filter(
-                    (registration) =>
+                    (registration: import("@/types/database").Registration) =>
                         registration.checked_in,
                 ).length,
         },
@@ -398,28 +398,28 @@ export async function getAdminDashboardSummary(
 
             pending:
                 scopedMatches.filter(
-                    (match) =>
+                    (match: Match) =>
                         match.estado ===
                         "pendiente",
                 ).length,
 
             live:
                 scopedMatches.filter(
-                    (match) =>
+                    (match: Match) =>
                         match.estado ===
                         "en_juego",
                 ).length,
 
             finished:
                 scopedMatches.filter(
-                    (match) =>
+                    (match: Match) =>
                         match.estado ===
                         "finalizado",
                 ).length,
 
             postponed:
                 scopedMatches.filter(
-                    (match) =>
+                    (match: Match) =>
                         match.estado ===
                         "aplazado",
                 ).length,
@@ -597,7 +597,7 @@ export async function deactivatePlayerAdmin(
         playerId,
         {
             estado:
-                "inactivo",
+                "baja",
         },
     );
 }
@@ -854,7 +854,7 @@ export async function getClubs(): Promise<
         .from("clubs")
         .select("*")
         .order(
-            "name",
+            "nombre",
             {
                 ascending: true,
             },
@@ -902,21 +902,27 @@ export async function createClub(
     } = await supabase
         .from("clubs")
         .insert({
-            name,
+            nombre: name,
 
-            address:
+            direccion:
                 input.address?.trim() ||
                 null,
 
-            courts:
+            lat:
+                input.latitude ?? null,
+
+            lng:
+                input.longitude ?? null,
+
+            num_pistas:
                 input.courts ??
-                undefined,
+                null,
 
             telefono:
                 input.telefono?.trim() ||
                 null,
 
-            photos:
+            fotos_json:
                 (input.photos ?? []) as Json,
         })
         .select("*")
@@ -978,7 +984,7 @@ export async function updateClub(
             ...(input.name !==
                 undefined
                 ? {
-                    name:
+                    nombre:
                         input.name.trim(),
                 }
                 : {}),
@@ -986,8 +992,24 @@ export async function updateClub(
             ...(input.address !==
                 undefined
                 ? {
-                    address:
+                    direccion:
                         input.address,
+                }
+                : {}),
+
+            ...(input.latitude !==
+                undefined
+                ? {
+                    lat:
+                        input.latitude,
+                }
+                : {}),
+
+            ...(input.longitude !==
+                undefined
+                ? {
+                    lng:
+                        input.longitude,
                 }
                 : {}),
 
@@ -996,7 +1018,7 @@ export async function updateClub(
                 input.courts !==
                 null
                 ? {
-                    courts:
+                    num_pistas:
                         input.courts,
                 }
                 : {}),
@@ -1012,7 +1034,7 @@ export async function updateClub(
             ...(input.photos !==
                 undefined
                 ? {
-                    photos:
+                    fotos_json:
                         input.photos as Json,
                 }
                 : {}),
@@ -1050,7 +1072,7 @@ export async function getCategories(): Promise<
         .from("categories")
         .select("*")
         .order(
-            "order",
+            "nivel_orden",
             {
                 ascending: true,
             },
@@ -1093,9 +1115,9 @@ export async function createCategory(
     } = await supabase
         .from("categories")
         .insert({
-            name,
+            nombre: name,
 
-            order:
+            nivel_orden:
                 input.order,
         })
         .select("*")
@@ -1142,7 +1164,7 @@ export async function updateCategory(
             ...(input.name !==
                 undefined
                 ? {
-                    name:
+                    nombre:
                         input.name.trim(),
                 }
                 : {}),
@@ -1150,7 +1172,7 @@ export async function updateCategory(
             ...(input.order !==
                 undefined
                 ? {
-                    order:
+                    nivel_orden:
                         input.order,
                 }
                 : {}),
@@ -1246,7 +1268,7 @@ export async function createNews(
     } = await supabase
         .from("news")
         .insert({
-            title,
+            titulo: title,
 
             slug,
 
@@ -1260,7 +1282,7 @@ export async function createNews(
                 }
                 : {}),
 
-            content:
+            contenido:
                 input.content ??
                 "",
 
@@ -1277,7 +1299,7 @@ export async function createNews(
                     ? "publicado"
                     : "borrador",
 
-            published_at:
+            fecha_publicacion:
                 input.published === true
                     ? new Date().toISOString()
                     : null,
@@ -1338,7 +1360,7 @@ export async function updateNews(
             ...(input.title !==
                 undefined
                 ? {
-                    title:
+                    titulo:
                         input.title.trim(),
                 }
                 : {}),
@@ -1366,7 +1388,7 @@ export async function updateNews(
                 input.content !==
                 null
                 ? {
-                    content:
+                    contenido:
                         input.content,
                 }
                 : {}),
@@ -1387,7 +1409,7 @@ export async function updateNews(
                             ? "publicado"
                             : "borrador",
 
-                    published_at:
+                    fecha_publicacion:
                         input.published
                             ? new Date().toISOString()
                             : null,
@@ -1429,7 +1451,7 @@ export async function getAdminSponsors(): Promise<
         .from("sponsors")
         .select("*")
         .order(
-            "order",
+            "orden",
             {
                 ascending: true,
             },
@@ -1448,6 +1470,7 @@ export async function getAdminSponsors(): Promise<
 
 export async function createSponsor(
     input: {
+        tournamentId: string;
         name: string;
         logo?: string | null;
         website?: string | null;
@@ -1476,28 +1499,25 @@ export async function createSponsor(
     } = await supabase
         .from("sponsors")
         .insert({
-            name,
+            tournament_id: input.tournamentId,
+            nombre: name,
 
-            logo:
+            logo_url:
                 input.logo ??
                 null,
 
-            website:
+            enlace:
                 input.website ??
                 null,
 
-            tramo:
-                input.tramo ??
-                null,
+            tipo: "comercial",
 
-            order:
+            orden:
                 input.order ??
                 0,
 
-            estado:
-                input.active === false
-                    ? "inactivo"
-                    : "activo",
+            active:
+                input.active !== false,
         })
         .select("*")
         .single();
@@ -1622,7 +1642,7 @@ export async function writeAdminAuditLog(
             entidad:
                 entry.entityType,
 
-            entity_id:
+            entidad_id:
                 entry.entityId,
 
             metadata:

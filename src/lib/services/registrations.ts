@@ -48,7 +48,7 @@ export type RegistrationWithRelationsExtended =
          * Computed compatibility fields.
          * They are not columns in registrations.
          */
-        categoria_id?: string;
+        categoria_id?: string | null;
         payment_status?: PaymentStatus;
 
         pair?: Pair | null;
@@ -856,7 +856,8 @@ export async function addPlayerToPartnerPool(
             player_id: input.playerId,
             tournament_id: input.tournamentId,
             categoria_id: input.categoryId,
-            available: true,
+            disponible: true,
+            disponibilidad: input.availability ?? "buscando",
         });
 
     if (error) {
@@ -906,13 +907,15 @@ export async function getPartnerPool(
             `
             id,
             player_id,
-            available
+            disponible,
+            disponibilidad,
+            fecha_publicacion
         `,
         )
         .eq("tournament_id", tournamentId)
         .eq("categoria_id", categoryId)
-        .eq("available", true)
-        .order("created_at", {
+        .eq("disponible", true)
+        .order("fecha_publicacion", {
             ascending: true,
         });
 
@@ -957,8 +960,8 @@ export async function getPartnerPool(
                 null,
             availability:
                 normalizePartnerAvailability(
-                    item.available
-                        ? "buscando"
+                    item.disponible
+                        ? (item.disponibilidad ?? "buscando")
                         : "no_busca",
                 ),
         }),
@@ -986,7 +989,7 @@ export async function createIncompletePair(
             player_1_id: input.playerId,
             player_2_id: null,
             estado: "incompleta",
-            seeded: false,
+            cabeza_de_serie: false,
         })
         .select("*")
         .single();
@@ -1033,7 +1036,7 @@ export async function createCompletePair(
             player_1_id: input.player1Id,
             player_2_id: input.player2Id,
             estado: "pendiente_pago",
-            seeded: false,
+            cabeza_de_serie: false,
         })
         .select("*")
         .single();
@@ -1309,7 +1312,7 @@ async function createRegistrationRecord(
             estado:
                 input.estado,
             metodo_pago:
-                null,
+                "fisico",
             fecha_pago:
                 null,
             importe:

@@ -689,7 +689,7 @@ export type RankingPoint = {
     puntos_obtenidos: number;
     ronda_alcanzada: string;
     fecha: string;
-    fecha_caducidad: string | null;
+    fecha_caducidad: string;
     season_id: string | null;
     source: string;
     metadata: Json;
@@ -1048,24 +1048,15 @@ export type Database = {
 
         Functions: Record<string, never>;
 
+        /**
+         * PostgreSQL enums that are explicitly present in the current SQL schema.
+         * Columns backed by CHECK constraints remain plain text unions above.
+         */
         Enums: {
-            user_role: UserRole;
-            player_status: PlayerStatus;
-            tournament_state: TournamentState;
-            pair_status: PairStatus;
-            registration_status: RegistrationStatus;
-            payment_method: PaymentMethod;
-            payment_status: PaymentStatus;
-            match_phase: MatchPhase;
-            match_status: MatchStatus;
             category_gender: CategoryGender;
             tournament_type: TournamentType;
+            payment_status: PaymentStatus;
             season_status: SeasonStatus;
-            sponsor_type: SponsorType;
-            sponsor_status: SponsorStatus;
-            news_status: NewsStatus;
-            notification_channel: NotificationChannel;
-            audit_action: AuditAction;
         };
 
         CompositeTypes: Record<string, never>;

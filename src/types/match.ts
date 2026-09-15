@@ -240,9 +240,9 @@ export type CreateMatchInput = {
 
     group_id?: string | null;
 
-    pair1_id?: string | null;
+    pair_1_id?: string | null;
 
-    pair2_id?: string | null;
+    pair_2_id?: string | null;
 
     tramo?: MatchTier | null;
 
@@ -902,8 +902,8 @@ export function canStartMatch(
 ): boolean {
     return (
         match.estado === "pendiente" &&
-        Boolean(match.pair1_id) &&
-        Boolean(match.pair2_id)
+        Boolean(match.pair_1_id) &&
+        Boolean(match.pair_2_id)
     );
 }
 
