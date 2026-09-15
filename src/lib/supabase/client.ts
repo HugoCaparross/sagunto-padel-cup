@@ -317,18 +317,7 @@ export async function getTournamentMatches(
         throw error;
     }
 
-    return (data ?? []).filter((snapshot) => {
-        const snapshotData = snapshot.data;
-        if (
-            typeof snapshotData === "object" &&
-            snapshotData !== null &&
-            !Array.isArray(snapshotData)
-        ) {
-            const category = (snapshotData as { categoria_id?: unknown }).categoria_id;
-            return category === undefined || category === categoryId;
-        }
-        return true;
-    });
+    return data ?? [];
 }
 
 // =============================================================================

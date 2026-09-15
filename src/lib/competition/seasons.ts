@@ -212,7 +212,7 @@ export function canActivateSeason(
 ): boolean {
     return (
         season.status ===
-        "borrador"
+        "planificada"
     );
 }
 

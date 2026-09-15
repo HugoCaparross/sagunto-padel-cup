@@ -1363,14 +1363,9 @@ export async function getRankingSnapshots(
         );
     }
 
-    if (
-        filters.categoryId
-    ) {
-        query = query.eq(
-            "categoria_id",
-            filters.categoryId,
-        );
-    }
+    // ranking_snapshots no tiene categoria_id como columna.
+    // Si se necesita filtrar por categoría, se conserva en data JSON.
+    // El filtrado se realiza después de recuperar los snapshots.
 
     if (
         filters.playerId
@@ -1781,11 +1776,10 @@ export async function findInvalidRankingPoints(
                 return true;
             }
 
+            const tier = getRankingPointTier(point);
             if (
-                getRankingPointTier(point) &&
-                !VALID_TIERS.has(
-                    getRankingPointTier(point),
-                )
+                tier !== null &&
+                !VALID_TIERS.has(tier)
             ) {
                 return true;
             }

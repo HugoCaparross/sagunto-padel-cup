@@ -2020,7 +2020,7 @@ export function getPublicPlayerFields(
         name: player.nombre,
 
         surname:
-            player.surname,
+            player.apellidos,
 
         foto_url:
             visibilidad_json.foto_url === false
@@ -2028,7 +2028,7 @@ export function getPublicPlayerFields(
                 : player.foto_url,
 
         city:
-            player.city,
+            player.ciudad,
 
         instagram:
             visibilidad_json.instagram === false

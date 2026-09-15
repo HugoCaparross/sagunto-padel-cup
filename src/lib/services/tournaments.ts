@@ -1164,13 +1164,15 @@ export async function addTournamentCategory(
         categoria_id:
             input.categoryId,
 
-        cupo_minimo:
-            input.minCapacity ??
-            null,
+        ...(input.minCapacity !== undefined &&
+            input.minCapacity !== null
+            ? { cupo_minimo: input.minCapacity }
+            : {}),
 
-        cupo_maximo:
-            input.maxCapacity ??
-            null,
+        ...(input.maxCapacity !== undefined &&
+            input.maxCapacity !== null
+            ? { cupo_maximo: input.maxCapacity }
+            : {}),
 
         enabled:
             input.registrationOpen ??
@@ -1201,22 +1203,18 @@ export async function addTournamentCategory(
     return data as TournamentCategory;
 }
 
-export type UpdateTournamentCategoryInput =
-    Partial<
-        Omit<
-            TournamentCategoryInput,
-            | "tournamentId"
-            | "categoryId"
-        >
-    >;
+export type UpdateTournamentCategoryInput = Partial<
+    Omit<TournamentCategoryInput, "tournamentId" | "categoryId">
+>;
 
 export async function updateTournamentCategory(
-    id: string,
+    tournamentId: string,
+    categoryId: string,
     input: UpdateTournamentCategoryInput,
 ): Promise<TournamentCategory> {
-    if (!id) {
+    if (!tournamentId || !categoryId) {
         throw new Error(
-            "Falta el identificador de la categoría del torneo.",
+            "Faltan los identificadores del torneo y de la categoría.",
         );
     }
 
@@ -1236,8 +1234,8 @@ export async function updateTournamentCategory(
         await createClient();
 
     const payload: {
-        cupo_minimo?: number | null;
-        cupo_maximo?: number | null;
+        cupo_minimo?: number;
+        cupo_maximo?: number;
         enabled?: boolean;
         settings?: Json;
     } = {};
@@ -1246,16 +1244,18 @@ export async function updateTournamentCategory(
         input.minCapacity !==
         undefined
     ) {
-        payload.cupo_minimo =
-            input.minCapacity;
+        if (input.minCapacity !== null) {
+            payload.cupo_minimo = input.minCapacity;
+        }
     }
 
     if (
         input.maxCapacity !==
         undefined
     ) {
-        payload.cupo_maximo =
-            input.maxCapacity;
+        if (input.maxCapacity !== null) {
+            payload.cupo_maximo = input.maxCapacity;
+        }
     }
 
     if (
@@ -1287,8 +1287,12 @@ export async function updateTournamentCategory(
             )
             .select("*")
             .eq(
-                "id",
-                id,
+                "tournament_id",
+                tournamentId,
+            )
+            .eq(
+                "categoria_id",
+                categoryId,
             )
             .single();
 
@@ -1310,8 +1314,12 @@ export async function updateTournamentCategory(
         )
         .update(payload)
         .eq(
-            "id",
-            id,
+            "tournament_id",
+            tournamentId,
+        )
+        .eq(
+            "categoria_id",
+            categoryId,
         )
         .select("*")
         .single();
@@ -1326,28 +1334,22 @@ export async function updateTournamentCategory(
 }
 
 export async function removeTournamentCategory(
-    id: string,
+    tournamentId: string,
+    categoryId: string,
 ): Promise<void> {
-    if (!id) {
+    if (!tournamentId || !categoryId) {
         throw new Error(
-            "Falta el identificador de la categoría del torneo.",
+            "Faltan los identificadores del torneo y de la categoría.",
         );
     }
 
-    const supabase =
-        await createClient();
+    const supabase = await createClient();
 
-    const {
-        error,
-    } = await supabase
-        .from(
-            "tournament_categories",
-        )
+    const { error } = await supabase
+        .from("tournament_categories")
         .delete()
-        .eq(
-            "id",
-            id,
-        );
+        .eq("tournament_id", tournamentId)
+        .eq("categoria_id", categoryId);
 
     if (error) {
         throw new Error(
@@ -1749,7 +1751,7 @@ export async function deleteTournament(
 export function isMasterTournament(
     tournament: Tournament,
 ): boolean {
-    return tournament.tournament_type;
+    return tournament.tournament_type === "master";
 }
 
 export function getTournamentTypeLabel(

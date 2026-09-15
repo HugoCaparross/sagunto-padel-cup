@@ -961,7 +961,7 @@ export async function getPartnerPool(
             availability:
                 normalizePartnerAvailability(
                     item.disponible
-                        ? (item.disponibilidad ?? "buscando")
+                        ? ((item.disponibilidad ?? "buscando") as PartnerAvailability)
                         : "no_busca",
                 ),
         }),
@@ -1089,6 +1089,12 @@ export async function completePair(
     ) {
         throw new Error(
             "El jugador ya pertenece a la pareja.",
+        );
+    }
+
+    if (!pair.player_1_id) {
+        throw new Error(
+            "La pareja no tiene un jugador principal válido.",
         );
     }
 
@@ -1486,7 +1492,7 @@ export async function markPaymentPending(
         .from("registrations")
         .update({
             fecha_pago: null,
-            metodo_pago: null,
+            metodo_pago: "fisico",
         })
         .eq("id", registrationId)
         .select("*")
