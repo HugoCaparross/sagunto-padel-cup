@@ -31,7 +31,6 @@ export type RankingTier =
  * Resultado final dentro de un tramo.
  */
 export type RankingFinish =
-    | "fase_grupos"
     | "campeon_oro"
     | "finalista_oro"
     | "semifinalista_oro"
@@ -74,7 +73,7 @@ export type RankingLedgerEntry = {
     playerId: string;
     tournamentId: string;
     category: RankingCategory;
-    tier: RankingTier | null;
+    tier: RankingTier;
     finish: RankingFinish;
     points: number;
     seasonId?: string | null;
@@ -360,7 +359,7 @@ export function getCategoryRankingBand(
             RANKING_POINTS[
             category
             ],
-        );
+        ) as number[];
 
     if (
         values.length === 0
@@ -649,7 +648,7 @@ export function calculateSeasonCarryOver(
         );
     }
 
-    return Math.round(
+    return Math.floor(
         points *
         (
             RANKING_RETENTION
@@ -911,11 +910,11 @@ export function validateRankingEvent(
         return false;
     }
 
-    if (event.finish === "fase_grupos") {
-        return event.tier === null && event.points === getGroupEliminationPoints(event.category);
-    }
-
-    if (!event.tier || !VALID_TIERS.has(event.tier)) {
+    if (
+        !VALID_TIERS.has(
+            event.tier,
+        )
+    ) {
         return false;
     }
 
@@ -957,9 +956,6 @@ export function getPositionFromFinish(
     finish: RankingFinish,
 ): number {
     switch (finish) {
-        case "fase_grupos":
-            return 5;
-
         case "campeon_oro":
         case "campeon_plata":
         case "campeon_bronce":
@@ -992,9 +988,7 @@ export function getPositionFromFinish(
  */
 export function getTierFromFinish(
     finish: RankingFinish,
-): RankingTier | null {
-    if (finish === "fase_grupos") return null;
-
+): RankingTier {
     if (
         finish.endsWith(
             "_oro",

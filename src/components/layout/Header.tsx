@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -25,7 +25,7 @@ const navigation = [
     },
     {
         label: "MASTER",
-        href: "/master",
+        href: "/master-final",
     },
     {
         label: "NOTICIAS",
@@ -61,7 +61,7 @@ export default function Header() {
 
                 <nav
                     className={styles.desktopNavigation}
-                    aria-label="Navegación principal"
+                    aria-label="NavegaciÃ³n principal"
                 >
                     {navigation.map((item) => (
                         <Link
@@ -80,7 +80,7 @@ export default function Header() {
                         className={styles.loginButton}
                     >
                         <span className={styles.loginIcon}>
-                            ◯
+                            â—¯
                         </span>
                         ACCEDER
                     </Link>
@@ -90,7 +90,7 @@ export default function Header() {
                         className={styles.registerButton}
                     >
                         INSCRIBIRME
-                        <span aria-hidden="true">→</span>
+                        <span aria-hidden="true">â†’</span>
                     </Link>
                 </div>
 
@@ -98,7 +98,7 @@ export default function Header() {
                     type="button"
                     className={styles.menuButton}
                     aria-label={
-                        menuOpen ? "Cerrar menú" : "Abrir menú"
+                        menuOpen ? "Cerrar menÃº" : "Abrir menÃº"
                     }
                     aria-expanded={menuOpen}
                     aria-controls="mobile-navigation"
@@ -121,7 +121,7 @@ export default function Header() {
                 aria-hidden={!menuOpen}
             >
                 <nav
-                    aria-label="Navegación móvil"
+                    aria-label="NavegaciÃ³n mÃ³vil"
                     className={styles.mobileNavigationInner}
                 >
                     <div className={styles.mobileLinks}>
@@ -135,7 +135,7 @@ export default function Header() {
                             >
                                 <span>{item.label}</span>
 
-                                <span aria-hidden="true">→</span>
+                                <span aria-hidden="true">â†’</span>
                             </Link>
                         ))}
                     </div>
@@ -157,7 +157,7 @@ export default function Header() {
                             onClick={closeMenu}
                         >
                             INSCRIBIRME
-                            <span aria-hidden="true">→</span>
+                            <span aria-hidden="true">â†’</span>
                         </Link>
                     </div>
                 </nav>
@@ -165,3 +165,4 @@ export default function Header() {
         </header>
     );
 }
+

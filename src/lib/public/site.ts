@@ -256,7 +256,10 @@ export async function getPublicPlayer(id: string): Promise<PublicResult<{
     ]);
     if (categoryQ.error || pointsQ.error || seasonQ.error) return { data: null, error: asError(categoryQ.error ?? pointsQ.error ?? seasonQ.error) };
     const allPoints = pointsQ.data ?? [];
-    const currentPoints = seasonQ.data ? allPoints.filter((point) => point.season_id === seasonQ.data.id) : [];
+    const activeSeason = seasonQ.data;
+    const currentPoints = activeSeason
+        ? allPoints.filter((point) => point.season_id === activeSeason.id)
+        : [];
     const tournamentIds = [...new Set(allPoints.map((point) => point.tournament_id))];
     const tournamentsQ = tournamentIds.length ? await supabase.from("tournaments").select("*").in("id", tournamentIds) : { data: [], error: null };
     if (tournamentsQ.error) return { data: null, error: asError(tournamentsQ.error) };

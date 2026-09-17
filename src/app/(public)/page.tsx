@@ -1,4 +1,4 @@
-import Image from "next/image";
+﻿import Image from "next/image";
 import Link from "next/link";
 
 import Header from "@/components/layout/Header";
@@ -23,10 +23,10 @@ import styles from "./page.module.css";
 
 export default async function Home() {
   /*
-   * La conexión con Supabase se incorporará cuando utilicemos
+   * La conexiÃ³n con Supabase se incorporarÃ¡ cuando utilicemos
    * el cliente real del proyecto.
    *
-   * No se inventa aquí ninguna ruta de cliente Supabase.
+   * No se inventa aquÃ­ ninguna ruta de cliente Supabase.
    */
   const [tournamentsResult, categoriesResult, newsResult] = await Promise.all([
     getPublicTournaments(),
@@ -147,18 +147,18 @@ function HeroSection({
           <h1 className={styles.heroTitle}>
             TORNEOS DE
             <br />
-            PÁDEL EN SAGUNTO
+            PÃDEL EN SAGUNTO
           </h1>
 
           <p className={styles.heroLead}>
-            Sagunto Padel Cup es un circuito de pádel amateur
+            Sagunto Padel Cup es un circuito de pÃ¡del amateur
             en Sagunto.
           </p>
 
           <p className={styles.heroDescription}>
             Un circuito formado por diferentes torneos, con
             ranking individual, Race to Master y un Master Final
-            donde se decide quién domina la temporada.
+            donde se decide quiÃ©n domina la temporada.
           </p>
 
           <div className={styles.heroActions}>
@@ -166,8 +166,8 @@ function HeroSection({
               href="/torneos"
               className={styles.primaryButton}
             >
-              <span>VER PRÓXIMOS TORNEOS</span>
-              <span aria-hidden="true">→</span>
+              <span>VER PRÃ“XIMOS TORNEOS</span>
+              <span aria-hidden="true">â†’</span>
             </Link>
 
             <Link
@@ -196,15 +196,15 @@ function HeroTournamentCard({
         <div className={styles.cardTopLine} />
 
         <p className={styles.heroCardEyebrow}>
-          PRÓXIMO TORNEO
+          PRÃ“XIMO TORNEO
         </p>
 
         <h2 className={styles.heroCardTitle}>
-          Próximamente
+          PrÃ³ximamente
         </h2>
 
         <p className={styles.heroCardEmpty}>
-          Estamos preparando la próxima prueba del circuito.
+          Estamos preparando la prÃ³xima prueba del circuito.
         </p>
 
         <Link
@@ -212,7 +212,7 @@ function HeroTournamentCard({
           className={styles.heroCardLink}
         >
           VER TORNEOS
-          <span aria-hidden="true">→</span>
+          <span aria-hidden="true">â†’</span>
         </Link>
       </aside>
     );
@@ -227,7 +227,7 @@ function HeroTournamentCard({
       <div className={styles.cardTopLine} />
 
       <p className={styles.heroCardEyebrow}>
-        PRÓXIMO TORNEO
+        PRÃ“XIMO TORNEO
       </p>
 
       <div className={styles.heroTournamentNumber}>
@@ -240,7 +240,7 @@ function HeroTournamentCard({
 
       <div className={styles.heroCardMeta}>
         <div>
-          <span className={styles.metaIcon}>▣</span>
+          <span className={styles.metaIcon}>â–£</span>
           <span>
             {formatTournamentDate(
               tournament.fechaInicio,
@@ -251,7 +251,7 @@ function HeroTournamentCard({
 
         {tournament.club && (
           <div>
-            <span className={styles.metaIcon}>⌖</span>
+            <span className={styles.metaIcon}>âŒ–</span>
             <span>{tournament.club.nombre}</span>
           </div>
         )}
@@ -274,7 +274,7 @@ function HeroTournamentCard({
         className={styles.heroCardLink}
       >
         VER TORNEO
-        <span aria-hidden="true">→</span>
+        <span aria-hidden="true">â†’</span>
       </Link>
     </aside>
   );
@@ -302,7 +302,7 @@ function CircuitSection() {
           <CircuitFeature
             number="02"
             title="RANKING"
-            description="Ranking individual por puntos que refleja tu evolución durante toda la temporada."
+            description="Ranking individual por puntos que refleja tu evoluciÃ³n durante toda la temporada."
             href="/ranking"
             symbol="R"
           />
@@ -311,8 +311,8 @@ function CircuitSection() {
             number="03"
             title="RACE TO MASTER"
             description="Cada punto cuenta. Avanza en el Race to Master y logra tu plaza para el Master Final."
-            href="/master"
-            symbol="★"
+            href="/master-final"
+            symbol="â˜…"
           />
         </div>
       </div>
@@ -351,8 +351,8 @@ function CircuitFeature({
         href={href}
         className={styles.textLinkDark}
       >
-        VER MÁS
-        <span aria-hidden="true">→</span>
+        VER MÃS
+        <span aria-hidden="true">â†’</span>
       </Link>
     </article>
   );
@@ -371,8 +371,8 @@ function CompetitionSection({
         <div className={styles.competitionGrid}>
           <div className={styles.tournamentsColumn}>
             <SectionHeader
-              eyebrow="PRÓXIMOS TORNEOS"
-              title="Próximos torneos de pádel"
+              eyebrow="PRÃ“XIMOS TORNEOS"
+              title="PrÃ³ximos torneos de pÃ¡del"
               href="/torneos"
               linkLabel="VER TODOS"
             />
@@ -389,8 +389,8 @@ function CompetitionSection({
               </div>
             ) : (
               <EmptyCompetitionState
-                title="Próximamente"
-                description="Aquí aparecerán las próximas pruebas del circuito."
+                title="PrÃ³ximamente"
+                description="AquÃ­ aparecerÃ¡n las prÃ³ximas pruebas del circuito."
                 href="/torneos"
               />
             )}
@@ -398,7 +398,7 @@ function CompetitionSection({
 
           <div className={styles.rankingColumn}>
             <SectionHeader
-              eyebrow="RANKING DE PÁDEL"
+              eyebrow="RANKING DE PÃDEL"
               title="Top 5 del ranking"
               href="/ranking"
               linkLabel="VER RANKING COMPLETO"
@@ -408,8 +408,8 @@ function CompetitionSection({
               <RankingTable ranking={ranking.slice(0, 5)} />
             ) : (
               <EmptyCompetitionState
-                title="Ranking próximamente"
-                description="Los resultados aparecerán aquí cuando haya puntos registrados."
+                title="Ranking prÃ³ximamente"
+                description="Los resultados aparecerÃ¡n aquÃ­ cuando haya puntos registrados."
                 href="/ranking"
               />
             )}
@@ -446,7 +446,7 @@ function TournamentCard({
 
         <div className={styles.tournamentMeta}>
           <span>
-            ▣{" "}
+            â–£{" "}
             {formatTournamentDate(
               tournament.fechaInicio,
               tournament.fechaFin,
@@ -454,12 +454,12 @@ function TournamentCard({
           </span>
 
           {tournament.club && (
-            <span>⌖ {tournament.club.nombre}</span>
+            <span>âŒ– {tournament.club.nombre}</span>
           )}
 
           {tournament.categorias.length > 0 && (
             <span>
-              {tournament.categorias.join(" · ")}
+              {tournament.categorias.join(" Â· ")}
             </span>
           )}
         </div>
@@ -481,7 +481,7 @@ function TournamentCard({
             className={styles.cardArrow}
             aria-label={`Ver ${tournament.nombre}`}
           >
-            →
+            â†’
           </Link>
         </div>
       </div>
@@ -551,8 +551,8 @@ function EmptyCompetitionState({
         href={href}
         className={styles.textLinkLight}
       >
-        VER MÁS
-        <span aria-hidden="true">→</span>
+        VER MÃS
+        <span aria-hidden="true">â†’</span>
       </Link>
     </div>
   );
@@ -567,9 +567,9 @@ function CategoriesSection({
     <section className={styles.categoriesSection}>
       <div className={styles.sectionContainer}>
         <div className={styles.sectionHeadingLight}>
-          <p className={styles.eyebrow}>CATEGORÍAS</p>
+          <p className={styles.eyebrow}>CATEGORÃAS</p>
 
-          <h2>Encuentra tu categoría</h2>
+          <h2>Encuentra tu categorÃ­a</h2>
         </div>
 
         <div className={styles.categoriesGrid}>
@@ -591,8 +591,8 @@ function CategoriesSection({
                 </p>
 
                 <span className={styles.textLinkLight}>
-                  VER MÁS
-                  <span aria-hidden="true">→</span>
+                  VER MÃS
+                  <span aria-hidden="true">â†’</span>
                 </span>
               </div>
             </Link>
@@ -610,31 +610,31 @@ function HowItWorksSection() {
 
       <div className={styles.sectionContainer}>
         <div className={styles.sectionHeadingDark}>
-          <p className={styles.eyebrow}>CÓMO FUNCIONA</p>
+          <p className={styles.eyebrow}>CÃ“MO FUNCIONA</p>
 
-          <h2>Así funciona Sagunto Padel Cup</h2>
+          <h2>AsÃ­ funciona Sagunto Padel Cup</h2>
         </div>
 
         <div className={styles.stepsGrid}>
           <HowItWorksStep
             number="01"
             title="COMPITE"
-            description="Participa en las pruebas del circuito en las categorías que mejor se adapten a tu nivel."
+            description="Participa en las pruebas del circuito en las categorÃ­as que mejor se adapten a tu nivel."
             symbol="T"
           />
 
           <HowItWorksStep
             number="02"
             title="SUMA PUNTOS"
-            description="Tus resultados en cada torneo influyen en tu clasificación del ranking individual."
-            symbol="↗"
+            description="Tus resultados en cada torneo influyen en tu clasificaciÃ³n del ranking individual."
+            symbol="â†—"
           />
 
           <HowItWorksStep
             number="03"
             title="LUCHA POR EL MASTER"
             description="Avanza en el Race to Master durante la temporada y consigue tu plaza para el Master Final."
-            symbol="★"
+            symbol="â˜…"
           />
         </div>
       </div>
@@ -682,7 +682,7 @@ function RaceToMasterSection() {
           <div className={styles.masterBrand}>
             <span>RACE TO</span>
             <strong>MASTER</strong>
-            <b>★</b>
+            <b>â˜…</b>
           </div>
 
           <div className={styles.masterContent}>
@@ -695,11 +695,11 @@ function RaceToMasterSection() {
             </p>
 
             <Link
-              href="/master"
+              href="/master-final"
               className={styles.primaryButton}
             >
               <span>VER RACE TO MASTER</span>
-              <span aria-hidden="true">→</span>
+              <span aria-hidden="true">â†’</span>
             </Link>
           </div>
         </div>
@@ -722,7 +722,7 @@ function NewsSection({
       <div className={styles.sectionContainer}>
         <SectionHeader
           eyebrow="ACTUALIDAD"
-          title="Últimas noticias"
+          title="Ãšltimas noticias"
           href="/noticias"
           linkLabel="VER TODAS"
         />
@@ -758,7 +758,7 @@ function NewsSection({
 
                 <span className={styles.textLinkLight}>
                   LEER NOTICIA
-                  <span aria-hidden="true">→</span>
+                  <span aria-hidden="true">â†’</span>
                 </span>
               </div>
             </Link>
@@ -844,12 +844,12 @@ function FinalCtaSection() {
       <div className={styles.finalCtaContent}>
         <p className={styles.eyebrow}>SAGUNTO PADEL CUP</p>
 
-        <h2>¿PREPARADO PARA COMPETIR?</h2>
+        <h2>Â¿PREPARADO PARA COMPETIR?</h2>
 
         <p>
-          Consulta los próximos torneos
+          Consulta los prÃ³ximos torneos
           <br />
-          y encuentra tu próxima prueba.
+          y encuentra tu prÃ³xima prueba.
         </p>
 
         <Link
@@ -857,7 +857,7 @@ function FinalCtaSection() {
           className={styles.primaryButton}
         >
           <span>VER TORNEOS</span>
-          <span aria-hidden="true">→</span>
+          <span aria-hidden="true">â†’</span>
         </Link>
       </div>
     </section>
@@ -887,7 +887,7 @@ function SectionHeader({
         className={styles.sectionHeaderLink}
       >
         {linkLabel}
-        <span aria-hidden="true">→</span>
+        <span aria-hidden="true">â†’</span>
       </Link>
     </div>
   );
@@ -912,7 +912,7 @@ function Footer() {
           </Link>
 
           <p>
-            Circuito de pádel amateur en Sagunto
+            Circuito de pÃ¡del amateur en Sagunto
             con torneos, ranking individual,
             Race to Master y Master Final.
           </p>
@@ -939,12 +939,12 @@ function Footer() {
         />
 
         <FooterColumn
-          title="COMPETICIÓN"
+          title="COMPETICIÃ“N"
           links={[
-            ["Cómo funciona", "/circuito"],
-            ["Categorías", "/ranking"],
-            ["Race to Master", "/master"],
-            ["Master Final", "/master"],
+            ["CÃ³mo funciona", "/circuito"],
+            ["CategorÃ­as", "/ranking"],
+            ["Race to Master", "/master-final"],
+            ["Master Final", "/master-final"],
           ]}
         />
 
@@ -959,7 +959,7 @@ function Footer() {
         <FooterColumn
           title="LEGAL"
           links={[
-            ["Aviso legal", "/legal"],
+            ["Aviso legal", "/aviso-legal"],
             ["Privacidad", "/privacidad"],
             ["Cookies", "/cookies"],
           ]}
@@ -968,7 +968,7 @@ function Footer() {
 
       <div className={styles.footerBottom}>
         <span>
-          © {new Date().getFullYear()} Sagunto Padel Cup.
+          Â© {new Date().getFullYear()} Sagunto Padel Cup.
         </span>
 
         <span>
@@ -1021,20 +1021,20 @@ function getCategoryShortLabel(
 ): string {
   const normalized = categoryName.toUpperCase();
 
-  if (normalized.includes("INICIACIÓN")) {
+  if (normalized.includes("INICIACIÃ“N")) {
     return "INC.";
   }
 
-  if (normalized.includes("2ª")) {
-    return "2ª";
+  if (normalized.includes("2Âª")) {
+    return "2Âª";
   }
 
-  if (normalized.includes("3ª")) {
-    return "3ª";
+  if (normalized.includes("3Âª")) {
+    return "3Âª";
   }
 
-  if (normalized.includes("4ª")) {
-    return "4ª";
+  if (normalized.includes("4Âª")) {
+    return "4Âª";
   }
 
   return categoryName.slice(0, 4);
@@ -1045,15 +1045,15 @@ function getCategoryDescription(
 ): string {
   const normalized = categoryName.toUpperCase();
 
-  if (normalized.includes("2ª")) {
+  if (normalized.includes("2Âª")) {
     return "Para jugadores con un nivel competitivo consolidado que buscan retos exigentes.";
   }
 
-  if (normalized.includes("3ª")) {
+  if (normalized.includes("3Âª")) {
     return "Nivel intermedio que busca competir y seguir mejorando en cada torneo.";
   }
 
-  if (normalized.includes("4ª")) {
+  if (normalized.includes("4Âª")) {
     return "Para jugadores que quieren disfrutar, competir y ganar experiencia.";
   }
 

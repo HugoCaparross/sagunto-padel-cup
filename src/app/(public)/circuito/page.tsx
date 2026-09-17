@@ -1,16 +1,147 @@
 import Link from "next/link";
+
 import PublicShell from "@/components/public/PublicShell";
-import { EmptyPublic, ErrorPublic, PageIntro } from "@/components/public/PublicBlocks";
-import { getPublicRanking } from "@/lib/public/site";
-import { getPublicCategories } from "@/lib/public/site";
+import { PageIntro } from "@/components/public/PublicBlocks";
 import { buildMetadata } from "@/lib/public/seo";
+
 import styles from "./page.module.css";
 
-export const metadata = buildMetadata({ title: "Master", description: "Race to Master y clasificación de la temporada de Sagunto Padel Cup.", path: "/master" });
+export const metadata = buildMetadata({
+    title: "Circuito",
+    description:
+        "Conoce cómo funciona Sagunto Padel Cup, sus categorías, ranking, pruebas y Master Final.",
+    path: "/circuito",
+});
 
-export default async function MasterPage() {
-    const categories = await getPublicCategories();
-    const selected = categories.data?.[0]?.id;
-    const ranking = await getPublicRanking(selected);
-    return <PublicShell><PageIntro eyebrow="RACE TO MASTER" title="Camino al Master" description="Consulta la clasificación de la temporada y sigue quién ocupa las primeras posiciones de cada categoría." /><section className={styles.content}>{ranking.error ? <ErrorPublic message={ranking.error.message} /> : !ranking.data?.season ? <EmptyPublic title="Temporada no disponible" description="Todavía no hay una temporada activa publicada." /> : <><div className={styles.season}><strong>{ranking.data.season.name}</strong><span>Las posiciones se calculan con los puntos publicados de la temporada activa.</span></div><h2>{ranking.data.category?.nombre ?? "Categoría"}</h2>{ranking.data.entries.length ? <div className={styles.list}>{ranking.data.entries.slice(0, 4).map((entry) => <Link href={`/jugadores/${entry.player.id}`} key={entry.player.id}><span>#{entry.position}</span><strong>{entry.player.nombre} {entry.player.apellidos ?? ""}</strong><b>{entry.points} pts</b></Link>)}</div> : <EmptyPublic title="Sin clasificación" description="Todavía no hay puntos registrados para esta categoría." />}</>}</section></PublicShell>;
+export default function CircuitPage() {
+    return (
+        <PublicShell>
+            <PageIntro
+                eyebrow="SAGUNTO PADEL CUP"
+                title="El circuito"
+                description="Todo lo que necesitas saber para competir, sumar puntos y seguir la temporada."
+            />
+
+            <div className={styles.content}>
+                <section className={styles.section}>
+                    <span className={styles.eyebrow}>
+                        EL CIRCUITO
+                    </span>
+
+                    <h2>
+                        Competición real durante toda la temporada
+                    </h2>
+
+                    <p>
+                        Sagunto Padel Cup es un circuito de pádel
+                        amateur construido alrededor de pruebas
+                        puntuables, un ranking individual y un
+                        Master Final de cierre de temporada.
+                    </p>
+                </section>
+
+                <section className={styles.grid}>
+                    <article>
+                        <strong>2026/27</strong>
+                        <span>Temporada inicial</span>
+                    </article>
+
+                    <article>
+                        <strong>6</strong>
+                        <span>Pruebas regulares</span>
+                    </article>
+
+                    <article>
+                        <strong>1</strong>
+                        <span>Master Final</span>
+                    </article>
+
+                    <article>
+                        <strong>4</strong>
+                        <span>Categorías</span>
+                    </article>
+                </section>
+
+                <section className={styles.section}>
+                    <span className={styles.eyebrow}>
+                        CATEGORÍAS
+                    </span>
+
+                    <h2>
+                        1ª · 2ª · 3ª · 4ª
+                    </h2>
+
+                    <p>
+                        El jugador compite en una categoría
+                        determinada. La organización valida la
+                        categoría y cualquier cambio se aplica a
+                        partir del siguiente torneo, manteniendo
+                        intacto el histórico.
+                    </p>
+                </section>
+
+                <section className={styles.section}>
+                    <span className={styles.eyebrow}>
+                        RANKING
+                    </span>
+
+                    <h2>
+                        Los puntos son individuales
+                    </h2>
+
+                    <p>
+                        Aunque los resultados se obtienen jugando
+                        en pareja, los puntos pertenecen
+                        individualmente a cada jugador y se
+                        acumulan durante la temporada.
+                    </p>
+
+                    <Link
+                        href="/ranking"
+                        className={styles.link}
+                    >
+                        CONSULTAR RANKING
+                    </Link>
+                </section>
+
+                <section className={styles.section}>
+                    <span className={styles.eyebrow}>
+                        MASTER FINAL
+                    </span>
+
+                    <h2>
+                        El cierre de la temporada
+                    </h2>
+
+                    <p>
+                        El Master Final es la prueba de cierre de
+                        la temporada. La Race to Master permite
+                        seguir la clasificación y la elegibilidad
+                        durante el circuito.
+                    </p>
+
+                    <Link
+                        href="/master-final"
+                        className={styles.link}
+                    >
+                        VER MASTER FINAL
+                    </Link>
+                </section>
+
+                <section className={styles.links}>
+                    <Link href="/circuito/faq">
+                        Preguntas frecuentes
+                    </Link>
+
+                    <Link href="/circuito/reglamento">
+                        Reglamento
+                    </Link>
+
+                    <Link href="/calendario">
+                        Calendario
+                    </Link>
+                </section>
+            </div>
+        </PublicShell>
+    );
 }
