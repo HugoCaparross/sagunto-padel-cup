@@ -821,10 +821,14 @@ export function createOfficialBrackets(params: {
         groupIds,
     } = params;
 
-    if (!Number.isInteger(pairCount)) {
+    if (!Number.isInteger(pairCount) || pairCount < 2) {
         throw new Error(
-            "El número de parejas debe ser un entero.",
+            "El número de parejas debe ser un entero mayor o igual que 2.",
         );
+    }
+
+    if (groupIds.some((id) => !id?.trim())) {
+        throw new Error("Todos los identificadores de grupo son obligatorios.");
     }
 
     if (pairCount === 3) {
@@ -1155,6 +1159,51 @@ export function advanceBracketMatch(
         ...bracket,
         matches: updatedMatches,
     };
+}
+
+
+export type BracketOutcome = {
+    winnerPairId: string;
+    loserPairId: string;
+};
+
+/**
+ * Applies a completed match to every downstream slot represented by the
+ * generated bracket. This is necessary for SPC because a semifinal can feed
+ * both Gold (winner) and Silver (loser).
+ */
+export function advanceBracketOutcome(
+    bracket: GeneratedBracket,
+    matchId: string,
+    outcome: BracketOutcome,
+): GeneratedBracket {
+    const match = bracket.matches.find((item) => item.id === matchId);
+    if (!match) throw new Error(`No existe el partido ${matchId} en el cuadro.`);
+    if (!outcome.winnerPairId || !outcome.loserPairId || outcome.winnerPairId === outcome.loserPairId) {
+        throw new Error("El resultado del partido no es válido.");
+    }
+    if (![match.pair1Id, match.pair2Id].includes(outcome.winnerPairId) ||
+        ![match.pair1Id, match.pair2Id].includes(outcome.loserPairId)) {
+        throw new Error("El resultado contiene parejas que no pertenecen al partido.");
+    }
+
+    const matches = bracket.matches.map((item) => ({ ...item }));
+    const current = matches.find((item) => item.id === matchId)!;
+    current.status = "finalizado";
+
+    for (const target of matches) {
+        if (target.pair1Source?.type === "match" && target.pair1Source.matchId === matchId) {
+            target.pair1Id = target.pair1Source.result === "winner" ? outcome.winnerPairId : outcome.loserPairId;
+        }
+        if (target.pair2Source?.type === "match" && target.pair2Source.matchId === matchId) {
+            target.pair2Id = target.pair2Source.result === "winner" ? outcome.winnerPairId : outcome.loserPairId;
+        }
+    }
+
+    const championPairId = match.round === "final"
+        ? outcome.winnerPairId
+        : bracket.championPairId;
+    return { ...bracket, matches, championPairId };
 }
 
 /* -------------------------------------------------------------------------- */

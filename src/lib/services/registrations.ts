@@ -146,17 +146,12 @@ function isActiveStatus(estado: RegistrationStatus): boolean {
 }
 
 function getPaymentStatus(
-    registration: Pick<Registration, "fecha_pago" | "metodo_pago">,
+    registration: Pick<Registration, "fecha_pago" | "metodo_pago" | "payment_status">,
 ): PaymentStatus {
-    if (registration.fecha_pago) {
-        return "verificado";
-    }
-
-    if (!registration.metodo_pago) {
-        return "pendiente";
-    }
-
-    return "pendiente";
+    if (registration.payment_status === "verificado") return "verificado";
+    if (registration.payment_status === "rechazado") return "rechazado";
+    if (registration.payment_status === "no_requerido") return "no_requerido";
+    return registration.fecha_pago ? "verificado" : "pendiente";
 }
 
 function withComputedFields(
@@ -1255,6 +1250,8 @@ export async function createIndividualRegistration(
                 input.tournamentId,
             pairId:
                 pair.id,
+            categoryId:
+                input.categoryId,
             estado:
                 registrationStatus,
             shirtSize:
@@ -1278,6 +1275,8 @@ export async function createIndividualRegistration(
                 input.tournamentId,
             pairId:
                 pair.id,
+            categoryId:
+                input.categoryId,
             estado:
                 registrationStatus,
             shirtSize:
@@ -1302,6 +1301,7 @@ async function createRegistrationRecord(
     input: {
         tournamentId: string;
         pairId: string;
+        categoryId?: string | null;
         estado: RegistrationStatus;
         shirtSize?: string | null;
     },
@@ -1315,6 +1315,8 @@ async function createRegistrationRecord(
                 input.tournamentId,
             pair_id:
                 input.pairId,
+            categoria_id:
+                input.categoryId ?? null,
             estado:
                 input.estado,
             metodo_pago:
@@ -1456,8 +1458,8 @@ export async function verifyRegistrationPayment(
                 new Date().toISOString(),
             importe:
                 input.amount ?? null,
-            estado:
-                "confirmada",
+            payment_status:
+                "verificado",
         })
         .eq("id", input.registrationId)
         .select("*")
@@ -1493,6 +1495,7 @@ export async function markPaymentPending(
         .update({
             fecha_pago: null,
             metodo_pago: "fisico",
+            payment_status: "pendiente",
         })
         .eq("id", registrationId)
         .select("*")
@@ -1563,6 +1566,7 @@ export async function undoCheckInRegistration(
         .from("registrations")
         .update({
             checked_in: false,
+            payment_status: "pendiente",
         })
         .eq("id", registrationId)
         .select("*")
@@ -1989,6 +1993,15 @@ export async function adminConfirmRegistration(
         throw new Error(
             "No se puede confirmar una inscripción cancelada.",
         );
+    }
+
+    if (!registration.pair?.player_1_id || !registration.pair?.player_2_id) {
+        throw new Error("No se puede confirmar una inscripción con la pareja incompleta.");
+    }
+
+    const paymentStatus = registration.payment_status ?? getPaymentStatus(registration);
+    if (paymentStatus !== "verificado" && paymentStatus !== "no_requerido") {
+        throw new Error("El pago debe estar verificado antes de confirmar la inscripción.");
     }
 
     return updateRegistrationStatus(

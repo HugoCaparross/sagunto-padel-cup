@@ -966,6 +966,8 @@ export async function addRankingPoints(
             input.awardedAt ??
             new Date().toISOString(),
 
+        fecha_caducidad: null,
+
         source,
 
         metadata: {
@@ -1340,6 +1342,8 @@ export async function addTournamentRankingPoints(
 
                 fecha:
                     new Date().toISOString(),
+
+                fecha_caducidad: null,
 
                 source:
                     "tournament",

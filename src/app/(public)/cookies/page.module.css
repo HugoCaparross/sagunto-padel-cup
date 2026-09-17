@@ -1,0 +1,15 @@
+.article {
+    width: min(820px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 48px 0 80px
+}
+
+.article h2 {
+    margin: 32px 0 10px;
+    font-size: 26px
+}
+
+.article p {
+    line-height: 1.8;
+    color: #555
+}

@@ -127,7 +127,8 @@ export type RankingResultType =
     | "campeon"
     | "finalista"
     | "semifinalista"
-    | "cuartos";
+    | "cuartos"
+    | "fase_grupos";
 
 export type RankingPointsByCategory = {
     category_order: number;
@@ -153,6 +154,7 @@ export type RankingPointsTable = {
         finalista: number;
         semifinalista: number;
         cuartos: number;
+        fase_grupos: number;
     };
 
     plata: {
@@ -160,6 +162,7 @@ export type RankingPointsTable = {
         finalista: number;
         semifinalista: number;
         cuartos: number;
+        fase_grupos: number;
     };
 
     bronce: {
@@ -167,6 +170,7 @@ export type RankingPointsTable = {
         finalista: number;
         semifinalista: number;
         cuartos: number;
+        fase_grupos: number;
     };
 };
 
@@ -184,6 +188,7 @@ export const SPC_RANKING_POINTS: Record<
             finalista: 118,
             semifinalista: 116,
             cuartos: 114,
+            fase_grupos: 106,
         },
 
         plata: {
@@ -191,6 +196,7 @@ export const SPC_RANKING_POINTS: Record<
             finalista: 112,
             semifinalista: 111,
             cuartos: 110,
+            fase_grupos: 106,
         },
 
         bronce: {
@@ -198,6 +204,7 @@ export const SPC_RANKING_POINTS: Record<
             finalista: 108,
             semifinalista: 107,
             cuartos: 106,
+            fase_grupos: 106,
         },
     },
 
@@ -207,6 +214,7 @@ export const SPC_RANKING_POINTS: Record<
             finalista: 103,
             semifinalista: 101,
             cuartos: 99,
+            fase_grupos: 91,
         },
 
         plata: {
@@ -214,6 +222,7 @@ export const SPC_RANKING_POINTS: Record<
             finalista: 97,
             semifinalista: 96,
             cuartos: 95,
+            fase_grupos: 91,
         },
 
         bronce: {
@@ -221,6 +230,7 @@ export const SPC_RANKING_POINTS: Record<
             finalista: 93,
             semifinalista: 92,
             cuartos: 91,
+            fase_grupos: 91,
         },
     },
 
@@ -230,6 +240,7 @@ export const SPC_RANKING_POINTS: Record<
             finalista: 88,
             semifinalista: 86,
             cuartos: 84,
+            fase_grupos: 76,
         },
 
         plata: {
@@ -237,6 +248,7 @@ export const SPC_RANKING_POINTS: Record<
             finalista: 82,
             semifinalista: 81,
             cuartos: 80,
+            fase_grupos: 76,
         },
 
         bronce: {
@@ -244,6 +256,7 @@ export const SPC_RANKING_POINTS: Record<
             finalista: 78,
             semifinalista: 77,
             cuartos: 76,
+            fase_grupos: 76,
         },
     },
 
@@ -253,6 +266,7 @@ export const SPC_RANKING_POINTS: Record<
             finalista: 73,
             semifinalista: 71,
             cuartos: 69,
+            fase_grupos: 61,
         },
 
         plata: {
@@ -260,6 +274,7 @@ export const SPC_RANKING_POINTS: Record<
             finalista: 67,
             semifinalista: 66,
             cuartos: 65,
+            fase_grupos: 61,
         },
 
         bronce: {
@@ -267,6 +282,7 @@ export const SPC_RANKING_POINTS: Record<
             finalista: 63,
             semifinalista: 62,
             cuartos: 61,
+            fase_grupos: 61,
         },
     },
 };

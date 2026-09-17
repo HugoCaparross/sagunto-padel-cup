@@ -1,0 +1,40 @@
+.grid {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 48px 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px
+}
+
+.grid figure {
+    margin: 0;
+    background: #fff;
+    border: 1px solid #ddd
+}
+
+.grid img,
+.grid video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover
+}
+
+.grid figcaption {
+    padding: 12px;
+    color: #555;
+    font-size: 13px
+}
+
+@media(max-width:800px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr)
+    }
+}
+
+@media(max-width:560px) {
+    .grid {
+        grid-template-columns: 1fr
+    }
+}

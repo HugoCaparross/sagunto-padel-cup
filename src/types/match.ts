@@ -972,6 +972,18 @@ export function canEditMatchResult(
     );
 }
 
+export function canEnterNormalResult(match: Match): boolean {
+    return match.estado === "en_juego" &&
+        Boolean(match.pair_1_id) &&
+        Boolean(match.pair_2_id);
+}
+
+export function getMatchFormatForPhase(
+    fase: MatchPhase,
+): MatchFormatConfig {
+    return getMatchFormat(fase);
+}
+
 // =============================================================================
 // MATCH ADMIN OPERATIONS
 // =============================================================================

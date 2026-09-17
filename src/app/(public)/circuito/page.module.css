@@ -1,0 +1,67 @@
+.content {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 48px 0
+}
+
+.season {
+    display: grid;
+    gap: 5px;
+    padding: 24px;
+    background: #050505;
+    color: #fff;
+    margin-bottom: 40px
+}
+
+.season strong {
+    font-size: 28px
+}
+
+.season span {
+    color: #bbb
+}
+
+.content h2 {
+    font-size: 30px
+}
+
+.list {
+    display: grid;
+    gap: 8px
+}
+
+.list a {
+    display: grid;
+    grid-template-columns: 70px 1fr 100px;
+    gap: 15px;
+    align-items: center;
+    padding: 18px;
+    background: #fff;
+    border: 1px solid #ddd;
+    color: #050505;
+    text-decoration: none
+}
+
+.list a:hover {
+    border-color: #e61219
+}
+
+.list span {
+    color: #e61219;
+    font-weight: 900
+}
+
+.list b {
+    text-align: right
+}
+
+@media(max-width:600px) {
+    .list a {
+        grid-template-columns: 45px 1fr
+    }
+
+    .list b {
+        grid-column: 2;
+        text-align: left
+    }
+}

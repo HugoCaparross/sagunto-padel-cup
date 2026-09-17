@@ -1,0 +1,141 @@
+.content {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 46px 0
+}
+
+.meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-block: 1px solid #ddd;
+    padding: 22px 0;
+    gap: 20px
+}
+
+.meta div {
+    display: grid;
+    gap: 5px
+}
+
+.meta strong {
+    font-size: 10px;
+    letter-spacing: .12em;
+    color: #e61219
+}
+
+.meta span {
+    font-weight: 700
+}
+
+.columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin: 45px 0
+}
+
+.content section>h2 {
+    font-size: 28px;
+    letter-spacing: -.03em
+}
+
+.content ul {
+    padding: 0;
+    list-style: none
+}
+
+.content li {
+    padding: 13px 0;
+    border-bottom: 1px solid #ddd
+}
+
+.matches {
+    display: grid;
+    gap: 8px
+}
+
+.matches>div {
+    display: grid;
+    grid-template-columns: 150px 1fr 100px;
+    gap: 16px;
+    padding: 16px;
+    background: #fff;
+    border: 1px solid #ddd
+}
+
+.matches span,
+.matches em {
+    color: #666;
+    font-size: 13px
+}
+
+.tableWrap {
+    overflow: auto;
+    background: #fff;
+    border: 1px solid #ddd
+}
+
+.tableWrap table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px
+}
+
+.tableWrap th,
+.tableWrap td {
+    padding: 13px;
+    border-bottom: 1px solid #eee;
+    text-align: left
+}
+
+.brackets,
+.sponsors {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap
+}
+
+.brackets article {
+    display: grid;
+    gap: 5px;
+    padding: 20px;
+    background: #050505;
+    color: #fff
+}
+
+.sponsors a,
+.sponsors span {
+    padding: 12px 18px;
+    background: #fff;
+    color: #050505;
+    text-decoration: none;
+    border: 1px solid #ddd
+}
+
+.content>a {
+    display: inline-block;
+    margin-top: 28px;
+    color: #050505;
+    font-weight: 800;
+    text-decoration: none
+}
+
+@media(max-width:800px) {
+    .meta {
+        grid-template-columns: 1fr 1fr
+    }
+
+    .columns {
+        grid-template-columns: 1fr
+    }
+
+    .matches>div {
+        grid-template-columns: 1fr
+    }
+}
+
+@media(max-width:500px) {
+    .meta {
+        grid-template-columns: 1fr
+    }
+}

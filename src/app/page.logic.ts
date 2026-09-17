@@ -76,28 +76,7 @@ export type HomeLoadState =
         message: string;
     };
 
-export const DEFAULT_CATEGORIES: HomeCategory[] = [
-    {
-        id: "2",
-        nombre: "2ª CATEGORÍA",
-        nivelOrden: 2,
-    },
-    {
-        id: "3",
-        nombre: "3ª CATEGORÍA",
-        nivelOrden: 3,
-    },
-    {
-        id: "4",
-        nombre: "4ª CATEGORÍA",
-        nivelOrden: 4,
-    },
-    {
-        id: "iniciacion",
-        nombre: "INICIACIÓN",
-        nivelOrden: 5,
-    },
-];
+
 
 export function formatTournamentDate(
     fechaInicio: string,

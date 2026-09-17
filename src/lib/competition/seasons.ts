@@ -14,7 +14,7 @@ import {
 /* -------------------------------------------------------------------------- */
 
 export type SeasonStatus =
-    | "borrador"
+    | "planificada"
     | "activa"
     | "finalizada"
     | "archivada";
@@ -188,15 +188,16 @@ export function createSeason(
                 input.endDate,
             ),
 
-        master_final_date:
-            input.masterFinalDate
-                ? normalizeDate(
-                    input.masterFinalDate,
-                )
-                : null,
+        settings: input.masterFinalDate
+            ? {
+                master_final_date: normalizeDate(input.masterFinalDate),
+            }
+            : {},
 
         status:
             "planificada" as SeasonStatus,
+
+        rollover_percentage: RANKING_RETENTION.retainedPercentage,
     };
 }
 
@@ -244,26 +245,21 @@ export function canArchiveSeason(
 
 export function activateSeason() {
     return {
-        estado:
-            "activa" as const,
+        status: "activa" as const,
     };
 }
 
 export function closeSeason() {
     return {
-        estado:
-            "finalizada" as const,
-        closedAt:
-            new Date().toISOString(),
+        status: "finalizada" as const,
+        closedAt: new Date().toISOString(),
     };
 }
 
 export function archiveSeason() {
     return {
-        estado:
-            "archivada" as const,
-        archivedAt:
-            new Date().toISOString(),
+        status: "archivada" as const,
+        archivedAt: new Date().toISOString(),
     };
 }
 
@@ -408,7 +404,7 @@ export function calculateRetainedPoints(
         );
     }
 
-    return Math.floor(
+    return Math.round(
         puntos_obtenidos *
         (
             RANKING_RETENTION.retainedPercentage /

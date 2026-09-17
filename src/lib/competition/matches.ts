@@ -360,6 +360,7 @@ export async function createMatch(
             tramo: input.tramo ?? null,
             siguiente_match_id: input.nextMatchId ?? null,
             siguiente_slot: input.nextSlot ?? null,
+            format: getMatchFormat(input.fase),
         })
         .select("*")
         .single();
@@ -403,6 +404,26 @@ export async function updateMatch(
     }
 
     if (
+        current.estado === "walkover" ||
+        current.estado === "retirada"
+    ) {
+        const onlyAdministrativeEdit =
+            input.scheduledAt !== undefined ||
+            input.pista !== undefined ||
+            input.estado === current.estado;
+        if (!onlyAdministrativeEdit) {
+            throw new Error("Un partido cerrado por walkover o retirada no admite cambios deportivos.");
+        }
+    }
+
+    if (
+        (current.estado === "en_juego" || current.estado === "finalizado" || current.estado === "walkover" || current.estado === "retirada") &&
+        (input.pair1Id !== undefined || input.pair2Id !== undefined)
+    ) {
+        throw new Error("Las parejas de un partido ya iniciado no pueden modificarse.");
+    }
+
+    if (
         input.pair1Id &&
         input.pair2Id &&
         input.pair1Id === input.pair2Id
@@ -434,6 +455,17 @@ export async function updateMatch(
     }
 
     if (input.estado !== undefined) {
+        const allowed: Record<MatchStatus, MatchStatus[]> = {
+            pendiente: ["pendiente", "en_juego", "aplazado", "walkover", "retirada"],
+            en_juego: ["en_juego", "finalizado", "aplazado", "walkover", "retirada"],
+            finalizado: ["finalizado"],
+            walkover: ["walkover"],
+            retirada: ["retirada"],
+            aplazado: ["aplazado", "pendiente"],
+        };
+        if (!allowed[current.estado].includes(input.estado)) {
+            throw new Error(`Transición de partido no permitida: ${current.estado} → ${input.estado}.`);
+        }
         payload.estado = input.estado;
     }
 
@@ -843,7 +875,7 @@ export async function markRetirement(
                     winnerPairId === match.pair_1_id
                         ? match.pair_2_id
                         : match.pair_1_id,
-                decided_by: "retirement",
+                decided_by: "retirada",
                 notes:
                     reason?.trim() || null,
             },
@@ -903,6 +935,8 @@ export async function postponeMatch(
             estado: "aplazado",
             hora_programada:
                 input.scheduledAt ?? null,
+            postponed_from: match.hora_programada,
+            postponement_reason: input.reason.trim(),
             fecha_modificacion: now,
             resultado_json: {
                 sets: [],

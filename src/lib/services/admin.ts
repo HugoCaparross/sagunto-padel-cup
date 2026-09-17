@@ -45,6 +45,7 @@ import {
     verifyRegistrationPayment,
     checkInRegistration,
     updateRegistrationStatus,
+    adminConfirmRegistration,
 } from "@/lib/services/registrations";
 
 import {
@@ -677,12 +678,7 @@ export async function confirmRegistrationAdmin(
 ) {
     await requireAdminContext();
 
-    return updateRegistrationStatus(
-        registrationId,
-        toServiceRegistrationStatus(
-            "confirmada",
-        ),
-    );
+    return adminConfirmRegistration(registrationId);
 }
 
 export async function moveRegistrationToWaitingListAdmin(

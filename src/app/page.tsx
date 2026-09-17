@@ -2,9 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 import Header from "@/components/layout/Header";
+import { getPublicCategories, getPublicNews, getPublicRanking, getPublicSponsors, getPublicTournaments } from "@/lib/public/site";
 
 import {
-  DEFAULT_CATEGORIES,
   formatNewsDate,
   formatRankingPoints,
   formatTournamentDate,
@@ -20,14 +20,6 @@ import {
 
 import styles from "./page.module.css";
 
-const EMPTY_HOME_DATA: HomeData = {
-  nextTournament: null,
-  upcomingTournaments: [],
-  rankingPreview: [],
-  categories: DEFAULT_CATEGORIES,
-  news: [],
-  sponsors: [],
-};
 
 export default async function Home() {
   /*
@@ -36,7 +28,72 @@ export default async function Home() {
    *
    * No se inventa aquí ninguna ruta de cliente Supabase.
    */
-  const data = EMPTY_HOME_DATA;
+  const [tournamentsResult, categoriesResult, newsResult] = await Promise.all([
+    getPublicTournaments(),
+    getPublicCategories(),
+    getPublicNews(),
+  ]);
+
+  const tournaments = tournamentsResult.data ?? [];
+  const nextTournament = [...tournaments]
+    .filter((tournament) => tournament.estado === "inscripciones_abiertas" || tournament.estado === "publicado")
+    .sort((a, b) => a.fecha_inicio.localeCompare(b.fecha_inicio))[0] ?? null;
+  const rankingResult = await getPublicRanking(categoriesResult.data?.[0]?.id);
+  const sponsorResult = await getPublicSponsors(tournaments.slice(0, 6).map((tournament) => tournament.id));
+
+  const data: HomeData = {
+    nextTournament: nextTournament ? {
+      id: nextTournament.id,
+      nombre: nextTournament.nombre,
+      slug: nextTournament.slug,
+      fechaInicio: nextTournament.fecha_inicio,
+      fechaFin: nextTournament.fecha_fin,
+      estado: nextTournament.estado,
+      precioTexto: nextTournament.precio_texto,
+      descripcion: nextTournament.descripcion,
+      club: nextTournament.club ? { nombre: nextTournament.club.nombre, direccion: nextTournament.club.direccion } : null,
+      categorias: [],
+    } : null,
+    upcomingTournaments: tournaments.slice(0, 6).map((tournament) => ({
+      id: tournament.id,
+      nombre: tournament.nombre,
+      slug: tournament.slug,
+      fechaInicio: tournament.fecha_inicio,
+      fechaFin: tournament.fecha_fin,
+      estado: tournament.estado,
+      precioTexto: tournament.precio_texto,
+      descripcion: tournament.descripcion,
+      club: tournament.club ? { nombre: tournament.club.nombre, direccion: tournament.club.direccion } : null,
+      categorias: [],
+    })),
+    rankingPreview: (rankingResult.data?.entries ?? []).slice(0, 5).map((entry) => ({
+      position: entry.position,
+      playerId: entry.player.id,
+      nombre: entry.player.nombre,
+      apellidos: entry.player.apellidos,
+      puntos: entry.points,
+      pruebas: entry.tournaments,
+      fotoUrl: entry.player.foto_url,
+    })),
+    categories: (categoriesResult.data ?? []).map((category) => ({ id: category.id, nombre: category.nombre, nivelOrden: category.nivel_orden })),
+    news: (newsResult.data ?? []).slice(0, 4).map((news) => ({
+      id: news.id,
+      titulo: news.titulo,
+      slug: news.slug,
+      contenido: news.contenido,
+      imagenDestacada: news.imagen_destacada,
+      categoria: news.categoria,
+      fechaPublicacion: news.fecha_publicacion,
+    })),
+    sponsors: (sponsorResult.data ?? []).slice(0, 8).map((sponsor) => ({
+      id: sponsor.id,
+      nombre: sponsor.nombre,
+      logoUrl: sponsor.logo_url,
+      descripcion: sponsor.descripcion,
+      enlace: sponsor.enlace,
+      tipo: sponsor.tipo,
+    })),
+  };
 
   return (
     <div className={styles.page}>
@@ -202,8 +259,8 @@ function HeroTournamentCard({
         <div>
           <span
             className={`${styles.statusDot} ${statusVariant === "open"
-                ? styles.statusDotOpen
-                : ""
+              ? styles.statusDotOpen
+              : ""
               }`}
           />
           <span>
@@ -410,10 +467,10 @@ function TournamentCard({
         <div className={styles.tournamentFooter}>
           <span
             className={`${styles.tournamentStatus} ${variant === "open"
-                ? styles.tournamentStatusOpen
-                : variant === "live"
-                  ? styles.tournamentStatusLive
-                  : styles.tournamentStatusUpcoming
+              ? styles.tournamentStatusOpen
+              : variant === "live"
+                ? styles.tournamentStatusLive
+                : styles.tournamentStatusUpcoming
               }`}
           >
             {getTournamentStatusLabel(tournament.estado)}

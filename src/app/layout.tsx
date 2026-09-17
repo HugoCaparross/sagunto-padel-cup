@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.saguntopadelcup.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.saguntopadelcup.com"),
   title: {
     default: "Sagunto Padel Cup",
     template: "%s | Sagunto Padel Cup",
