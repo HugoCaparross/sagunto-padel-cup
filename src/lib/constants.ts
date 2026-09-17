@@ -317,6 +317,10 @@ export type DrawMode = (typeof DRAW_MODES)[number];
  * 2ª: 105–91
  * 3ª: 90–76
  * 4ª: 75–61
+ *
+ * 5ª en formato de 5 parejas (eliminación en fase de grupos):
+ * recibe el mínimo de puntos de su categoría para no crear solapamientos
+ * entre bandas. La etiqueta competitiva se conserva como `fase_grupos`.
  */
 export const RANKING_POINTS = {
     "1ª": {
@@ -334,6 +338,7 @@ export const RANKING_POINTS = {
         finalista_bronce: 108,
         semifinalista_bronce: 107,
         cuartos_bronce: 106,
+        fase_grupos: 106,
     },
 
     "2ª": {
@@ -351,6 +356,7 @@ export const RANKING_POINTS = {
         finalista_bronce: 93,
         semifinalista_bronce: 92,
         cuartos_bronce: 91,
+        fase_grupos: 91,
     },
 
     "3ª": {
@@ -368,6 +374,7 @@ export const RANKING_POINTS = {
         finalista_bronce: 78,
         semifinalista_bronce: 77,
         cuartos_bronce: 76,
+        fase_grupos: 76,
     },
 
     "4ª": {
@@ -385,6 +392,7 @@ export const RANKING_POINTS = {
         finalista_bronce: 63,
         semifinalista_bronce: 62,
         cuartos_bronce: 61,
+        fase_grupos: 61,
     },
 } as const;
 

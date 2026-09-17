@@ -709,6 +709,127 @@ export const FOUR_PAIR_STRUCTURE:
 };
 
 /**
+ * Estructura para 5 parejas.
+ *
+ * - Un grupo de 5, todos contra todos.
+ * - 1º vs 4º y 2º vs 3º en semifinales de Oro.
+ * - Ganadores → final de Oro.
+ * - Perdedores → final de Plata.
+ * - 5º eliminado tras la fase de grupos.
+ */
+export const FIVE_PAIR_STRUCTURE: KnockoutStructureTemplate = {
+    pair_count: 5,
+    tiers: ["oro", "plata"],
+    group_count: 1,
+    group_size: 5,
+    phases: [
+        {
+            fase: "semis",
+            match_count: 2,
+            tramo: "oro",
+            sources: [
+                { type: "group_position", group_index: 0, group_position: 1 },
+                { type: "group_position", group_index: 0, group_position: 4 },
+            ],
+        },
+        {
+            fase: "semis",
+            match_count: 1,
+            tramo: "oro",
+            sources: [
+                { type: "group_position", group_index: 0, group_position: 2 },
+                { type: "group_position", group_index: 0, group_position: 3 },
+            ],
+        },
+        {
+            fase: "final",
+            match_count: 1,
+            tramo: "oro",
+            sources: [
+                { type: "match_winner", match_index: 0 },
+                { type: "match_winner", match_index: 1 },
+            ],
+        },
+        {
+            fase: "final",
+            match_count: 1,
+            tramo: "plata",
+            sources: [
+                { type: "match_loser", match_index: 0 },
+                { type: "match_loser", match_index: 1 },
+            ],
+        },
+    ],
+    notes:
+        "Con 5 parejas, la 5ª queda eliminada tras la fase de grupos; las otras cuatro disputan semifinales de Oro.",
+};
+
+/**
+ * Estructura para 6 parejas.
+ *
+ * - 2 grupos de 3, todos contra todos.
+ * - 1A vs 2B y 1B vs 2A en semifinales de Oro.
+ * - Ganadores → final de Oro.
+ * - Perdedores → final de Plata.
+ * - 3A vs 3B → final de Bronce.
+ */
+export const SIX_PAIR_STRUCTURE: KnockoutStructureTemplate = {
+    pair_count: 6,
+    tiers: ["oro", "plata", "bronce"],
+    group_count: 2,
+    group_size: 3,
+    phases: [
+        {
+            fase: "semis",
+            match_count: 2,
+            tramo: "oro",
+            sources: [
+                { type: "group_position", group_index: 0, group_position: 1 },
+                { type: "group_position", group_index: 1, group_position: 2 },
+            ],
+        },
+        {
+            fase: "semis",
+            match_count: 1,
+            tramo: "oro",
+            sources: [
+                { type: "group_position", group_index: 1, group_position: 1 },
+                { type: "group_position", group_index: 0, group_position: 2 },
+            ],
+        },
+        {
+            fase: "final",
+            match_count: 1,
+            tramo: "oro",
+            sources: [
+                { type: "match_winner", match_index: 0 },
+                { type: "match_winner", match_index: 1 },
+            ],
+        },
+        {
+            fase: "final",
+            match_count: 1,
+            tramo: "plata",
+            sources: [
+                { type: "match_loser", match_index: 0 },
+                { type: "match_loser", match_index: 1 },
+            ],
+        },
+        {
+            fase: "final",
+            match_count: 1,
+            tramo: "bronce",
+            sources: [
+                { type: "group_position", group_index: 0, group_position: 3 },
+                { type: "group_position", group_index: 1, group_position: 3 },
+            ],
+        },
+    ],
+    notes:
+        "Con 6 parejas, los dos primeros de cada grupo disputan semifinales de Oro cruzadas; los perdedores juegan Plata y los terceros Bronce.",
+};
+
+/**
  * Estructura para 8 parejas.
  *
  * - 2 grupos de 4.
@@ -1171,6 +1292,12 @@ export function getStructureForPairCount(
 
         case 4:
             return FOUR_PAIR_STRUCTURE;
+
+        case 5:
+            return FIVE_PAIR_STRUCTURE;
+
+        case 6:
+            return SIX_PAIR_STRUCTURE;
 
         case 8:
             return EIGHT_PAIR_STRUCTURE;

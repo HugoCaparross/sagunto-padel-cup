@@ -275,6 +275,35 @@ export function getRankingPoints(
     return points;
 }
 
+
+/**
+ * Returns the points awarded to the last classified pair in the
+ * five-pair format.
+ *
+ * The fifth pair is eliminated after the group phase. It receives the
+ * minimum points available in its category. This reuses the lower bound
+ * of the official band and therefore preserves the non-overlap between
+ * categories. The competitive label stored by the service is
+ * `fase_grupos`; it is not treated as a Bronce tier.
+ */
+export function getGroupEliminationPoints(
+    category: RankingCategory,
+): number {
+    assertCategory(category);
+
+    const points =
+        RANKING_POINTS[category]
+            .fase_grupos;
+
+    if (typeof points !== "number") {
+        throw new Error(
+            `No hay puntos configurados para la eliminación en fase de grupos de ${category}.`,
+        );
+    }
+
+    return points;
+}
+
 /**
  * Complete point calculation.
  */

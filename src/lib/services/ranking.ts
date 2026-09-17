@@ -16,6 +16,7 @@ import type {
 
 import {
     calculateRankingPoints,
+    getGroupEliminationPoints,
     calculateSeasonCarryOver,
     calculateSeasonExpiredPoints,
     getPositionFromFinish,
@@ -40,7 +41,8 @@ type RankingResultType =
     | "campeon"
     | "finalista"
     | "semifinalista"
-    | "cuartos";
+    | "cuartos"
+    | "fase_grupos";
 
 /* -------------------------------------------------------------------------- */
 /* TYPES                                                                      */
@@ -202,6 +204,7 @@ const VALID_RESULT_TYPES =
         "finalista",
         "semifinalista",
         "cuartos",
+        "fase_grupos",
     ]);
 
 /* -------------------------------------------------------------------------- */
@@ -1146,6 +1149,56 @@ export async function addTournamentFinishPoints(
 
         source:
             "tournament",
+    });
+}
+
+/**
+ * Registra los puntos del quinto clasificado en el formato de 5 parejas.
+ *
+ * Este resultado no pertenece a Oro/Plata/Bronce: la pareja queda eliminada
+ * tras la fase de grupos. Recibe el mínimo de puntos de su categoría para
+ * mantener las bandas de ranking sin solapamientos.
+ */
+export async function addGroupEliminationPoints(
+    input: {
+        seasonId: string;
+        tournamentId: string;
+        playerId: string;
+        categoryId: string;
+        category: RankingCategory;
+        pairId?: string | null;
+        notes?: string | null;
+    },
+): Promise<RankingPoint> {
+    assertCategory(input.category);
+
+    const points = getGroupEliminationPoints(
+        input.category,
+    );
+
+    const alreadyExists =
+        await hasTournamentRankingPoints(
+            input.playerId,
+            input.tournamentId,
+        );
+
+    if (alreadyExists) {
+        throw new Error(
+            "El jugador ya tiene puntos registrados para este torneo.",
+        );
+    }
+
+    return addRankingPoints({
+        seasonId: input.seasonId,
+        tournamentId: input.tournamentId,
+        playerId: input.playerId,
+        categoryId: input.categoryId,
+        pairId: input.pairId ?? null,
+        puntos_obtenidos: points,
+        resultType: "fase_grupos",
+        tramo: null,
+        notes: input.notes ?? "5.º clasificado — eliminado en fase de grupos",
+        source: "tournament",
     });
 }
 

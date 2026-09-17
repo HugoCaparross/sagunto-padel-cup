@@ -167,6 +167,8 @@ function cloneStandings(
  *
  * 3 parejas  → 1 grupo
  * 4 parejas  → 1 grupo
+ * 5 parejas  → 1 grupo
+ * 6 parejas  → 2 grupos
  * 8 parejas  → 2 grupos
  *
  * Para cantidades futuras se intenta mantener aproximadamente
@@ -185,6 +187,11 @@ export function calculateNumberOfGroups(
     }
 
     if (pairCount <= 4) {
+        return 1;
+    }
+
+    // 5 parejas: un único grupo para mantener el todos-contra-todos.
+    if (pairCount === 5) {
         return 1;
     }
 
@@ -1149,6 +1156,16 @@ export function getNonQualifiedPairs(
  * - 4 → estructura Oro
  * - perdedores de semifinal → Plata
  *
+ * 5:
+ * - 4 → estructura Oro
+ * - perdedores de semifinal → Plata
+ * - 1 → eliminado tras grupos
+ *
+ * 6:
+ * - 4 → estructura Oro
+ * - perdedores de semifinal → Plata
+ * - 2 → Bronce
+ *
  * 8:
  * - 4 → Oro
  * - 2 → Plata
@@ -1184,6 +1201,24 @@ export function getTierDistribution(
                 silver: 0,
 
                 bronze: 0,
+            };
+
+        case 5:
+            return {
+                gold: 4,
+
+                silver: 2,
+
+                bronze: 0,
+            };
+
+        case 6:
+            return {
+                gold: 4,
+
+                silver: 2,
+
+                bronze: 2,
             };
 
         case 8:
@@ -1417,6 +1452,18 @@ export function getGroupStructureDescription(
             return (
                 "4 parejas: todos juegan fase de grupos; " +
                 "1ª-4ª y 2ª-3ª forman las semifinales de Oro."
+            );
+
+        case 5:
+            return (
+                "5 parejas: un grupo de 5, todos contra todos; " +
+                "1ª-4ª y 2ª-3ª forman las semifinales de Oro; la 5ª queda eliminada."
+            );
+
+        case 6:
+            return (
+                "6 parejas: 2 grupos de 3; 1A-2B y 1B-2A son las semifinales de Oro; " +
+                "los perdedores juegan Plata y los terceros Bronce."
             );
 
         case 8:

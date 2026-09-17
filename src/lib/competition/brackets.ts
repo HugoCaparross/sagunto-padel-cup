@@ -376,6 +376,248 @@ export function createFourPairBrackets(
     };
 }
 
+
+/* -------------------------------------------------------------------------- */
+/* 5 PAIRS                                                                    */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Official 5-pair structure:
+ *
+ * Group:
+ *   1st, 2nd, 3rd, 4th, 5th
+ *
+ * The group stage is a complete round robin.
+ * The 5th pair is eliminated after the group stage.
+ *
+ * Gold semifinals:
+ *   1st vs 4th
+ *   2nd vs 3rd
+ *
+ * Winners → Gold final
+ * Losers  → Silver final
+ *
+ * There is no Bronze bracket.
+ */
+export function createFivePairBrackets(
+    groupId: string,
+): TournamentBrackets {
+    const goldSemi1 = createKnockoutMatch({
+        tier: "oro",
+        round: "semis",
+        position: 1,
+        pair1Source: {
+            type: "group",
+            groupId,
+            position: 1,
+        },
+        pair2Source: {
+            type: "group",
+            groupId,
+            position: 4,
+        },
+    });
+
+    const goldSemi2 = createKnockoutMatch({
+        tier: "oro",
+        round: "semis",
+        position: 2,
+        pair1Source: {
+            type: "group",
+            groupId,
+            position: 2,
+        },
+        pair2Source: {
+            type: "group",
+            groupId,
+            position: 3,
+        },
+    });
+
+    const goldFinal = createKnockoutMatch({
+        tier: "oro",
+        round: "final",
+        position: 1,
+        pair1Source: {
+            type: "match",
+            matchId: goldSemi1.id,
+            result: "winner",
+        },
+        pair2Source: {
+            type: "match",
+            matchId: goldSemi2.id,
+            result: "winner",
+        },
+    });
+
+    const silverFinal = createKnockoutMatch({
+        tier: "plata",
+        round: "final",
+        position: 1,
+        pair1Source: {
+            type: "match",
+            matchId: goldSemi1.id,
+            result: "loser",
+        },
+        pair2Source: {
+            type: "match",
+            matchId: goldSemi2.id,
+            result: "loser",
+        },
+    });
+
+    goldSemi1.nextMatchId = goldFinal.id;
+    goldSemi1.nextSlot = 1;
+    goldSemi2.nextMatchId = goldFinal.id;
+    goldSemi2.nextSlot = 2;
+
+    return {
+        oro: {
+            tier: "oro",
+            pairCount: 4,
+            matches: [goldSemi1, goldSemi2, goldFinal],
+            championPairId: null,
+        },
+        plata: {
+            tier: "plata",
+            pairCount: 2,
+            matches: [silverFinal],
+            championPairId: null,
+        },
+        bronce: null,
+    };
+}
+
+/* -------------------------------------------------------------------------- */
+/* 6 PAIRS                                                                    */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Official 6-pair structure:
+ *
+ * Two groups of three, each in complete round robin.
+ *
+ * Gold semifinals:
+ *   1A vs 2B
+ *   1B vs 2A
+ *
+ * Winners → Gold final
+ * Losers  → Silver final
+ *
+ * Bronze:
+ *   3A vs 3B
+ */
+export function createSixPairBrackets(
+    groupAId: string,
+    groupBId: string,
+): TournamentBrackets {
+    const goldSemi1 = createKnockoutMatch({
+        tier: "oro",
+        round: "semis",
+        position: 1,
+        pair1Source: {
+            type: "group",
+            groupId: groupAId,
+            position: 1,
+        },
+        pair2Source: {
+            type: "group",
+            groupId: groupBId,
+            position: 2,
+        },
+    });
+
+    const goldSemi2 = createKnockoutMatch({
+        tier: "oro",
+        round: "semis",
+        position: 2,
+        pair1Source: {
+            type: "group",
+            groupId: groupBId,
+            position: 1,
+        },
+        pair2Source: {
+            type: "group",
+            groupId: groupAId,
+            position: 2,
+        },
+    });
+
+    const goldFinal = createKnockoutMatch({
+        tier: "oro",
+        round: "final",
+        position: 1,
+        pair1Source: {
+            type: "match",
+            matchId: goldSemi1.id,
+            result: "winner",
+        },
+        pair2Source: {
+            type: "match",
+            matchId: goldSemi2.id,
+            result: "winner",
+        },
+    });
+
+    const silverFinal = createKnockoutMatch({
+        tier: "plata",
+        round: "final",
+        position: 1,
+        pair1Source: {
+            type: "match",
+            matchId: goldSemi1.id,
+            result: "loser",
+        },
+        pair2Source: {
+            type: "match",
+            matchId: goldSemi2.id,
+            result: "loser",
+        },
+    });
+
+    const bronzeFinal = createKnockoutMatch({
+        tier: "bronce",
+        round: "final",
+        position: 1,
+        pair1Source: {
+            type: "group",
+            groupId: groupAId,
+            position: 3,
+        },
+        pair2Source: {
+            type: "group",
+            groupId: groupBId,
+            position: 3,
+        },
+    });
+
+    goldSemi1.nextMatchId = goldFinal.id;
+    goldSemi1.nextSlot = 1;
+    goldSemi2.nextMatchId = goldFinal.id;
+    goldSemi2.nextSlot = 2;
+
+    return {
+        oro: {
+            tier: "oro",
+            pairCount: 4,
+            matches: [goldSemi1, goldSemi2, goldFinal],
+            championPairId: null,
+        },
+        plata: {
+            tier: "plata",
+            pairCount: 2,
+            matches: [silverFinal],
+            championPairId: null,
+        },
+        bronce: {
+            tier: "bronce",
+            pairCount: 2,
+            matches: [bronzeFinal],
+            championPairId: null,
+        },
+    };
+}
+
 /* -------------------------------------------------------------------------- */
 /* 8 PAIRS                                                                    */
 /* -------------------------------------------------------------------------- */
@@ -611,6 +853,29 @@ export function createOfficialBrackets(params: {
 
         return createFourPairBrackets(
             groupIds[0],
+        );
+    }
+
+    if (pairCount === 5) {
+        if (groupIds.length !== 1) {
+            throw new Error(
+                "La estructura de 5 parejas necesita un único grupo.",
+            );
+        }
+
+        return createFivePairBrackets(groupIds[0]);
+    }
+
+    if (pairCount === 6) {
+        if (groupIds.length !== 2) {
+            throw new Error(
+                "La estructura de 6 parejas necesita dos grupos.",
+            );
+        }
+
+        return createSixPairBrackets(
+            groupIds[0],
+            groupIds[1],
         );
     }
 
@@ -1060,6 +1325,18 @@ export function getOfficialBracketDescription(
             return (
                 "Semifinales de Oro 1ª-4ª y 2ª-3ª. " +
                 "Los perdedores disputan la final de Plata."
+            );
+
+        case 5:
+            return (
+                "Todos contra todos; 1ª-4ª y 2ª-3ª forman semifinales de Oro. " +
+                "Los perdedores disputan la final de Plata y la 5ª pareja queda eliminada."
+            );
+
+        case 6:
+            return (
+                "Dos grupos de 3; semifinales de Oro cruzadas 1A-2B y 1B-2A. " +
+                "Los perdedores disputan Plata y los terceros Bronce."
             );
 
         case 8:
