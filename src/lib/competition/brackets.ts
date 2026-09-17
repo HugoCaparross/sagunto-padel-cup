@@ -1025,20 +1025,16 @@ export function validateBracket(
         return false;
     }
 
-    const pairIds =
-        bracket.matches.flatMap(
-            (match) =>
-                [
-                    match.pair1Id,
-                    match.pair2Id,
-                ].filter(
-                    (id): id is string =>
-                        Boolean(id),
-                ),
-        );
-
-    return uniqueIds(
-        pairIds,
+    /*
+     * Una pareja aparece legítimamente en varias rondas del mismo cuadro
+     * (semifinal → final). La unicidad se valida dentro de cada partido,
+     * no globalmente en todo el cuadro.
+     */
+    return bracket.matches.every(
+        (match) =>
+            !match.pair1Id ||
+            !match.pair2Id ||
+            match.pair1Id !== match.pair2Id,
     );
 }
 

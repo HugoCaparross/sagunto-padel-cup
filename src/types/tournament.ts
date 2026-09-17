@@ -989,6 +989,10 @@ export const SPC_KNOCKOUT_STRUCTURES:
 
         FOUR_PAIR_STRUCTURE,
 
+        FIVE_PAIR_STRUCTURE,
+
+        SIX_PAIR_STRUCTURE,
+
         EIGHT_PAIR_STRUCTURE,
     ];
 

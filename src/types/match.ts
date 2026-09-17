@@ -452,21 +452,54 @@ export function validateMatchResult(
 // GROUP RESULT VALIDATION
 // =============================================================================
 
+function validateStandardSetScore(
+    set: SetScore,
+    errors: string[],
+    context: "grupo" | "final",
+): void {
+    if (
+        !Number.isInteger(set.pair1) ||
+        !Number.isInteger(set.pair2) ||
+        set.pair1 < 0 ||
+        set.pair2 < 0
+    ) {
+        return;
+    }
+
+    if (set.pair1 === set.pair2) {
+        errors.push(
+            `El set de ${context} no puede terminar empatado.`,
+        );
+        return;
+    }
+
+    const winner = Math.max(set.pair1, set.pair2);
+    const loser = Math.min(set.pair1, set.pair2);
+
+    /*
+     * Set estándar:
+     * 6-0 hasta 6-4, 7-5 o 7-6.
+     */
+    const valid =
+        (winner === 6 && loser >= 0 && loser <= 4) ||
+        (winner === 7 && (loser === 5 || loser === 6));
+
+    if (!valid) {
+        errors.push(
+            `El resultado del set de ${context} no es válido.`,
+        );
+    }
+}
+
 function validateGroupSet(
     set: SetScore,
     errors: string[],
 ): void {
-    if (set.pair1 === set.pair2) {
-        errors.push(
-            "Un set de grupos no puede terminar empatado.",
-        );
-    }
-
-    if (set.pair1 < 6 && set.pair2 < 6) {
-        errors.push(
-            "Un set debe alcanzar al menos 6 juegos para tener un ganador.",
-        );
-    }
+    validateStandardSetScore(
+        set,
+        errors,
+        "grupo",
+    );
 }
 
 // =============================================================================
@@ -501,6 +534,15 @@ function validateRaceToNine(
             "Uno de los participantes debe alcanzar 9 juegos.",
         );
     }
+
+    if (
+        Math.max(set.pair1, set.pair2) === 9 &&
+        Math.min(set.pair1, set.pair2) > 8
+    ) {
+        errors.push(
+            "En un partido a 9, el perdedor no puede superar los 8 juegos.",
+        );
+    }
 }
 
 // =============================================================================
@@ -525,14 +567,17 @@ function validateFinalResult(
 
     const secondSet = resultado_json.sets[1];
 
-    if (
-        firstSet.pair1 === firstSet.pair2 ||
-        secondSet.pair1 === secondSet.pair2
-    ) {
-        errors.push(
-            "Los sets de la final no pueden terminar empatados.",
-        );
-    }
+    validateStandardSetScore(
+        firstSet,
+        errors,
+        "final",
+    );
+
+    validateStandardSetScore(
+        secondSet,
+        errors,
+        "final",
+    );
 
     const firstWinner =
         firstSet.pair1 > firstSet.pair2
@@ -544,12 +589,16 @@ function validateFinalResult(
             ? 1
             : 2;
 
+    /*
+     * Si una pareja gana ambos sets, el partido termina 2-0.
+     * El super tie-break solo existe cuando los sets se reparten 1-1.
+     */
     if (
         firstWinner === secondWinner
     ) {
-        if (!resultado_json.super_tiebreak) {
+        if (resultado_json.super_tiebreak) {
             errors.push(
-                "Debe existir super tie-break cuando un jugador gana los dos sets.",
+                "No debe existir super tie-break cuando una pareja gana los dos sets.",
             );
         }
 

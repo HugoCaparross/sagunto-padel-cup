@@ -571,12 +571,55 @@ export function applyGroupMatchResult(
             resultado_json.pair2Games,
         );
 
-    if (
-        pair1Sets === pair2Sets &&
-        pair1Games === pair2Games
-    ) {
+    /*
+     * La fase de grupos se juega a un único set.
+     * Por tanto, el resultado deportivo válido siempre es 1-0
+     * en sets y el marcador de juegos debe corresponder a un set
+     * estándar ganado: 6-0…6-4, 7-5 o 7-6.
+     */
+    const validGroupSet =
+        (
+            pair1Sets === 1 &&
+            pair2Sets === 0
+        ) ||
+        (
+            pair1Sets === 0 &&
+            pair2Sets === 1
+        );
+
+    if (!validGroupSet) {
         throw new Error(
-            "El resultado no puede terminar empatado.",
+            "La fase de grupos debe registrar exactamente un set ganado por una de las parejas.",
+        );
+    }
+
+    const winnerGames = Math.max(
+        pair1Games,
+        pair2Games,
+    );
+
+    const loserGames = Math.min(
+        pair1Games,
+        pair2Games,
+    );
+
+    const validGames =
+        (
+            winnerGames === 6 &&
+            loserGames >= 0 &&
+            loserGames <= 4
+        ) ||
+        (
+            winnerGames === 7 &&
+            (
+                loserGames === 5 ||
+                loserGames === 6
+            )
+        );
+
+    if (!validGames) {
+        throw new Error(
+            "El marcador de juegos de grupos no corresponde a un set válido.",
         );
     }
 
@@ -1426,10 +1469,12 @@ export function createSeededOrder<T>(
  */
 export function isOfficialGroupStructure(
     pairCount: number,
-): pairCount is 3 | 4 | 8 {
+): pairCount is 3 | 4 | 5 | 6 | 8 {
     return (
         pairCount === 3 ||
         pairCount === 4 ||
+        pairCount === 5 ||
+        pairCount === 6 ||
         pairCount === 8
     );
 }
