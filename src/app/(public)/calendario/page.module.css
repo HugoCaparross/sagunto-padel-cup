@@ -1,0 +1,107 @@
+.content {
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: clamp(48px, 7vw, 96px) 0 120px;
+}
+
+.timeline {
+    display: grid;
+    gap: 72px;
+}
+
+.monthHeader {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+}
+
+.monthHeader span {
+    color: var(--brand);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+}
+
+.monthHeader h2 {
+    text-transform: capitalize;
+}
+
+.items {
+    border-bottom: 1px solid var(--line);
+}
+
+.item {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr) auto;
+    gap: 32px;
+    align-items: center;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.item:last-child {
+    border-bottom: 0;
+}
+
+.date {
+    font-weight: 800;
+}
+
+.main {
+    min-width: 0;
+}
+
+.status {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--brand);
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.main h3 {
+    margin: 0 0 6px;
+    font-size: clamp(1.4rem, 2.4vw, 2rem);
+}
+
+.main p {
+    color: var(--muted);
+}
+
+.link {
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    color: var(--foreground);
+}
+
+.link:hover {
+    color: var(--brand);
+}
+
+@media (max-width: 767px) {
+    .content {
+        width: min(100% - 28px, 1180px);
+        padding-bottom: 72px;
+    }
+
+    .monthHeader {
+        display: grid;
+        gap: 8px;
+    }
+
+    .item {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 24px 0;
+    }
+
+    .link {
+        justify-self: start;
+    }
+}

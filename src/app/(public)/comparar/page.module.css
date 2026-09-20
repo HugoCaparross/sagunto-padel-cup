@@ -1,0 +1,131 @@
+.content {
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: clamp(48px, 7vw, 96px) 0 120px
+}
+
+.selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 14px;
+    align-items: end;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--line)
+}
+
+.selector label {
+    display: grid;
+    gap: 8px;
+    font-size: .75rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase
+}
+
+.selector select {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 14px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    color: var(--foreground)
+}
+
+.selector button {
+    min-height: 48px;
+    padding: 0 22px;
+    background: var(--brand);
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 900;
+    letter-spacing: .06em
+}
+
+.selector button:hover {
+    background: var(--brand-dark)
+}
+
+.comparison {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: 48px;
+    background: var(--line)
+}
+
+.player {
+    min-height: 420px;
+    padding: clamp(28px, 5vw, 56px);
+    background: var(--surface)
+}
+
+.player>span {
+    color: var(--brand);
+    font-size: .72rem;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase
+}
+
+.player h2 {
+    margin: 14px 0 48px;
+    font-size: clamp(2rem, 4vw, 3.4rem)
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 32px
+}
+
+.stats div {
+    display: grid;
+    gap: 8px;
+    padding: 20px 0
+}
+
+.stats div+div {
+    border-left: 1px solid var(--line);
+    padding-left: 20px
+}
+
+.stats small {
+    font-size: .65rem;
+    font-weight: 900;
+    letter-spacing: .1em;
+    color: var(--muted)
+}
+
+.stats strong {
+    font-size: 1.5rem
+}
+
+.player>a {
+    font-size: .72rem;
+    font-weight: 900;
+    color: var(--brand)
+}
+
+@media(max-width:767px) {
+    .content {
+        width: min(100% - 28px, 1180px)
+    }
+
+    .selector {
+        grid-template-columns: 1fr
+    }
+
+    .comparison {
+        grid-template-columns: 1fr
+    }
+
+    .player {
+        min-height: 0
+    }
+
+    .player h2 {
+        margin-bottom: 32px
+    }
+}

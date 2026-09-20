@@ -1,20 +1,7 @@
 .page {
-  --coral: #e7131a;
-  --coral-dark: #c90f15;
-  --black: #07090b;
-  --black-soft: #101315;
-  --black-card: #151719;
-  --white: #ffffff;
-  --off-white: #f5f5f3;
-  --grey-100: #eeeeec;
-  --grey-200: #d8d8d5;
-  --grey-500: #737574;
-  --green: #80ad58;
-  --yellow: #f4c542;
-
   min-height: 100vh;
-  background: var(--off-white);
-  color: var(--black);
+  background: var(--background);
+  color: var(--foreground);
 }
 
 .page a {
@@ -28,7 +15,7 @@
 
 .eyebrow {
   margin: 0 0 10px;
-  color: var(--coral);
+  color: var(--brand);
   font-family: var(--font-ui);
   font-size: 12px;
   font-weight: 800;
@@ -82,12 +69,12 @@
 }
 
 .primaryButton {
-  background: var(--coral);
+  background: var(--brand);
   color: var(--white);
 }
 
 .primaryButton:hover {
-  background: var(--coral-dark);
+  background: var(--brand-dark);
   transform: translateY(-2px);
 }
 
@@ -117,7 +104,7 @@
 
 .textLinkDark,
 .textLinkLight {
-  color: var(--coral);
+  color: var(--brand);
 }
 
 .textLinkDark:hover,
@@ -256,7 +243,7 @@
 
 .heroCardEyebrow {
   margin: 0 0 12px;
-  color: var(--coral);
+  color: var(--brand);
   font-family: var(--font-ui);
   font-size: 11px;
   font-weight: 800;
@@ -324,7 +311,7 @@
 }
 
 .sectionLight {
-  background: var(--off-white);
+  background: var(--background);
   color: var(--black);
 }
 
@@ -349,7 +336,7 @@
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
-  color: var(--coral);
+  color: var(--brand);
   font-family: var(--font-ui);
   font-size: 11px;
   font-weight: 800;
@@ -369,7 +356,7 @@
   position: relative;
   min-height: 310px;
   overflow: hidden;
-  background: var(--black-card);
+  background: var(--dark-surface-soft);
 }
 
 .tournamentCardImage {
@@ -399,7 +386,7 @@
   align-self: flex-start;
   margin-bottom: auto;
   padding: 7px 10px;
-  background: var(--coral);
+  background: var(--brand);
   color: var(--white);
   font-family: var(--font-ui);
   font-size: 9px;
@@ -409,7 +396,7 @@
 }
 
 .tournamentStatusLive {
-  background: var(--green);
+  background: var(--accent-green);
 }
 
 .tournamentStatusFinished {
@@ -477,7 +464,7 @@
 }
 
 .rankingTable th {
-  color: var(--grey-500);
+  color: var(--muted);
   font-family: var(--font-ui);
   font-size: 10px;
   font-weight: 800;
@@ -492,7 +479,7 @@
 
 .rankingPosition {
   width: 50px;
-  color: var(--coral);
+  color: var(--brand);
   font-weight: 800;
 }
 
@@ -530,7 +517,7 @@
 .rankingSideLink {
   display: inline-flex;
   margin-top: 25px;
-  color: var(--coral);
+  color: var(--brand);
   font-family: var(--font-ui);
   font-size: 11px;
   font-weight: 800;
@@ -551,7 +538,7 @@
   flex-direction: column;
   justify-content: space-between;
   padding: 24px;
-  border: 1px solid var(--grey-200);
+  border: 1px solid var(--line);
   background: var(--white);
   color: var(--black);
   transition:
@@ -560,12 +547,12 @@
 }
 
 .categoryCard:hover {
-  border-color: var(--coral);
+  border-color: var(--brand);
   transform: translateY(-3px);
 }
 
 .categoryNumber {
-  color: var(--coral);
+  color: var(--brand);
   font-family: var(--font-ui);
   font-size: 11px;
   font-weight: 800;
@@ -606,7 +593,7 @@
 
 .newsCategory {
   margin: 0 0 10px;
-  color: var(--coral);
+  color: var(--brand);
   font-family: var(--font-ui);
   font-size: 10px;
   font-weight: 800;
@@ -624,7 +611,7 @@
 
 .newsDate {
   margin: 14px 0 0;
-  color: var(--grey-500);
+  color: var(--muted);
   font-family: var(--font-ui);
   font-size: 11px;
 }
@@ -632,7 +619,7 @@
 .newsLink {
   display: inline-flex;
   margin-top: 20px;
-  color: var(--coral);
+  color: var(--brand);
   font-family: var(--font-ui);
   font-size: 10px;
   font-weight: 800;
@@ -644,7 +631,7 @@
 .cta {
   position: relative;
   overflow: hidden;
-  background: var(--green);
+  background: var(--accent-green);
   color: var(--white);
 }
 
@@ -706,7 +693,7 @@
 }
 
 .ctaButton:hover {
-  background: var(--off-white);
+  background: var(--background);
   transform: translateY(-2px);
 }
 
@@ -714,14 +701,14 @@
 
 .empty {
   padding: 40px;
-  border: 1px dashed var(--grey-200);
+  border: 1px dashed var(--line);
   background: rgba(255, 255, 255, 0.65);
   text-align: center;
 }
 
 .empty p {
   margin: 0;
-  color: var(--grey-500);
+  color: var(--muted);
   font-family: var(--font-ui);
   font-size: 14px;
 }
@@ -837,5 +824,2141 @@
   .newsContent,
   .tournamentCardContent {
     padding: 22px;
+  }
+}
+
+/* =========================================================
+   SPC HOME — VISUAL / RESPONSIVE CORRECTIONS
+   These rules complete the classes used by page.tsx and
+   override the incomplete Phase 1 base where necessary.
+========================================================= */
+
+.heroTitle,
+.heroCardTitle,
+.heroCardEmpty {
+  color: var(--white);
+}
+
+.heroDescription {
+  max-width: 620px;
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.heroTournamentCard {
+  position: relative;
+  width: 100%;
+  max-width: 330px;
+  justify-self: end;
+  padding: 28px;
+  border-left: 1px solid rgba(255, 255, 255, .18);
+  background: rgba(5, 5, 5, .34);
+  color: var(--white);
+}
+
+.cardTopLine {
+  width: 42px;
+  height: 3px;
+  margin-bottom: 28px;
+  background: var(--brand);
+}
+
+.heroTournamentNumber {
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, .46);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.heroCardEmpty {
+  margin-top: 16px;
+  color: rgba(255, 255, 255, .62);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.heroCardMeta .metaIcon {
+  display: none;
+}
+
+.heroCardMeta>div:last-child {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .35);
+}
+
+.statusDotOpen {
+  background: var(--brand);
+}
+
+/* Circuit */
+.circuitSection {
+  padding: clamp(72px, 9vw, 118px) 0;
+  background: var(--black);
+  color: var(--white);
+}
+
+.circuitSection .sectionHeadingDark h2,
+.howSection .sectionHeadingDark h2 {
+  color: var(--white);
+}
+
+.circuitGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 58px;
+  border-top: 1px solid rgba(255, 255, 255, .14);
+  border-bottom: 1px solid rgba(255, 255, 255, .14);
+}
+
+.circuitFeature {
+  position: relative;
+  min-width: 0;
+  padding: 34px 34px 36px;
+  border-right: 1px solid rgba(255, 255, 255, .14);
+}
+
+.circuitFeature:last-child {
+  border-right: 0;
+}
+
+.featureSymbol {
+  position: absolute;
+  top: 30px;
+  right: 28px;
+  color: rgba(255, 255, 255, .12);
+  font-size: 42px;
+  font-weight: 900;
+}
+
+.featureNumber {
+  margin-bottom: 48px;
+  color: var(--brand);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+
+.circuitFeature h3 {
+  margin: 0;
+  color: var(--white);
+  font-size: clamp(26px, 2.6vw, 38px);
+  line-height: .95;
+  text-transform: uppercase;
+}
+
+.circuitFeature p {
+  max-width: 320px;
+  min-height: 72px;
+  margin: 16px 0 22px;
+  color: rgba(255, 255, 255, .62);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.textLinkDark {
+  color: var(--brand);
+}
+
+.textLinkLight {
+  color: var(--brand);
+}
+
+/* Competition */
+.competitionSection {
+  padding: clamp(72px, 8vw, 112px) 0;
+  background: var(--background);
+}
+
+.competitionGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(320px, .75fr);
+  gap: clamp(40px, 5vw, 76px);
+  align-items: start;
+}
+
+.tournamentsColumn,
+.rankingColumn {
+  min-width: 0;
+}
+
+.tournamentGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tournamentCard {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.tournamentImage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.tournamentImagePlaceholder {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(0, 0, 0, .06), rgba(0, 0, 0, .4)),
+    linear-gradient(135deg, #b8b5ad, #4e4d49);
+}
+
+.tournamentNumber {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  color: rgba(255, 255, 255, .75);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.tournamentBody {
+  display: flex;
+  min-height: 190px;
+  flex: 1;
+  flex-direction: column;
+  padding: 22px;
+}
+
+.tournamentBody h3 {
+  margin: 0;
+  color: var(--foreground);
+  font-size: clamp(22px, 2vw, 30px);
+  line-height: .98;
+  text-transform: uppercase;
+}
+
+.tournamentMeta {
+  display: grid;
+  gap: 7px;
+  margin-top: 15px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.tournamentFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.tournamentStatus {
+  margin: 0;
+  padding: 6px 9px;
+}
+
+.tournamentStatusOpen {
+  background: var(--brand);
+}
+
+.tournamentStatusLive {
+  background: var(--accent-green);
+}
+
+.tournamentStatusUpcoming {
+  background: #d7d5cf;
+  color: var(--foreground);
+}
+
+.cardArrow {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  color: var(--foreground);
+  font-size: 17px;
+  transition: background-color .18s ease, color .18s ease, border-color .18s ease;
+}
+
+.cardArrow:hover {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--white);
+}
+
+.emptyCompetition {
+  min-height: 250px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.emptyCompetitionLine {
+  display: block;
+  width: 36px;
+  height: 3px;
+  margin-bottom: 45px;
+  background: var(--brand);
+}
+
+.emptyCompetition h3 {
+  margin: 0;
+  font-size: 28px;
+  text-transform: uppercase;
+}
+
+.emptyCompetition p {
+  max-width: 390px;
+  margin: 10px 0 22px;
+  color: var(--muted);
+}
+
+/* Ranking */
+.rankingTable {
+  overflow: hidden;
+  border-top: 1px solid var(--line-strong);
+  background: var(--surface);
+}
+
+.rankingHeader,
+.rankingRow {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) 76px 58px;
+  gap: 10px;
+  align-items: center;
+}
+
+.rankingHeader {
+  min-height: 42px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.rankingRow {
+  min-height: 64px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line);
+  color: var(--foreground);
+  font-size: 13px;
+}
+
+.rankingRow:last-child {
+  border-bottom: 0;
+}
+
+.rankingRow:hover {
+  background: #f0efeb;
+}
+
+.rankingPosition {
+  color: var(--brand);
+  font-weight: 850;
+}
+
+.rankingPlayer {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.rankingPoints {
+  text-align: right;
+  font-weight: 850;
+}
+
+.rankingEvents {
+  text-align: right;
+  color: var(--muted);
+}
+
+/* Categories */
+.categoriesSection {
+  padding: clamp(72px, 9vw, 118px) 0;
+  background: var(--surface);
+}
+
+.categoriesGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 50px;
+}
+
+.categoryCard {
+  display: flex;
+  min-height: 230px;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: var(--background);
+  color: var(--foreground);
+  transition: border-color .18s ease, transform .18s ease, background-color .18s ease;
+}
+
+.categoryCard:hover {
+  border-color: var(--brand);
+  background: var(--surface);
+  transform: translateY(-3px);
+}
+
+.categoryBadge {
+  color: var(--brand);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .08em;
+}
+
+.categoryContent h3 {
+  margin: 0;
+  font-size: clamp(24px, 2.2vw, 34px);
+  line-height: .95;
+  text-transform: uppercase;
+}
+
+.categoryContent p {
+  min-height: 64px;
+  margin: 12px 0 18px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* How it works */
+.howSection {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(72px, 9vw, 118px) 0;
+  background: #0b0b0b;
+  color: var(--white);
+}
+
+.howOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(120deg, transparent 0 58%, rgba(230, 18, 25, .08) 100%);
+}
+
+.howSection>.sectionContainer {
+  position: relative;
+  z-index: 1;
+}
+
+.stepsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 58px;
+  border-top: 1px solid rgba(255, 255, 255, .14);
+  border-bottom: 1px solid rgba(255, 255, 255, .14);
+}
+
+.step {
+  min-width: 0;
+  padding: 28px 30px 34px;
+  border-right: 1px solid rgba(255, 255, 255, .14);
+}
+
+.step:last-child {
+  border-right: 0;
+}
+
+.stepTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 46px;
+}
+
+.stepNumber {
+  color: var(--brand);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .08em;
+}
+
+.stepSymbol {
+  color: rgba(255, 255, 255, .16);
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.step h3 {
+  margin: 0;
+  color: var(--white);
+  font-size: clamp(24px, 2.2vw, 34px);
+  line-height: .95;
+  text-transform: uppercase;
+}
+
+.step p {
+  margin-top: 14px;
+  color: rgba(255, 255, 255, .6);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Race to Master */
+.masterSection {
+  position: relative;
+  min-height: 520px;
+  overflow: hidden;
+  background: var(--black);
+  color: var(--white);
+}
+
+.masterBackground,
+.masterOverlay {
+  position: absolute;
+  inset: 0;
+}
+
+.masterImagePlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(115deg, #090909 0%, #191b1b 48%, #38332d 100%);
+}
+
+.masterOverlay {
+  background: linear-gradient(90deg, rgba(0, 0, 0, .96) 0%, rgba(0, 0, 0, .74) 52%, rgba(0, 0, 0, .35) 100%);
+}
+
+.masterSection>.sectionContainer {
+  position: relative;
+  z-index: 1;
+  min-height: 520px;
+  display: grid;
+  align-items: center;
+}
+
+.masterGrid {
+  display: grid;
+  grid-template-columns: minmax(230px, .65fr) minmax(0, 1.35fr);
+  gap: 60px;
+  align-items: center;
+}
+
+.masterBrand {
+  display: grid;
+  line-height: .82;
+  text-transform: uppercase;
+}
+
+.masterBrand span {
+  color: var(--brand);
+  font-size: 15px;
+  font-weight: 850;
+  letter-spacing: .08em;
+}
+
+.masterBrand strong {
+  color: var(--white);
+  font-size: clamp(56px, 7vw, 100px);
+  letter-spacing: -.055em;
+}
+
+.masterBrand b {
+  color: var(--brand);
+  font-size: 28px;
+}
+
+.masterContent {
+  max-width: 680px;
+}
+
+.masterContent h2 {
+  margin: 0;
+  color: var(--white);
+  font-size: clamp(38px, 5vw, 70px);
+  line-height: .9;
+  text-transform: uppercase;
+}
+
+.masterContent p {
+  margin: 20px 0 28px;
+  color: rgba(255, 255, 255, .68);
+  font-size: 16px;
+}
+
+/* News */
+.newsSection {
+  padding: clamp(72px, 9vw, 118px) 0;
+  background: var(--background);
+}
+
+.newsGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.newsCard {
+  display: block;
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  transition: transform .18s ease, border-color .18s ease;
+}
+
+.newsCard:hover {
+  border-color: var(--brand);
+  transform: translateY(-3px);
+}
+
+.newsImage {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16/9;
+}
+
+.newsImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.newsImagePlaceholder {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #d0cec6, #78766f);
+}
+
+.newsBody {
+  padding: 22px;
+}
+
+.newsBody>span:first-child {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.newsBody h3 {
+  margin: 0;
+  color: var(--foreground);
+  font-size: clamp(22px, 2vw, 28px);
+  line-height: .98;
+  text-transform: uppercase;
+}
+
+.newsBody .textLinkLight {
+  margin-top: 20px;
+}
+
+/* Sponsors */
+.sponsorsSection {
+  padding: clamp(64px, 7vw, 92px) 0;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+}
+
+.sponsorsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 44px;
+}
+
+.sponsor {
+  min-height: 100px;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  border: 1px solid var(--line);
+  background: var(--background);
+}
+
+.sponsor:hover {
+  border-color: var(--brand);
+}
+
+.sponsorLogo {
+  width: auto;
+  max-width: 180px;
+  max-height: 58px;
+  object-fit: contain;
+}
+
+.sponsorName {
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* Final CTA */
+.finalCta {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(78px, 10vw, 130px) 24px;
+  background: var(--accent-green);
+  color: var(--white);
+  text-align: center;
+}
+
+.finalCtaBackground {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 75% 40%, rgba(255, 255, 255, .12), transparent 32%);
+}
+
+.finalCtaContent {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.finalCtaContent .eyebrow {
+  color: var(--white);
+}
+
+.finalCtaContent h2 {
+  margin: 0;
+  color: var(--white);
+  font-size: clamp(42px, 6vw, 82px);
+  line-height: .9;
+  text-transform: uppercase;
+}
+
+.finalCtaContent p {
+  margin: 20px auto 28px;
+  color: rgba(255, 255, 255, .86);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.finalCtaContent .primaryButton {
+  background: var(--white);
+  color: var(--black);
+}
+
+.finalCtaContent .primaryButton:hover {
+  background: var(--black);
+  color: var(--white);
+}
+
+/* Section headings */
+.sectionHeadingDark h2,
+.sectionHeadingLight h2 {
+  max-width: 1050px;
+  margin-inline: auto;
+}
+
+.sectionHeadingDark p,
+.sectionHeadingLight p {
+  margin-bottom: 12px;
+}
+
+/* Desktop/tablet precision */
+@media (max-width: 1180px) {
+
+  .sectionContainer,
+  .heroContainer {
+    width: min(100% - 48px, 1180px);
+  }
+
+  .competitionGrid {
+    grid-template-columns: minmax(0, 1fr) 330px;
+    gap: 34px;
+  }
+
+  .categoriesGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sponsorsGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .hero {
+    min-height: auto;
+  }
+
+  .heroContainer {
+    min-height: 0;
+    grid-template-columns: 1fr;
+    gap: 42px;
+    padding: 72px 0 64px;
+  }
+
+  .heroContent {
+    max-width: 760px;
+  }
+
+  .heroTournamentCard {
+    max-width: none;
+    justify-self: stretch;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, .18);
+    padding: 26px 0 0;
+    background: transparent;
+  }
+
+  .competitionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rankingColumn {
+    margin-top: 8px;
+  }
+
+  .circuitGrid,
+  .stepsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .circuitFeature,
+  .step {
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .14);
+  }
+
+  .circuitFeature:last-child,
+  .step:last-child {
+    border-bottom: 0;
+  }
+
+  .masterGrid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .masterSection,
+  .masterSection>.sectionContainer {
+    min-height: 0;
+  }
+
+  .masterSection>.sectionContainer {
+    padding-block: 82px;
+  }
+
+  .sponsorsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+
+  .sectionContainer,
+  .heroContainer {
+    width: calc(100% - 32px);
+  }
+
+  .heroContainer {
+    padding: 54px 0 50px;
+  }
+
+  .heroTitle {
+    font-size: clamp(45px, 14vw, 72px);
+    line-height: .9;
+    letter-spacing: -.035em;
+  }
+
+  .heroLead {
+    margin-top: 22px;
+    font-size: 16px;
+  }
+
+  .heroDescription {
+    font-size: 14px;
+  }
+
+  .heroActions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+    min-height: 50px;
+    padding-inline: 18px;
+  }
+
+  .circuitSection,
+  .competitionSection,
+  .categoriesSection,
+  .howSection,
+  .newsSection {
+    padding-block: 68px;
+  }
+
+  .sectionHeadingDark h2,
+  .sectionHeadingLight h2 {
+    font-size: clamp(32px, 9vw, 48px);
+    line-height: .94;
+  }
+
+  .circuitGrid,
+  .stepsGrid {
+    margin-top: 38px;
+  }
+
+  .circuitFeature,
+  .step {
+    padding: 28px 20px 30px;
+  }
+
+  .featureNumber,
+  .stepTop {
+    margin-bottom: 34px;
+  }
+
+  .competitionGrid {
+    gap: 48px;
+  }
+
+  .tournamentGrid,
+  .newsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .categoriesGrid {
+    grid-template-columns: 1fr;
+    margin-top: 38px;
+  }
+
+  .categoryCard {
+    min-height: 210px;
+  }
+
+  .rankingHeader,
+  .rankingRow {
+    grid-template-columns: 42px minmax(0, 1fr) 68px;
+  }
+
+  .rankingHeader span:last-child,
+  .rankingRow .rankingEvents {
+    display: none;
+  }
+
+  .rankingHeader,
+  .rankingRow {
+    padding-inline: 12px;
+  }
+
+  .sponsorsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .finalCta {
+    padding-inline: 18px;
+  }
+
+  .finalCtaContent h2 {
+    font-size: clamp(38px, 11vw, 58px);
+  }
+}
+
+@media (max-width: 430px) {
+
+  .sectionContainer,
+  .heroContainer {
+    width: calc(100% - 24px);
+  }
+
+  .heroTitle {
+    font-size: clamp(40px, 14vw, 58px);
+  }
+
+  .heroCardTitle {
+    font-size: 27px;
+  }
+
+  .tournamentBody {
+    padding: 18px;
+  }
+
+  .rankingHeader,
+  .rankingRow {
+    grid-template-columns: 36px minmax(0, 1fr) 62px;
+    gap: 7px;
+  }
+
+  .rankingPlayer {
+    font-size: 12px;
+  }
+
+  .rankingPoints {
+    font-size: 12px;
+  }
+
+  .sponsorsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 340px) {
+  .heroTitle {
+    font-size: 38px;
+  }
+
+  .heroLead {
+    font-size: 15px;
+  }
+
+  .categoryCard {
+    min-height: 195px;
+    padding: 20px;
+  }
+
+  .finalCtaContent h2 {
+    font-size: 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .categoryCard,
+  .tournamentCard,
+  .rankingRow,
+  .newsCard,
+  .cardArrow,
+  .primaryButton,
+  .secondaryButton {
+    transition: none;
+  }
+}
+
+/* ================================================================
+   SPC HOME — BLOQUES FULL-BLEED + RITMO VISUAL ALTERNADO
+   Orden: oscuro / claro / oscuro / claro / oscuro / claro / oscuro / claro / CTA
+   ================================================================ */
+
+.page {
+  width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+}
+
+.page>section {
+  width: 100%;
+  min-width: 0;
+}
+
+/* 01 — HERO: OSCURO */
+.hero {
+  width: 100%;
+  min-height: clamp(620px, 78vh, 820px);
+}
+
+/* 02 — CIRCUITO: CLARO */
+.circuitSection {
+  width: 100%;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.circuitSection .sectionHeadingDark h2,
+.circuitSection .sectionHeadingLight h2 {
+  color: var(--foreground);
+}
+
+.circuitSection .circuitGrid {
+  border-top-color: var(--line-strong);
+  border-bottom-color: var(--line-strong);
+}
+
+.circuitSection .circuitFeature {
+  border-right-color: var(--line-strong);
+}
+
+.circuitSection .featureSymbol {
+  color: rgba(0, 0, 0, 0.07);
+}
+
+.circuitSection .circuitFeature h3 {
+  color: var(--foreground);
+}
+
+.circuitSection .circuitFeature p {
+  color: var(--foreground-soft);
+}
+
+/* 03 — COMPETICIÓN: OSCURO */
+.competitionSection {
+  width: 100%;
+  background: var(--black);
+  color: var(--white);
+}
+
+.competitionSection .sectionHeader h2 {
+  color: var(--white);
+}
+
+.competitionSection .sectionHeaderLink {
+  color: var(--brand);
+}
+
+.competitionSection .tournamentCard {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: var(--dark-surface-soft);
+}
+
+.competitionSection .tournamentBody h3 {
+  color: var(--white);
+}
+
+.competitionSection .tournamentMeta {
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.competitionSection .tournamentStatusUpcoming {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--white);
+}
+
+.competitionSection .cardArrow {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--white);
+}
+
+.competitionSection .cardArrow:hover {
+  border-color: var(--brand);
+  background: var(--brand);
+}
+
+.competitionSection .rankingTable {
+  border-top-color: rgba(255, 255, 255, 0.2);
+  background: var(--dark-surface-soft);
+}
+
+.competitionSection .rankingHeader {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.competitionSection .rankingRow {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+  color: var(--white);
+}
+
+.competitionSection .rankingRow:hover {
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.competitionSection .rankingEvents {
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.competitionSection .emptyCompetition {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: var(--dark-surface-soft);
+}
+
+.competitionSection .emptyCompetition p {
+  color: rgba(255, 255, 255, 0.58);
+}
+
+/* 04 — CATEGORÍAS: CLARO */
+.categoriesSection {
+  width: 100%;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.categoriesSection .categoryCard {
+  background: var(--surface);
+}
+
+/* 05 — CÓMO FUNCIONA: OSCURO */
+.howSection {
+  width: 100%;
+  background: var(--dark-surface);
+}
+
+/* 06 — RACE TO MASTER: CLARO */
+.masterSection {
+  width: 100%;
+  min-height: clamp(460px, 60vh, 700px);
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.masterBackground {
+  opacity: 0.9;
+}
+
+.masterImagePlaceholder {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(247, 246, 243, 0.96)),
+    linear-gradient(115deg, #dedbd4 0%, #f7f6f3 48%, #d7d3cb 100%);
+}
+
+.masterOverlay {
+  background:
+    linear-gradient(90deg, rgba(247, 246, 243, 0.98) 0%, rgba(247, 246, 243, 0.84) 52%, rgba(247, 246, 243, 0.35) 100%),
+    linear-gradient(180deg, rgba(247, 246, 243, 0.15), rgba(247, 246, 243, 0.4));
+}
+
+.masterBrand span,
+.masterBrand b {
+  color: var(--brand);
+}
+
+.masterBrand strong,
+.masterContent h2 {
+  color: var(--foreground);
+}
+
+.masterContent p {
+  color: var(--foreground-soft);
+}
+
+.masterContent .primaryButton {
+  background: var(--brand);
+  color: var(--white);
+}
+
+/* 07 — NOTICIAS: OSCURO */
+.newsSection {
+  width: 100%;
+  background: var(--black);
+  color: var(--white);
+}
+
+.newsSection .sectionHeader h2 {
+  color: var(--white);
+}
+
+.newsSection .newsCard {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: var(--dark-surface-soft);
+}
+
+.newsSection .newsCard:hover {
+  border-color: var(--brand);
+}
+
+.newsSection .newsBody h3 {
+  color: var(--white);
+}
+
+.newsSection .newsBody>span:first-child {
+  color: rgba(255, 255, 255, 0.48);
+}
+
+/* 08 — SPONSORS: CLARO */
+.sponsorsSection {
+  width: 100%;
+  background: var(--surface);
+  color: var(--foreground);
+}
+
+/* 09 — CTA FINAL: EXCEPCIÓN VERDE DEL SISTEMA */
+.finalCta {
+  width: 100%;
+}
+
+/* FULL WIDTH REAL: solo el contenido tiene límite de lectura */
+.sectionContainer,
+.heroContainer {
+  width: min(1180px, calc(100% - 64px));
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+/* Evita cualquier overflow accidental en viewport estrecho */
+@media (max-width: 767px) {
+
+  .page,
+  .page>section,
+  .hero,
+  .circuitSection,
+  .competitionSection,
+  .categoriesSection,
+  .howSection,
+  .masterSection,
+  .newsSection,
+  .sponsorsSection,
+  .finalCta {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .sectionContainer,
+  .heroContainer {
+    width: calc(100% - 32px);
+    max-width: none;
+  }
+
+  .competitionGrid,
+  .tournamentGrid,
+  .categoriesGrid,
+  .stepsGrid,
+  .newsGrid,
+  .sponsorsGrid,
+  .circuitGrid,
+  .masterGrid {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 430px) {
+
+  .sectionContainer,
+  .heroContainer {
+    width: calc(100% - 24px);
+  }
+}
+
+
+/* ================================================================
+   SPC HOME — ESTRUCTURA DEFINITIVA 10 SECCIONES
+   01 oscuro / 02 claro / 03 oscuro / 04 claro / 05 oscuro /
+   06 claro / 07 oscuro / 08 claro / 09 oscuro / 10 verde
+   ================================================================ */
+
+/* 01 — HERO */
+.hero {
+  width: 100%;
+  background: var(--black);
+}
+
+/* 02 — CIRCUITO: CLARO */
+.circuitSection {
+  width: 100%;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.circuitSection .sectionHeadingDark h2 {
+  color: var(--foreground);
+}
+
+.circuitSection .circuitGrid {
+  border-top-color: var(--line-strong);
+  border-bottom-color: var(--line-strong);
+}
+
+.circuitSection .circuitFeature {
+  border-right-color: var(--line-strong);
+}
+
+.circuitSection .featureSymbol {
+  color: rgba(0, 0, 0, .07);
+}
+
+.circuitSection .circuitFeature h3 {
+  color: var(--foreground);
+}
+
+.circuitSection .circuitFeature p {
+  color: var(--foreground-soft);
+}
+
+.circuitSection .textLinkDark {
+  color: var(--brand);
+}
+
+/* 03 — TORNEOS: OSCURO */
+.tournamentsSection {
+  width: 100%;
+  padding: clamp(72px, 8vw, 112px) 0;
+  background: var(--black);
+  color: var(--white);
+}
+
+.tournamentsSection .sectionHeader h2 {
+  color: var(--white);
+}
+
+.tournamentsSection .sectionHeaderLink {
+  color: var(--brand);
+}
+
+.tournamentsSection .tournamentCard {
+  border-color: rgba(255, 255, 255, .14);
+  background: var(--dark-surface-soft);
+}
+
+.tournamentsSection .tournamentBody h3 {
+  color: var(--white);
+}
+
+.tournamentsSection .tournamentMeta {
+  color: rgba(255, 255, 255, .58);
+}
+
+.tournamentsSection .tournamentStatusUpcoming {
+  background: rgba(255, 255, 255, .12);
+  color: var(--white);
+}
+
+.tournamentsSection .cardArrow {
+  border-color: rgba(255, 255, 255, .2);
+  color: var(--white);
+}
+
+.tournamentsSection .cardArrow:hover {
+  border-color: var(--brand);
+  background: var(--brand);
+}
+
+.tournamentsSection .emptyCompetition {
+  border-color: rgba(255, 255, 255, .14);
+  background: var(--dark-surface-soft);
+}
+
+.tournamentsSection .emptyCompetition p {
+  color: rgba(255, 255, 255, .58);
+}
+
+/* 04 — RANKING: CLARO */
+.rankingSection {
+  width: 100%;
+  padding: clamp(72px, 8vw, 112px) 0;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.rankingSection .sectionHeader h2 {
+  color: var(--foreground);
+}
+
+.rankingSection .sectionHeaderLink {
+  color: var(--brand);
+}
+
+.rankingSection .rankingTable {
+  border-top-color: var(--line-strong);
+  background: var(--surface);
+}
+
+.rankingSection .rankingHeader {
+  border-bottom-color: var(--line);
+  color: var(--muted);
+}
+
+.rankingSection .rankingRow {
+  border-bottom-color: var(--line);
+  color: var(--foreground);
+}
+
+.rankingSection .rankingRow:hover {
+  background: #f0efeb;
+}
+
+.rankingSection .rankingEvents {
+  color: var(--muted);
+}
+
+.rankingSection .emptyCompetition {
+  background: var(--surface);
+}
+
+/* 05 — CATEGORÍAS: OSCURO */
+.categoriesSection {
+  width: 100%;
+  background: var(--black);
+  color: var(--white);
+}
+
+.categoriesSection .sectionHeadingLight h2 {
+  color: var(--white);
+}
+
+.categoriesSection .categoryCard {
+  border-color: rgba(255, 255, 255, .14);
+  background: var(--dark-surface-soft);
+  color: var(--white);
+}
+
+.categoriesSection .categoryCard:hover {
+  border-color: var(--brand);
+  background: #171717;
+}
+
+.categoriesSection .categoryContent h3 {
+  color: var(--white);
+}
+
+.categoriesSection .categoryContent p {
+  color: rgba(255, 255, 255, .62);
+}
+
+/* 06 — CÓMO FUNCIONA: CLARO */
+.howSection {
+  width: 100%;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.howSection .sectionHeadingDark h2 {
+  color: var(--foreground);
+}
+
+.howSection .howOverlay {
+  display: none;
+}
+
+.howSection .step {
+  border-color: var(--line-strong);
+}
+
+.howSection .stepNumber {
+  color: var(--brand);
+}
+
+.howSection .stepSymbol {
+  color: rgba(0, 0, 0, .12);
+}
+
+.howSection .step h3 {
+  color: var(--foreground);
+}
+
+.howSection .step p {
+  color: var(--foreground-soft);
+}
+
+/* 07 — RACE TO MASTER: OSCURO */
+.masterSection {
+  width: 100%;
+  background: var(--black);
+  color: var(--white);
+}
+
+.masterSection .masterImagePlaceholder {
+  background: linear-gradient(135deg, #111, #252525 55%, #080808);
+}
+
+.masterSection .masterOverlay {
+  background: linear-gradient(90deg, rgba(0, 0, 0, .98), rgba(0, 0, 0, .72) 58%, rgba(0, 0, 0, .35));
+}
+
+.masterSection .masterBrand span,
+.masterSection .masterBrand b {
+  color: var(--brand);
+}
+
+.masterSection .masterBrand strong,
+.masterSection .masterContent h2 {
+  color: var(--white);
+}
+
+.masterSection .masterContent p {
+  color: rgba(255, 255, 255, .68);
+}
+
+/* 08 — NOTICIAS: CLARO */
+.newsSection {
+  width: 100%;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.newsSection .sectionHeader h2 {
+  color: var(--foreground);
+}
+
+.newsSection .newsCard {
+  border-color: var(--line);
+  background: var(--surface);
+}
+
+.newsSection .newsCard:hover {
+  border-color: var(--brand);
+}
+
+.newsSection .newsBody h3 {
+  color: var(--foreground);
+}
+
+.newsSection .newsBody>span:first-child {
+  color: var(--muted);
+}
+
+/* 09 — SPONSORS: OSCURO */
+.sponsorsSection {
+  width: 100%;
+  background: var(--black);
+  color: var(--white);
+  border-top: 0;
+}
+
+.sponsorsSection .sectionHeadingLight h2 {
+  color: var(--white);
+}
+
+.sponsorsSection .sponsor {
+  border-color: rgba(255, 255, 255, .14);
+  background: var(--dark-surface-soft);
+}
+
+.sponsorsSection .sponsorName {
+  color: var(--white);
+}
+
+/* 10 — CTA FINAL: VERDE */
+.finalCta {
+  width: 100%;
+  background: var(--accent-green);
+}
+
+/* Todas las secciones ocupan el ancho completo. Solo el contenido se limita. */
+.page,
+.page>section {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.sectionContainer,
+.heroContainer {
+  width: min(1180px, calc(100% - 64px));
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+@media (max-width: 767px) {
+
+  .sectionContainer,
+  .heroContainer {
+    width: calc(100% - 32px);
+    max-width: none;
+  }
+
+  .tournamentsSection,
+  .rankingSection {
+    padding-block: 68px;
+  }
+}
+
+@media (max-width: 430px) {
+
+  .sectionContainer,
+  .heroContainer {
+    width: calc(100% - 24px);
+  }
+}
+
+
+/* ================================================================
+   SPC HOME — FINAL RESPONSIVE / FULL-VIEWPORT SYSTEM
+   10 sections, one visual block per section.
+   01 dark / 02 light / 03 dark / 04 light / 05 dark /
+   06 light / 07 dark / 08 light / 09 dark / 10 green CTA.
+   ================================================================ */
+
+:root {
+  --home-content-max: 1180px;
+  --home-gutter: clamp(16px, 3.2vw, 48px);
+}
+
+.page {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  overflow-x: clip;
+}
+
+.page>section {
+  width: 100%;
+  min-width: 0;
+  min-height: 100svh;
+  box-sizing: border-box;
+}
+
+.sectionContainer,
+.heroContainer {
+  width: min(calc(100% - (2 * var(--home-gutter))), var(--home-content-max));
+  margin-inline: auto;
+}
+
+.sectionContainer {
+  min-width: 0;
+}
+
+/* 01 — HERO / DARK */
+.hero {
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+}
+
+.heroContainer {
+  min-height: 100svh;
+  box-sizing: border-box;
+  padding-block: clamp(96px, 12vh, 150px);
+}
+
+.heroTitle {
+  color: var(--white);
+  font-size: clamp(44px, 6.6vw, 92px);
+  line-height: .88;
+  letter-spacing: clamp(-.045em, -.25vw, -.015em);
+  text-wrap: balance;
+}
+
+.heroContent {
+  min-width: 0;
+}
+
+.heroActions {
+  align-items: stretch;
+}
+
+/* 02 — CIRCUITO / LIGHT */
+.circuitSection {
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  padding-block: clamp(72px, 9vh, 120px);
+  box-sizing: border-box;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.circuitSection .sectionHeadingDark h2,
+.circuitSection .sectionHeadingLight h2,
+.circuitSection .circuitFeature h3 {
+  color: var(--foreground);
+}
+
+.circuitSection .sectionHeadingDark,
+.circuitSection .sectionHeadingLight {
+  color: var(--foreground);
+}
+
+.circuitSection .circuitFeature p {
+  color: var(--foreground-soft);
+}
+
+.circuitSection .circuitFeature {
+  border-color: var(--line-strong);
+}
+
+/* 03 — TOURNAMENTS / DARK */
+.tournamentsSection {
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  padding-block: clamp(72px, 9vh, 120px);
+  box-sizing: border-box;
+  background: var(--black);
+  color: var(--white);
+}
+
+.tournamentsSection .sectionHeader h2,
+.tournamentsSection .sectionHeader {
+  color: var(--white);
+}
+
+.tournamentsSection .tournamentCard {
+  background: var(--dark-surface-soft);
+  border-color: rgba(255, 255, 255, .14);
+}
+
+.tournamentsSection .tournamentBody h3 {
+  color: var(--white);
+}
+
+.tournamentsSection .tournamentMeta {
+  color: rgba(255, 255, 255, .62);
+}
+
+.tournamentsSection .tournamentFooter {
+  border-top-color: rgba(255, 255, 255, .12);
+}
+
+.tournamentsSection .cardArrow {
+  color: var(--white);
+  border-color: rgba(255, 255, 255, .18);
+}
+
+/* 04 — RANKING / LIGHT */
+.rankingSection {
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  padding-block: clamp(72px, 9vh, 120px);
+  box-sizing: border-box;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.rankingSection .sectionHeader h2,
+.rankingSection .sectionHeader {
+  color: var(--foreground);
+}
+
+.rankingSection .rankingHeader,
+.rankingSection .rankingRow {
+  border-color: var(--line);
+}
+
+/* 05 — CATEGORIES / DARK */
+.categoriesSection {
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  padding-block: clamp(72px, 9vh, 120px);
+  box-sizing: border-box;
+  background: var(--black);
+  color: var(--white);
+}
+
+.categoriesSection .sectionHeadingLight h2,
+.categoriesSection .sectionHeadingLight {
+  color: var(--white);
+}
+
+.categoriesSection .categoryCard {
+  background: var(--dark-surface-soft);
+  border-color: rgba(255, 255, 255, .14);
+  color: var(--white);
+}
+
+.categoriesSection .categoryContent h3,
+.categoriesSection .categoryContent p {
+  color: var(--white);
+}
+
+.categoriesSection .categoryContent p {
+  color: rgba(255, 255, 255, .62);
+}
+
+/* 06 — HOW IT WORKS / LIGHT */
+.howSection {
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  padding-block: clamp(72px, 9vh, 120px);
+  box-sizing: border-box;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.howSection .howOverlay {
+  display: none;
+}
+
+.howSection .sectionHeadingDark h2,
+.howSection .sectionHeadingDark,
+.howSection .step h3 {
+  color: var(--foreground);
+}
+
+.howSection .step {
+  border-color: var(--line-strong);
+}
+
+.howSection .step p {
+  color: var(--foreground-soft);
+}
+
+/* 07 — RACE TO MASTER / DARK */
+.masterSection {
+  min-height: 100svh;
+}
+
+.masterSection>.sectionContainer {
+  min-height: 100svh;
+}
+
+/* 08 — NEWS / LIGHT */
+.newsSection {
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  padding-block: clamp(72px, 9vh, 120px);
+  box-sizing: border-box;
+  background: var(--background);
+}
+
+.newsSection .sectionHeader h2,
+.newsSection .sectionHeader {
+  color: var(--foreground);
+}
+
+/* 09 — SPONSORS / DARK */
+.sponsorsSection {
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  padding-block: clamp(72px, 9vh, 120px);
+  box-sizing: border-box;
+  background: var(--black);
+  color: var(--white);
+  border-top: 0;
+}
+
+.sponsorsSection .sectionHeadingLight h2,
+.sponsorsSection .sectionHeadingLight {
+  color: var(--white);
+}
+
+.sponsorsSection .sponsor {
+  background: var(--dark-surface-soft);
+  border-color: rgba(255, 255, 255, .14);
+}
+
+.sponsorsSection .sponsorName {
+  color: var(--white);
+}
+
+/* 10 — FINAL CTA / GREEN */
+.finalCta {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding-block: clamp(72px, 10vh, 140px);
+}
+
+/* Reduce decorative pseudo-graphics: content remains the focus. */
+.featureSymbol,
+.stepSymbol,
+.masterBrand b {
+  display: none;
+}
+
+/* Do not use decorative icon glyphs for competition metadata. */
+.metaIcon {
+  display: none !important;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  :root {
+    --home-gutter: clamp(20px, 4vw, 32px);
+  }
+
+  .page>section {
+    min-height: 100svh;
+  }
+
+  .heroContainer,
+  .masterSection>.sectionContainer {
+    min-height: 100svh;
+  }
+
+  .heroContainer {
+    align-content: center;
+    padding-block: 100px;
+  }
+
+  .circuitGrid,
+  .stepsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+
+  .heroContainer,
+  .masterSection>.sectionContainer {
+    min-height: 100svh;
+  }
+
+  .heroContainer {
+    align-content: center;
+  }
+
+  .circuitGrid,
+  .stepsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile — 320px through 767px */
+@media (max-width: 767px) {
+  :root {
+    --home-gutter: clamp(14px, 5vw, 22px);
+  }
+
+  .page>section,
+  .hero,
+  .circuitSection,
+  .tournamentsSection,
+  .rankingSection,
+  .categoriesSection,
+  .howSection,
+  .masterSection,
+  .newsSection,
+  .sponsorsSection,
+  .finalCta {
+    min-height: 100svh;
+  }
+
+  .heroContainer,
+  .masterSection>.sectionContainer {
+    min-height: 100svh;
+    padding-block: 88px;
+  }
+
+  .heroTitle {
+    font-size: clamp(39px, 13.5vw, 64px);
+  }
+
+  .heroLead {
+    max-width: 100%;
+    font-size: clamp(15px, 4vw, 17px);
+  }
+
+  .heroDescription {
+    font-size: 14px;
+  }
+
+  .heroActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+    min-height: 52px;
+  }
+
+  .circuitSection,
+  .tournamentsSection,
+  .rankingSection,
+  .categoriesSection,
+  .howSection,
+  .newsSection,
+  .sponsorsSection,
+  .finalCta {
+    padding-block: 72px;
+  }
+
+  .sectionHeadingDark h2,
+  .sectionHeadingLight h2,
+  .sectionHeader h2 {
+    font-size: clamp(31px, 9vw, 47px);
+    line-height: .92;
+    text-wrap: balance;
+  }
+
+  .sectionHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .circuitGrid,
+  .tournamentGrid,
+  .categoriesGrid,
+  .newsGrid,
+  .sponsorsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rankingHeader,
+  .rankingRow {
+    grid-template-columns: 38px minmax(0, 1fr) 70px;
+  }
+
+  .rankingHeader span:last-child,
+  .rankingRow .rankingEvents {
+    display: none;
+  }
+
+  .masterGrid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .masterBrand strong {
+    font-size: clamp(56px, 19vw, 90px);
+  }
+
+  .masterContent h2 {
+    font-size: clamp(37px, 11vw, 58px);
+  }
+
+  .finalCtaContent h2 {
+    font-size: clamp(39px, 12vw, 62px);
+  }
+}
+
+/* Small phones — explicitly tested down to 320px. */
+@media (max-width: 360px) {
+  :root {
+    --home-gutter: 14px;
+  }
+
+  .heroContainer,
+  .masterSection>.sectionContainer {
+    padding-block: 76px;
+  }
+
+  .heroTitle {
+    font-size: clamp(37px, 12.8vw, 48px);
+  }
+
+  .sectionHeadingDark h2,
+  .sectionHeadingLight h2,
+  .sectionHeader h2 {
+    font-size: clamp(29px, 8.8vw, 39px);
+  }
+
+  .rankingHeader,
+  .rankingRow {
+    grid-template-columns: 32px minmax(0, 1fr) 58px;
+    gap: 6px;
+    padding-inline: 8px;
+  }
+
+  .rankingPlayer,
+  .rankingPoints {
+    font-size: 12px;
+  }
+}
+
+/* Large screens — never stretch the reading width. */
+@media (min-width: 1440px) {
+
+  .sectionContainer,
+  .heroContainer {
+    width: min(calc(100% - 96px), var(--home-content-max));
+  }
+}
+
+@media (min-width: 1920px) {
+
+  .sectionContainer,
+  .heroContainer {
+    width: var(--home-content-max);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .page *,
+  .page *::before,
+  .page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

@@ -1,94 +1,142 @@
-.intro,
-.section,
-.empty {
-    width: min(1180px, calc(100% - 32px));
-    margin: 0 auto
+.pageIntro {
+    background: var(--dark-surface);
+    color: var(--white);
 }
 
-.intro {
-    padding: 72px 0 40px;
-    border-bottom: 1px solid #d8d6d1
+.pageIntroInner {
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: clamp(72px, 10vw, 140px) 0 clamp(64px, 8vw, 112px);
 }
 
-.intro p,
-.sectionHeading p {
-    margin: 0 0 10px;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: .14em;
-    color: var(--brand)
+.eyebrow {
+    display: block;
+    margin-bottom: 18px;
+    color: var(--brand);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    line-height: 1.2;
+    text-transform: uppercase;
 }
 
-.intro h1 {
-    max-width: 850px;
+.pageIntro h1 {
+    max-width: 900px;
     margin: 0;
-    font-size: clamp(42px, 7vw, 82px);
-    line-height: .95;
-    letter-spacing: -.045em
+    font-size: clamp(3rem, 7vw, 6.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.05em;
 }
 
-.description {
+.pageIntro p {
     max-width: 700px;
-    margin-top: 22px;
-    font-size: 18px;
-    line-height: 1.6;
-    color: #505050
+    margin: 28px 0 0;
+    color: rgba(253, 253, 253, 0.72);
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+    line-height: 1.65;
 }
 
-.empty {
-    margin-top: 30px;
-    padding: 48px;
-    border: 1px solid #ddd;
-    background: #fff
-}
-
-.empty h2 {
-    margin: 0 0 8px
-}
-
-.empty p {
-    margin: 0;
-    color: #666
-}
-
-.section {
-    padding: 48px 0
-}
-
-.sectionHeading {
+.sectionHeader {
     display: flex;
-    justify-content: space-between;
     align-items: end;
-    gap: 20px;
-    margin-bottom: 24px
+    justify-content: space-between;
+    gap: 32px;
 }
 
-.sectionHeading h2 {
+.sectionHeader h2 {
     margin: 0;
-    font-size: 32px;
-    letter-spacing: -.03em
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
 }
 
-.sectionHeading a {
+.sectionHeader p {
+    max-width: 620px;
+    margin: 18px 0 0;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.sectionLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
     color: var(--foreground);
-    font-weight: 800;
-    text-decoration: none
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-decoration: none;
 }
 
-.sectionHeading a:hover {
-    color: var(--brand)
+.sectionLink:hover {
+    color: var(--brand);
 }
 
-@media(max-width:700px) {
-    .intro {
-        padding: 52px 0 32px
+.stat {
+    display: grid;
+    gap: 6px;
+}
+
+.stat strong {
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+}
+
+.stat span {
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.emptyState {
+    padding: 48px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+}
+
+.emptyState h3 {
+    margin: 0 0 12px;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    line-height: 1.05;
+}
+
+.emptyState p {
+    max-width: 620px;
+    margin: 0 0 24px;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+@media (max-width: 767px) {
+    .pageIntroInner {
+        width: min(100% - 28px, 1180px);
+        padding-top: 64px;
+        padding-bottom: 64px;
     }
 
-    .empty {
-        padding: 30px
+    .pageIntro h1 {
+        font-size: clamp(2.8rem, 15vw, 4.5rem);
     }
 
-    .sectionHeading {
-        display: grid
+    .pageIntro p {
+        margin-top: 22px;
+        font-size: 1rem;
+    }
+
+    .sectionHeader {
+        display: grid;
+        gap: 24px;
+    }
+
+    .sectionHeader h2 {
+        font-size: 2.2rem;
+    }
+
+    .emptyState {
+        padding: 28px 24px;
     }
 }

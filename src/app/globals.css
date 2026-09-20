@@ -1,49 +1,49 @@
 :root {
-  --background: #f5f3ef;
-  --surface: #ffffff;
-  --surface-soft: #eeece7;
-  --surface-dark: #111214;
+  --brand: #E61219;
+  --brand-dark: #B80E14;
 
-  --foreground: #111214;
-  --foreground-soft: #34363a;
-  --muted: #686b70;
-  --muted-light: #96999d;
+  --accent-green: #7CAB50;
+  --accent-green-dark: #5F8E38;
 
-  --brand: #681f2c;
-  --brand-dark: #3e111a;
-  --brand-soft: #f0e3e6;
-  --brand-border: #d9bcc2;
+  --black: #000000;
+  --dark-surface: #050505;
+  --dark-surface-soft: #111111;
 
-  --success: #28754a;
-  --success-soft: #e7f2eb;
+  --white: #FDFDFD;
+  --background: #F7F6F3;
+  --surface: #FFFFFF;
 
-  --warning: #9a6819;
-  --warning-soft: #f7eedb;
+  --foreground: #090909;
+  --foreground-soft: #303030;
+  --muted: #707070;
+  --muted-light: #969696;
 
-  --danger: #a33b42;
-  --danger-soft: #f7e6e7;
+  --line: #DEDDD9;
+  --line-strong: #C9C8C4;
 
-  --line: #d9d6d0;
-  --line-strong: #c7c3bc;
+  --success: #28754A;
+  --success-soft: #E8F2EC;
+  --warning: #9A6819;
+  --warning-soft: #F7EEDB;
+  --danger: #A33B42;
+  --danger-soft: #F7E6E7;
 
-  --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
 
   --container: 1240px;
   --gutter: 28px;
+  --header-height: 72px;
 
-  --header-height: 76px;
+  --shadow-sm: 0 1px 2px rgba(9, 9, 9, 0.04);
+  --shadow-md: 0 10px 28px rgba(9, 9, 9, 0.08);
+  --shadow-lg: 0 24px 60px rgba(9, 9, 9, 0.12);
 
-  --shadow-sm: 0 1px 2px rgba(17, 18, 20, 0.04);
-  --shadow-md:
-    0 8px 30px rgba(17, 18, 20, 0.07),
-    0 2px 8px rgba(17, 18, 20, 0.04);
-  --shadow-lg:
-    0 20px 60px rgba(17, 18, 20, 0.1),
-    0 4px 16px rgba(17, 18, 20, 0.05);
+  --font-ui: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -277,7 +277,7 @@ small {
 }
 
 .surface-dark {
-  background: var(--surface-dark);
+  background: var(--dark-surface);
   color: #ffffff;
 }
 
@@ -478,7 +478,7 @@ small {
 }
 
 .btn-dark {
-  background: var(--surface-dark);
+  background: var(--dark-surface);
   color: #ffffff;
 }
 
@@ -654,7 +654,7 @@ small {
   z-index: 9999;
   padding: 10px 14px;
   border-radius: var(--radius-sm);
-  background: var(--surface-dark);
+  background: var(--dark-surface);
   color: #ffffff;
   font-weight: 700;
   transform: translateY(-150%);
