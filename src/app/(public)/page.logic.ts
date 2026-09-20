@@ -76,8 +76,6 @@ export type HomeLoadState =
         message: string;
     };
 
-
-
 export function formatTournamentDate(
     fechaInicio: string,
     fechaFin: string,
@@ -102,11 +100,8 @@ export function formatTournamentDate(
         month: "long",
     }).format(start);
 
-    const normalizedMonth =
-        month.charAt(0).toUpperCase() + month.slice(1);
-
     if (sameMonth) {
-        return `${startDay}–${endDay} ${normalizedMonth.toUpperCase()} ${start.getFullYear()}`;
+        return `${startDay}–${endDay} ${month.toUpperCase()} ${start.getFullYear()}`;
     }
 
     if (sameYear) {

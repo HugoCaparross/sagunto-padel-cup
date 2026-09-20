@@ -111,7 +111,7 @@ export const CATEGORY_GENDERS = [
 export type CategoryGender = (typeof CATEGORY_GENDERS)[number];
 
 /* -------------------------------------------------------------------------- */
-/* TOURNAMENT STATES                                                           */
+/* TOURNAMENT STATES                                                          */
 /* -------------------------------------------------------------------------- */
 
 export const TOURNAMENT_STATES = [
@@ -126,7 +126,7 @@ export const TOURNAMENT_STATES = [
 export type TournamentState = (typeof TOURNAMENT_STATES)[number];
 
 /* -------------------------------------------------------------------------- */
-/* TOURNAMENT TYPES                                                            */
+/* TOURNAMENT TYPES                                                           */
 /* -------------------------------------------------------------------------- */
 
 export const TOURNAMENT_TYPES = [
@@ -137,7 +137,7 @@ export const TOURNAMENT_TYPES = [
 export type TournamentType = (typeof TOURNAMENT_TYPES)[number];
 
 /* -------------------------------------------------------------------------- */
-/* PAIR STATES                                                                 */
+/* PAIR STATES                                                                */
 /* -------------------------------------------------------------------------- */
 
 export const PAIR_STATUSES = [
@@ -150,7 +150,7 @@ export const PAIR_STATUSES = [
 export type PairStatus = (typeof PAIR_STATUSES)[number];
 
 /* -------------------------------------------------------------------------- */
-/* REGISTRATION                                                                */
+/* REGISTRATION                                                               */
 /* -------------------------------------------------------------------------- */
 
 export const REGISTRATION_STATUSES = [
@@ -160,7 +160,8 @@ export const REGISTRATION_STATUSES = [
     "cancelada",
 ] as const;
 
-export type RegistrationStatus = (typeof REGISTRATION_STATUSES)[number];
+export type RegistrationStatus =
+    (typeof REGISTRATION_STATUSES)[number];
 
 /**
  * Payment is deliberately independent from registration status.
@@ -175,7 +176,8 @@ export const PAYMENT_STATUSES = [
     "no_requerido",
 ] as const;
 
-export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
+export type PaymentStatus =
+    (typeof PAYMENT_STATUSES)[number];
 
 export const PAYMENT_METHODS = [
     "fisico",
@@ -183,10 +185,11 @@ export const PAYMENT_METHODS = [
     "otro",
 ] as const;
 
-export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+export type PaymentMethod =
+    (typeof PAYMENT_METHODS)[number];
 
 /* -------------------------------------------------------------------------- */
-/* MATCHES                                                                     */
+/* MATCHES                                                                    */
 /* -------------------------------------------------------------------------- */
 
 export const MATCH_PHASES = [
@@ -197,7 +200,8 @@ export const MATCH_PHASES = [
     "final",
 ] as const;
 
-export type MatchPhase = (typeof MATCH_PHASES)[number];
+export type MatchPhase =
+    (typeof MATCH_PHASES)[number];
 
 export const MATCH_STATUSES = [
     "pendiente",
@@ -208,7 +212,8 @@ export const MATCH_STATUSES = [
     "aplazado",
 ] as const;
 
-export type MatchStatus = (typeof MATCH_STATUSES)[number];
+export type MatchStatus =
+    (typeof MATCH_STATUSES)[number];
 
 export const MATCH_TIERS = [
     "oro",
@@ -216,10 +221,11 @@ export const MATCH_TIERS = [
     "bronce",
 ] as const;
 
-export type MatchTier = (typeof MATCH_TIERS)[number];
+export type MatchTier =
+    (typeof MATCH_TIERS)[number];
 
 /* -------------------------------------------------------------------------- */
-/* OFFICIAL MATCH FORMATS                                                      */
+/* OFFICIAL MATCH FORMATS                                                     */
 /* -------------------------------------------------------------------------- */
 
 /**
@@ -259,7 +265,7 @@ export const FINAL_MATCH_FORMAT = {
 } as const;
 
 /* -------------------------------------------------------------------------- */
-/* COMPETITION TIERS                                                           */
+/* COMPETITION TIERS                                                          */
 /* -------------------------------------------------------------------------- */
 
 export const COMPETITION_TIERS = {
@@ -278,7 +284,7 @@ export const COMPETITION_TIERS = {
 } as const;
 
 /* -------------------------------------------------------------------------- */
-/* GROUP STAGE                                                                 */
+/* GROUP STAGE                                                                */
 /* -------------------------------------------------------------------------- */
 
 export const DEFAULT_GROUP_TIE_BREAKERS = [
@@ -287,13 +293,18 @@ export const DEFAULT_GROUP_TIE_BREAKERS = [
     "diferencia_juegos",
 ] as const;
 
+/**
+ * Group standings:
+ * - Victory = 1 point.
+ * - Defeat = 0 points.
+ */
 export const GROUP_STANDING_POINTS = {
     win: 1,
     loss: 0,
 } as const;
 
 /* -------------------------------------------------------------------------- */
-/* DRAW                                                                        */
+/* DRAW                                                                       */
 /* -------------------------------------------------------------------------- */
 
 export const DRAW_MODES = [
@@ -302,10 +313,11 @@ export const DRAW_MODES = [
     "sembrado",
 ] as const;
 
-export type DrawMode = (typeof DRAW_MODES)[number];
+export type DrawMode =
+    (typeof DRAW_MODES)[number];
 
 /* -------------------------------------------------------------------------- */
-/* RANKING                                                                     */
+/* RANKING                                                                    */
 /* -------------------------------------------------------------------------- */
 
 /**
@@ -318,9 +330,11 @@ export type DrawMode = (typeof DRAW_MODES)[number];
  * 3ª: 90–76
  * 4ª: 75–61
  *
- * 5ª en formato de 5 parejas (eliminación en fase de grupos):
- * recibe el mínimo de puntos de su categoría para no crear solapamientos
- * entre bandas. La etiqueta competitiva se conserva como `fase_grupos`.
+ * In a 5-pair format, the fifth pair is eliminated after the group phase
+ * and receives the minimum points of its category.
+ *
+ * Ranking points are individual:
+ * the points generated by a pair are assigned to each player individually.
  */
 export const RANKING_POINTS = {
     "1ª": {
@@ -338,6 +352,7 @@ export const RANKING_POINTS = {
         finalista_bronce: 108,
         semifinalista_bronce: 107,
         cuartos_bronce: 106,
+
         fase_grupos: 106,
     },
 
@@ -356,6 +371,7 @@ export const RANKING_POINTS = {
         finalista_bronce: 93,
         semifinalista_bronce: 92,
         cuartos_bronce: 91,
+
         fase_grupos: 91,
     },
 
@@ -374,6 +390,7 @@ export const RANKING_POINTS = {
         finalista_bronce: 78,
         semifinalista_bronce: 77,
         cuartos_bronce: 76,
+
         fase_grupos: 76,
     },
 
@@ -392,11 +409,17 @@ export const RANKING_POINTS = {
         finalista_bronce: 63,
         semifinalista_bronce: 62,
         cuartos_bronce: 61,
+
         fase_grupos: 61,
     },
 } as const;
 
-export type RankingCategory = keyof typeof RANKING_POINTS;
+export type RankingCategory =
+    keyof typeof RANKING_POINTS;
+
+/* -------------------------------------------------------------------------- */
+/* SEASON ROLLOVER                                                            */
+/* -------------------------------------------------------------------------- */
 
 export const RANKING_RETENTION = {
     retainedPercentage: 30,
@@ -404,7 +427,7 @@ export const RANKING_RETENTION = {
 } as const;
 
 /* -------------------------------------------------------------------------- */
-/* RACE TO MASTER                                                              */
+/* MASTER FINAL                                                               */
 /* -------------------------------------------------------------------------- */
 
 export const MASTER = {
@@ -415,20 +438,27 @@ export const MASTER = {
 } as const;
 
 /* -------------------------------------------------------------------------- */
-/* SEASON                                                                      */
+/* SEASON                                                                     */
 /* -------------------------------------------------------------------------- */
 
 export const SEASON = {
     current: "2026/27",
-    firstTournamentDate: "2026-09-12",
-    firstTournamentEndDate: "2026-09-13",
+
+    firstTournamentDate:
+        "2026-09-12",
+
+    firstTournamentEndDate:
+        "2026-09-13",
+
     masterFinalYear: 2027,
+
     rankingRetentionPercentage: 30,
+
     rankingExpirationPercentage: 70,
 } as const;
 
 /* -------------------------------------------------------------------------- */
-/* PLAYER                                                                      */
+/* PLAYER                                                                     */
 /* -------------------------------------------------------------------------- */
 
 export const PLAYER_ROLES = [
@@ -436,17 +466,19 @@ export const PLAYER_ROLES = [
     "admin",
 ] as const;
 
-export type PlayerRole = (typeof PLAYER_ROLES)[number];
+export type PlayerRole =
+    (typeof PLAYER_ROLES)[number];
 
 export const PLAYER_STATUSES = [
     "activo",
     "inactivo",
 ] as const;
 
-export type PlayerStatus = (typeof PLAYER_STATUSES)[number];
+export type PlayerStatus =
+    (typeof PLAYER_STATUSES)[number];
 
 /* -------------------------------------------------------------------------- */
-/* VISIBILITY                                                                  */
+/* VISIBILITY                                                                 */
 /* -------------------------------------------------------------------------- */
 
 export const DEFAULT_PLAYER_VISIBILITY = {
@@ -458,7 +490,7 @@ export const DEFAULT_PLAYER_VISIBILITY = {
 } as const;
 
 /* -------------------------------------------------------------------------- */
-/* NOTIFICATIONS                                                               */
+/* NOTIFICATIONS                                                              */
 /* -------------------------------------------------------------------------- */
 
 export const NOTIFICATION_TYPES = [
@@ -468,10 +500,11 @@ export const NOTIFICATION_TYPES = [
     "error",
 ] as const;
 
-export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
+export type NotificationType =
+    (typeof NOTIFICATION_TYPES)[number];
 
 /* -------------------------------------------------------------------------- */
-/* NEWS                                                                        */
+/* NEWS                                                                       */
 /* -------------------------------------------------------------------------- */
 
 export const NEWS_STATUSES = [
@@ -480,10 +513,11 @@ export const NEWS_STATUSES = [
     "archivado",
 ] as const;
 
-export type NewsStatus = (typeof NEWS_STATUSES)[number];
+export type NewsStatus =
+    (typeof NEWS_STATUSES)[number];
 
 /* -------------------------------------------------------------------------- */
-/* SPONSORS                                                                    */
+/* SPONSORS                                                                   */
 /* -------------------------------------------------------------------------- */
 
 export const SPONSOR_TIERS = [
@@ -492,15 +526,17 @@ export const SPONSOR_TIERS = [
     "colaborador",
 ] as const;
 
-export type SponsorTier = (typeof SPONSOR_TIERS)[number];
+export type SponsorTier =
+    (typeof SPONSOR_TIERS)[number];
 
 /* -------------------------------------------------------------------------- */
-/* PAGINATION                                                                  */
+/* PAGINATION                                                                 */
 /* -------------------------------------------------------------------------- */
 
 export const PAGINATION = {
     defaultPage: 1,
     defaultPageSize: 20,
+
     rankingPageSize: 50,
     playersPageSize: 24,
     newsPageSize: 12,
@@ -508,7 +544,7 @@ export const PAGINATION = {
 } as const;
 
 /* -------------------------------------------------------------------------- */
-/* DATE / TIME                                                                 */
+/* DATE / TIME                                                                */
 /* -------------------------------------------------------------------------- */
 
 export const DATE_FORMATS = {
@@ -517,99 +553,3 @@ export const DATE_FORMATS = {
     time: "HH:mm",
     dateTime: "dd/MM/yyyy HH:mm",
 } as const;
-
-export const TIMEZONE = "Europe/Madrid";
-
-/* -------------------------------------------------------------------------- */
-/* FILES                                                                       */
-/* -------------------------------------------------------------------------- */
-
-export const FILE_LIMITS = {
-    galleryImageMaxMb: 10,
-    sponsorLogoMaxMb: 5,
-    playerPhotoMaxMb: 5,
-} as const;
-
-export const ALLOWED_IMAGE_TYPES = [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-] as const;
-
-/* -------------------------------------------------------------------------- */
-/* UI                                                                          */
-/* -------------------------------------------------------------------------- */
-
-export const UI = {
-    mobileBreakpoint: 768,
-    tabletBreakpoint: 1024,
-    desktopBreakpoint: 1280,
-
-    toastDurationMs: 4500,
-    animationDurationMs: 220,
-} as const;
-
-/* -------------------------------------------------------------------------- */
-/* SEO                                                                         */
-/* -------------------------------------------------------------------------- */
-
-export const SEO = {
-    defaultTitle: "Sagunto Padel Cup",
-    titleSuffix: " | Sagunto Padel Cup",
-    defaultDescription:
-        "Circuito de pádel amateur en Sagunto. Compite, suma puntos en el ranking y lucha por llegar a la Master Final.",
-    locale: "es_ES",
-    siteUrl:
-        process.env.NEXT_PUBLIC_SITE_URL ?? "https://saguntopadelcup.es",
-} as const;
-
-/* -------------------------------------------------------------------------- */
-/* HELPERS                                                                     */
-/* -------------------------------------------------------------------------- */
-
-export function isValidCategory(
-    value: string,
-): value is CategoryName {
-    return CATEGORY_NAMES.includes(value as CategoryName);
-}
-
-export function isValidTournamentState(
-    value: string,
-): value is TournamentState {
-    return TOURNAMENT_STATES.includes(value as TournamentState);
-}
-
-export function isValidTournamentType(
-    value: string,
-): value is TournamentType {
-    return TOURNAMENT_TYPES.includes(value as TournamentType);
-}
-
-export function isValidMatchTier(
-    value: string,
-): value is MatchTier {
-    return MATCH_TIERS.includes(value as MatchTier);
-}
-
-export function isValidPlayerRole(
-    value: string,
-): value is PlayerRole {
-    return PLAYER_ROLES.includes(value as PlayerRole);
-}
-
-export function getCategoryOrder(
-    category: CategoryName,
-): number {
-    return CATEGORY_ORDER[category];
-}
-
-export function getRankingBand(
-    category: RankingCategory,
-) {
-    const points = Object.values(RANKING_POINTS[category]);
-
-    return {
-        max: Math.max(...points),
-        min: Math.min(...points),
-    };
-}

@@ -125,7 +125,7 @@ a:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 3px solid rgba(104, 31, 44, 0.22);
+  outline: 3px solid rgba(230, 19, 26, 0.22);
   outline-offset: 3px;
 }
 
@@ -580,7 +580,7 @@ small {
 .select:focus,
 .textarea:focus {
   border-color: var(--brand);
-  box-shadow: 0 0 0 3px rgba(104, 31, 44, 0.1);
+  box-shadow: 0 0 0 3px rgba(230, 19, 26, 0.1);
 }
 
 .input[aria-invalid="true"],

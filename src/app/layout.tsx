@@ -72,7 +72,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body className={`${displayFont.variable} ${uiFont.variable}`}>{children}</body>
     </html>
   );
 }

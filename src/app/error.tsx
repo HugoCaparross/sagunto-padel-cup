@@ -3,7 +3,10 @@
 import { useEffect } from "react";
 
 type GlobalErrorProps = {
-    error: Error & { digest?: string };
+    error: Error & {
+        digest?: string;
+    };
+
     reset: () => void;
 };
 
@@ -35,11 +38,14 @@ export default function GlobalError({
                 >
                     SAGUNTO PADEL CUP
                 </p>
+
                 <h1>Ha ocurrido un error</h1>
+
                 <p>
                     No hemos podido cargar esta página. Puedes volver a
                     intentarlo.
                 </p>
+
                 <button
                     type="button"
                     onClick={reset}
