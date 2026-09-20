@@ -1,3 +1,5 @@
+import type { PublicNews, PublicTournament } from "@/lib/public/site";
+
 export type TournamentStatus =
     | "borrador"
     | "publicado"
@@ -6,84 +8,31 @@ export type TournamentStatus =
     | "finalizado"
     | "archivado";
 
-export interface HomeTournament {
-    id: string;
-    nombre: string;
-    slug: string;
-    fechaInicio: string;
-    fechaFin: string;
-    estado: TournamentStatus;
-    precioTexto: string | null;
-    descripcion: string | null;
-    club: {
+export type HomeTournament = PublicTournament;
+
+export type HomeData = {
+    tournaments: PublicTournament[];
+    categories: Array<{
+        id: string;
         nombre: string;
-        direccion: string | null;
-    } | null;
-    categorias: string[];
-}
-
-export interface HomeRankingPlayer {
-    position: number;
-    playerId: string;
-    nombre: string;
-    apellidos: string | null;
-    puntos: number;
-    pruebas: number;
-    fotoUrl: string | null;
-}
-
-export interface HomeNewsItem {
-    id: string;
-    titulo: string;
-    slug: string;
-    contenido: string | null;
-    imagenDestacada: string | null;
-    categoria: string | null;
-    fechaPublicacion: string | null;
-}
-
-export interface HomeSponsor {
-    id: string;
-    nombre: string;
-    logoUrl: string | null;
-    descripcion: string | null;
-    enlace: string | null;
-    tipo: "comercial" | "institucion";
-}
-
-export interface HomeCategory {
-    id: string;
-    nombre: string;
-    nivelOrden: number;
-}
-
-export interface HomeData {
-    nextTournament: HomeTournament | null;
-    upcomingTournaments: HomeTournament[];
-    rankingPreview: HomeRankingPlayer[];
-    categories: HomeCategory[];
-    news: HomeNewsItem[];
-    sponsors: HomeSponsor[];
-}
+    }>;
+    news: PublicNews[];
+};
 
 export type HomeLoadState =
-    | {
-        status: "success";
-        data: HomeData;
-    }
-    | {
-        status: "error";
-        message: string;
-    };
+    | "idle"
+    | "loading"
+    | "success"
+    | "error";
 
 export function formatTournamentDate(
     fechaInicio: string,
     fechaFin: string,
 ): string {
-    const start = parseDate(fechaInicio);
-    const end = parseDate(fechaFin);
+    const start = new Date(fechaInicio);
+    const end = new Date(fechaFin);
 
-    if (!start || !end) {
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
         return `${fechaInicio} — ${fechaFin}`;
     }
 
@@ -96,12 +45,15 @@ export function formatTournamentDate(
     const startDay = start.getDate().toString().padStart(2, "0");
     const endDay = end.getDate().toString().padStart(2, "0");
 
-    const month = new Intl.DateTimeFormat("es-ES", {
+    const startMonth = new Intl.DateTimeFormat("es-ES", {
         month: "long",
     }).format(start);
 
+    const normalizedStartMonth =
+        startMonth.charAt(0).toUpperCase() + startMonth.slice(1);
+
     if (sameMonth) {
-        return `${startDay}–${endDay} ${month.toUpperCase()} ${start.getFullYear()}`;
+        return `${startDay}–${endDay} ${normalizedStartMonth.toUpperCase()} ${start.getFullYear()}`;
     }
 
     if (sameYear) {
@@ -109,17 +61,14 @@ export function formatTournamentDate(
             month: "long",
         }).format(end);
 
-        return `${startDay} ${month.toUpperCase()} – ${endDay} ${endMonth.toUpperCase()} ${start.getFullYear()}`;
+        return `${startDay} ${startMonth.toUpperCase()} – ${endDay} ${endMonth.toUpperCase()} ${start.getFullYear()}`;
     }
 
-    return `${startDay} ${month.toUpperCase()} ${start.getFullYear()} – ${endDay} ${new Intl.DateTimeFormat(
-        "es-ES",
-        {
-            month: "long",
-        },
-    )
-        .format(end)
-        .toUpperCase()} ${end.getFullYear()}`;
+    const endMonth = new Intl.DateTimeFormat("es-ES", {
+        month: "long",
+    }).format(end);
+
+    return `${startDay} ${startMonth.toUpperCase()} ${start.getFullYear()} – ${endDay} ${endMonth.toUpperCase()} ${end.getFullYear()}`;
 }
 
 export function getTournamentStatusLabel(
@@ -211,20 +160,7 @@ export function formatNewsDate(
 
     return new Intl.DateTimeFormat("es-ES", {
         day: "2-digit",
-        month: "short",
+        month: "long",
         year: "numeric",
-    })
-        .format(date)
-        .replace(".", "")
-        .toUpperCase();
-}
-
-function parseDate(value: string): Date | null {
-    const date = new Date(`${value}T12:00:00`);
-
-    if (Number.isNaN(date.getTime())) {
-        return null;
-    }
-
-    return date;
+    }).format(date);
 }
