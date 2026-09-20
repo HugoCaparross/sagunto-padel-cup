@@ -1,8 +1,3 @@
-import type {
-    PublicNews,
-    PublicTournament,
-} from "@/lib/public/site";
-
 export type TournamentStatus =
     | "borrador"
     | "publicado"
@@ -11,34 +6,84 @@ export type TournamentStatus =
     | "finalizado"
     | "archivado";
 
-export type HomeTournament = PublicTournament;
-
-export type HomeData = {
-    tournaments: PublicTournament[];
-    categories: Array<{
-        id: string;
+export interface HomeTournament {
+    id: string;
+    nombre: string;
+    slug: string;
+    fechaInicio: string;
+    fechaFin: string;
+    estado: TournamentStatus;
+    precioTexto: string | null;
+    descripcion: string | null;
+    club: {
         nombre: string;
-    }>;
-    news: PublicNews[];
-};
+        direccion: string | null;
+    } | null;
+    categorias: string[];
+}
+
+export interface HomeRankingPlayer {
+    position: number;
+    playerId: string;
+    nombre: string;
+    apellidos: string | null;
+    puntos: number;
+    pruebas: number;
+    fotoUrl: string | null;
+}
+
+export interface HomeNewsItem {
+    id: string;
+    titulo: string;
+    slug: string;
+    contenido: string | null;
+    imagenDestacada: string | null;
+    categoria: string | null;
+    fechaPublicacion: string | null;
+}
+
+export interface HomeSponsor {
+    id: string;
+    nombre: string;
+    logoUrl: string | null;
+    descripcion: string | null;
+    enlace: string | null;
+    tipo: "comercial" | "institucion";
+}
+
+export interface HomeCategory {
+    id: string;
+    nombre: string;
+    nivelOrden: number;
+}
+
+export interface HomeData {
+    nextTournament: HomeTournament | null;
+    upcomingTournaments: HomeTournament[];
+    rankingPreview: HomeRankingPlayer[];
+    categories: HomeCategory[];
+    news: HomeNewsItem[];
+    sponsors: HomeSponsor[];
+}
 
 export type HomeLoadState =
-    | "idle"
-    | "loading"
-    | "success"
-    | "error";
+    | {
+        status: "success";
+        data: HomeData;
+    }
+    | {
+        status: "error";
+        message: string;
+    };
 
 export function formatTournamentDate(
     fechaInicio: string,
     fechaFin: string,
 ): string {
-    const start = new Date(fechaInicio);
-    const end = new Date(fechaFin);
+    const start = parseDate(fechaInicio);
+    const end = parseDate(fechaFin);
 
-    if (
-        Number.isNaN(start.getTime()) ||
-        Number.isNaN(end.getTime())
-    ) {
+    if (!start || !end) {
         return `${fechaInicio} — ${fechaFin}`;
     }
 
@@ -59,16 +104,16 @@ export function formatTournamentDate(
         .toString()
         .padStart(2, "0");
 
-    const startMonth = new Intl.DateTimeFormat("es-ES", {
+    const month = new Intl.DateTimeFormat("es-ES", {
         month: "long",
     }).format(start);
 
-    const normalizedStartMonth =
-        startMonth.charAt(0).toUpperCase() +
-        startMonth.slice(1);
+    const normalizedMonth =
+        month.charAt(0).toUpperCase() +
+        month.slice(1);
 
     if (sameMonth) {
-        return `${startDay}–${endDay} ${normalizedStartMonth.toUpperCase()} ${start.getFullYear()}`;
+        return `${startDay}–${endDay} ${normalizedMonth.toUpperCase()} ${start.getFullYear()}`;
     }
 
     if (sameYear) {
@@ -76,14 +121,17 @@ export function formatTournamentDate(
             month: "long",
         }).format(end);
 
-        return `${startDay} ${startMonth.toUpperCase()} – ${endDay} ${endMonth.toUpperCase()} ${start.getFullYear()}`;
+        return `${startDay} ${month.toUpperCase()} – ${endDay} ${endMonth.toUpperCase()} ${start.getFullYear()}`;
     }
 
-    const endMonth = new Intl.DateTimeFormat("es-ES", {
-        month: "long",
-    }).format(end);
-
-    return `${startDay} ${startMonth.toUpperCase()} ${start.getFullYear()} – ${endDay} ${endMonth.toUpperCase()} ${end.getFullYear()}`;
+    return `${startDay} ${month.toUpperCase()} ${start.getFullYear()} – ${endDay} ${new Intl.DateTimeFormat(
+        "es-ES",
+        {
+            month: "long",
+        },
+    )
+        .format(end)
+        .toUpperCase()} ${end.getFullYear()}`;
 }
 
 export function getTournamentStatusLabel(
@@ -185,7 +233,22 @@ export function formatNewsDate(
 
     return new Intl.DateTimeFormat("es-ES", {
         day: "2-digit",
-        month: "long",
+        month: "short",
         year: "numeric",
-    }).format(date);
+    })
+        .format(date)
+        .replace(".", "")
+        .toUpperCase();
+}
+
+function parseDate(
+    value: string,
+): Date | null {
+    const date = new Date(`${value}T12:00:00`);
+
+    if (Number.isNaN(date.getTime())) {
+        return null;
+    }
+
+    return date;
 }

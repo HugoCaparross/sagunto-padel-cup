@@ -15,6 +15,12 @@ type GroupStanding = Tables["group_standings"]["Row"];
 type Bracket = Tables["brackets"]["Row"];
 type Sponsor = Tables["sponsors"]["Row"];
 
+export type PublicTournament = Tournament & {
+    club: Club | null;
+};
+
+export type PublicNews = News;
+
 type PublicResult<T> =
     | { data: T; error: null }
     | { data: null; error: Error };
@@ -86,7 +92,7 @@ export async function getPublicCategories(): Promise<
 }
 
 export async function getPublicTournaments(): Promise<
-    PublicResult<Array<Tournament & { club: Club | null }>>
+    PublicResult<PublicTournament[]>
 > {
     const supabase = await createClient();
 
@@ -104,7 +110,7 @@ export async function getPublicTournaments(): Promise<
         };
     }
 
-    const rows = (data ?? []).map((row) => {
+    const rows: PublicTournament[] = (data ?? []).map((row) => {
         const raw = row as Tournament & {
             clubs?: Club | null;
         };
@@ -718,9 +724,7 @@ export async function getPublicRanking(
     if (seasonQ.error) {
         return {
             data: null,
-            error: asError(
-                seasonQ.error,
-            ),
+            error: asError(seasonQ.error),
         };
     }
 
@@ -757,9 +761,7 @@ export async function getPublicRanking(
     if (categoryQ.error) {
         return {
             data: null,
-            error: asError(
-                categoryQ.error,
-            ),
+            error: asError(categoryQ.error),
         };
     }
 
@@ -789,9 +791,7 @@ export async function getPublicRanking(
     if (pointsQ.error) {
         return {
             data: null,
-            error: asError(
-                pointsQ.error,
-            ),
+            error: asError(pointsQ.error),
         };
     }
 
@@ -824,9 +824,7 @@ export async function getPublicRanking(
     if (playersQ.error) {
         return {
             data: null,
-            error: asError(
-                playersQ.error,
-            ),
+            error: asError(playersQ.error),
         };
     }
 
@@ -1019,9 +1017,7 @@ export async function getPublicPlayer(
     if (playerQ.error) {
         return {
             data: null,
-            error: asError(
-                playerQ.error,
-            ),
+            error: asError(playerQ.error),
         };
     }
 

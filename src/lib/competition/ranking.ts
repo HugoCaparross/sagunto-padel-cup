@@ -1,5 +1,3 @@
-// src/lib/competition/ranking.ts
-
 import {
     RANKING_POINTS,
     RANKING_RETENTION,
@@ -44,6 +42,26 @@ export type RankingFinish =
     | "semifinalista_bronce"
     | "cuartos_bronce"
     | "fase_grupos";
+
+/**
+ * Entrada utilizada para calcular los puntos de un resultado.
+ */
+export type RankingPointsCalculation = {
+    category: RankingCategory;
+    tier: RankingTier;
+    position: number;
+};
+
+/**
+ * Resultado del cálculo oficial de puntos.
+ *
+ * El servicio de ranking utiliza tanto los puntos obtenidos
+ * como la ronda/resultado alcanzado.
+ */
+export type RankingPointsResult = {
+    points: number;
+    finish: RankingFinish;
+};
 
 /* -------------------------------------------------------------------------- */
 /* INTERNAL HELPERS                                                           */
@@ -125,14 +143,100 @@ function getFinishKey(
     }
 }
 
+function assertNeverFinish(
+    finish: never,
+): never {
+    throw new Error(
+        `Ronda de finalización no válida: ${String(finish)}`,
+    );
+}
+
 /* -------------------------------------------------------------------------- */
-/* POINT CALCULATION                                                           */
+/* FINISH / TIER CONVERSION                                                    */
 /* -------------------------------------------------------------------------- */
 
 /**
- * Returns the official points for a category/tier/position.
+ * Obtiene la posición numérica asociada a un resultado.
  *
- * Ranking points are awarded individually to both players of the pair.
+ * La fase de grupos no representa una posición final de 1 a 4,
+ * por lo que devuelve 0.
+ */
+export function getPositionFromFinish(
+    finish: RankingFinish,
+): number {
+    switch (finish) {
+        case "campeon_oro":
+        case "campeon_plata":
+        case "campeon_bronce":
+            return 1;
+
+        case "finalista_oro":
+        case "finalista_plata":
+        case "finalista_bronce":
+            return 2;
+
+        case "semifinalista_oro":
+        case "semifinalista_plata":
+        case "semifinalista_bronce":
+            return 3;
+
+        case "cuartos_oro":
+        case "cuartos_plata":
+        case "cuartos_bronce":
+            return 4;
+
+        case "fase_grupos":
+            return 0;
+
+        default:
+            return assertNeverFinish(finish);
+    }
+}
+
+/**
+ * Obtiene el tramo competitivo asociado a un resultado.
+ *
+ * La fase de grupos no pertenece a Oro, Plata ni Bronce.
+ */
+export function getTierFromFinish(
+    finish: RankingFinish,
+): RankingTier | null {
+    switch (finish) {
+        case "campeon_oro":
+        case "finalista_oro":
+        case "semifinalista_oro":
+        case "cuartos_oro":
+            return "oro";
+
+        case "campeon_plata":
+        case "finalista_plata":
+        case "semifinalista_plata":
+        case "cuartos_plata":
+            return "plata";
+
+        case "campeon_bronce":
+        case "finalista_bronce":
+        case "semifinalista_bronce":
+        case "cuartos_bronce":
+            return "bronce";
+
+        case "fase_grupos":
+            return null;
+
+        default:
+            return assertNeverFinish(finish);
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/* POINT CALCULATION                                                          */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Devuelve únicamente los puntos oficiales de una categoría,
+ * tramo competitivo y posición.
+ *
+ * Esta función mantiene la API simple utilizada por otros módulos.
  */
 export function getRankingPoints(
     category: RankingCategory,
@@ -150,7 +254,44 @@ export function getRankingPoints(
 }
 
 /**
- * Returns the minimum points of a category.
+ * Calcula los puntos oficiales y devuelve también el resultado alcanzado.
+ *
+ * IMPORTANTE:
+ * El servicio de ranking utiliza esta función pasando un objeto
+ * y posteriormente accede a:
+ *
+ *   result.points
+ *   result.finish
+ *
+ * Por eso no debe convertirse en una función que devuelva solamente
+ * un número.
+ */
+export function calculateRankingPoints(
+    input: RankingPointsCalculation,
+): RankingPointsResult {
+    const {
+        category,
+        tier,
+        position,
+    } = input;
+
+    assertCategory(category);
+
+    const finish =
+        getFinishKey(
+            tier,
+            position,
+        );
+
+    return {
+        points:
+            RANKING_POINTS[category][finish],
+        finish,
+    };
+}
+
+/**
+ * Devuelve el mínimo de puntos de una categoría.
  */
 export function getMinimumCategoryPoints(
     category: RankingCategory,
@@ -166,7 +307,7 @@ export function getMinimumCategoryPoints(
 }
 
 /**
- * Returns the maximum points of a category.
+ * Devuelve el máximo de puntos de una categoría.
  */
 export function getMaximumCategoryPoints(
     category: RankingCategory,
@@ -181,13 +322,25 @@ export function getMaximumCategoryPoints(
     return Math.max(...values);
 }
 
+/**
+ * Devuelve los puntos correspondientes a una eliminación
+ * durante la fase de grupos.
+ */
+export function getGroupEliminationPoints(
+    category: RankingCategory,
+): number {
+    assertCategory(category);
+
+    return RANKING_POINTS[category]
+        .fase_grupos;
+}
+
 /* -------------------------------------------------------------------------- */
 /* CATEGORY BANDS                                                             */
 /* -------------------------------------------------------------------------- */
 
 /**
- * Returns the minimum and maximum official ranking points
- * available in a category.
+ * Devuelve la banda mínima/máxima de puntos de una categoría.
  */
 export function getCategoryRankingBand(
     category: RankingCategory,
@@ -215,10 +368,11 @@ export function getCategoryRankingBand(
 }
 
 /**
- * Validates the fundamental property of the SPC ranking:
+ * Valida la propiedad fundamental del ranking SPC:
  *
- * every point awarded in a higher category must remain above every
- * point awarded in the next lower category.
+ * todos los puntos posibles de una categoría superior
+ * deben estar por encima de todos los puntos posibles
+ * de la categoría inmediatamente inferior.
  */
 export function validateRankingBands(): boolean {
     const categories =
@@ -268,9 +422,10 @@ export function validateRankingBands(): boolean {
 /* -------------------------------------------------------------------------- */
 
 /**
- * Creates the ranking event generated by a tournament result.
+ * Crea el evento de ranking generado por un resultado.
  *
- * Ranking points belong to individual players, not pairs.
+ * Los puntos son individuales: cada jugador de la pareja
+ * recibe su propio evento de ranking.
  */
 export function createRankingPointEvent(
     params: {
@@ -293,23 +448,21 @@ export function createRankingPointEvent(
         fecha = new Date().toISOString(),
     } = params;
 
-    const puntos =
-        getRankingPoints(
+    const result =
+        calculateRankingPoints({
             category,
             tier,
             position,
-        );
+        });
 
     return {
         player_id: playerId,
         tournament_id: tournamentId,
         categoria_id: null,
-        puntos_obtenidos: puntos,
+        puntos_obtenidos:
+            result.points,
         ronda_alcanzada:
-            getFinishKey(
-                tier,
-                position,
-            ),
+            result.finish,
         fecha,
         fecha_caducidad: null,
         season_id: seasonId,
@@ -323,8 +476,8 @@ export function createRankingPointEvent(
 }
 
 /**
- * Creates the minimum ranking event for a pair eliminated
- * during the group phase in a five-pair tournament.
+ * Crea el evento mínimo para un jugador eliminado
+ * durante la fase de grupos.
  */
 export function createGroupPhaseRankingPointEvent(
     params: {
@@ -348,10 +501,11 @@ export function createGroupPhaseRankingPointEvent(
         tournament_id: tournamentId,
         categoria_id: null,
         puntos_obtenidos:
-            getMinimumCategoryPoints(
+            getGroupEliminationPoints(
                 category,
             ),
-        ronda_alcanzada: "fase_grupos",
+        ronda_alcanzada:
+            "fase_grupos",
         fecha,
         fecha_caducidad: null,
         season_id: seasonId,
@@ -369,11 +523,11 @@ export function createGroupPhaseRankingPointEvent(
 /* -------------------------------------------------------------------------- */
 
 /**
- * Calculates the points retained when a season closes.
+ * Calcula los puntos que se conservan al cerrar una temporada.
  *
- * SPC official rule:
- * - 30% retained.
- * - 70% removed.
+ * Regla oficial SPC:
+ * - 30 % conservado.
+ * - 70 % eliminado.
  */
 export function calculateSeasonRolloverPoints(
     points: number,
@@ -390,13 +544,32 @@ export function calculateSeasonRolloverPoints(
 
     return Math.floor(
         points *
-        (RANKING_RETENTION.retainedPercentage /
-            100),
+        (
+            RANKING_RETENTION
+                .retainedPercentage / 100
+        ),
     );
 }
 
 /**
- * Calculates the points removed at season close.
+ * Alias utilizado por los servicios de temporada.
+ *
+ * Conserva el 30 % de los puntos acumulados.
+ */
+export function calculateSeasonCarryOver(
+    points: number,
+): number {
+    return calculateSeasonRolloverPoints(
+        points,
+    );
+}
+
+/**
+ * Calcula los puntos eliminados al cerrar temporada.
+ *
+ * El resultado es exactamente:
+ *
+ * puntos acumulados - puntos conservados.
  */
 export function calculateSeasonRemovedPoints(
     points: number,
@@ -419,6 +592,20 @@ export function calculateSeasonRemovedPoints(
     );
 }
 
+/**
+ * Alias utilizado por los servicios de temporada.
+ *
+ * Representa el 70 % que deja de formar parte del ranking
+ * de la nueva temporada.
+ */
+export function calculateSeasonExpiredPoints(
+    points: number,
+): number {
+    return calculateSeasonRemovedPoints(
+        points,
+    );
+}
+
 /* -------------------------------------------------------------------------- */
 /* RANKING AGGREGATION                                                        */
 /* -------------------------------------------------------------------------- */
@@ -429,6 +616,12 @@ export type RankingEntry = {
     position: number;
 };
 
+/**
+ * Ordena las entradas del ranking por puntos descendentes.
+ *
+ * En caso de empate se utiliza el ID del jugador como
+ * desempate técnico estable.
+ */
 export function sortRankingEntries(
     entries: Array<{
         playerId: string;
@@ -452,7 +645,10 @@ export function sortRankingEntries(
 }
 
 /**
- * Aggregates ranking point events by player.
+ * Agrega eventos de ranking por jugador.
+ *
+ * El ranking es individual aunque los puntos se hayan
+ * generado desde resultados de parejas.
  */
 export function aggregateRankingPoints<
     T extends {
@@ -495,7 +691,8 @@ export function aggregateRankingPoints<
 /* -------------------------------------------------------------------------- */
 
 /**
- * Validates that an awarded amount belongs to the official category band.
+ * Comprueba que un número de puntos pertenece a la banda
+ * oficial de una categoría.
  */
 export function validateRankingPoints(
     category: RankingCategory,
@@ -521,7 +718,7 @@ export function validateRankingPoints(
 }
 
 /**
- * Validates the complete official SPC ranking configuration.
+ * Valida la configuración oficial completa del ranking SPC.
  */
 export function validateOfficialRankingConfiguration(): boolean {
     const expectedBands = {
