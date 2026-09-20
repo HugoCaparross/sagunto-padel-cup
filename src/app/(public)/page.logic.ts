@@ -1,4 +1,7 @@
-import type { PublicNews, PublicTournament } from "@/lib/public/site";
+import type {
+    PublicNews,
+    PublicTournament,
+} from "@/lib/public/site";
 
 export type TournamentStatus =
     | "borrador"
@@ -32,7 +35,10 @@ export function formatTournamentDate(
     const start = new Date(fechaInicio);
     const end = new Date(fechaFin);
 
-    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    if (
+        Number.isNaN(start.getTime()) ||
+        Number.isNaN(end.getTime())
+    ) {
         return `${fechaInicio} — ${fechaFin}`;
     }
 
@@ -40,17 +46,26 @@ export function formatTournamentDate(
         start.getMonth() === end.getMonth() &&
         start.getFullYear() === end.getFullYear();
 
-    const sameYear = start.getFullYear() === end.getFullYear();
+    const sameYear =
+        start.getFullYear() === end.getFullYear();
 
-    const startDay = start.getDate().toString().padStart(2, "0");
-    const endDay = end.getDate().toString().padStart(2, "0");
+    const startDay = start
+        .getDate()
+        .toString()
+        .padStart(2, "0");
+
+    const endDay = end
+        .getDate()
+        .toString()
+        .padStart(2, "0");
 
     const startMonth = new Intl.DateTimeFormat("es-ES", {
         month: "long",
     }).format(start);
 
     const normalizedStartMonth =
-        startMonth.charAt(0).toUpperCase() + startMonth.slice(1);
+        startMonth.charAt(0).toUpperCase() +
+        startMonth.slice(1);
 
     if (sameMonth) {
         return `${startDay}–${endDay} ${normalizedStartMonth.toUpperCase()} ${start.getFullYear()}`;
@@ -125,23 +140,33 @@ export function canRegisterTournament(
     return status === "inscripciones_abiertas";
 }
 
-export function getTournamentHref(slug: string): string {
+export function getTournamentHref(
+    slug: string,
+): string {
     return `/torneos/${slug}`;
 }
 
-export function getPlayerHref(playerId: string): string {
+export function getPlayerHref(
+    playerId: string,
+): string {
     return `/jugadores/${playerId}`;
 }
 
-export function getNewsHref(slug: string): string {
+export function getNewsHref(
+    slug: string,
+): string {
     return `/noticias/${slug}`;
 }
 
-export function getCategoryHref(categoryId: string): string {
+export function getCategoryHref(
+    categoryId: string,
+): string {
     return `/ranking?categoria=${encodeURIComponent(categoryId)}`;
 }
 
-export function formatRankingPoints(points: number): string {
+export function formatRankingPoints(
+    points: number,
+): string {
     return new Intl.NumberFormat("es-ES").format(points);
 }
 
