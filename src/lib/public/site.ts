@@ -15,6 +15,11 @@ type GroupStanding = Tables["group_standings"]["Row"];
 type Bracket = Tables["brackets"]["Row"];
 type Sponsor = Tables["sponsors"]["Row"];
 
+type PublicPair = Pair & {
+    player1: Player | null;
+    player2: Player | null;
+};
+
 export type PublicTournament = Tournament & {
     club: Club | null;
 };
@@ -34,14 +39,20 @@ function asError(error: unknown): Error {
         "message" in error
     ) {
         return new Error(
-            String((error as { message: unknown }).message),
+            String(
+                (error as { message: unknown }).message,
+            ),
         );
     }
 
-    return new Error("No se han podido cargar los datos públicos.");
+    return new Error(
+        "No se han podido cargar los datos públicos.",
+    );
 }
 
-function isPublishedTournament(tournament: Tournament): boolean {
+function isPublishedTournament(
+    tournament: Tournament,
+): boolean {
     return (
         tournament.estado !== "borrador" &&
         tournament.estado !== "archivado"
@@ -57,12 +68,21 @@ function publicPlayerName(
         .trim();
 }
 
-function publicVisibilityAllowsInstagram(value: Json): boolean {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
+function publicVisibilityAllowsInstagram(
+    value: Json,
+): boolean {
+    if (
+        !value ||
+        typeof value !== "object" ||
+        Array.isArray(value)
+    ) {
         return false;
     }
 
-    const visibility = value as Record<string, Json | undefined>;
+    const visibility = value as Record<
+        string,
+        Json | undefined
+    >;
 
     return visibility.instagram !== false;
 }
@@ -76,7 +96,9 @@ export async function getPublicCategories(): Promise<
         .from("categories")
         .select("*")
         .eq("active", true)
-        .order("nivel_orden", { ascending: true });
+        .order("nivel_orden", {
+            ascending: true,
+        });
 
     if (error) {
         return {
@@ -101,7 +123,9 @@ export async function getPublicTournaments(): Promise<
         .select("*, clubs(*)")
         .neq("estado", "borrador")
         .neq("estado", "archivado")
-        .order("fecha_inicio", { ascending: false });
+        .order("fecha_inicio", {
+            ascending: false,
+        });
 
     if (error) {
         return {
@@ -110,7 +134,9 @@ export async function getPublicTournaments(): Promise<
         };
     }
 
-    const rows: PublicTournament[] = (data ?? []).map((row) => {
+    const rows: PublicTournament[] = (
+        data ?? []
+    ).map((row) => {
         const raw = row as Tournament & {
             clubs?: Club | null;
         };
@@ -134,28 +160,28 @@ export async function getPublicTournamentBySlug(
         tournament: Tournament;
         club: Club | null;
         season: Tables["seasons"]["Row"] | null;
+
         categories: Array<
             Tables["tournament_categories"]["Row"] & {
                 category: Category | null;
             }
         >;
-        pairs: Array<
-            Pair & {
-                player1: Player | null;
-                player2: Player | null;
-            }
-        >;
+
+        pairs: PublicPair[];
+
         matches: Array<
             Match & {
-                pair1: Pair | null;
-                pair2: Pair | null;
+                pair1: PublicPair | null;
+                pair2: PublicPair | null;
             }
         >;
+
         standings: Array<
             GroupStanding & {
                 groupName: string;
             }
         >;
+
         brackets: Bracket[];
         sponsors: Sponsor[];
     }>
@@ -171,21 +197,28 @@ export async function getPublicTournamentBySlug(
     if (tournamentQuery.error) {
         return {
             data: null,
-            error: asError(tournamentQuery.error),
+            error: asError(
+                tournamentQuery.error,
+            ),
         };
     }
 
     if (
         !tournamentQuery.data ||
-        !isPublishedTournament(tournamentQuery.data)
+        !isPublishedTournament(
+            tournamentQuery.data,
+        )
     ) {
         return {
             data: null,
-            error: new Error("TORNEO_NOT_FOUND"),
+            error: new Error(
+                "TORNEO_NOT_FOUND",
+            ),
         };
     }
 
-    const tournament = tournamentQuery.data;
+    const tournament =
+        tournamentQuery.data;
 
     const [
         clubQ,
@@ -201,7 +234,10 @@ export async function getPublicTournamentBySlug(
             ? supabase
                 .from("clubs")
                 .select("*")
-                .eq("id", tournament.club_id)
+                .eq(
+                    "id",
+                    tournament.club_id,
+                )
                 .maybeSingle()
             : Promise.resolve({
                 data: null,
@@ -212,7 +248,10 @@ export async function getPublicTournamentBySlug(
             ? supabase
                 .from("seasons")
                 .select("*")
-                .eq("id", tournament.season_id)
+                .eq(
+                    "id",
+                    tournament.season_id,
+                )
                 .maybeSingle()
             : Promise.resolve({
                 data: null,
@@ -222,22 +261,37 @@ export async function getPublicTournamentBySlug(
         supabase
             .from("tournament_categories")
             .select("*")
-            .eq("tournament_id", tournament.id)
+            .eq(
+                "tournament_id",
+                tournament.id,
+            )
             .eq("enabled", true),
 
         supabase
             .from("pairs")
             .select("*")
-            .eq("tournament_id", tournament.id)
-            .neq("estado", "pendiente_pago")
-            .order("fecha_inscripcion", {
-                ascending: true,
-            }),
+            .eq(
+                "tournament_id",
+                tournament.id,
+            )
+            .neq(
+                "estado",
+                "pendiente_pago",
+            )
+            .order(
+                "fecha_inscripcion",
+                {
+                    ascending: true,
+                },
+            ),
 
         supabase
             .from("matches")
             .select("*")
-            .eq("tournament_id", tournament.id)
+            .eq(
+                "tournament_id",
+                tournament.id,
+            )
             .order("hora_programada", {
                 ascending: true,
                 nullsFirst: false,
@@ -246,17 +300,26 @@ export async function getPublicTournamentBySlug(
         supabase
             .from("groups")
             .select("id,nombre")
-            .eq("tournament_id", tournament.id),
+            .eq(
+                "tournament_id",
+                tournament.id,
+            ),
 
         supabase
             .from("brackets")
             .select("*")
-            .eq("tournament_id", tournament.id),
+            .eq(
+                "tournament_id",
+                tournament.id,
+            ),
 
         supabase
             .from("sponsors")
             .select("*")
-            .eq("tournament_id", tournament.id)
+            .eq(
+                "tournament_id",
+                tournament.id,
+            )
             .eq("active", true)
             .order("orden", {
                 ascending: true,
@@ -281,167 +344,242 @@ export async function getPublicTournamentBySlug(
         }
     }
 
-    const categoryIds = (categoriesQ.data ?? []).map(
+    const categoryIds = (
+        categoriesQ.data ?? []
+    ).map(
         (item) => item.categoria_id,
     );
 
-    const [categoryRows, playerRows] = await Promise.all([
-        categoryIds.length
-            ? supabase
-                .from("categories")
-                .select("*")
-                .in("id", categoryIds)
-            : Promise.resolve({
-                data: [],
-                error: null,
-            }),
-
-        (() => {
-            const ids = new Set<string>();
-
-            for (const pair of pairsQ.data ?? []) {
-                if (pair.player_1_id) {
-                    ids.add(pair.player_1_id);
-                }
-
-                if (pair.player_2_id) {
-                    ids.add(pair.player_2_id);
-                }
-            }
-
-            return ids.size
+    const [categoryRows, playerRows] =
+        await Promise.all([
+            categoryIds.length
                 ? supabase
-                    .from("players")
+                    .from("categories")
                     .select("*")
-                    .in("id", [...ids])
+                    .in(
+                        "id",
+                        categoryIds,
+                    )
                 : Promise.resolve({
                     data: [],
                     error: null,
-                });
-        })(),
-    ]);
+                }),
 
-    if (categoryRows.error || playerRows.error) {
+            (() => {
+                const ids =
+                    new Set<string>();
+
+                for (const pair of
+                    pairsQ.data ?? []) {
+                    if (
+                        pair.player_1_id
+                    ) {
+                        ids.add(
+                            pair.player_1_id,
+                        );
+                    }
+
+                    if (
+                        pair.player_2_id
+                    ) {
+                        ids.add(
+                            pair.player_2_id,
+                        );
+                    }
+                }
+
+                return ids.size
+                    ? supabase
+                        .from("players")
+                        .select("*")
+                        .in(
+                            "id",
+                            [...ids],
+                        )
+                    : Promise.resolve({
+                        data: [],
+                        error: null,
+                    });
+            })(),
+        ]);
+
+    if (
+        categoryRows.error ||
+        playerRows.error
+    ) {
         return {
             data: null,
             error: asError(
-                categoryRows.error ?? playerRows.error,
+                categoryRows.error ??
+                playerRows.error,
             ),
         };
     }
 
-    const categoriesById = new Map(
-        (categoryRows.data ?? []).map((item) => [
-            item.id,
-            item,
-        ]),
-    );
+    const categoriesById =
+        new Map(
+            (
+                categoryRows.data ??
+                []
+            ).map((item) => [
+                item.id,
+                item,
+            ]),
+        );
 
-    const playersById = new Map(
-        (playerRows.data ?? []).map((item) => [
-            item.id,
-            item,
-        ]),
-    );
+    const playersById =
+        new Map(
+            (
+                playerRows.data ??
+                []
+            ).map((item) => [
+                item.id,
+                item,
+            ]),
+        );
 
-    const groupsById = new Map(
-        (groupsQ.data ?? []).map((item) => [
-            item.id,
-            item.nombre,
-        ]),
-    );
+    const groupsById =
+        new Map(
+            (
+                groupsQ.data ??
+                []
+            ).map((item) => [
+                item.id,
+                item.nombre,
+            ]),
+        );
 
-    const standingsQ = (groupsQ.data ?? []).length
-        ? await supabase
-            .from("group_standings")
-            .select("*")
-            .in(
-                "group_id",
-                (groupsQ.data ?? []).map(
-                    (item) => item.id,
-                ),
-            )
-            .order("posicion", {
-                ascending: true,
-            })
-        : {
-            data: [],
-            error: null,
-        };
+    const standingsQ =
+        (groupsQ.data ?? []).length
+            ? await supabase
+                .from(
+                    "group_standings",
+                )
+                .select("*")
+                .in(
+                    "group_id",
+                    (
+                        groupsQ.data ??
+                        []
+                    ).map(
+                        (item) =>
+                            item.id,
+                    ),
+                )
+                .order(
+                    "posicion",
+                    {
+                        ascending: true,
+                    },
+                )
+            : {
+                data: [],
+                error: null,
+            };
 
     if (standingsQ.error) {
         return {
             data: null,
-            error: asError(standingsQ.error),
+            error: asError(
+                standingsQ.error,
+            ),
         };
     }
 
-    const pairs = pairsQ.data ?? [];
+    /*
+     * Construimos las parejas públicas una sola vez.
+     *
+     * De esta forma tanto la sección de parejas
+     * como los partidos utilizan exactamente
+     * la misma estructura enriquecida.
+     */
+    const pairs: PublicPair[] = (
+        pairsQ.data ?? []
+    ).map((pair) => ({
+        ...pair,
+
+        player1: pair.player_1_id
+            ? playersById.get(
+                pair.player_1_id,
+            ) ?? null
+            : null,
+
+        player2: pair.player_2_id
+            ? playersById.get(
+                pair.player_2_id,
+            ) ?? null
+            : null,
+    }));
+
+    /*
+     * Los partidos reutilizan las parejas
+     * enriquecidas anteriores.
+     *
+     * No hacemos nuevas consultas a players.
+     */
+    const matches = (
+        matchesQ.data ?? []
+    ).map((match) => ({
+        ...match,
+
+        pair1: match.pair_1_id
+            ? pairs.find(
+                (pair) =>
+                    pair.id ===
+                    match.pair_1_id,
+            ) ?? null
+            : null,
+
+        pair2: match.pair_2_id
+            ? pairs.find(
+                (pair) =>
+                    pair.id ===
+                    match.pair_2_id,
+            ) ?? null
+            : null,
+    }));
 
     return {
         data: {
             tournament,
-            club: clubQ.data ?? null,
-            season: seasonQ.data ?? null,
 
-            categories: (categoriesQ.data ?? []).map(
-                (item) => ({
-                    ...item,
-                    category:
-                        categoriesById.get(
-                            item.categoria_id,
-                        ) ?? null,
-                }),
-            ),
+            club:
+                clubQ.data ?? null,
 
-            pairs: pairs.map((pair) => ({
-                ...pair,
-                player1: pair.player_1_id
-                    ? playersById.get(
-                        pair.player_1_id,
-                    ) ?? null
-                    : null,
-                player2: pair.player_2_id
-                    ? playersById.get(
-                        pair.player_2_id,
-                    ) ?? null
-                    : null,
+            season:
+                seasonQ.data ?? null,
+
+            categories: (
+                categoriesQ.data ?? []
+            ).map((item) => ({
+                ...item,
+
+                category:
+                    categoriesById.get(
+                        item.categoria_id,
+                    ) ?? null,
             })),
 
-            matches: (matchesQ.data ?? []).map(
-                (match) => ({
-                    ...match,
+            pairs,
 
-                    pair1: match.pair_1_id
-                        ? pairs.find(
-                            (pair) =>
-                                pair.id ===
-                                match.pair_1_id,
-                        ) ?? null
-                        : null,
+            matches,
 
-                    pair2: match.pair_2_id
-                        ? pairs.find(
-                            (pair) =>
-                                pair.id ===
-                                match.pair_2_id,
-                        ) ?? null
-                        : null,
-                }),
-            ),
+            standings: (
+                standingsQ.data ?? []
+            ).map((standing) => ({
+                ...standing,
 
-            standings: (standingsQ.data ?? []).map(
-                (standing) => ({
-                    ...standing,
-                    groupName:
-                        groupsById.get(
-                            standing.group_id,
-                        ) ?? "Grupo",
-                }),
-            ),
+                groupName:
+                    groupsById.get(
+                        standing.group_id,
+                    ) ?? "Grupo",
+            })),
 
-            brackets: bracketsQ.data ?? [],
-            sponsors: sponsorsQ.data ?? [],
+            brackets:
+                bracketsQ.data ?? [],
+
+            sponsors:
+                sponsorsQ.data ?? [],
         },
 
         error: null,
@@ -457,10 +595,13 @@ export async function getPublicNews(): Promise<
         .from("news")
         .select("*")
         .eq("estado", "publicado")
-        .order("fecha_publicacion", {
-            ascending: false,
-            nullsFirst: false,
-        });
+        .order(
+            "fecha_publicacion",
+            {
+                ascending: false,
+                nullsFirst: false,
+            },
+        );
 
     if (error) {
         return {
@@ -497,7 +638,9 @@ export async function getPublicNewsBySlug(
     if (!data) {
         return {
             data: null,
-            error: new Error("NEWS_NOT_FOUND"),
+            error: new Error(
+                "NEWS_NOT_FOUND",
+            ),
         };
     }
 
@@ -519,7 +662,10 @@ export async function getPublicPlayers(): Promise<
 > {
     const supabase = await createClient();
 
-    const { data: players, error } = await supabase
+    const {
+        data: players,
+        error,
+    } = await supabase
         .from("players")
         .select("*")
         .eq("estado", "activo")
@@ -557,15 +703,19 @@ export async function getPublicPlayers(): Promise<
         ),
     ];
 
-    const categoriesQ = categoryIds.length
-        ? await supabase
-            .from("categories")
-            .select("*")
-            .in("id", categoryIds)
-        : {
-            data: [],
-            error: null,
-        };
+    const categoriesQ =
+        categoryIds.length
+            ? await supabase
+                .from("categories")
+                .select("*")
+                .in(
+                    "id",
+                    categoryIds,
+                )
+            : {
+                data: [],
+                error: null,
+            };
 
     if (categoriesQ.error) {
         return {
@@ -580,7 +730,8 @@ export async function getPublicPlayers(): Promise<
         await getCurrentSeasonPoints(
             supabase,
             players.map(
-                (player) => player.id,
+                (player) =>
+                    player.id,
             ),
         );
 
@@ -591,46 +742,51 @@ export async function getPublicPlayers(): Promise<
         };
     }
 
-    const pointsByPlayer = new Map<
-        string,
-        number
-    >();
+    const pointsByPlayer =
+        new Map<string, number>();
 
-    for (const point of pointsQ.data) {
+    for (const point of
+        pointsQ.data) {
         pointsByPlayer.set(
             point.player_id,
-            (pointsByPlayer.get(
-                point.player_id,
-            ) ?? 0) +
+            (
+                pointsByPlayer.get(
+                    point.player_id,
+                ) ?? 0
+            ) +
             point.puntos_obtenidos,
         );
     }
 
-    const categoriesById = new Map(
-        (categoriesQ.data ?? []).map(
-            (category) => [
+    const categoriesById =
+        new Map(
+            (
+                categoriesQ.data ??
+                []
+            ).map((category) => [
                 category.id,
                 category,
-            ],
-        ),
-    );
+            ]),
+        );
 
     return {
-        data: players.map((player) => ({
-            ...player,
+        data: players.map(
+            (player) => ({
+                ...player,
 
-            category:
-                player.categoria_actual_id
-                    ? categoriesById.get(
-                        player.categoria_actual_id,
-                    ) ?? null
-                    : null,
+                category:
+                    player.categoria_actual_id
+                        ? categoriesById.get(
+                            player.categoria_actual_id,
+                        ) ?? null
+                        : null,
 
-            points:
-                pointsByPlayer.get(
-                    player.id,
-                ) ?? 0,
-        })),
+                points:
+                    pointsByPlayer.get(
+                        player.id,
+                    ) ?? 0,
+            }),
+        ),
 
         error: null,
     };
@@ -724,7 +880,9 @@ export async function getPublicRanking(
     if (seasonQ.error) {
         return {
             data: null,
-            error: asError(seasonQ.error),
+            error: asError(
+                seasonQ.error,
+            ),
         };
     }
 
@@ -752,16 +910,21 @@ export async function getPublicRanking(
             .from("categories")
             .select("*")
             .eq("active", true)
-            .order("nivel_orden", {
-                ascending: true,
-            })
+            .order(
+                "nivel_orden",
+                {
+                    ascending: true,
+                },
+            )
             .limit(1)
             .maybeSingle();
 
     if (categoryQ.error) {
         return {
             data: null,
-            error: asError(categoryQ.error),
+            error: asError(
+                categoryQ.error,
+            ),
         };
     }
 
@@ -782,7 +945,10 @@ export async function getPublicRanking(
     const pointsQ = await supabase
         .from("ranking_points")
         .select("*")
-        .eq("season_id", season.id)
+        .eq(
+            "season_id",
+            season.id,
+        )
         .eq(
             "categoria_id",
             category.id,
@@ -791,7 +957,9 @@ export async function getPublicRanking(
     if (pointsQ.error) {
         return {
             data: null,
-            error: asError(pointsQ.error),
+            error: asError(
+                pointsQ.error,
+            ),
         };
     }
 
@@ -824,18 +992,22 @@ export async function getPublicRanking(
     if (playersQ.error) {
         return {
             data: null,
-            error: asError(playersQ.error),
+            error: asError(
+                playersQ.error,
+            ),
         };
     }
 
-    const playersById = new Map(
-        (playersQ.data ?? []).map(
-            (player) => [
+    const playersById =
+        new Map(
+            (
+                playersQ.data ??
+                []
+            ).map((player) => [
                 player.id,
                 player,
-            ],
-        ),
-    );
+            ]),
+        );
 
     const totals = new Map<
         string,
@@ -845,7 +1017,8 @@ export async function getPublicRanking(
         }
     >();
 
-    for (const point of pointsQ.data ?? []) {
+    for (const point of
+        pointsQ.data ?? []) {
         const current =
             totals.get(
                 point.player_id,
@@ -877,7 +1050,8 @@ export async function getPublicRanking(
                     playersById.get(
                         playerId,
                     ),
-                points: value.points,
+                points:
+                    value.points,
                 tournaments:
                     value.tournaments
                         .size,
@@ -890,7 +1064,10 @@ export async function getPublicRanking(
                 player: Player;
                 points: number;
                 tournaments: number;
-            } => Boolean(entry.player),
+            } =>
+                Boolean(
+                    entry.player,
+                ),
         )
         .sort(
             (a, b) =>
@@ -925,7 +1102,9 @@ export async function getPublicRanking(
 
 export async function getPublicSponsors(
     tournamentIds: string[],
-): Promise<PublicResult<Sponsor[]>> {
+): Promise<
+    PublicResult<Sponsor[]>
+> {
     if (!tournamentIds.length) {
         return {
             data: [],
@@ -999,7 +1178,9 @@ export async function getPublicPlayer(
         tournaments: number;
         results: Array<
             RankingPoint & {
-                tournament: Tournament | null;
+                tournament:
+                | Tournament
+                | null;
             }
         >;
         instagramVisible: boolean;
@@ -1017,7 +1198,9 @@ export async function getPublicPlayer(
     if (playerQ.error) {
         return {
             data: null,
-            error: asError(playerQ.error),
+            error: asError(
+                playerQ.error,
+            ),
         };
     }
 
@@ -1218,7 +1401,8 @@ export function safeExternalUrl(
     try {
         const url = new URL(value);
 
-        return url.protocol === "https:" ||
+        return url.protocol ===
+            "https:" ||
             url.protocol === "http:"
             ? url.toString()
             : null;

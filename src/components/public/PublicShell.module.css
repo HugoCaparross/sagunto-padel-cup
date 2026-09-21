@@ -1,15 +1,300 @@
 .shell {
+    min-width: 0;
     min-height: 100svh;
+
     background: var(--background);
     color: var(--foreground);
 }
 
 .shell main {
-    min-height: calc(100svh - 72px);
+    min-width: 0;
+
+    min-height:
+        calc(100svh - var(--header-height));
 }
+
+/* ================================================================
+   FOOTER
+================================================================ */
+
+.footer {
+    width: 100%;
+
+    min-width: 0;
+
+    background: var(--dark-surface);
+
+    color: var(--white);
+}
+
+.footerInner {
+    width:
+        min(var(--container),
+            calc(100% - (var(--gutter) * 2)));
+
+    margin-inline: auto;
+
+    min-width: 0;
+}
+
+.footerTop {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.05fr) minmax(0, 1.95fr);
+
+    gap:
+        clamp(32px,
+            7vw,
+            96px);
+
+    padding-block:
+        clamp(48px,
+            7vw,
+            84px);
+}
+
+.footerBrand {
+    min-width: 0;
+}
+
+.footerBrand strong {
+    display: block;
+
+    color: var(--white);
+
+    font-size:
+        clamp(1rem,
+            1.4vw,
+            1.2rem);
+
+    font-weight: 900;
+
+    letter-spacing: 0.08em;
+}
+
+.footerBrand p {
+    max-width: 480px;
+
+    margin-top: 14px;
+
+    color:
+        rgba(253, 253, 253, 0.62);
+
+    line-height: 1.7;
+}
+
+.footerNavigation {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,
+            minmax(0, 1fr));
+
+    gap: 28px;
+
+    min-width: 0;
+}
+
+.footerColumn {
+    display: grid;
+
+    min-width: 0;
+
+    align-content: start;
+
+    gap: 10px;
+}
+
+.footerColumn strong {
+    margin-bottom: 4px;
+
+    color: var(--brand);
+
+    font-size: 0.68rem;
+
+    font-weight: 900;
+
+    letter-spacing: 0.14em;
+}
+
+.footerColumn a {
+    width: fit-content;
+
+    max-width: 100%;
+
+    color:
+        rgba(253, 253, 253, 0.68);
+
+    font-size: 0.9rem;
+
+    line-height: 1.45;
+
+    transition:
+        color 160ms var(--ease-standard);
+}
+
+.footerColumn a:hover,
+.footerColumn a:focus-visible {
+    color: var(--white);
+}
+
+/* ================================================================
+   FOOTER BOTTOM
+================================================================ */
+
+.footerBottom {
+    display: flex;
+
+    min-width: 0;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding:
+        18px 0 calc(18px + var(--safe-bottom));
+
+    border-top:
+        1px solid rgba(255, 255, 255, 0.1);
+
+    color:
+        rgba(253, 253, 253, 0.5);
+
+    font-size: 0.75rem;
+}
+
+.footerBottom>span {
+    min-width: 0;
+
+    overflow-wrap: anywhere;
+}
+
+.footerLegal {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    justify-content: flex-end;
+
+    gap: 18px;
+
+    min-width: 0;
+}
+
+.footerLegal a {
+    color: inherit;
+
+    white-space: nowrap;
+}
+
+.footerLegal a:hover,
+.footerLegal a:focus-visible {
+    color: var(--white);
+}
+
+/* ================================================================
+   TABLET
+================================================================ */
+
+@media (max-width: 900px) {
+    .footerTop {
+        grid-template-columns: 1fr;
+    }
+
+    .footerNavigation {
+        grid-template-columns:
+            repeat(3,
+                minmax(0, 1fr));
+    }
+}
+
+/* ================================================================
+   MOBILE
+================================================================ */
 
 @media (max-width: 767px) {
     .shell main {
-        min-height: calc(100svh - 64px);
+        min-height:
+            calc(100svh - var(--header-height));
+    }
+
+    .footerNavigation {
+        grid-template-columns:
+            repeat(2,
+                minmax(0, 1fr));
+
+        gap: 28px 20px;
+    }
+
+    .footerBottom {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .footerLegal {
+        justify-content: flex-start;
+
+        gap: 12px 18px;
+    }
+}
+
+/* ================================================================
+   SMALL MOBILE
+================================================================ */
+
+@media (max-width: 430px) {
+    .footerTop {
+        padding-block: 44px;
+    }
+
+    .footerNavigation {
+        grid-template-columns: 1fr;
+    }
+
+    .footerColumn a {
+        font-size: 0.88rem;
+    }
+
+    .footerBottom {
+        gap: 14px;
+    }
+}
+
+/* ================================================================
+   VERY SMALL MOBILE
+================================================================ */
+
+@media (max-width: 359px) {
+    .footerTop {
+        padding-block: 38px;
+    }
+
+    .footerLegal {
+        display: grid;
+
+        width: 100%;
+
+        grid-template-columns:
+            repeat(2,
+                minmax(0, 1fr));
+
+        gap: 10px;
+    }
+
+    .footerLegal a {
+        white-space: normal;
+    }
+}
+
+/* ================================================================
+   REDUCED MOTION
+================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .footerColumn a {
+        transition: none;
     }
 }
