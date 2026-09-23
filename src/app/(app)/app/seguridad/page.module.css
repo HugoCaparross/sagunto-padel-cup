@@ -1,0 +1,138 @@
+.page {
+    min-height: 100svh;
+    padding: clamp(44px, 7vw, 88px) 0;
+    background: var(--background);
+}
+
+.container {
+    width: min(760px, calc(100% - (var(--gutter) * 2)));
+    margin-inline: auto;
+}
+
+.back {
+    display: inline-block;
+    margin-bottom: 34px;
+    color: var(--muted);
+    font-size: 0.76rem;
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition:
+        color 160ms var(--ease-standard),
+        opacity 160ms var(--ease-standard);
+}
+
+.back:hover {
+    color: var(--foreground);
+}
+
+.back:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 4px;
+}
+
+.eyebrow {
+    display: block;
+    color: var(--brand);
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.container h1 {
+    margin: 14px 0 16px;
+    color: var(--foreground);
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 6vw, 5rem);
+    font-weight: 950;
+    letter-spacing: -0.055em;
+    line-height: 0.92;
+}
+
+.intro {
+    max-width: 650px;
+    margin: 0 0 32px;
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+.panel {
+    padding: clamp(24px, 4vw, 38px);
+    border: 1px solid var(--line);
+    background: var(--surface);
+}
+
+.panel h2 {
+    margin: 0 0 8px;
+    color: var(--foreground);
+    font-size: 1.7rem;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+}
+
+.panel>p {
+    margin: 0 0 22px;
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 767px) {
+    .page {
+        padding-block: 38px 56px;
+    }
+
+    .container {
+        width: calc(100% - (var(--gutter) * 2));
+    }
+
+    .container h1 {
+        font-size: clamp(2.5rem, 12vw, 4rem);
+    }
+
+    .intro {
+        font-size: 0.94rem;
+    }
+
+    .panel {
+        padding: 24px 20px;
+    }
+}
+
+@media (max-width: 430px) {
+    .page {
+        padding-block: 32px 48px;
+    }
+
+    .container {
+        width: calc(100% - (var(--gutter) * 2));
+    }
+
+    .container h1 {
+        font-size: clamp(2.3rem, 14vw, 3.4rem);
+    }
+
+    .panel {
+        padding: 22px 18px;
+    }
+}
+
+@media (max-width: 359px) {
+    .container h1 {
+        font-size: 2.2rem;
+    }
+
+    .panel {
+        padding: 20px 16px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .back {
+        transition: none;
+    }
+}

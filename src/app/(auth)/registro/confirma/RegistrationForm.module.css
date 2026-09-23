@@ -1,0 +1,162 @@
+.form {
+    display: grid;
+    gap: 14px;
+}
+
+.block {
+    border:
+        1px solid var(--line);
+    background: var(--surface);
+    padding:
+        clamp(20px,
+            3vw,
+            30px);
+}
+
+.blockHeader {
+    display: grid;
+    gap: 5px;
+    margin-bottom: 20px;
+}
+
+.blockHeader span {
+    color: var(--brand);
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.15em;
+}
+
+.blockHeader p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+
+.gridTwo {
+    display: grid;
+    grid-template-columns:
+        repeat(2,
+            minmax(0, 1fr));
+    gap: 16px;
+}
+
+.field,
+.accountField {
+    display: grid;
+    gap: 8px;
+}
+
+.field label,
+.accountField label {
+    font-size: 0.77rem;
+    font-weight: 800;
+}
+
+.field input,
+.field select,
+.accountField input {
+    width: 100%;
+    min-height: 48px;
+    border:
+        1px solid var(--line);
+    background: var(--surface);
+    color: var(--foreground);
+    padding: 0 13px;
+    font: inherit;
+    font-size: 0.86rem;
+    outline: none;
+}
+
+.field input:focus,
+.field select:focus {
+    border-color: var(--foreground);
+    box-shadow:
+        0 0 0 3px rgba(230, 18, 25, .08);
+}
+
+.accountField input {
+    background: var(--background);
+    color: var(--muted);
+    cursor: not-allowed;
+}
+
+.fieldError {
+    color: var(--danger);
+    font-size: 0.7rem;
+    line-height: 1.4;
+}
+
+.checks {
+    display: grid;
+    gap: 9px;
+}
+
+.check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 0.77rem;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+.check input {
+    width: 17px;
+    height: 17px;
+    margin-top: 1px;
+    flex: 0 0 17px;
+    accent-color: var(--brand);
+}
+
+.check a {
+    color: var(--foreground);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.formError {
+    padding:
+        13px 15px;
+    border-left:
+        3px solid var(--danger);
+    background:
+        var(--danger-soft);
+    color: var(--danger);
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.submit {
+    width: 100%;
+    min-height: 54px;
+    border: 0;
+    background: var(--brand);
+    color: #fff;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+        background-color 160ms var(--ease-standard),
+        transform 160ms var(--ease-standard);
+}
+
+.submit:hover:not(:disabled) {
+    background: var(--brand-dark);
+    transform: translateY(-1px);
+}
+
+.submit:disabled {
+    opacity: 0.68;
+    cursor: wait;
+}
+
+@media (max-width: 650px) {
+    .gridTwo {
+        grid-template-columns: 1fr;
+    }
+}

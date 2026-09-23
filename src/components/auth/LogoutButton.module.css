@@ -1,0 +1,56 @@
+.button,
+.mobile {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 1px solid rgba(255, 255, 255, .2);
+    background: transparent;
+    color: var(--white);
+    padding-inline: 12px;
+    font: inherit;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+        border-color 160ms var(--ease-standard),
+        color 160ms var(--ease-standard),
+        background-color 160ms var(--ease-standard);
+}
+
+.button:hover:not(:disabled),
+.mobile:hover:not(:disabled) {
+    border-color:
+        rgba(255, 255, 255, .55);
+}
+
+.button:disabled,
+.mobile:disabled {
+    opacity: .65;
+    cursor: wait;
+}
+
+.mobile {
+    width: 100%;
+    min-height: 46px;
+}
+
+.loader {
+    animation:
+        spin 700ms linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .loader {
+        animation: none;
+    }
+}

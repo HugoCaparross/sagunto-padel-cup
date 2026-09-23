@@ -1,18 +1,14 @@
 ﻿"use client";
 
-import {
-    ArrowUpRight,
-    Menu,
-    UserRound,
-    X,
-} from "lucide-react";
+import { ArrowUpRight, Menu, UserRound, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import styles from "./Header.module.css";
 
 const navigation = [
-    { label: "Torneos", href: "/torneos" },
+    { label: "Calendario", href: "/torneos" },
     { label: "Ranking", href: "/ranking" },
     { label: "Jugadores", href: "/jugadores" },
     { label: "Circuito", href: "/circuito" },
@@ -20,223 +16,145 @@ const navigation = [
     { label: "Noticias", href: "/noticias" },
 ];
 
-const MOBILE_BREAKPOINT = 850;
-
 export default function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
-        if (!menuOpen) {
-            return;
-        }
+        const onScroll = () => setScrolled(window.scrollY > 24);
 
-        const previousOverflow = document.body.style.overflow;
+        onScroll();
 
-        document.body.style.overflow = "hidden";
+        window.addEventListener("scroll", onScroll, { passive: true });
 
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === "Escape") {
-                setMenuOpen(false);
-            }
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
+
+    useEffect(() => {
+        document.body.style.overflow = menuOpen ? "hidden" : "";
+
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") setMenuOpen(false);
         };
 
-        const handleResize = () => {
-            if (window.innerWidth > MOBILE_BREAKPOINT) {
-                setMenuOpen(false);
-            }
-        };
-
-        window.addEventListener("keydown", handleKeyDown);
-        window.addEventListener("resize", handleResize);
+        window.addEventListener("keydown", onKeyDown);
 
         return () => {
-            document.body.style.overflow = previousOverflow;
-
-            window.removeEventListener(
-                "keydown",
-                handleKeyDown,
-            );
-
-            window.removeEventListener(
-                "resize",
-                handleResize,
-            );
+            document.body.style.overflow = "";
+            window.removeEventListener("keydown", onKeyDown);
         };
     }, [menuOpen]);
 
-    const closeMenu = () => {
-        setMenuOpen(false);
-    };
-
-    const toggleMenu = () => {
-        setMenuOpen((current) => !current);
-    };
-
     return (
-        <header className={styles.header}>
+        <header
+            className={`${styles.header} ${scrolled ? styles.scrolled : ""}`}
+        >
             <div className={styles.container}>
                 <Link
                     href="/"
                     className={styles.brand}
-                    aria-label="Sagunto Padel Cup — Inicio"
-                    onClick={closeMenu}
+                    aria-label="Sagunto Padel Cup"
+                    onClick={() => setMenuOpen(false)}
                 >
-                    <span
-                        className={styles.brandMark}
-                        aria-hidden="true"
-                    >
-                        SPC
+                    <span className={styles.brandLogoWrap}>
+                        <Image
+                            src="/images/brand/sagunto-padel-cup-logo.png"
+                            alt="Sagunto Padel Cup"
+                            width={1422}
+                            height={1106}
+                            priority
+                            className={styles.brandLogo}
+                        />
                     </span>
 
-                    <span className={styles.brandWordmark}>
+                    <span className={styles.brandText}>
                         <strong>SAGUNTO</strong>
                         <span>PADEL CUP</span>
                     </span>
                 </Link>
 
                 <nav
-                    className={styles.desktopNavigation}
+                    className={styles.navigation}
                     aria-label="Navegación principal"
                 >
                     {navigation.map((item) => (
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={styles.navigationLink}
+                            className={styles.navLink}
                         >
                             {item.label}
                         </Link>
                     ))}
                 </nav>
 
-                <div className={styles.desktopActions}>
-                    <Link
-                        href="/login"
-                        className={styles.loginButton}
-                    >
-                        <UserRound
-                            size={15}
-                            strokeWidth={2}
-                            aria-hidden="true"
-                        />
-
-                        <span>Acceder</span>
+                <div className={styles.actions}>
+                    <Link href="/login" className={styles.login}>
+                        <UserRound size={16} aria-hidden="true" />
+                        Acceder
                     </Link>
 
                     <Link
                         href="/registro"
-                        className={styles.registerButton}
+                        className={styles.register}
                     >
-                        <span>Inscribirme</span>
-
-                        <ArrowUpRight
-                            size={15}
-                            strokeWidth={2.2}
-                            aria-hidden="true"
-                        />
+                        Inscribirme
+                        <ArrowUpRight size={16} aria-hidden="true" />
                     </Link>
                 </div>
 
                 <button
-                    type="button"
                     className={styles.menuButton}
-                    aria-label={
-                        menuOpen
-                            ? "Cerrar menú"
-                            : "Abrir menú"
-                    }
+                    onClick={() => setMenuOpen(!menuOpen)}
+                    aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
                     aria-expanded={menuOpen}
-                    aria-controls="mobile-navigation"
-                    onClick={toggleMenu}
+                    type="button"
                 >
-                    {menuOpen ? (
-                        <X
-                            size={23}
-                            strokeWidth={2}
-                            aria-hidden="true"
-                        />
-                    ) : (
-                        <Menu
-                            size={23}
-                            strokeWidth={2}
-                            aria-hidden="true"
-                        />
-                    )}
+                    {menuOpen ? <X size={24} /> : <Menu size={24} />}
                 </button>
             </div>
 
             <div
-                id="mobile-navigation"
-                className={`${styles.mobileNavigation} ${menuOpen
-                        ? styles.mobileNavigationOpen
-                        : ""
-                    }`}
-                aria-hidden={!menuOpen}
+                className={`${styles.mobilePanel} ${menuOpen ? styles.mobilePanelOpen : ""}`}
             >
-                <nav
-                    className={styles.mobileNavigationInner}
-                    aria-label="Navegación móvil"
-                >
-                    <div className={styles.mobileLinks}>
+                <div className={styles.mobileInner}>
+                    <div className={styles.mobileSeason}>
+                        <span>TEMPORADA</span>
+                        <strong>2026 / 2027</strong>
+                    </div>
+
+                    <nav className={styles.mobileNav}>
                         {navigation.map((item) => (
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={
-                                    styles.mobileNavigationLink
-                                }
-                                tabIndex={
-                                    menuOpen ? 0 : -1
-                                }
-                                onClick={closeMenu}
+                                onClick={() => setMenuOpen(false)}
+                                className={styles.mobileLink}
                             >
                                 <span>{item.label}</span>
-
-                                <ArrowUpRight
-                                    size={19}
-                                    strokeWidth={2}
-                                    aria-hidden="true"
-                                />
+                                <ArrowUpRight size={20} aria-hidden="true" />
                             </Link>
                         ))}
-                    </div>
+                    </nav>
 
                     <div className={styles.mobileActions}>
                         <Link
                             href="/login"
+                            onClick={() => setMenuOpen(false)}
                             className={styles.mobileLogin}
-                            tabIndex={
-                                menuOpen ? 0 : -1
-                            }
-                            onClick={closeMenu}
                         >
-                            <UserRound
-                                size={15}
-                                strokeWidth={2}
-                                aria-hidden="true"
-                            />
-
-                            <span>Acceder</span>
+                            Acceder
                         </Link>
 
                         <Link
                             href="/registro"
+                            onClick={() => setMenuOpen(false)}
                             className={styles.mobileRegister}
-                            tabIndex={
-                                menuOpen ? 0 : -1
-                            }
-                            onClick={closeMenu}
                         >
-                            <span>Inscribirme</span>
-
-                            <ArrowUpRight
-                                size={16}
-                                strokeWidth={2}
-                                aria-hidden="true"
-                            />
+                            Inscribirme
                         </Link>
                     </div>
-                </nav>
+                </div>
             </div>
         </header>
     );

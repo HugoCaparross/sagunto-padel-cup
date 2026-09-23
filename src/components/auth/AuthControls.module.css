@@ -1,0 +1,105 @@
+.group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.login,
+.register,
+.profile {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding-inline: 13px;
+    font: inherit;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition:
+        background-color 160ms var(--ease-standard),
+        border-color 160ms var(--ease-standard),
+        color 160ms var(--ease-standard),
+        transform 160ms var(--ease-standard);
+}
+
+.login,
+.profile {
+    border:
+        1px solid rgba(255, 255, 255, .25);
+    color: var(--white);
+}
+
+.login:hover,
+.profile:hover {
+    border-color:
+        rgba(255, 255, 255, .65);
+    transform: translateY(-1px);
+}
+
+.register {
+    min-width: 125px;
+    background: var(--brand);
+    color: #fff;
+}
+
+.register:hover {
+    background: var(--brand-dark);
+    transform: translateY(-1px);
+}
+
+.loading {
+    display: block;
+    width: 125px;
+    height: 40px;
+    border:
+        1px solid rgba(255, 255, 255, .08);
+    background:
+        rgba(255, 255, 255, .04);
+}
+
+.mobileGroup {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.mobileLogin,
+.mobileRegister,
+.mobileProfile {
+    display: inline-flex;
+    min-width: 0;
+    min-height: 46px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding-inline: 10px;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 850;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+}
+
+.mobileLogin,
+.mobileProfile {
+    border:
+        1px solid rgba(255, 255, 255, .25);
+    color: var(--white);
+}
+
+.mobileRegister {
+    background: var(--brand);
+    color: #fff;
+}
+
+@media (max-width: 430px) {
+    .mobileGroup {
+        grid-template-columns: 1fr;
+    }
+}
