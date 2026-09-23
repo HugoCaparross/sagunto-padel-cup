@@ -38,48 +38,35 @@ export default function RegistrationForm({
         state,
         formAction,
         pending,
-    ] =
-        useActionState(
-            completeRegistration,
-            initialRegistrationState,
-        );
+    ] = useActionState(
+        completeRegistration,
+        initialRegistrationState,
+    );
 
-    const fieldError = (
-        name: string,
-    ) =>
-        state.fieldErrors[
-        name
-        ]?.[0];
+    // Defensive access: the form must never crash if a stale/partial
+    // action state is temporarily received during development/HMR.
+    const fieldError = (name: string) =>
+        state?.fieldErrors?.[name]?.[0];
+
+    const formMessage = state?.message ?? "";
 
     return (
         <form
             className={styles.form}
             action={formAction}
+            noValidate
         >
-            <section
-                className={styles.block}
-            >
-                <div
-                    className={
-                        styles.blockHeader
-                    }
-                >
-                    <span>
-                        CUENTA
-                    </span>
+            <section className={styles.block}>
+                <div className={styles.blockHeader}>
+                    <span>CUENTA</span>
 
                     <p>
-                        La identidad de
-                        acceso se gestiona
+                        La identidad de acceso se gestiona
                         desde Supabase Auth.
                     </p>
                 </div>
 
-                <div
-                    className={
-                        styles.accountField
-                    }
-                >
+                <div className={styles.accountField}>
                     <label htmlFor="profile-email">
                         Email
                     </label>
@@ -93,30 +80,17 @@ export default function RegistrationForm({
                 </div>
             </section>
 
-            <section
-                className={styles.block}
-            >
-                <div
-                    className={
-                        styles.blockHeader
-                    }
-                >
-                    <span>
-                        DATOS PERSONALES
-                    </span>
+            <section className={styles.block}>
+                <div className={styles.blockHeader}>
+                    <span>DATOS PERSONALES</span>
 
                     <p>
-                        Estos datos identifican
-                        tu perfil dentro del
-                        circuito.
+                        Estos datos identifican tu perfil
+                        dentro del circuito.
                     </p>
                 </div>
 
-                <div
-                    className={
-                        styles.gridTwo
-                    }
-                >
+                <div className={styles.gridTwo}>
                     <Field
                         name="nombre"
                         label="Nombre"
@@ -124,9 +98,7 @@ export default function RegistrationForm({
                             existingPlayer?.nombre ??
                             defaultName
                         }
-                        error={fieldError(
-                            "nombre",
-                        )}
+                        error={fieldError("nombre")}
                     />
 
                     <Field
@@ -136,9 +108,7 @@ export default function RegistrationForm({
                             existingPlayer?.apellidos ??
                             defaultSurname
                         }
-                        error={fieldError(
-                            "apellidos",
-                        )}
+                        error={fieldError("apellidos")}
                     />
 
                     <Field
@@ -148,10 +118,9 @@ export default function RegistrationForm({
                             existingPlayer?.telefono ??
                             ""
                         }
-                        error={fieldError(
-                            "telefono",
-                        )}
+                        error={fieldError("telefono")}
                         type="tel"
+                        autoComplete="tel"
                     />
 
                     <Field
@@ -161,42 +130,24 @@ export default function RegistrationForm({
                             existingPlayer?.ciudad ??
                             ""
                         }
-                        error={fieldError(
-                            "ciudad",
-                        )}
+                        error={fieldError("ciudad")}
+                        autoComplete="address-level2"
                     />
                 </div>
             </section>
 
-            <section
-                className={styles.block}
-            >
-                <div
-                    className={
-                        styles.blockHeader
-                    }
-                >
-                    <span>
-                        DATOS DEPORTIVOS
-                    </span>
+            <section className={styles.block}>
+                <div className={styles.blockHeader}>
+                    <span>DATOS DEPORTIVOS</span>
 
                     <p>
-                        Podrás completar o
-                        modificar estos datos
-                        desde tu área privada.
+                        Podrás completar o modificar estos
+                        datos desde tu área privada.
                     </p>
                 </div>
 
-                <div
-                    className={
-                        styles.gridTwo
-                    }
-                >
-                    <div
-                        className={
-                            styles.field
-                        }
-                    >
+                <div className={styles.gridTwo}>
+                    <div className={styles.field}>
                         <label htmlFor="categoria_actual_id">
                             Categoría
                         </label>
@@ -208,39 +159,39 @@ export default function RegistrationForm({
                                 existingPlayer?.categoria_actual_id ??
                                 ""
                             }
-                        >
-                            <option value="">
-                                Seleccionar
-                                categoría
-                            </option>
-
-                            {categories.map(
-                                (
-                                    category,
-                                ) => (
-                                    <option
-                                        key={
-                                            category.id
-                                        }
-                                        value={
-                                            category.id
-                                        }
-                                    >
-                                        {
-                                            category.nombre
-                                        }
-                                    </option>
+                            aria-invalid={Boolean(
+                                fieldError(
+                                    "categoria_actual_id",
                                 ),
                             )}
+                            aria-describedby={
+                                fieldError(
+                                    "categoria_actual_id",
+                                )
+                                    ? "categoria_actual_id-error"
+                                    : undefined
+                            }
+                        >
+                            <option value="">
+                                Seleccionar categoría
+                            </option>
+
+                            {categories.map((category) => (
+                                <option
+                                    key={category.id}
+                                    value={category.id}
+                                >
+                                    {category.nombre}
+                                </option>
+                            ))}
                         </select>
 
                         {fieldError(
                             "categoria_actual_id",
                         ) && (
                                 <small
-                                    className={
-                                        styles.fieldError
-                                    }
+                                    id="categoria_actual_id-error"
+                                    className={styles.fieldError}
                                 >
                                     {fieldError(
                                         "categoria_actual_id",
@@ -249,11 +200,7 @@ export default function RegistrationForm({
                             )}
                     </div>
 
-                    <div
-                        className={
-                            styles.field
-                        }
-                    >
+                    <div className={styles.field}>
                         <label htmlFor="mano_dominante">
                             Mano dominante
                         </label>
@@ -264,6 +211,14 @@ export default function RegistrationForm({
                             defaultValue={
                                 existingPlayer?.mano_dominante ??
                                 ""
+                            }
+                            aria-invalid={Boolean(
+                                fieldError("mano_dominante"),
+                            )}
+                            aria-describedby={
+                                fieldError("mano_dominante")
+                                    ? "mano_dominante-error"
+                                    : undefined
                             }
                         >
                             <option value="">
@@ -278,6 +233,15 @@ export default function RegistrationForm({
                                 Zurdo
                             </option>
                         </select>
+
+                        {fieldError("mano_dominante") && (
+                            <small
+                                id="mano_dominante-error"
+                                className={styles.fieldError}
+                            >
+                                {fieldError("mano_dominante")}
+                            </small>
+                        )}
                     </div>
 
                     <Field
@@ -287,9 +251,7 @@ export default function RegistrationForm({
                             existingPlayer?.pala ??
                             ""
                         }
-                        error={fieldError(
-                            "pala",
-                        )}
+                        error={fieldError("pala")}
                     />
 
                     <Field
@@ -297,48 +259,44 @@ export default function RegistrationForm({
                         label="Instagram"
                         defaultValue={
                             existingPlayer?.instagram
-                                ? `@${existingPlayer.instagram.replace(/^@/, "")}`
+                                ? `@${existingPlayer.instagram.replace(
+                                    /^@/,
+                                    "",
+                                )}`
                                 : ""
                         }
-                        error={fieldError(
-                            "instagram",
-                        )}
+                        error={fieldError("instagram")}
                         placeholder="@usuario"
+                        autoComplete="off"
                     />
                 </div>
             </section>
 
-            <section
-                className={styles.block}
-            >
-                <div
-                    className={
-                        styles.blockHeader
-                    }
-                >
-                    <span>
-                        PRIVACIDAD
-                    </span>
+            <section className={styles.block}>
+                <div className={styles.blockHeader}>
+                    <span>PRIVACIDAD</span>
 
                     <p>
-                        Necesitamos estas
-                        confirmaciones para
+                        Necesitamos estas confirmaciones para
                         completar el alta.
                     </p>
                 </div>
 
-                <div
-                    className={styles.checks}
-                >
-                    <label
-                        className={
-                            styles.check
-                        }
-                    >
+                <div className={styles.checks}>
+                    <label className={styles.check}>
                         <input
                             type="checkbox"
                             name="acceptTerms"
+                            value="on"
                             required
+                            aria-invalid={Boolean(
+                                fieldError("acceptTerms"),
+                            )}
+                            aria-describedby={
+                                fieldError("acceptTerms")
+                                    ? "acceptTerms-error"
+                                    : undefined
+                            }
                         />
 
                         <span>
@@ -354,29 +312,29 @@ export default function RegistrationForm({
                         </span>
                     </label>
 
-                    {fieldError(
-                        "acceptTerms",
-                    ) && (
-                            <small
-                                className={
-                                    styles.fieldError
-                                }
-                            >
-                                {fieldError(
-                                    "acceptTerms",
-                                )}
-                            </small>
-                        )}
+                    {fieldError("acceptTerms") && (
+                        <small
+                            id="acceptTerms-error"
+                            className={styles.fieldError}
+                        >
+                            {fieldError("acceptTerms")}
+                        </small>
+                    )}
 
-                    <label
-                        className={
-                            styles.check
-                        }
-                    >
+                    <label className={styles.check}>
                         <input
                             type="checkbox"
                             name="acceptPrivacy"
+                            value="on"
                             required
+                            aria-invalid={Boolean(
+                                fieldError("acceptPrivacy"),
+                            )}
+                            aria-describedby={
+                                fieldError("acceptPrivacy")
+                                    ? "acceptPrivacy-error"
+                                    : undefined
+                            }
                         />
 
                         <span>
@@ -386,37 +344,30 @@ export default function RegistrationForm({
                                 target="_blank"
                                 rel="noreferrer"
                             >
-                                política de
-                                privacidad
+                                política de privacidad
                             </a>
                             .
                         </span>
                     </label>
 
-                    {fieldError(
-                        "acceptPrivacy",
-                    ) && (
-                            <small
-                                className={
-                                    styles.fieldError
-                                }
-                            >
-                                {fieldError(
-                                    "acceptPrivacy",
-                                )}
-                            </small>
-                        )}
+                    {fieldError("acceptPrivacy") && (
+                        <small
+                            id="acceptPrivacy-error"
+                            className={styles.fieldError}
+                        >
+                            {fieldError("acceptPrivacy")}
+                        </small>
+                    )}
                 </div>
             </section>
 
-            {state.message && (
+            {formMessage && (
                 <div
-                    className={
-                        styles.formError
-                    }
+                    className={styles.formError}
                     role="alert"
+                    aria-live="polite"
                 >
-                    {state.message}
+                    {formMessage}
                 </div>
             )}
 
@@ -441,6 +392,7 @@ function Field({
     error,
     type = "text",
     placeholder,
+    autoComplete,
 }: {
     name: string;
     label: string;
@@ -448,7 +400,10 @@ function Field({
     error?: string;
     type?: string;
     placeholder?: string;
+    autoComplete?: string;
 }) {
+    const errorId = `${name}-error`;
+
     return (
         <div className={styles.field}>
             <label htmlFor={name}>
@@ -459,22 +414,19 @@ function Field({
                 id={name}
                 name={name}
                 type={type}
-                defaultValue={
-                    defaultValue
-                }
-                placeholder={
-                    placeholder
-                }
-                aria-invalid={
-                    Boolean(error)
+                defaultValue={defaultValue}
+                placeholder={placeholder}
+                autoComplete={autoComplete}
+                aria-invalid={Boolean(error)}
+                aria-describedby={
+                    error ? errorId : undefined
                 }
             />
 
             {error && (
                 <small
-                    className={
-                        styles.fieldError
-                    }
+                    id={errorId}
+                    className={styles.fieldError}
                 >
                     {error}
                 </small>
