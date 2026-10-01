@@ -1,21 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
 
-import {
-    getUser,
-} from "@/lib/supabase/server";
+import { getUser } from "@/lib/supabase/server";
 
 import SetPasswordForm from "./SetPasswordForm";
-
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-    title: "Seguridad",
-
+    title: "Seguridad | Sagunto Padel Cup",
     description:
-        "Gestiona la seguridad de tu cuenta de Sagunto Padel Cup.",
-
+        "Gestiona la contraseña y la seguridad de tu cuenta de Sagunto Padel Cup.",
     robots: {
         index: false,
         follow: false,
@@ -23,8 +19,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SeguridadPage() {
-    const user =
-        await getUser();
+    const user = await getUser();
 
     if (!user) {
         redirect("/login");
@@ -32,58 +27,44 @@ export default async function SeguridadPage() {
 
     return (
         <main className={styles.page}>
-            <div
-                className={
-                    styles.container
-                }
-            >
-                <Link
-                    href="/app/perfil"
-                    className={styles.back}
-                >
-                    Volver a mi perfil
+            <div className={styles.container}>
+                <Link href="/app/perfil" className={styles.back}>
+                    <ArrowLeft size={15} aria-hidden="true" />
+                    <span>Volver a mi perfil</span>
                 </Link>
 
-                <span
-                    className={
-                        styles.eyebrow
-                    }
-                >
-                    CUENTA · SEGURIDAD
-                </span>
+                <header className={styles.header}>
+                    <span className={styles.eyebrow}>
+                        CUENTA · SEGURIDAD
+                    </span>
 
-                <h1>
-                    Protege tu acceso.
-                </h1>
+                    <div className={styles.titleRow}>
+                        <div className={styles.icon} aria-hidden="true">
+                            <ShieldCheck size={22} />
+                        </div>
 
-                <p
-                    className={
-                        styles.intro
-                    }
-                >
-                    Puedes añadir o cambiar
-                    la contraseña de tu cuenta.
-                    Esto permite utilizar el
-                    acceso manual con email y
-                    contraseña incluso si
-                    originalmente creaste la
-                    cuenta con Google.
-                </p>
+                        <h1>Seguridad de la cuenta</h1>
+                    </div>
+
+                    <p className={styles.intro}>
+                        Gestiona tu contraseña para acceder a Sagunto Padel
+                        Cup de forma segura.
+                    </p>
+                </header>
 
                 <section
-                    className={
-                        styles.panel
-                    }
+                    className={styles.panel}
+                    aria-labelledby="password-title"
                 >
-                    <h2>
-                        Contraseña
-                    </h2>
-
-                    <p>
-                        Usa al menos 8
-                        caracteres, con una
-                        letra y un número.
-                    </p>
+                    <div className={styles.panelHeader}>
+                        <h2 id="password-title">Contraseña</h2>
+                        <p>
+                            Puedes establecer una contraseña o cambiar la
+                            que utilizas actualmente. Si te registraste con
+                            Google, también podrás acceder con tu email y
+                            contraseña después de configurarla.
+                        </p>
+                    </div>
 
                     <SetPasswordForm />
                 </section>

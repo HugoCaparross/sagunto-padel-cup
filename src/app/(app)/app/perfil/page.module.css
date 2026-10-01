@@ -1,60 +1,138 @@
 .page {
+    width: 100%;
     min-width: 0;
-    min-height: 100svh;
-    background: var(--background);
+    padding: 38px 0 64px;
+    color: var(--foreground);
 }
 
 .container {
-    width: min(var(--container),
-            calc(100% - (var(--gutter) * 2)));
+    width: min(100% - 48px, 1120px);
     margin-inline: auto;
-}
-
-.hero {
-    padding: clamp(44px, 7vw, 76px) 0 42px;
-    background: var(--dark-surface);
-    color: var(--white);
 }
 
 .welcome {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 26px;
-    padding: 13px 15px;
-    border-left: 3px solid var(--brand);
-    background: rgb(255 255 255 / 5%);
+    gap: 12px;
+    margin-bottom: 28px;
+    padding: 15px 18px;
+    border: 1px solid rgba(35, 145, 91, 0.2);
+    border-radius: 12px;
+    background: rgba(35, 145, 91, 0.06);
+}
+
+.welcomeIcon {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    place-items: center;
+    border-radius: 10px;
+    background: rgba(35, 145, 91, 0.1);
+    color: #238f5b;
+}
+
+.welcomeText {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.welcomeText strong {
+    font-size: 0.88rem;
+    font-weight: 750;
+}
+
+.welcomeText span {
+    color: var(--muted);
     font-size: 0.8rem;
+    line-height: 1.5;
 }
 
-.welcome span {
-    color: rgb(255 255 255 / 65%);
+.pageHeader {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
 }
 
-.eyebrow,
-.sectionEyebrow,
-.cardEyebrow {
-    display: block;
-    font-size: 0.66rem;
-    font-weight: 900;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
+.heading {
+    min-width: 0;
 }
 
 .eyebrow {
+    display: block;
+    margin-bottom: 9px;
+    color: var(--brand);
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.13em;
+}
+
+.heading h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-weight: 900;
+    letter-spacing: -0.045em;
+    line-height: 1.1;
+}
+
+.heading p {
+    max-width: 620px;
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.65;
+}
+
+.securityLink {
+    display: inline-flex;
+    min-height: 42px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--foreground);
+    font-size: 0.78rem;
+    font-weight: 750;
+    text-decoration: none;
+    transition:
+        border-color 160ms ease,
+        background 160ms ease,
+        color 160ms ease;
+}
+
+.securityLink:hover {
+    border-color: var(--brand);
     color: var(--brand);
 }
 
-.heroRow {
+.securityLink:focus-visible,
+.accountAction:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--brand) 35%, transparent);
+    outline-offset: 3px;
+}
+
+.identityCard {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 28px;
-    margin-top: 18px;
+    gap: 24px;
+    min-width: 0;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
 }
 
-.identity {
+.identityMain {
     display: flex;
     align-items: center;
     gap: 18px;
@@ -63,251 +141,377 @@
 
 .avatar {
     display: grid;
-    width: 76px;
-    height: 76px;
-    flex: 0 0 76px;
-    place-items: center;
+    width: 68px;
+    height: 68px;
+    flex: 0 0 68px;
     overflow: hidden;
-    background: var(--brand);
-    color: var(--white);
-    font-size: 1.2rem;
-    font-weight: 900;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--surface-soft);
+    color: var(--foreground);
+    font-size: 1.05rem;
+    font-weight: 850;
 }
 
 .avatar img {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.identityText {
+.identityInfo {
     min-width: 0;
 }
 
-.identityText h1 {
-    margin: 0 0 5px;
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 5vw, 3.8rem);
-    font-weight: 950;
-    letter-spacing: -0.055em;
-    line-height: 0.98;
-    overflow-wrap: anywhere;
+.identityLabel {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--muted);
+    font-size: 0.63rem;
+    font-weight: 850;
+    letter-spacing: 0.11em;
 }
 
-.identityText p {
+.identityInfo h2 {
     margin: 0;
-    color: rgb(255 255 255 / 58%);
-    font-size: 0.82rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+    font-weight: 850;
+    letter-spacing: -0.035em;
+    line-height: 1.3;
     overflow-wrap: anywhere;
 }
 
-.secondaryButton {
+.identityEmail {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 7px 0 0;
+    color: var(--muted);
+    font-size: 0.8rem;
+    overflow-wrap: anywhere;
+}
+
+.identityEmail svg {
+    flex: 0 0 auto;
+}
+
+.statusBadge {
     display: inline-flex;
-    min-height: 44px;
+    min-height: 30px;
     flex: 0 0 auto;
     align-items: center;
-    justify-content: center;
-    padding: 0 16px;
-    border: 1px solid rgb(255 255 255 / 24%);
-    color: var(--white);
+    gap: 8px;
+    padding: 0 11px;
+    border: 1px solid transparent;
+    border-radius: 999px;
     font-size: 0.72rem;
-    font-weight: 850;
-    text-align: center;
-    text-transform: uppercase;
-    transition: border-color 160ms ease;
+    font-weight: 750;
 }
 
-.secondaryButton:hover {
-    border-color: rgb(255 255 255 / 65%);
+.statusActive {
+    border-color: rgba(35, 145, 91, 0.18);
+    background: rgba(35, 145, 91, 0.07);
+    color: #238f5b;
 }
 
-.content {
-    padding: 42px 0 76px;
-}
-
-.sectionHeading {
-    margin-bottom: 24px;
-}
-
-.sectionEyebrow {
-    margin-bottom: 9px;
-    color: var(--brand);
-}
-
-.sectionHeading h2 {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(1.6rem, 3vw, 2.2rem);
-    font-weight: 900;
-    letter-spacing: -0.04em;
-}
-
-.sectionHeading p {
-    margin: 8px 0 0;
+.statusOther {
+    border-color: var(--line);
+    background: var(--surface-soft);
     color: var(--muted);
-    font-size: 0.86rem;
-    line-height: 1.55;
 }
 
-.profileLayout {
+.statusDot {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.sections {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
-    align-items: start;
-    gap: 22px;
+    gap: 18px;
+    margin-top: 22px;
 }
 
-.mainColumn,
-.sideColumn {
+.section {
     min-width: 0;
-}
-
-.sideColumn {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.infoCard,
-.securityCard {
     padding: 24px;
     border: 1px solid var(--line);
+    border-radius: 14px;
     background: var(--surface);
 }
 
-.cardEyebrow {
-    color: var(--brand);
-    font-size: 0.62rem;
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 22px;
 }
 
-.infoCard h3,
-.securityCard h3 {
-    margin: 12px 0 20px;
+.sectionIcon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    place-items: center;
+    border-radius: 11px;
+    background: var(--surface-soft);
+    color: var(--foreground);
+}
+
+.sectionHeader h2,
+.accountSectionContent h2 {
+    margin: 0;
     font-family: var(--font-display);
-    font-size: 1.15rem;
+    font-size: 1rem;
     font-weight: 850;
     letter-spacing: -0.025em;
 }
 
-.infoRow {
+.sectionHeader p,
+.accountSectionContent p {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 0.8rem;
+    line-height: 1.55;
+}
+
+.detailsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 32px;
+}
+
+.detail {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    padding: 14px 0;
+    gap: 7px;
+    min-width: 0;
+    padding: 15px 0;
     border-top: 1px solid var(--line);
 }
 
-.infoRow span {
+.detailLabel {
     color: var(--muted);
-    font-size: 0.72rem;
+    font-size: 0.75rem;
+    font-weight: 550;
 }
 
-.infoRow strong {
+.detail strong {
+    min-width: 0;
     color: var(--foreground);
-    font-size: 0.86rem;
-    font-weight: 800;
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.breakable {
     overflow-wrap: anywhere;
 }
 
-.emailValue {
-    font-size: 0.78rem !important;
+.sportGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
 }
 
-.infoNote {
-    margin: 14px 0 0;
-    color: var(--muted);
-    font-size: 0.76rem;
-    line-height: 1.6;
+.sportItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    min-width: 0;
+    padding: 17px;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    background: var(--surface-soft);
 }
 
-.securityCard h3 {
-    margin-bottom: 9px;
-}
-
-.securityCard p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.8rem;
-    line-height: 1.6;
-}
-
-.textLink {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    margin-top: 20px;
-    color: var(--foreground);
-    font-size: 0.75rem;
-    font-weight: 850;
-    text-transform: uppercase;
-}
-
-.textLink span {
+.sportItemIcon {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    place-items: center;
+    border-radius: 9px;
+    background: var(--surface);
     color: var(--brand);
-    font-size: 1rem;
-    transition: transform 160ms ease;
 }
 
-.textLink:hover span {
-    transform: translateX(3px);
+.sportItem>div:last-child {
+    min-width: 0;
 }
 
-@media (max-width: 900px) {
-    .profileLayout {
-        grid-template-columns: minmax(0, 1fr) 260px;
-        gap: 16px;
-    }
+.sportItem strong {
+    display: block;
+    margin-top: 5px;
+    color: var(--foreground);
+    font-size: 0.86rem;
+    font-weight: 750;
+    line-height: 1.4;
+}
 
-    .infoCard,
-    .securityCard {
-        padding: 19px;
-    }
+.sportItem p {
+    margin: 7px 0 0;
+    color: var(--muted);
+    font-size: 0.75rem;
+    line-height: 1.55;
+}
+
+.accountSection {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 0;
+    padding: 20px 22px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+}
+
+.accountSectionIcon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    place-items: center;
+    border-radius: 11px;
+    background: var(--surface-soft);
+    color: var(--foreground);
+}
+
+.accountSectionContent {
+    flex: 1;
+    min-width: 0;
+}
+
+.accountAction {
+    display: inline-flex;
+    min-height: 40px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 12px;
+    border-radius: 8px;
+    color: var(--brand);
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-decoration: none;
+    transition: background 160ms ease;
+}
+
+.accountAction:hover {
+    background: var(--surface-soft);
 }
 
 @media (max-width: 767px) {
-    .hero {
-        padding-block: 38px 34px;
+    .page {
+        padding: 28px 0 48px;
     }
 
-    .heroRow {
+    .container {
+        width: min(100% - 32px, 600px);
+    }
+
+    .pageHeader {
         align-items: flex-start;
         flex-direction: column;
+        gap: 17px;
+        margin-bottom: 22px;
     }
 
-    .profileLayout {
-        grid-template-columns: 1fr;
+    .securityLink {
+        min-height: 40px;
     }
 
-    .sideColumn {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .identityCard {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 16px;
+        padding: 19px;
+    }
+
+    .identityMain {
+        align-items: flex-start;
+        gap: 14px;
     }
 
     .avatar {
-        width: 64px;
-        height: 64px;
-        flex-basis: 64px;
+        width: 56px;
+        height: 56px;
+        flex-basis: 56px;
+        font-size: 0.9rem;
     }
-}
 
-@media (max-width: 560px) {
-    .sideColumn {
+    .statusBadge {
+        align-self: flex-start;
+    }
+
+    .section {
+        padding: 19px;
+    }
+
+    .detailsGrid,
+    .sportGrid {
         grid-template-columns: 1fr;
     }
 
-    .identity {
+    .detail {
+        padding: 13px 0;
+    }
+
+    .accountSection {
         align-items: flex-start;
-        gap: 13px;
+        flex-wrap: wrap;
+        padding: 18px;
     }
 
-    .identityText h1 {
-        font-size: clamp(1.65rem, 8vw, 2.4rem);
+    .accountSectionContent {
+        flex-basis: calc(100% - 60px);
     }
 
-    .secondaryButton {
-        width: 100%;
+    .accountAction {
+        margin-left: 54px;
+        padding-left: 0;
+    }
+}
+
+@media (max-width: 380px) {
+    .container {
+        width: calc(100% - 24px);
     }
 
-    .content {
-        padding-top: 32px;
+    .welcome {
+        align-items: flex-start;
+        padding: 13px;
+    }
+
+    .identityMain {
+        gap: 11px;
+    }
+
+    .identityInfo h2 {
+        font-size: 1.05rem;
+    }
+
+    .identityEmail {
+        font-size: 0.72rem;
+    }
+
+    .sectionHeader h2,
+    .accountSectionContent h2 {
+        font-size: 0.94rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .securityLink,
+    .accountAction {
+        transition: none;
     }
 }
