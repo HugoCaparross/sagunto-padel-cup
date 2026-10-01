@@ -9,7 +9,8 @@ import {
 export type AuthDestination =
     | "/login"
     | "/registro/confirma"
-    | "/app/perfil";
+    | "/app/perfil"
+    | "/admin/torneos";
 
 export async function getAuthenticatedContext() {
     const user =
@@ -42,6 +43,12 @@ export async function getAuthenticatedDestination(): Promise<AuthDestination> {
 
     if (!user) {
         return "/login";
+    }
+
+    // Los administradores acceden al panel
+    // independientemente del estado del onboarding.
+    if (player?.role === "admin") {
+        return "/admin/torneos";
     }
 
     if (

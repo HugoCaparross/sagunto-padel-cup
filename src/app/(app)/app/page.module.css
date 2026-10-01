@@ -1,0 +1,189 @@
+.page {
+    display: grid;
+    gap: clamp(28px, 4vw, 44px);
+    width: 100%;
+}
+
+.welcome {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.eyebrow {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--brand-dark);
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 0.12em;
+}
+
+.welcome h1 {
+    margin: 0;
+    color: var(--foreground);
+    font-family: var(--font-display);
+    font-size: clamp(27px, 3vw, 38px);
+    font-weight: 850;
+    letter-spacing: -0.045em;
+    line-height: 1.12;
+}
+
+.welcome p {
+    max-width: 580px;
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.statusGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.statusCard {
+    display: flex;
+    min-width: 0;
+    gap: 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    padding: clamp(18px, 2.2vw, 26px);
+}
+
+.cardIcon,
+.emptyIcon {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 10px;
+    background: var(--surface-soft);
+    color: var(--foreground);
+}
+
+.cardIcon {
+    width: 42px;
+    height: 42px;
+}
+
+.statusContent {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.statusContent>span {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.statusContent strong {
+    margin-top: 7px;
+    color: var(--foreground);
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+.statusContent p {
+    margin: 9px 0 16px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.65;
+}
+
+.statusContent a {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: auto;
+    color: var(--brand-dark);
+    font-size: 11px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.statusContent a:hover {
+    text-decoration: underline;
+}
+
+.nextSection {
+    display: grid;
+    gap: 16px;
+}
+
+.sectionHeading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.sectionHeading .eyebrow {
+    margin-bottom: 7px;
+}
+
+.sectionHeading h2 {
+    margin: 0;
+    color: var(--foreground);
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+}
+
+.emptyState {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    border: 1px dashed var(--line-strong);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.55);
+    padding: 22px;
+}
+
+.emptyIcon {
+    width: 40px;
+    height: 40px;
+}
+
+.emptyState strong {
+    display: block;
+    color: var(--foreground);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.emptyState p {
+    max-width: 650px;
+    margin: 7px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+@media (max-width: 760px) {
+    .statusGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .statusCard {
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .statusContent strong {
+        font-size: 15px;
+    }
+
+    .emptyState {
+        padding: 17px;
+    }
+}

@@ -16,21 +16,13 @@ import {
     createClient,
 } from "@/lib/supabase/server";
 
-export type RegistrationState = {
-    success: boolean;
-    message: string;
-    fieldErrors: Record<
-        string,
-        string[]
-    >;
-};
+import {
+    initialRegistrationState,
+} from "./registration-state";
 
-export const initialRegistrationState: RegistrationState =
-{
-    success: false,
-    message: "",
-    fieldErrors: {},
-};
+import type {
+    RegistrationState,
+} from "./registration-state";
 
 export async function completeRegistration(
     _previousState: RegistrationState,

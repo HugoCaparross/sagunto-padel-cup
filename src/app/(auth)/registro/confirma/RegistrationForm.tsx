@@ -4,8 +4,11 @@ import { useActionState } from "react";
 
 import {
     completeRegistration,
-    initialRegistrationState,
 } from "./actions";
+
+import {
+    initialRegistrationState,
+} from "./registration-state";
 
 import type {
     Category,
