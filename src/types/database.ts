@@ -259,6 +259,22 @@ export type Player = {
     updated_at: string;
 };
 
+export type PublicPlayerProfileRow = Pick<
+    Player,
+    | "id"
+    | "nombre"
+    | "apellidos"
+    | "foto_url"
+    | "categoria_actual_id"
+    | "mano_dominante"
+    | "pala"
+    | "ciudad"
+    | "instagram"
+    | "visibilidad_json"
+    | "estado"
+    | "updated_at"
+>;
+
 export type PlayerInsert = {
     id?: string;
     auth_user_id?: string | null;
@@ -378,8 +394,8 @@ export type TournamentUpdate = Partial<TournamentInsert>;
 export type TournamentCategory = {
     tournament_id: string;
     categoria_id: string;
-    cupo_minimo: number;
-    cupo_maximo: number;
+    cupo_minimo: number | null;
+    cupo_maximo: number | null;
     enabled: boolean;
     settings: Json;
     created_at: string;
@@ -389,8 +405,8 @@ export type TournamentCategory = {
 export type TournamentCategoryInsert = {
     tournament_id: string;
     categoria_id: string;
-    cupo_minimo?: number;
-    cupo_maximo?: number;
+    cupo_minimo?: number | null;
+    cupo_maximo?: number | null;
     enabled?: boolean;
     settings?: Json;
     created_at?: string;
@@ -1044,7 +1060,12 @@ export type Database = {
             badges: TableDefinition<Badge, BadgeInsert, BadgeUpdate>;
         };
 
-        Views: Record<string, never>;
+        Views: {
+            public_player_profiles: {
+                Row: PublicPlayerProfileRow;
+                Relationships: [];
+            };
+        };
 
         Functions: Record<string, never>;
 

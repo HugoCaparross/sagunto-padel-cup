@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sagunto Padel Cup
 
-## Getting Started
+Plataforma web del circuito Sagunto Padel Cup para consultar torneos, calendario,
+clasificaciones, jugadores y noticias, además de gestionar cuentas y operar torneos.
 
-First, run the development server:
+## Requisitos
+
+- Node.js (el proyecto se ha validado con Node 24).
+- npm.
+- Un proyecto Supabase con el esquema y las políticas RLS que espera
+  `src/types/database.ts`.
+
+## Configuración local
+
+Instala dependencias con `npm ci` y crea `.env.local` en la raíz:
+
+```dotenv
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+La clave anónima es pública y las operaciones deben protegerse mediante sesión,
+autorización en servidor y RLS. No añadas una clave `service_role` a variables
+`NEXT_PUBLIC_*` ni al cliente.
+
+Inicia el servidor de desarrollo con:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Comprobaciones
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npm run qa
+npm run build
+npm run start
+```
 
-## Learn More
+`npm run qa` comprueba rutas públicas, algunas condiciones de contenido, lint y
+TypeScript. No sustituye pruebas de integración con Supabase ni pruebas de los
+flujos deportivos.
 
-To learn more about Next.js, take a look at the following resources:
+## Estructura
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `src/app/(public)`: páginas públicas, torneos, ranking, jugadores, circuito,
+  noticias y contenido legal.
+- `src/app/(auth)`: registro, inicio de sesión y recuperación de cuenta.
+- `src/app/(app)`: inicio privado del jugador, perfil y seguridad.
+- `src/app/(admin)`: panel administrativo y gestión de torneos.
+- `src/lib/competition`: reglas de competición, cuadros, grupos, ranking y
+  temporadas.
+- `src/lib/services`: acceso a datos y operaciones de negocio con Supabase.
+- `src/types/database.ts`: tipos TypeScript del esquema esperado.
+- `supabase/schema.sql`: exportación de esquema usada como evidencia de las
+  tablas y políticas actuales.
+- `supabase/migrations`: migraciones revisables para perfiles/datos privados y
+  capacidad ilimitada por categoría. Validarlas en local/staging antes de aplicarlas.
+- `supabase/seed/official-calendar-2026-2027.sql`: calendario aprobado y
+  categorías iniciales; ejecutar después de las migraciones solo en local/staging.
+- `docs/implementation-status.md`: matriz de estado, verificaciones y decisiones
+  de producto pendientes.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Estado conocido
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+El pago de inscripciones se realiza fuera de la plataforma. El panel actualmente
+incluye el dashboard y la gestión de torneos; otros módulos de administración aún
+no tienen páginas implementadas. `schema.sql` es una exportación y no una secuencia
+de migraciones. La migración de perfiles públicos no se ha aplicado: debe probarse
+en local/staging y el resto de políticas RLS debe revisarse antes de operar con
+datos reales.

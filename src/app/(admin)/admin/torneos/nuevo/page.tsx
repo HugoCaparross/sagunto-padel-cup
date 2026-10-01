@@ -7,7 +7,7 @@ import {
 } from "@/lib/services/admin";
 import { getSeasons } from "@/lib/services/seasons";
 
-import { createTournamentAction } from "./actions";
+import TournamentForm, { TournamentSubmitButton } from "./TournamentForm";
 import styles from "./page.module.css";
 
 export default async function NewTournamentPage() {
@@ -93,9 +93,9 @@ export default async function NewTournamentPage() {
                     </div>
                 )}
 
-                <form
-                    action={createTournamentAction}
+                <TournamentForm
                     className={styles.form}
+                    errorClassName={styles.errorMessage}
                 >
                     <section className={styles.formSection}>
                         <div className={styles.sectionHeading}>
@@ -347,15 +347,12 @@ export default async function NewTournamentPage() {
                             Cancelar
                         </Link>
 
-                        <button
-                            type="submit"
+                        <TournamentSubmitButton
                             className={styles.submitButton}
                             disabled={!canCreate}
-                        >
-                            Crear torneo
-                        </button>
+                        />
                     </footer>
-                </form>
+                </TournamentForm>
             </div>
         </main>
     );

@@ -25,11 +25,9 @@ import {
 
 import {
   formatNewsDate,
-  formatRankingPoints,
   formatTournamentDate,
   getCategoryHref,
   getNewsHref,
-  getPlayerHref,
   getTournamentHref,
   getTournamentStatusLabel,
   getTournamentStatusVariant,
@@ -41,28 +39,44 @@ import styles from "./page.module.css";
 import RankingPreview from "./RankingPreview";
 
 export default async function Home() {
-  /*
-   * La conexión con Supabase se incorporará cuando utilicemos
-   * el cliente real del proyecto.
-   *
-   * No se inventa aquí ninguna ruta de cliente Supabase.
-   */
   const [tournamentsResult, categoriesResult, newsResult] = await Promise.all([
     getPublicTournaments(),
     getPublicCategories(),
     getPublicNews(),
   ]);
 
+  if (
+    tournamentsResult.error ||
+    categoriesResult.error ||
+    newsResult.error
+  ) {
+    throw new Error("No se pudo cargar la información de inicio.");
+  }
+
   const tournaments = tournamentsResult.data ?? [];
-  const nextTournament =
-    [...tournaments]
-      .filter(
-        (tournament) =>
-          tournament.estado === "inscripciones_abiertas" ||
-          tournament.estado === "publicado",
-      )
-      .sort((a, b) => a.fecha_inicio.localeCompare(b.fecha_inicio))[0] ??
-    null;
+  const todayParts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Europe/Madrid",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const todayValues = Object.fromEntries(
+    todayParts.map(({ type, value }) => [type, value]),
+  );
+  const today = `${todayValues.year}-${todayValues.month}-${todayValues.day}`;
+  const upcomingTournaments = tournaments
+    .filter(
+      (tournament) =>
+        tournament.fecha_fin >= today &&
+        tournament.estado !== "finalizado",
+    )
+    .sort((a, b) => a.fecha_inicio.localeCompare(b.fecha_inicio));
+  const nextTournament = upcomingTournaments.find(
+    (tournament) =>
+      tournament.estado === "inscripciones_abiertas" ||
+      tournament.estado === "publicado" ||
+      tournament.estado === "en_juego",
+  ) ?? null;
 
   const circuitCategories = getUniqueCircuitCategories(
     (categoriesResult.data ?? []).map((category) => ({
@@ -74,6 +88,10 @@ export default async function Home() {
   const categoryRankingResults = await Promise.all(
     circuitCategories.map(async (category) => {
       const result = await getPublicRanking(category.id);
+
+      if (result.error) {
+        throw new Error("No se pudo cargar el ranking de inicio.");
+      }
 
       return {
         category: {
@@ -97,8 +115,12 @@ export default async function Home() {
   const rankingPreview = categoryRankingResults[0]?.ranking ?? [];
 
   const sponsorResult = await getPublicSponsors(
-    tournaments.slice(0, 6).map((tournament) => tournament.id),
+    upcomingTournaments.slice(0, 6).map((tournament) => tournament.id),
   );
+
+  if (sponsorResult.error) {
+    throw new Error("No se pudieron cargar los patrocinadores.");
+  }
 
   const data: HomeData = {
     nextTournament: nextTournament
@@ -120,7 +142,7 @@ export default async function Home() {
         categorias: [],
       }
       : null,
-    upcomingTournaments: tournaments.slice(0, 6).map((tournament) => ({
+    upcomingTournaments: upcomingTournaments.slice(0, 6).map((tournament) => ({
       id: tournament.id,
       nombre: tournament.nombre,
       slug: tournament.slug,

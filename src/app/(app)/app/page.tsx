@@ -3,10 +3,12 @@ import Link from "next/link";
 import {
     ArrowRight,
     ShieldCheck,
+    Trophy,
     UserRound,
 } from "lucide-react";
 
 import { getAuthenticatedContext } from "@/lib/auth/flow";
+import { getPlayerStats } from "@/lib/services/players";
 
 import styles from "./page.module.css";
 
@@ -26,6 +28,8 @@ export default async function PlayerDashboardPage() {
     if (!player) {
         return null;
     }
+
+    const playerStats = await getPlayerStats(player.id);
 
     const firstName =
         player.nombre?.trim().split(/\s+/)[0] || "jugador";
@@ -119,7 +123,30 @@ export default async function PlayerDashboardPage() {
                     </div>
                 </div>
 
-                <div className={styles.emptyState}>
+                <div className={styles.statusGrid}>
+                    <article className={styles.statusCard}>
+                        <div className={styles.cardIcon}>
+                            <Trophy size={19} />
+                        </div>
+                        <div className={styles.statusContent}>
+                            <span>Actividad registrada</span>
+                            <strong>{playerStats.tournamentsPlayed} torneos</strong>
+                            <p>Participaciones asociadas a tus parejas y partidos finalizados.</p>
+                        </div>
+                    </article>
+                    <article className={styles.statusCard}>
+                        <div className={styles.cardIcon}>
+                            <UserRound size={19} />
+                        </div>
+                        <div className={styles.statusContent}>
+                            <span>Partidos finalizados</span>
+                            <strong>{playerStats.matchesPlayed} jugados · {playerStats.matchesWon} ganados</strong>
+                            <p>Estadísticas calculadas a partir de los resultados registrados.</p>
+                        </div>
+                    </article>
+                </div>
+
+                <div hidden className={styles.emptyState}>
                     <div className={styles.emptyIcon}>
                         <UserRound size={20} />
                     </div>

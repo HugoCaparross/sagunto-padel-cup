@@ -1234,8 +1234,8 @@ export async function updateTournamentCategory(
         await createClient();
 
     const payload: {
-        cupo_minimo?: number;
-        cupo_maximo?: number;
+        cupo_minimo?: number | null;
+        cupo_maximo?: number | null;
         enabled?: boolean;
         settings?: Json;
     } = {};
@@ -1244,18 +1244,14 @@ export async function updateTournamentCategory(
         input.minCapacity !==
         undefined
     ) {
-        if (input.minCapacity !== null) {
-            payload.cupo_minimo = input.minCapacity;
-        }
+        payload.cupo_minimo = input.minCapacity;
     }
 
     if (
         input.maxCapacity !==
         undefined
     ) {
-        if (input.maxCapacity !== null) {
-            payload.cupo_maximo = input.maxCapacity;
-        }
+        payload.cupo_maximo = input.maxCapacity;
     }
 
     if (

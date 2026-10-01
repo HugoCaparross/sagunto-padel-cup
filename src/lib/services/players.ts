@@ -227,7 +227,7 @@ function toVisibilityJson(
 ): Player["visibilidad_json"] {
     return {
         profile:
-            visibilidad_json.profile ?? true,
+            visibilidad_json.profile ?? false,
 
         telefono:
             visibilidad_json.telefono ?? false,
@@ -384,14 +384,13 @@ export async function getPlayers(
     const supabase =
         await createClient();
 
+    const playerSelection = filters.visibleOnly
+        ? `id,nombre,apellidos,foto_url,categoria_actual_id,mano_dominante,pala,ciudad,instagram,visibilidad_json,estado,category:categories(*)`
+        : `*,category:categories(*)`;
+
     let query = supabase
         .from("players")
-        .select(
-            `
-                *,
-                category:categories(*)
-            `,
-        )
+        .select(playerSelection)
         .order(
             "nombre",
             {
@@ -448,11 +447,17 @@ export async function getPlayers(
             filters.search.trim();
 
         query = query.or(
-            [
+            (filters.visibleOnly
+                ? [
                 `nombre.ilike.%${search}%`,
                 `apellidos.ilike.%${search}%`,
-                `email.ilike.%${search}%`,
-            ].join(","),
+                ]
+                : [
+                    `nombre.ilike.%${search}%`,
+                    `apellidos.ilike.%${search}%`,
+                    `email.ilike.%${search}%`,
+                ]
+            ).join(","),
         );
     }
 
@@ -476,7 +481,7 @@ export async function getPlayers(
                 (player) =>
                     getPlayerVisibility(
                         player.visibilidad_json,
-                    ).profile !== false,
+                    ).profile === true,
             );
     }
 
@@ -628,11 +633,58 @@ export async function getPublicPlayers(
         "visibleOnly" | "estado"
     > = {},
 ): Promise<PlayerWithCategory[]> {
-    return getPlayers({
-        ...filters,
-        visibleOnly: true,
-        estado: "activo",
-    });
+    const supabase = await createClient();
+    let query = supabase
+        .from("public_player_profiles")
+        .select("*")
+        .order("nombre", { ascending: true })
+        .order("apellidos", { ascending: true });
+
+    if (filters.categoryId) {
+        query = query.eq("categoria_actual_id", filters.categoryId);
+    }
+
+    if (filters.city?.trim()) {
+        query = query.ilike("ciudad", `%${filters.city.trim()}%`);
+    }
+
+    if (filters.search?.trim()) {
+        const search = filters.search.trim();
+        query = query.or(
+            `nombre.ilike.%${search}%,apellidos.ilike.%${search}%`,
+        );
+    }
+
+    const { data, error } = await query;
+    if (error) {
+        throw new Error(`No se pudieron obtener los perfiles públicos: ${error.message}`);
+    }
+
+    const players = data ?? [];
+    const categoryIds = [...new Set(
+        players
+            .map((player) => player.categoria_actual_id)
+            .filter((categoryId): categoryId is string => Boolean(categoryId)),
+    )];
+
+    const categoriesResult = categoryIds.length
+        ? await supabase.from("categories").select("*").in("id", categoryIds)
+        : { data: [], error: null };
+
+    if (categoriesResult.error) {
+        throw new Error(`No se pudieron obtener las categorías públicas: ${categoriesResult.error.message}`);
+    }
+
+    const categoriesById = new Map(
+        (categoriesResult.data ?? []).map((category) => [category.id, category]),
+    );
+
+    return players.map((player) => ({
+        ...player,
+        category: player.categoria_actual_id
+            ? categoriesById.get(player.categoria_actual_id) ?? null
+            : null,
+    })) as unknown as PlayerWithCategory[];
 }
 
 /* -------------------------------------------------------------------------- */

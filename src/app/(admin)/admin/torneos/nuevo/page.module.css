@@ -71,6 +71,17 @@
     box-shadow: var(--shadow-sm);
 }
 
+.errorMessage {
+    margin: 20px 28px 0;
+    padding: 12px 14px;
+    border: 1px solid var(--danger);
+    border-radius: var(--radius-sm);
+    background: var(--danger-soft);
+    color: var(--danger);
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
 .formSection {
     padding: 28px;
     border-bottom: 1px solid var(--line);

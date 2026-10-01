@@ -432,7 +432,7 @@ export const RANKING_RETENTION = {
 
 export const MASTER = {
     minimumRegularTournaments: 1,
-    topPairsPerCategory: 4,
+    topPlayersPerCategory: 4,
     qualifyingRequirement:
         "haber disputado al menos un torneo regular del circuito",
 } as const;

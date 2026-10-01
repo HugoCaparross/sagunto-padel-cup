@@ -1,8 +1,8 @@
-import type { Database, Json } from "@/types/database";
+import type { Database, Json, PublicPlayerProfileRow } from "@/types/database";
 import { createClient } from "@/lib/supabase/server";
 
 type Tables = Database["public"]["Tables"];
-type Player = Tables["players"]["Row"];
+type Player = Database["public"]["Views"]["public_player_profiles"]["Row"];
 type Category = Tables["categories"]["Row"];
 type Tournament = Tables["tournaments"]["Row"];
 type Club = Tables["clubs"]["Row"];
@@ -390,7 +390,7 @@ export async function getPublicTournamentBySlug(
 
                 return ids.size
                     ? supabase
-                        .from("players")
+                        .from("public_player_profiles")
                         .select("*")
                         .in(
                             "id",
@@ -653,7 +653,7 @@ export async function getPublicNewsBySlug(
 export async function getPublicPlayers(): Promise<
     PublicResult<
         Array<
-            Player & {
+            PublicPlayerProfileRow & {
                 category: Category | null;
                 points: number;
             }
@@ -666,9 +666,9 @@ export async function getPublicPlayers(): Promise<
         data: players,
         error,
     } = await supabase
-        .from("players")
+        .from("public_player_profiles")
         .select("*")
-        .eq("estado", "activo")
+        .eq("visibilidad_json->>profile", "true")
         .order("nombre", {
             ascending: true,
         });
@@ -984,7 +984,7 @@ export async function getPublicRanking(
     }
 
     const playersQ = await supabase
-        .from("players")
+        .from("public_player_profiles")
         .select("*")
         .in("id", playerIds)
         .eq("estado", "activo");
@@ -1172,7 +1172,7 @@ export async function getPublicPlayer(
     id: string,
 ): Promise<
     PublicResult<{
-        player: Player;
+        player: PublicPlayerProfileRow;
         category: Category | null;
         points: number;
         tournaments: number;
@@ -1189,10 +1189,9 @@ export async function getPublicPlayer(
     const supabase = await createClient();
 
     const playerQ = await supabase
-        .from("players")
+        .from("public_player_profiles")
         .select("*")
         .eq("id", id)
-        .eq("estado", "activo")
         .maybeSingle();
 
     if (playerQ.error) {

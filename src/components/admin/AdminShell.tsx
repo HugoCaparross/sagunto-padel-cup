@@ -11,7 +11,6 @@ import {
     FolderOpen,
     Handshake,
     LayoutDashboard,
-    LogOut,
     Menu,
     Newspaper,
     Settings,
@@ -144,6 +143,13 @@ const navigationGroups: NavigationGroup[] = [
     },
 ];
 
+// Keep navigation limited to implemented destinations so users never land on
+// an empty 404 route from the administration shell.
+const availableAdminRoutes = new Set([
+    "/admin",
+    "/admin/torneos",
+]);
+
 function isActiveRoute(
     pathname: string,
     item: NavigationItem,
@@ -227,7 +233,11 @@ export default function AdminShell({
                 </div>
 
                 <nav className={styles.navigation}>
-                    {navigationGroups.map((group) => (
+                    {navigationGroups
+                        .filter((group) =>
+                            group.items.some((item) => availableAdminRoutes.has(item.href)),
+                        )
+                        .map((group) => (
                         <div
                             className={styles.navigationGroup}
                             key={group.label}
@@ -237,7 +247,9 @@ export default function AdminShell({
                             </span>
 
                             <ul className={styles.navigationList}>
-                                {group.items.map((item) => {
+                                {group.items
+                                    .filter((item) => availableAdminRoutes.has(item.href))
+                                    .map((item) => {
                                     const Icon = item.icon;
                                     const active = isActiveRoute(
                                         pathname,
