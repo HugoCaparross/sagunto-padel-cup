@@ -3,8 +3,6 @@ import Link from "next/link";
 import {
     ArrowRight,
     BadgeCheck,
-    CalendarDays,
-    CircleUserRound,
     Mail,
     ShieldCheck,
     Trophy,
@@ -12,12 +10,14 @@ import {
 } from "lucide-react";
 
 import { getAuthenticatedContext } from "@/lib/auth/flow";
+import ProfileForm from "@/components/private/profile/ProfileForm";
 
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
     title: "Mi perfil",
-    description: "Consulta y gestiona tu perfil de jugador en Sagunto Padel Cup.",
+    description:
+        "Consulta y gestiona tu perfil de jugador en Sagunto Padel Cup.",
     robots: {
         index: false,
         follow: false,
@@ -30,14 +30,19 @@ type Props = {
     }>;
 };
 
-function getInitials(nombre: string, apellidos?: string | null) {
+function getInitials(
+    nombre: string,
+    apellidos?: string | null,
+) {
     const first = nombre.trim().charAt(0);
     const last = apellidos?.trim().charAt(0) ?? "";
 
     return `${first}${last}`.toUpperCase() || "J";
 }
 
-function formatStatus(status: string | null | undefined) {
+function formatStatus(
+    status: string | null | undefined,
+) {
     if (!status) return "Sin información";
 
     const normalized = status.toLowerCase();
@@ -49,7 +54,9 @@ function formatStatus(status: string | null | undefined) {
     return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
-export default async function PerfilPage({ searchParams }: Props) {
+export default async function PerfilPage({
+    searchParams,
+}: Props) {
     const [{ user, player }, params] = await Promise.all([
         getAuthenticatedContext(),
         searchParams,
@@ -59,25 +66,53 @@ export default async function PerfilPage({ searchParams }: Props) {
         return null;
     }
 
-    const fullName = `${player.nombre} ${player.apellidos ?? ""}`.trim();
-    const initials = getInitials(player.nombre, player.apellidos);
-    const email = player.email || user.email || "Correo no disponible";
+    const fullName =
+        `${player.nombre} ${player.apellidos ?? ""}`.trim();
+
+    const initials = getInitials(
+        player.nombre,
+        player.apellidos,
+    );
+
+    const email =
+        player.email || user.email || "Correo no disponible";
+
     const isActive = player.estado === "activo";
+
     const categoryStatus = player.categoria_actual_id
         ? "Asignada"
         : "Pendiente de asignación";
+
+    const profileData = {
+        nombre: player.nombre ?? "",
+        apellidos: player.apellidos ?? "",
+        telefono: player.telefono ?? "",
+        ciudad: player.ciudad ?? "",
+        instagram: player.instagram ?? "",
+        pala: player.pala ?? "",
+        manoDominante: player.mano_dominante ?? "",
+    };
 
     return (
         <main className={styles.page}>
             <div className={styles.container}>
                 {params.welcome === "1" && (
-                    <div className={styles.welcome} role="status">
+                    <div
+                        className={styles.welcome}
+                        role="status"
+                    >
                         <span className={styles.welcomeIcon}>
-                            <BadgeCheck size={19} aria-hidden="true" />
+                            <BadgeCheck
+                                size={19}
+                                aria-hidden="true"
+                            />
                         </span>
 
                         <div className={styles.welcomeText}>
-                            <strong>Bienvenido a Sagunto Padel Cup</strong>
+                            <strong>
+                                Bienvenido a Sagunto Padel Cup
+                            </strong>
+
                             <span>
                                 Tu perfil de jugador ya está preparado.
                             </span>
@@ -87,11 +122,15 @@ export default async function PerfilPage({ searchParams }: Props) {
 
                 <header className={styles.pageHeader}>
                     <div className={styles.heading}>
-                        <span className={styles.eyebrow}>MI CUENTA</span>
+                        <span className={styles.eyebrow}>
+                            MI CUENTA
+                        </span>
+
                         <h1>Mi perfil</h1>
+
                         <p>
-                            Consulta tu información personal y los datos
-                            asociados a tu cuenta de jugador.
+                            Consulta y gestiona tu información
+                            personal y deportiva.
                         </p>
                     </div>
 
@@ -99,9 +138,17 @@ export default async function PerfilPage({ searchParams }: Props) {
                         href="/app/seguridad"
                         className={styles.securityLink}
                     >
-                        <ShieldCheck size={17} aria-hidden="true" />
+                        <ShieldCheck
+                            size={17}
+                            aria-hidden="true"
+                        />
+
                         Seguridad
-                        <ArrowRight size={15} aria-hidden="true" />
+
+                        <ArrowRight
+                            size={15}
+                            aria-hidden="true"
+                        />
                     </Link>
                 </header>
 
@@ -112,11 +159,15 @@ export default async function PerfilPage({ searchParams }: Props) {
                     <div className={styles.identityMain}>
                         <div className={styles.avatar}>
                             {player.foto_url ? (
-                                // La imagen procede de la URL guardada en el perfil.
                                 // eslint-disable-next-line @next/next/no-img-element
-                                <img src={player.foto_url} alt="" />
+                                <img
+                                    src={player.foto_url}
+                                    alt=""
+                                />
                             ) : (
-                                <span aria-hidden="true">{initials}</span>
+                                <span aria-hidden="true">
+                                    {initials}
+                                </span>
                             )}
                         </div>
 
@@ -124,19 +175,33 @@ export default async function PerfilPage({ searchParams }: Props) {
                             <span className={styles.identityLabel}>
                                 PERFIL DE JUGADOR
                             </span>
-                            <h2 id="identity-title">{fullName}</h2>
+
+                            <h2 id="identity-title">
+                                {fullName}
+                            </h2>
+
                             <p className={styles.identityEmail}>
-                                <Mail size={15} aria-hidden="true" />
+                                <Mail
+                                    size={15}
+                                    aria-hidden="true"
+                                />
+
                                 <span>{email}</span>
                             </p>
                         </div>
                     </div>
 
                     <div
-                        className={`${styles.statusBadge} ${isActive ? styles.statusActive : styles.statusOther
+                        className={`${styles.statusBadge} ${isActive
+                                ? styles.statusActive
+                                : styles.statusOther
                             }`}
                     >
-                        <span className={styles.statusDot} />
+                        <span
+                            className={styles.statusDot}
+                            aria-hidden="true"
+                        />
+
                         {formatStatus(player.estado)}
                     </div>
                 </section>
@@ -148,52 +213,24 @@ export default async function PerfilPage({ searchParams }: Props) {
                     >
                         <div className={styles.sectionHeader}>
                             <div className={styles.sectionIcon}>
-                                <UserRound size={19} aria-hidden="true" />
+                                <UserRound
+                                    size={19}
+                                    aria-hidden="true"
+                                />
                             </div>
 
                             <div>
-                                <h2 id="personal-title">Datos personales</h2>
+                                <h2 id="personal-title">
+                                    Datos personales
+                                </h2>
+
                                 <p>
                                     Información vinculada a tu cuenta.
                                 </p>
                             </div>
                         </div>
 
-                        <div className={styles.detailsGrid}>
-                            <div className={styles.detail}>
-                                <span className={styles.detailLabel}>
-                                    Nombre
-                                </span>
-                                <strong>{player.nombre || "No indicado"}</strong>
-                            </div>
-
-                            <div className={styles.detail}>
-                                <span className={styles.detailLabel}>
-                                    Apellidos
-                                </span>
-                                <strong>
-                                    {player.apellidos || "No indicados"}
-                                </strong>
-                            </div>
-
-                            <div className={styles.detail}>
-                                <span className={styles.detailLabel}>
-                                    Correo electrónico
-                                </span>
-                                <strong className={styles.breakable}>
-                                    {email}
-                                </strong>
-                            </div>
-
-                            <div className={styles.detail}>
-                                <span className={styles.detailLabel}>
-                                    Teléfono
-                                </span>
-                                <strong>
-                                    {player.telefono || "No indicado"}
-                                </strong>
-                            </div>
-                        </div>
+                        <ProfileForm player={profileData} />
                     </section>
 
                     <section
@@ -202,16 +239,20 @@ export default async function PerfilPage({ searchParams }: Props) {
                     >
                         <div className={styles.sectionHeader}>
                             <div className={styles.sectionIcon}>
-                                <Trophy size={19} aria-hidden="true" />
+                                <Trophy
+                                    size={19}
+                                    aria-hidden="true"
+                                />
                             </div>
 
                             <div>
                                 <h2 id="sport-title">
                                     Información deportiva
                                 </h2>
+
                                 <p>
-                                    Datos relacionados con tu participación
-                                    en el circuito.
+                                    Datos relacionados con tu
+                                    participación en el circuito.
                                 </p>
                             </div>
                         </div>
@@ -219,24 +260,7 @@ export default async function PerfilPage({ searchParams }: Props) {
                         <div className={styles.sportGrid}>
                             <div className={styles.sportItem}>
                                 <div className={styles.sportItemIcon}>
-                                    <Trophy size={17} aria-hidden="true" />
-                                </div>
-
-                                <div>
-                                    <span className={styles.detailLabel}>
-                                        Categoría actual
-                                    </span>
-                                    <strong>{categoryStatus}</strong>
-                                    <p>
-                                        La categoría es gestionada según las
-                                        reglas deportivas del circuito.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className={styles.sportItem}>
-                                <div className={styles.sportItemIcon}>
-                                    <CalendarDays
+                                    <Trophy
                                         size={17}
                                         aria-hidden="true"
                                     />
@@ -244,46 +268,21 @@ export default async function PerfilPage({ searchParams }: Props) {
 
                                 <div>
                                     <span className={styles.detailLabel}>
-                                        Estado del jugador
+                                        Categoría actual
                                     </span>
+
                                     <strong>
-                                        {formatStatus(player.estado)}
+                                        {categoryStatus}
                                     </strong>
+
                                     <p>
-                                        Estado actual de tu ficha de jugador.
+                                        La categoría es gestionada
+                                        según las reglas deportivas
+                                        del circuito.
                                     </p>
                                 </div>
                             </div>
                         </div>
-                    </section>
-
-                    <section
-                        className={styles.accountSection}
-                        aria-labelledby="account-title"
-                    >
-                        <div className={styles.accountSectionIcon}>
-                            <CircleUserRound
-                                size={20}
-                                aria-hidden="true"
-                            />
-                        </div>
-
-                        <div className={styles.accountSectionContent}>
-                            <h2 id="account-title">Acceso y seguridad</h2>
-                            <p>
-                                Gestiona las opciones de acceso y la
-                                contraseña de tu cuenta.
-                            </p>
-                        </div>
-
-                        <Link
-                            href="/app/seguridad"
-                            className={styles.accountAction}
-                            aria-label="Ir a seguridad de la cuenta"
-                        >
-                            Gestionar
-                            <ArrowRight size={16} aria-hidden="true" />
-                        </Link>
                     </section>
                 </div>
             </div>

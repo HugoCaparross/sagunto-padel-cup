@@ -214,11 +214,6 @@
     font-size: 10px;
 }
 
-.accountChevron {
-    flex: 0 0 auto;
-    color: var(--muted);
-}
-
 .mainColumn {
     display: flex;
     min-width: 0;
@@ -284,24 +279,192 @@
     cursor: pointer;
 }
 
+/* Menú de cuenta */
+
+.accountMenuContainer {
+    position: relative;
+    flex: 0 0 auto;
+}
+
 .topbarProfile {
     display: inline-flex;
     align-items: center;
     gap: 9px;
+    border: 0;
+    padding: 0;
+    background: transparent;
     color: var(--foreground);
+    font-family: inherit;
     font-size: 11px;
     font-weight: 750;
-    text-decoration: none;
+    cursor: pointer;
 }
 
 .topbarProfile:hover {
     color: var(--brand-dark);
 }
 
+.topbarProfile:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 5px;
+    border-radius: 4px;
+}
+
 .topbarAvatar {
     width: 30px;
     height: 30px;
 }
+
+.topbarChevron {
+    flex: 0 0 auto;
+    color: var(--muted);
+    transition: transform 160ms ease;
+}
+
+.topbarChevronOpen {
+    transform: rotate(180deg);
+}
+
+.accountDropdown {
+    position: absolute;
+    z-index: 50;
+    top: calc(100% + 14px);
+    right: 0;
+    width: 240px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow:
+        0 12px 32px rgba(20, 25, 35, 0.12),
+        0 2px 6px rgba(20, 25, 35, 0.05);
+    animation: accountDropdownIn 140ms ease-out;
+}
+
+.dropdownHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    padding: 15px 16px;
+    border-bottom: 1px solid var(--line);
+}
+
+.dropdownName,
+.dropdownEmail {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dropdownName {
+    color: var(--foreground);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.dropdownEmail {
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.dropdownLinks {
+    display: grid;
+    gap: 3px;
+    padding: 7px;
+}
+
+.dropdownLink {
+    display: flex;
+    min-height: 38px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 7px;
+    padding: 0 10px;
+    color: var(--foreground);
+    font-size: 12px;
+    font-weight: 650;
+    text-decoration: none;
+    transition:
+        background-color 150ms ease,
+        color 150ms ease;
+}
+
+.dropdownLink svg {
+    flex: 0 0 auto;
+    color: var(--muted);
+}
+
+.dropdownLink:hover {
+    background: var(--surface-soft);
+    color: var(--brand-dark);
+}
+
+.dropdownLink:hover svg {
+    color: var(--brand-dark);
+}
+
+.dropdownLink:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: -2px;
+}
+
+.dropdownLogout {
+    border-top: 1px solid var(--line);
+    padding: 7px;
+}
+
+.dropdownLogout :global(button) {
+    display: flex;
+    width: 100%;
+    min-height: 38px;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    border: 0;
+    border-radius: 7px;
+    padding: 0 10px;
+    background: transparent;
+    color: #b42318;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 150ms ease;
+}
+
+.dropdownLogout :global(button:hover:not(:disabled)) {
+    background: rgba(180, 35, 24, 0.07);
+}
+
+.dropdownLogout :global(button:focus-visible) {
+    outline: 2px solid var(--brand);
+    outline-offset: -2px;
+}
+
+.dropdownLogout :global(button:disabled) {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.dropdownLogout :global(svg) {
+    flex: 0 0 auto;
+}
+
+@keyframes accountDropdownIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Contenido */
 
 .content {
     width: 100%;
@@ -342,6 +505,8 @@
 .backdrop {
     display: none;
 }
+
+/* Responsive */
 
 @media (max-width: 900px) {
     .shell {
@@ -390,8 +555,21 @@
         font-size: 11px;
     }
 
-    .topbarProfile>span:last-child {
+    .topbarProfile>span:nth-child(2) {
         display: none;
+    }
+
+    .topbarProfile {
+        gap: 6px;
+    }
+
+    .topbarChevron {
+        display: none;
+    }
+
+    .accountDropdown {
+        top: calc(100% + 12px);
+        width: min(240px, calc(100vw - 28px));
     }
 
     .content {
@@ -410,11 +588,16 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .sidebar {
+
+    .sidebar,
+    .navLink,
+    .topbarChevron,
+    .dropdownLink,
+    .dropdownLogout :global(button) {
         transition: none;
     }
 
-    .navLink {
-        transition: none;
+    .accountDropdown {
+        animation: none;
     }
 }

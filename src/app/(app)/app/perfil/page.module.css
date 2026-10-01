@@ -1,7 +1,7 @@
 .page {
     width: 100%;
     min-width: 0;
-    padding: 38px 0 64px;
+    padding: 32px 0 56px;
     color: var(--foreground);
 }
 
@@ -10,12 +10,14 @@
     margin-inline: auto;
 }
 
+/* Mensaje de bienvenida */
+
 .welcome {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 28px;
-    padding: 15px 18px;
+    margin-bottom: 24px;
+    padding: 14px 16px;
     border: 1px solid rgba(35, 145, 91, 0.2);
     border-radius: 12px;
     background: rgba(35, 145, 91, 0.06);
@@ -23,9 +25,9 @@
 
 .welcomeIcon {
     display: grid;
-    width: 38px;
-    height: 38px;
-    flex: 0 0 38px;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
     place-items: center;
     border-radius: 10px;
     background: rgba(35, 145, 91, 0.1);
@@ -42,6 +44,7 @@
 .welcomeText strong {
     font-size: 0.88rem;
     font-weight: 750;
+    line-height: 1.4;
 }
 
 .welcomeText span {
@@ -50,12 +53,14 @@
     line-height: 1.5;
 }
 
+/* Cabecera */
+
 .pageHeader {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
     gap: 24px;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
 }
 
 .heading {
@@ -64,61 +69,63 @@
 
 .eyebrow {
     display: block;
-    margin-bottom: 9px;
+    margin-bottom: 7px;
     color: var(--brand);
     font-size: 0.68rem;
-    font-weight: 850;
-    letter-spacing: 0.13em;
+    font-weight: 800;
+    letter-spacing: 0.12em;
 }
 
 .heading h1 {
     margin: 0;
     font-family: var(--font-display);
-    font-size: clamp(1.8rem, 3vw, 2.5rem);
-    font-weight: 900;
-    letter-spacing: -0.045em;
-    line-height: 1.1;
+    font-size: clamp(1.75rem, 2.6vw, 2.25rem);
+    font-weight: 850;
+    letter-spacing: -0.04em;
+    line-height: 1.15;
 }
 
 .heading p {
-    max-width: 620px;
-    margin: 10px 0 0;
+    max-width: 580px;
+    margin: 8px 0 0;
     color: var(--muted);
-    font-size: 0.9rem;
-    line-height: 1.65;
+    font-size: 0.88rem;
+    line-height: 1.6;
 }
 
 .securityLink {
     display: inline-flex;
-    min-height: 42px;
+    min-height: 40px;
     flex: 0 0 auto;
     align-items: center;
     justify-content: center;
-    gap: 9px;
-    padding: 0 14px;
+    gap: 8px;
+    padding: 0 13px;
     border: 1px solid var(--line);
     border-radius: 9px;
     background: var(--surface);
     color: var(--foreground);
     font-size: 0.78rem;
-    font-weight: 750;
+    font-weight: 700;
     text-decoration: none;
     transition:
         border-color 160ms ease,
-        background 160ms ease,
+        background-color 160ms ease,
         color 160ms ease;
 }
 
 .securityLink:hover {
     border-color: var(--brand);
+    background: var(--surface-soft);
     color: var(--brand);
 }
 
-.securityLink:focus-visible,
-.accountAction:focus-visible {
-    outline: 3px solid color-mix(in srgb, var(--brand) 35%, transparent);
+.securityLink:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--brand) 40%, transparent);
     outline-offset: 3px;
 }
+
+/* Identidad del jugador */
 
 .identityCard {
     display: flex;
@@ -126,7 +133,7 @@
     justify-content: space-between;
     gap: 24px;
     min-width: 0;
-    padding: 24px;
+    padding: 22px 24px;
     border: 1px solid var(--line);
     border-radius: 14px;
     background: var(--surface);
@@ -135,23 +142,23 @@
 .identityMain {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 17px;
     min-width: 0;
 }
 
 .avatar {
     display: grid;
-    width: 68px;
-    height: 68px;
-    flex: 0 0 68px;
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
     overflow: hidden;
     place-items: center;
     border: 1px solid var(--line);
     border-radius: 50%;
     background: var(--surface-soft);
     color: var(--foreground);
-    font-size: 1.05rem;
-    font-weight: 850;
+    font-size: 1rem;
+    font-weight: 800;
 }
 
 .avatar img {
@@ -167,19 +174,20 @@
 
 .identityLabel {
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     color: var(--muted);
     font-size: 0.63rem;
-    font-weight: 850;
-    letter-spacing: 0.11em;
+    font-weight: 800;
+    letter-spacing: 0.1em;
 }
 
 .identityInfo h2 {
     margin: 0;
+    color: var(--foreground);
     font-family: var(--font-display);
-    font-size: clamp(1.1rem, 2.2vw, 1.5rem);
-    font-weight: 850;
-    letter-spacing: -0.035em;
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
     line-height: 1.3;
     overflow-wrap: anywhere;
 }
@@ -191,12 +199,15 @@
     margin: 7px 0 0;
     color: var(--muted);
     font-size: 0.8rem;
+    line-height: 1.5;
     overflow-wrap: anywhere;
 }
 
 .identityEmail svg {
     flex: 0 0 auto;
 }
+
+/* Estado de la cuenta */
 
 .statusBadge {
     display: inline-flex;
@@ -208,12 +219,13 @@
     border: 1px solid transparent;
     border-radius: 999px;
     font-size: 0.72rem;
-    font-weight: 750;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 .statusActive {
-    border-color: rgba(35, 145, 91, 0.18);
-    background: rgba(35, 145, 91, 0.07);
+    border-color: rgba(35, 145, 91, 0.22);
+    background: rgba(35, 145, 91, 0.08);
     color: #238f5b;
 }
 
@@ -231,15 +243,19 @@
     background: currentColor;
 }
 
+/* Secciones */
+
 .sections {
     display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.85fr);
+    align-items: start;
     gap: 18px;
-    margin-top: 22px;
+    margin-top: 20px;
 }
 
 .section {
     min-width: 0;
-    padding: 24px;
+    padding: 22px;
     border: 1px solid var(--line);
     border-radius: 14px;
     background: var(--surface);
@@ -248,93 +264,62 @@
 .sectionHeader {
     display: flex;
     align-items: center;
-    gap: 13px;
-    margin-bottom: 22px;
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
 .sectionIcon {
     display: grid;
-    width: 42px;
-    height: 42px;
-    flex: 0 0 42px;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
     place-items: center;
-    border-radius: 11px;
+    border-radius: 10px;
     background: var(--surface-soft);
     color: var(--foreground);
 }
 
-.sectionHeader h2,
-.accountSectionContent h2 {
+.sectionHeader h2 {
     margin: 0;
-    font-family: var(--font-display);
-    font-size: 1rem;
-    font-weight: 850;
-    letter-spacing: -0.025em;
-}
-
-.sectionHeader p,
-.accountSectionContent p {
-    margin: 5px 0 0;
-    color: var(--muted);
-    font-size: 0.8rem;
-    line-height: 1.55;
-}
-
-.detailsGrid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0 32px;
-}
-
-.detail {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-    min-width: 0;
-    padding: 15px 0;
-    border-top: 1px solid var(--line);
-}
-
-.detailLabel {
-    color: var(--muted);
-    font-size: 0.75rem;
-    font-weight: 550;
-}
-
-.detail strong {
-    min-width: 0;
     color: var(--foreground);
-    font-size: 0.88rem;
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: 0.98rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.4;
+}
+
+.sectionHeader p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 0.78rem;
     line-height: 1.5;
 }
 
-.breakable {
-    overflow-wrap: anywhere;
-}
+/* Datos deportivos */
 
 .sportGrid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
 }
 
 .sportItem {
     display: flex;
     align-items: flex-start;
-    gap: 13px;
+    gap: 12px;
     min-width: 0;
-    padding: 17px;
+    padding: 15px;
     border: 1px solid var(--line);
-    border-radius: 11px;
+    border-radius: 10px;
     background: var(--surface-soft);
 }
 
 .sportItemIcon {
     display: grid;
-    width: 36px;
-    height: 36px;
-    flex: 0 0 36px;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
     place-items: center;
     border-radius: 9px;
     background: var(--surface);
@@ -345,72 +330,50 @@
     min-width: 0;
 }
 
+.detailLabel {
+    display: block;
+    color: var(--muted);
+    font-size: 0.73rem;
+    font-weight: 550;
+    line-height: 1.5;
+}
+
 .sportItem strong {
     display: block;
-    margin-top: 5px;
+    margin-top: 4px;
     color: var(--foreground);
-    font-size: 0.86rem;
+    font-size: 0.85rem;
     font-weight: 750;
     line-height: 1.4;
+    overflow-wrap: anywhere;
 }
 
 .sportItem p {
-    margin: 7px 0 0;
+    margin: 6px 0 0;
     color: var(--muted);
-    font-size: 0.75rem;
-    line-height: 1.55;
+    font-size: 0.74rem;
+    line-height: 1.5;
 }
 
-.accountSection {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    min-width: 0;
-    padding: 20px 22px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: var(--surface);
+/* Estados de interacción */
+
+.securityLink:active {
+    transform: translateY(1px);
 }
 
-.accountSectionIcon {
-    display: grid;
-    width: 42px;
-    height: 42px;
-    flex: 0 0 42px;
-    place-items: center;
-    border-radius: 11px;
-    background: var(--surface-soft);
-    color: var(--foreground);
+/* Adaptación a tablet */
+
+@media (max-width: 900px) {
+    .sections {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
-.accountSectionContent {
-    flex: 1;
-    min-width: 0;
-}
-
-.accountAction {
-    display: inline-flex;
-    min-height: 40px;
-    flex: 0 0 auto;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 0 12px;
-    border-radius: 8px;
-    color: var(--brand);
-    font-size: 0.78rem;
-    font-weight: 800;
-    text-decoration: none;
-    transition: background 160ms ease;
-}
-
-.accountAction:hover {
-    background: var(--surface-soft);
-}
+/* Adaptación a móvil */
 
 @media (max-width: 767px) {
     .page {
-        padding: 28px 0 48px;
+        padding: 26px 0 44px;
     }
 
     .container {
@@ -420,24 +383,25 @@
     .pageHeader {
         align-items: flex-start;
         flex-direction: column;
-        gap: 17px;
-        margin-bottom: 22px;
+        gap: 15px;
+        margin-bottom: 20px;
     }
 
     .securityLink {
-        min-height: 40px;
+        min-height: 39px;
     }
 
     .identityCard {
         align-items: flex-start;
         flex-direction: column;
-        gap: 16px;
-        padding: 19px;
+        gap: 14px;
+        padding: 18px;
     }
 
     .identityMain {
-        align-items: flex-start;
-        gap: 14px;
+        align-items: center;
+        gap: 13px;
+        width: 100%;
     }
 
     .avatar {
@@ -452,33 +416,11 @@
     }
 
     .section {
-        padding: 19px;
-    }
-
-    .detailsGrid,
-    .sportGrid {
-        grid-template-columns: 1fr;
-    }
-
-    .detail {
-        padding: 13px 0;
-    }
-
-    .accountSection {
-        align-items: flex-start;
-        flex-wrap: wrap;
         padding: 18px;
     }
-
-    .accountSectionContent {
-        flex-basis: calc(100% - 60px);
-    }
-
-    .accountAction {
-        margin-left: 54px;
-        padding-left: 0;
-    }
 }
+
+/* Móviles estrechos */
 
 @media (max-width: 380px) {
     .container {
@@ -487,31 +429,34 @@
 
     .welcome {
         align-items: flex-start;
-        padding: 13px;
+        padding: 12px;
     }
 
     .identityMain {
-        gap: 11px;
+        gap: 10px;
     }
 
     .identityInfo h2 {
-        font-size: 1.05rem;
+        font-size: 1.02rem;
     }
 
     .identityEmail {
         font-size: 0.72rem;
     }
 
-    .sectionHeader h2,
-    .accountSectionContent h2 {
-        font-size: 0.94rem;
+    .sectionHeader {
+        gap: 10px;
+    }
+
+    .sectionHeader h2 {
+        font-size: 0.93rem;
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
+/* Accesibilidad */
 
-    .securityLink,
-    .accountAction {
+@media (prefers-reduced-motion: reduce) {
+    .securityLink {
         transition: none;
     }
 }

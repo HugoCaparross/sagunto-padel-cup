@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import LogoutButton from "@/components/auth/LogoutButton";
 
@@ -69,7 +69,11 @@ export default function PlayerAppShell({
     playerEmail,
 }: Props) {
     const pathname = usePathname();
+
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+
+    const accountMenuRef = useRef<HTMLDivElement>(null);
 
     const title = getPageTitle(pathname);
     const initials = getInitials(playerName);
@@ -77,6 +81,45 @@ export default function PlayerAppShell({
     function closeMobileMenu() {
         setMobileOpen(false);
     }
+
+    function closeAccountMenu() {
+        setAccountMenuOpen(false);
+    }
+
+    useEffect(() => {
+        if (!accountMenuOpen) {
+            return;
+        }
+
+        function handlePointerDown(event: PointerEvent) {
+            if (
+                event.target instanceof Node &&
+                !accountMenuRef.current?.contains(event.target)
+            ) {
+                setAccountMenuOpen(false);
+            }
+        }
+
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.key === "Escape") {
+                setAccountMenuOpen(false);
+            }
+        }
+
+        document.addEventListener("pointerdown", handlePointerDown);
+        document.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            document.removeEventListener(
+                "pointerdown",
+                handlePointerDown,
+            );
+            document.removeEventListener(
+                "keydown",
+                handleKeyDown,
+            );
+        };
+    }, [accountMenuOpen]);
 
     return (
         <div className={styles.shell}>
@@ -127,7 +170,9 @@ export default function PlayerAppShell({
                 </div>
 
                 <div className={styles.navGroup}>
-                    <p className={styles.navLabel}>ÁREA DE JUGADOR</p>
+                    <p className={styles.navLabel}>
+                        ÁREA DE JUGADOR
+                    </p>
 
                     <nav className={styles.navigation}>
                         {navigation.map((item) => {
@@ -139,9 +184,13 @@ export default function PlayerAppShell({
                                     key={item.href}
                                     href={item.href}
                                     onClick={closeMobileMenu}
-                                    className={`${styles.navLink} ${active ? styles.navLinkActive : ""
+                                    className={`${styles.navLink} ${active
+                                            ? styles.navLinkActive
+                                            : ""
                                         }`}
-                                    aria-current={active ? "page" : undefined}
+                                    aria-current={
+                                        active ? "page" : undefined
+                                    }
                                 >
                                     <Icon
                                         size={18}
@@ -160,17 +209,22 @@ export default function PlayerAppShell({
                         <span className={styles.helpTitle}>
                             ¿Necesitas ayuda?
                         </span>
+
                         <p>
-                            Contacta con la organización si tienes alguna
-                            consulta sobre tu cuenta.
+                            Contacta con la organización si tienes
+                            alguna consulta sobre tu cuenta.
                         </p>
+
                         <Link href="/contacto">
                             Contactar
                         </Link>
                     </div>
 
                     <div className={styles.account}>
-                        <div className={styles.avatar} aria-hidden="true">
+                        <div
+                            className={styles.avatar}
+                            aria-hidden="true"
+                        >
                             {initials}
                         </div>
 
@@ -178,19 +232,12 @@ export default function PlayerAppShell({
                             <span className={styles.accountName}>
                                 {playerName}
                             </span>
+
                             <span className={styles.accountEmail}>
                                 {playerEmail}
                             </span>
                         </div>
-
-                        <ChevronDown
-                            size={15}
-                            className={styles.accountChevron}
-                            aria-hidden="true"
-                        />
                     </div>
-
-                    <LogoutButton />
                 </div>
             </aside>
 
@@ -210,22 +257,111 @@ export default function PlayerAppShell({
 
                         <div className={styles.breadcrumb}>
                             <span>Área de jugador</span>
-                            <span className={styles.breadcrumbDivider}>
+
+                            <span
+                                className={styles.breadcrumbDivider}
+                            >
                                 /
                             </span>
+
                             <strong>{title}</strong>
                         </div>
                     </div>
 
-                    <Link
-                        href="/app/perfil"
-                        className={styles.topbarProfile}
+                    <div
+                        className={styles.accountMenuContainer}
+                        ref={accountMenuRef}
                     >
-                        <span className={styles.topbarAvatar}>
-                            {initials}
-                        </span>
-                        <span>Mi cuenta</span>
-                    </Link>
+                        <button
+                            type="button"
+                            className={styles.topbarProfile}
+                            onClick={() =>
+                                setAccountMenuOpen((open) => !open)
+                            }
+                            aria-expanded={accountMenuOpen}
+                            aria-controls="account-dropdown"
+                            aria-haspopup="true"
+                        >
+                            <span
+                                className={styles.topbarAvatar}
+                                aria-hidden="true"
+                            >
+                                {initials}
+                            </span>
+
+                            <span>Mi cuenta</span>
+
+                            <ChevronDown
+                                size={14}
+                                className={`${styles.topbarChevron
+                                    } ${accountMenuOpen
+                                        ? styles.topbarChevronOpen
+                                        : ""
+                                    }`}
+                                aria-hidden="true"
+                            />
+                        </button>
+
+                        {accountMenuOpen && (
+                            <div
+                                id="account-dropdown"
+                                className={styles.accountDropdown}
+                            >
+                                <div
+                                    className={styles.dropdownHeader}
+                                >
+                                    <span
+                                        className={styles.dropdownName}
+                                    >
+                                        {playerName}
+                                    </span>
+
+                                    <span
+                                        className={styles.dropdownEmail}
+                                    >
+                                        {playerEmail}
+                                    </span>
+                                </div>
+
+                                <nav
+                                    className={styles.dropdownLinks}
+                                    aria-label="Opciones de cuenta"
+                                >
+                                    <Link
+                                        href="/app/perfil"
+                                        className={styles.dropdownLink}
+                                        onClick={closeAccountMenu}
+                                    >
+                                        <UserRound
+                                            size={16}
+                                            aria-hidden="true"
+                                        />
+                                        <span>Mi perfil</span>
+                                    </Link>
+
+                                    <Link
+                                        href="/app/seguridad"
+                                        className={styles.dropdownLink}
+                                        onClick={closeAccountMenu}
+                                    >
+                                        <ShieldCheck
+                                            size={16}
+                                            aria-hidden="true"
+                                        />
+                                        <span>Seguridad</span>
+                                    </Link>
+                                </nav>
+
+                                <div
+                                    className={styles.dropdownLogout}
+                                >
+                                    <LogoutButton
+                                        onDone={closeAccountMenu}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </header>
 
                 <div className={styles.content}>
@@ -244,9 +380,11 @@ export default function PlayerAppShell({
                         <Link href="/aviso-legal">
                             Aviso legal
                         </Link>
+
                         <Link href="/privacidad">
                             Privacidad
                         </Link>
+
                         <Link href="/contacto">
                             Contacto
                         </Link>

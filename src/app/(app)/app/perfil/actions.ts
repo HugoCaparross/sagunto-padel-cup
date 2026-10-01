@@ -24,19 +24,38 @@ type ProfileActionState = {
 };
 
 const profileSchema = z.object({
-    nombre: z.string().trim().min(1, "Introduce tu nombre.").max(80),
-    apellidos: z.string().trim().min(1, "Introduce tus apellidos.").max(120),
-    telefono: z.string().trim().max(30, "El teléfono es demasiado largo."),
-    ciudad: z.string().trim().max(100, "La ciudad es demasiado larga."),
+    nombre: z
+        .string()
+        .trim()
+        .min(1, "Introduce tu nombre.")
+        .max(80, "El nombre es demasiado largo."),
+    apellidos: z
+        .string()
+        .trim()
+        .min(1, "Introduce tus apellidos.")
+        .max(120, "Los apellidos son demasiado largos."),
+    telefono: z
+        .string()
+        .trim()
+        .max(30, "El teléfono es demasiado largo."),
+    ciudad: z
+        .string()
+        .trim()
+        .max(100, "La ciudad es demasiado larga."),
     instagram: z
         .string()
         .trim()
         .transform((value) => value.replace(/^@/, ""))
         .refine(
-            (value) => value === "" || /^[a-zA-Z0-9._]{1,30}$/.test(value),
+            (value) =>
+                value === "" ||
+                /^[a-zA-Z0-9._]{1,30}$/.test(value),
             "Introduce un usuario de Instagram válido.",
         ),
-    pala: z.string().trim().max(100, "El dato de la pala es demasiado largo."),
+    pala: z
+        .string()
+        .trim()
+        .max(100, "El dato de la pala es demasiado largo."),
     manoDominante: z.enum(["", "diestro", "zurdo"]),
 });
 
@@ -78,19 +97,21 @@ export async function updateOwnProfile(
 
             if (
                 typeof field === "string" &&
-                field in {
-                    nombre: true,
-                    apellidos: true,
-                    telefono: true,
-                    ciudad: true,
-                    instagram: true,
-                    pala: true,
-                    manoDominante: true,
-                }
+                [
+                    "nombre",
+                    "apellidos",
+                    "telefono",
+                    "ciudad",
+                    "instagram",
+                    "pala",
+                    "manoDominante",
+                ].includes(field)
             ) {
-                fieldErrors[field as keyof NonNullable<
-                    ProfileActionState["fieldErrors"]
-                >] = issue.message;
+                fieldErrors[
+                    field as keyof NonNullable<
+                        ProfileActionState["fieldErrors"]
+                    >
+                ] = issue.message;
             }
         }
 
@@ -121,7 +142,8 @@ export async function updateOwnProfile(
     } catch {
         return {
             success: false,
-            message: "No se han podido guardar los cambios. Inténtalo de nuevo.",
+            message:
+                "No se han podido guardar los cambios. Inténtalo de nuevo.",
         };
     }
 }

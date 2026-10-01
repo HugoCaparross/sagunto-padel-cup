@@ -72,8 +72,8 @@
     opacity: 0.7;
 }
 
-.field input:focus,
-.field select:focus {
+.field input:focus-visible,
+.field select:focus-visible {
     border-color: var(--brand);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
 }
@@ -83,6 +83,11 @@
     border-color: #b42318;
 }
 
+.field input[aria-invalid="true"]:focus-visible,
+.field select[aria-invalid="true"]:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in srgb, #b42318 15%, transparent);
+}
+
 .inputPrefix {
     display: flex;
     align-items: center;
@@ -90,11 +95,18 @@
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--background);
+    transition:
+        border-color 160ms ease,
+        box-shadow 160ms ease;
 }
 
 .inputPrefix:focus-within {
     border-color: var(--brand);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
+}
+
+.inputPrefix:has(input[aria-invalid="true"]) {
+    border-color: #b42318;
 }
 
 .inputPrefix>span {
@@ -114,6 +126,10 @@
 .inputPrefix input:focus {
     border: 0;
     box-shadow: none;
+}
+
+.inputPrefix input:focus-visible {
+    outline: none;
 }
 
 .fieldError {
@@ -185,6 +201,11 @@
     background: var(--brand-hover, var(--brand));
 }
 
+.submitButton:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--brand) 35%, transparent);
+    outline-offset: 3px;
+}
+
 .submitButton:disabled {
     opacity: 0.6;
     cursor: wait;
@@ -207,5 +228,15 @@
 
     .submitButton {
         width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .field input,
+    .field select,
+    .inputPrefix,
+    .submitButton {
+        transition: none;
     }
 }

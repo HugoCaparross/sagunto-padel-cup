@@ -445,7 +445,7 @@ export async function getRegistrations(
     let query = supabase
         .from("registrations")
         .select("*")
-        .order("created_at", {
+        .order("updated_at", {
             ascending: false,
         });
 

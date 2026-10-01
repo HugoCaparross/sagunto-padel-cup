@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useActionState } from "react";
@@ -23,7 +24,9 @@ type ProfileFormProps = {
 type ProfileActionState = {
     success: boolean;
     message: string;
-    fieldErrors?: Partial<Record<keyof ProfileFormValues, string>>;
+    fieldErrors?: Partial<
+        Record<keyof ProfileFormValues, string>
+    >;
 };
 
 const initialState: ProfileActionState = {
@@ -35,7 +38,6 @@ const dominantHandOptions = [
     { value: "", label: "Selecciona una opción" },
     { value: "diestro", label: "Diestro" },
     { value: "zurdo", label: "Zurdo" },
-    { value: "ambidiestro", label: "Ambidiestro" },
 ];
 
 export default function ProfileForm({
@@ -73,16 +75,26 @@ export default function ProfileForm({
                             aria-invalid={Boolean(
                                 state.fieldErrors?.nombre,
                             )}
+                            aria-describedby={
+                                state.fieldErrors?.nombre
+                                    ? "nombre-error"
+                                    : undefined
+                            }
                         />
                         {state.fieldErrors?.nombre && (
-                            <span className={styles.fieldError}>
+                            <span
+                                id="nombre-error"
+                                className={styles.fieldError}
+                            >
                                 {state.fieldErrors.nombre}
                             </span>
                         )}
                     </div>
 
                     <div className={styles.field}>
-                        <label htmlFor="apellidos">Apellidos</label>
+                        <label htmlFor="apellidos">
+                            Apellidos
+                        </label>
                         <input
                             id="apellidos"
                             name="apellidos"
@@ -94,16 +106,26 @@ export default function ProfileForm({
                             aria-invalid={Boolean(
                                 state.fieldErrors?.apellidos,
                             )}
+                            aria-describedby={
+                                state.fieldErrors?.apellidos
+                                    ? "apellidos-error"
+                                    : undefined
+                            }
                         />
                         {state.fieldErrors?.apellidos && (
-                            <span className={styles.fieldError}>
+                            <span
+                                id="apellidos-error"
+                                className={styles.fieldError}
+                            >
                                 {state.fieldErrors.apellidos}
                             </span>
                         )}
                     </div>
 
                     <div className={styles.field}>
-                        <label htmlFor="telefono">Teléfono</label>
+                        <label htmlFor="telefono">
+                            Teléfono
+                        </label>
                         <input
                             id="telefono"
                             name="telefono"
@@ -115,9 +137,17 @@ export default function ProfileForm({
                             aria-invalid={Boolean(
                                 state.fieldErrors?.telefono,
                             )}
+                            aria-describedby={
+                                state.fieldErrors?.telefono
+                                    ? "telefono-error"
+                                    : undefined
+                            }
                         />
                         {state.fieldErrors?.telefono && (
-                            <span className={styles.fieldError}>
+                            <span
+                                id="telefono-error"
+                                className={styles.fieldError}
+                            >
                                 {state.fieldErrors.telefono}
                             </span>
                         )}
@@ -136,16 +166,26 @@ export default function ProfileForm({
                             aria-invalid={Boolean(
                                 state.fieldErrors?.ciudad,
                             )}
+                            aria-describedby={
+                                state.fieldErrors?.ciudad
+                                    ? "ciudad-error"
+                                    : undefined
+                            }
                         />
                         {state.fieldErrors?.ciudad && (
-                            <span className={styles.fieldError}>
+                            <span
+                                id="ciudad-error"
+                                className={styles.fieldError}
+                            >
                                 {state.fieldErrors.ciudad}
                             </span>
                         )}
                     </div>
 
                     <div className={styles.field}>
-                        <label htmlFor="instagram">Instagram</label>
+                        <label htmlFor="instagram">
+                            Instagram
+                        </label>
                         <div className={styles.inputPrefix}>
                             <span aria-hidden="true">@</span>
                             <input
@@ -159,10 +199,18 @@ export default function ProfileForm({
                                 aria-invalid={Boolean(
                                     state.fieldErrors?.instagram,
                                 )}
+                                aria-describedby={
+                                    state.fieldErrors?.instagram
+                                        ? "instagram-error"
+                                        : undefined
+                                }
                             />
                         </div>
                         {state.fieldErrors?.instagram && (
-                            <span className={styles.fieldError}>
+                            <span
+                                id="instagram-error"
+                                className={styles.fieldError}
+                            >
                                 {state.fieldErrors.instagram}
                             </span>
                         )}
@@ -193,6 +241,11 @@ export default function ProfileForm({
                             aria-invalid={Boolean(
                                 state.fieldErrors?.manoDominante,
                             )}
+                            aria-describedby={
+                                state.fieldErrors?.manoDominante
+                                    ? "manoDominante-error"
+                                    : undefined
+                            }
                         >
                             {dominantHandOptions.map((option) => (
                                 <option
@@ -204,7 +257,10 @@ export default function ProfileForm({
                             ))}
                         </select>
                         {state.fieldErrors?.manoDominante && (
-                            <span className={styles.fieldError}>
+                            <span
+                                id="manoDominante-error"
+                                className={styles.fieldError}
+                            >
                                 {state.fieldErrors.manoDominante}
                             </span>
                         )}
@@ -222,9 +278,17 @@ export default function ProfileForm({
                             aria-invalid={Boolean(
                                 state.fieldErrors?.pala,
                             )}
+                            aria-describedby={
+                                state.fieldErrors?.pala
+                                    ? "pala-error"
+                                    : undefined
+                            }
                         />
                         {state.fieldErrors?.pala && (
-                            <span className={styles.fieldError}>
+                            <span
+                                id="pala-error"
+                                className={styles.fieldError}
+                            >
                                 {state.fieldErrors.pala}
                             </span>
                         )}
@@ -256,7 +320,9 @@ export default function ProfileForm({
                     className={styles.submitButton}
                     disabled={isPending}
                 >
-                    {isPending ? "Guardando..." : "Guardar cambios"}
+                    {isPending
+                        ? "Guardando..."
+                        : "Guardar cambios"}
                 </button>
             </div>
         </form>
