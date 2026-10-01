@@ -44,31 +44,28 @@ export default function AccountMenu({
     avatarUrl,
     compact = false,
 }: AccountMenuProps) {
-    const [open, setOpen] = useState(false);
+    const [openPathname, setOpenPathname] = useState<string | null>(null);
     const rootRef = useRef<HTMLDivElement>(null);
     const triggerRef = useRef<HTMLButtonElement>(null);
     const menuId = useId();
     const pathname = usePathname();
+    const open = openPathname === pathname;
 
     useEffect(() => {
-        setOpen(false);
-    }, [pathname]);
-
-    useEffect(() => {
-        if (!open) return;
+        if (openPathname !== pathname) return;
 
         function handlePointerDown(event: PointerEvent) {
             if (
                 event.target instanceof Node &&
                 !rootRef.current?.contains(event.target)
             ) {
-                setOpen(false);
+                setOpenPathname(null);
             }
         }
 
         function handleKeyDown(event: KeyboardEvent) {
             if (event.key === "Escape") {
-                setOpen(false);
+                setOpenPathname(null);
                 triggerRef.current?.focus();
             }
         }
@@ -80,14 +77,14 @@ export default function AccountMenu({
             document.removeEventListener("pointerdown", handlePointerDown);
             document.removeEventListener("keydown", handleKeyDown);
         };
-    }, [open]);
+    }, [openPathname, pathname]);
 
     function toggleMenu() {
-        setOpen((current) => !current);
+        setOpenPathname((current) => current === pathname ? null : pathname);
     }
 
     function closeMenu() {
-        setOpen(false);
+        setOpenPathname(null);
     }
 
     const initials = getInitials(name);

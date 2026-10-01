@@ -6,24 +6,45 @@ import { redirect } from "next/navigation";
 import { requireAdminContext } from "@/lib/services/admin";
 import { createTournament } from "@/lib/services/tournaments";
 
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+function isValidDate(value: string): boolean {
+    if (!DATE_PATTERN.test(value)) return false;
+
+    const date = new Date(`${value}T12:00:00`);
+    return (
+        Number.isFinite(date.getTime()) &&
+        date.toISOString().slice(0, 10) === value
+    );
+}
+
+function readText(formData: FormData, key: string): string {
+    const value = formData.get(key);
+    return typeof value === "string" ? value.trim() : "";
+}
+
 export async function createTournamentAction(
     formData: FormData,
 ): Promise<void> {
     await requireAdminContext();
 
-    const name = String(formData.get("name") ?? "").trim();
-    const slug = String(formData.get("slug") ?? "").trim();
-    const seasonId = String(formData.get("seasonId") ?? "");
-    const clubId = String(formData.get("clubId") ?? "");
-    const startDate = String(formData.get("startDate") ?? "");
-    const endDate = String(formData.get("endDate") ?? "");
-    const tournamentType = String(
-        formData.get("tournamentType") ?? "regular",
-    );
-    const price = String(formData.get("price") ?? "").trim();
-    const description = String(
-        formData.get("description") ?? "",
-    ).trim();
+    const name = readText(formData, "name");
+    const slug = readText(formData, "slug");
+    const seasonId = readText(formData, "seasonId");
+    const clubId = readText(formData, "clubId");
+    const startDate = readText(formData, "startDate");
+    const endDate = readText(formData, "endDate");
+    const tournamentType = readText(formData, "tournamentType") || "regular";
+    const price = readText(formData, "price");
+    const description = readText(formData, "description");
+
+    if (!name || !slug || !seasonId || !clubId) {
+        throw new Error("Completa todos los campos obligatorios.");
+    }
+
+    if (name.length > 120 || slug.length > 120) {
+        throw new Error("El nombre o el identificador del torneo es demasiado largo.");
+    }
 
     if (
         tournamentType !== "regular" &&
@@ -32,16 +53,20 @@ export async function createTournamentAction(
         throw new Error("El tipo de torneo no es válido.");
     }
 
-    if (!name || !slug || !seasonId || !clubId) {
-        throw new Error(
-            "Completa todos los campos obligatorios.",
-        );
+    if (!isValidDate(startDate) || !isValidDate(endDate)) {
+        throw new Error("Introduce fechas válidas para el torneo.");
     }
 
-    if (!startDate || !endDate || endDate < startDate) {
-        throw new Error(
-            "Comprueba las fechas del torneo.",
-        );
+    if (endDate < startDate) {
+        throw new Error("La fecha de finalización no puede ser anterior a la de inicio.");
+    }
+
+    if (price.length > 80) {
+        throw new Error("El texto del precio es demasiado largo.");
+    }
+
+    if (description.length > 5000) {
+        throw new Error("La descripción supera el máximo permitido.");
     }
 
     const tournament = await createTournament({

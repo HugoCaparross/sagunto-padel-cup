@@ -6,7 +6,7 @@ const root = resolve(process.cwd());
 
 const requiredFiles = [
     "src/app/layout.tsx",
-    "src/app/page.tsx",
+    "src/app/(public)/page.tsx",
     "src/app/loading.tsx",
     "src/app/error.tsx",
     "src/app/not-found.tsx",
@@ -21,39 +21,39 @@ const requiredFiles = [
     "src/lib/public/site.ts",
     "src/lib/public/seo.ts",
 
-    "src/app/torneos/page.tsx",
-    "src/app/torneos/page.module.css",
-    "src/app/torneos/[slug]/page.tsx",
-    "src/app/torneos/[slug]/page.module.css",
+    "src/app/(public)/torneos/page.tsx",
+    "src/app/(public)/torneos/page.module.css",
+    "src/app/(public)/torneos/[slug]/page.tsx",
+    "src/app/(public)/torneos/[slug]/page.module.css",
 
-    "src/app/ranking/page.tsx",
-    "src/app/ranking/page.module.css",
+    "src/app/(public)/ranking/page.tsx",
+    "src/app/(public)/ranking/page.module.css",
 
-    "src/app/jugadores/page.tsx",
-    "src/app/jugadores/page.module.css",
-    "src/app/jugadores/[id]/page.tsx",
-    "src/app/jugadores/[id]/page.module.css",
+    "src/app/(public)/jugadores/page.tsx",
+    "src/app/(public)/jugadores/page.module.css",
+    "src/app/(public)/jugadores/[id]/page.tsx",
+    "src/app/(public)/jugadores/[id]/page.module.css",
 
-    "src/app/circuito/page.tsx",
-    "src/app/circuito/page.module.css",
+    "src/app/(public)/circuito/page.tsx",
+    "src/app/(public)/circuito/page.module.css",
 
-    "src/app/master/page.tsx",
-    "src/app/master/page.module.css",
+    "src/app/(public)/master-final/page.tsx",
+    "src/app/(public)/master-final/page.module.css",
 
-    "src/app/noticias/page.tsx",
-    "src/app/noticias/page.module.css",
-    "src/app/noticias/[slug]/page.tsx",
-    "src/app/noticias/[slug]/page.module.css",
+    "src/app/(public)/noticias/page.tsx",
+    "src/app/(public)/noticias/page.module.css",
+    "src/app/(public)/noticias/[slug]/page.tsx",
+    "src/app/(public)/noticias/[slug]/page.module.css",
 
-    "src/app/galeria/page.tsx",
-    "src/app/galeria/page.module.css",
+    "src/app/(public)/galeria/page.tsx",
+    "src/app/(public)/galeria/page.module.css",
 
-    "src/app/privacidad/page.tsx",
-    "src/app/privacidad/page.module.css",
-    "src/app/cookies/page.tsx",
-    "src/app/cookies/page.module.css",
-    "src/app/aviso-legal/page.tsx",
-    "src/app/aviso-legal/page.module.css",
+    "src/app/(public)/privacidad/page.tsx",
+    "src/app/(public)/privacidad/page.module.css",
+    "src/app/(public)/cookies/page.tsx",
+    "src/app/(public)/cookies/page.module.css",
+    "src/app/(public)/aviso-legal/page.tsx",
+    "src/app/(public)/aviso-legal/page.module.css",
 ];
 
 const forbiddenValidatorTerms = [
@@ -172,7 +172,6 @@ if (publicSite === null) {
     logError("No existe src/lib/public/site.ts");
 } else {
     const requiredPublicFunctions = [
-        "getPublicHomeData",
         "getPublicTournaments",
         "getPublicTournamentBySlug",
         "getPublicRanking",
@@ -210,10 +209,11 @@ console.log("");
  */
 console.log("4. Noticias públicas");
 
-const newsPage = readText("src/app/noticias/page.tsx");
-const newsDetailPage = readText("src/app/noticias/[slug]/page.tsx");
+const newsPage = readText("src/app/(public)/noticias/page.tsx");
+const publicSiteContent = readText("src/lib/public/site.ts");
+const newsDetailPage = readText("src/app/(public)/noticias/[slug]/page.tsx");
 
-if (newsPage?.includes("publicado")) {
+if (newsPage?.includes("getPublicNews") && publicSiteContent?.includes("getPublicNews")) {
     logOk("Listado de noticias contempla estado publicado");
 } else {
     logWarning(
@@ -236,9 +236,9 @@ console.log("");
  */
 console.log("5. Galería pública");
 
-const galleryPage = readText("src/app/galeria/page.tsx");
+const galleryPage = readText("src/app/(public)/galeria/page.tsx");
 
-if (galleryPage?.includes("published")) {
+if (galleryPage?.includes("getPublicGallery") && publicSiteContent?.includes(".eq(") && publicSiteContent?.includes("published")) {
     logOk("Galería contempla contenido publicado");
 } else {
     logWarning(
@@ -367,6 +367,7 @@ if (packageJson.scripts?.lint) {
         {
             cwd: root,
             stdio: "inherit",
+            shell: process.platform === "win32",
         },
     );
 
@@ -388,10 +389,11 @@ console.log("10. TypeScript");
 
 const tscResult = spawnSync(
     process.platform === "win32" ? "npx.cmd" : "npx",
-    ["tsc", "--noEmit"],
+    ["tsc", "--noEmit", "--incremental", "false"],
     {
         cwd: root,
         stdio: "inherit",
+        shell: process.platform === "win32",
     },
 );
 

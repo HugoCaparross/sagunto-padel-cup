@@ -49,9 +49,7 @@ function Metric({
     return (
         <article className={styles.metric}>
             <span className={styles.metricLabel}>{label}</span>
-
             <strong className={styles.metricValue}>{value}</strong>
-
             {description && (
                 <span className={styles.metricDescription}>
                     {description}
@@ -163,13 +161,9 @@ export default async function TournamentDetailPage({
                     aria-label="Migas de pan"
                 >
                     <Link href="/admin">Administración</Link>
-
                     <span aria-hidden="true">/</span>
-
                     <Link href="/admin/torneos">Torneos</Link>
-
                     <span aria-hidden="true">/</span>
-
                     <span aria-current="page">
                         {tournament.nombre}
                     </span>
@@ -209,12 +203,14 @@ export default async function TournamentDetailPage({
                     </Link>
                 </header>
 
-                <section className={styles.infoGrid}>
+                <section
+                    className={styles.infoGrid}
+                    aria-label="Información general del torneo"
+                >
                     <article className={styles.infoCard}>
                         <span className={styles.infoLabel}>
                             Fecha de inicio
                         </span>
-
                         <strong>
                             {formatDate(tournament.fecha_inicio)}
                         </strong>
@@ -224,7 +220,6 @@ export default async function TournamentDetailPage({
                         <span className={styles.infoLabel}>
                             Fecha de finalización
                         </span>
-
                         <strong>
                             {formatDate(tournament.fecha_fin)}
                         </strong>
@@ -234,7 +229,6 @@ export default async function TournamentDetailPage({
                         <span className={styles.infoLabel}>
                             Tipo de torneo
                         </span>
-
                         <strong>
                             {tournament.tournament_type === "master"
                                 ? "Master"
@@ -246,7 +240,6 @@ export default async function TournamentDetailPage({
                         <span className={styles.infoLabel}>
                             Precio informativo
                         </span>
-
                         <strong>
                             {tournament.precio_texto || "No definido"}
                         </strong>
@@ -259,7 +252,6 @@ export default async function TournamentDetailPage({
                             <span className={styles.sectionEyebrow}>
                                 Resumen
                             </span>
-
                             <h2>Estado de la competición</h2>
                         </div>
                     </div>
@@ -318,7 +310,6 @@ export default async function TournamentDetailPage({
                             <span className={styles.sectionEyebrow}>
                                 Categorías
                             </span>
-
                             <h2>Categorías del torneo</h2>
                         </div>
 
@@ -333,10 +324,9 @@ export default async function TournamentDetailPage({
                     {summary.categories.length === 0 ? (
                         <div className={styles.emptyState}>
                             <h3>Todavía no hay categorías</h3>
-
                             <p>
-                                Añade las categorías que formarán parte de
-                                esta prueba.
+                                Añade las categorías que formarán parte
+                                de esta prueba.
                             </p>
 
                             <Link
@@ -358,25 +348,28 @@ export default async function TournamentDetailPage({
                                             {item.category?.nombre ??
                                                 "Categoría sin nombre"}
                                         </h3>
-
                                         <p>
                                             {item.pair_count} parejas
                                             {" · "}
-                                            {item.confirmed_pair_count} confirmadas
+                                            {item.confirmed_pair_count}
+                                            {" confirmadas"}
                                         </p>
                                     </div>
 
-                                    <div className={styles.categoryStats}>
+                                    <div
+                                        className={styles.categoryStats}
+                                    >
                                         <span>
-                                            {item.pending_match_count} pendientes
+                                            {item.pending_match_count}
+                                            {" pendientes"}
                                         </span>
-
                                         <span>
-                                            {item.live_match_count} en juego
+                                            {item.live_match_count}
+                                            {" en juego"}
                                         </span>
-
                                         <span>
-                                            {item.completed_match_count} finalizados
+                                            {item.completed_match_count}
+                                            {" finalizados"}
                                         </span>
                                     </div>
                                 </article>
@@ -405,7 +398,6 @@ export default async function TournamentDetailPage({
                                 >
                                     <div>
                                         <h3>{link.label}</h3>
-
                                         <p>{link.description}</p>
                                     </div>
 

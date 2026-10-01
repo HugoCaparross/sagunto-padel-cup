@@ -689,7 +689,7 @@ export type RankingPoint = {
     puntos_obtenidos: number;
     ronda_alcanzada: string;
     fecha: string;
-    fecha_caducidad: string;
+    fecha_caducidad: string | null;
     season_id: string | null;
     source: string;
     metadata: Json;
