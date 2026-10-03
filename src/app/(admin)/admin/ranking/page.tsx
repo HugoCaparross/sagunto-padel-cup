@@ -1,6 +1,7 @@
 import { getPublicCategories } from "@/lib/public/site";
 import { createClient } from "@/lib/supabase/server";
 import { getAdminRanking, requireAdminContext } from "@/lib/services/admin";
+import { getMasterQualification } from "@/lib/competition/ranking";
 
 import styles from "../admin-list.module.css";
 
@@ -29,8 +30,12 @@ export default async function AdminRankingPage({ searchParams }: { searchParams:
         : categoriesResult.data[0]?.id;
     const category = categoriesResult.data.find((item) => item.id === categoryId);
     const entries = season && categoryId ? await getAdminRanking(season.id, categoryId) : [];
-    const cutoffPoints = entries[3]?.totalPoints;
-    const cutoffTie = cutoffPoints !== undefined && entries.filter((entry) => entry.totalPoints === cutoffPoints).length > 1;
+    const qualification = getMasterQualification(entries.map((entry) => ({
+        playerId: entry.playerId,
+        points: entry.totalPoints,
+        position: entry.posicion,
+    })));
+    const qualifiedPlayerIds = new Set(qualification.qualifiedPlayerIds);
 
     return (
         <main className={styles.page}>
@@ -68,7 +73,8 @@ export default async function AdminRankingPage({ searchParams }: { searchParams:
                                 <thead><tr><th scope="col">Posición</th><th scope="col">Jugador</th><th scope="col">Puntos</th><th scope="col">Pruebas</th><th scope="col">Acceso Master</th></tr></thead>
                                 <tbody>
                                     {entries.map((entry) => {
-                                        const tiedAtCutoff = cutoffTie && entry.totalPoints === cutoffPoints;
+                                        const isQualified = qualifiedPlayerIds.has(entry.playerId);
+                                        const tiedAtCutoff = qualification.hasCutoffTie && entry.totalPoints === qualification.cutoffPoints;
                                         return (
                                             <tr key={entry.playerId}>
                                                 <td><span className={styles.primaryText}>#{entry.posicion}</span></td>
@@ -76,7 +82,7 @@ export default async function AdminRankingPage({ searchParams }: { searchParams:
                                                 <td>{entry.totalPoints.toLocaleString("es-ES")} pts</td>
                                                 <td>{entry.tournamentsPlayed}</td>
                                                 <td>
-                                                    {entry.posicion <= 4 || tiedAtCutoff ? (
+                                                    {isQualified ? (
                                                         <span className={`${styles.badge} ${tiedAtCutoff ? styles.warning : styles.success}`}>{tiedAtCutoff ? "Empate pendiente" : "Plaza directa"}</span>
                                                     ) : <span className={`${styles.badge} ${styles.neutral}`}>Fuera del top 4</span>}
                                                 </td>

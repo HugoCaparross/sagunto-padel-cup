@@ -106,12 +106,9 @@ export default async function MasterFinalPage() {
                             if (ranking.error || !ranking.data?.category) return null;
 
                             const entries = ranking.data.entries;
-                            const cutoffPoints = entries[3]?.points;
-                            const qualified = cutoffPoints === undefined
-                                ? entries
-                                : entries.filter((entry) => entry.position <= 4 || entry.points === cutoffPoints);
-                            const cutoffTie = cutoffPoints !== undefined &&
-                                qualified.filter((entry) => entry.points === cutoffPoints).length > 1;
+                            const qualification = ranking.data.qualification;
+                            const qualifiedPlayerIds = new Set(qualification.qualifiedPlayerIds);
+                            const qualified = entries.filter((entry) => qualifiedPlayerIds.has(entry.player.id));
 
                             return (
                                 <section key={ranking.data.category.id}>
@@ -132,7 +129,7 @@ export default async function MasterFinalPage() {
                                                     <span>#{entry.position}</span>
                                                     <strong>{entry.player.nombre} {entry.player.apellidos}</strong>
                                                     <b>
-                                                        {cutoffTie && entry.points === cutoffPoints
+                                                        {qualification.hasCutoffTie && entry.points === qualification.cutoffPoints
                                                             ? `${entry.points} pts · Empate por plaza directa`
                                                             : `${entry.points} pts · Plaza directa`}
                                                     </b>

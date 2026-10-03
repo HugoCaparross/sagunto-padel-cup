@@ -16,9 +16,7 @@ Revisión local del 4 de octubre de 2026. La auditoría de Supabase queda en pau
 
 ## Siguiente bloque recomendado
 
-Empezar por el bloque 1: añadir pruebas unitarias con fixtures para la tabla oficial de puntos v1.1, acumulación por temporada, orden del ranking y corte Race to Master. Las pruebas deben asegurar que el empate en la cuarta plaza se presenta como provisional y no inventa un desempate. Es un bloque acotado, verificable localmente y no requiere cambiar datos ni reglas.
-
-Después, completar categorías/grupos y navegación contextual de la ficha del torneo. Dejar generación de cuadros y captura de resultados para cuando se aprueben sus decisiones deportivas; el estado actual de `/admin/competicion` permite filtrar, programar fecha/pista y consultar resultados, pero no editar marcadores.
+El bloque de regresión de ranking v1.1/Race to Master está implementado localmente: cubre la tabla de puntos, agregación individual por categoría, perfiles no públicos en el corte y empates provisionales. Tras verificar el build, continuar con categorías/grupos y navegación contextual de la ficha del torneo. Dejar generación de cuadros y captura de resultados para cuando se aprueben sus decisiones deportivas; `/admin/competicion` permite filtrar, programar fecha/pista y consultar resultados, pero no editar marcadores.
 
 ## Estado de producto observado
 
@@ -27,5 +25,5 @@ Después, completar categorías/grupos y navegación contextual de la ficha del 
 - La competición permite programar partidos y consultar marcadores, pero no generar cuadros desde el panel ni introducir/corregir resultados.
 - Ranking público/admin y Race to Master existen; el desempate de la cuarta plaza y el recalculado desde resultados siguen pendientes.
 - Las categorías de torneo tienen una pantalla administrativa; gestión completa de grupos sigue pendiente.
-- La suite automatizada actual tiene cuatro pruebas unitarias centradas en destinos internos OAuth. No hay pruebas funcionales end-to-end del circuito.
+- La suite automatizada incluye regresiones de destinos internos OAuth y del ranking/Race to Master. No hay pruebas funcionales end-to-end del circuito.
 - No se verificaron operaciones contra Supabase y la auditoría de base de datos permanece pausada.

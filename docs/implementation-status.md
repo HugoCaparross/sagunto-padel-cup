@@ -23,7 +23,7 @@ Este registro contrasta la Especificación Definitiva, el Documento Maestro v1.1
 | Gestión de jugadores | Listado y ficha deportiva de solo consulta con actividad, inscripciones y puntos | `/admin/jugadores`, `/admin/jugadores/[id]`; faltan edición administrativa autorizada y pruebas de extremo a extremo |
 | Gestión de inscripciones | Filtros por torneo/estado/pago, verificar pago, confirmar pareja pagada y check-in | `/admin/inscripciones`; confirmar requiere pareja completa y el servicio valida el pago |
 | Operación de partidos | Filtros por torneo/categoría/estado; editar programación y pista; resultado en solo lectura | `/admin/competicion`; la captura/corrección de marcador requiere un flujo de validación dedicado |
-| Ranking administrativo | Tabla individual por categoría con puntos, pruebas y plazas Race to Master | `/admin/ranking`; empate de corte se identifica, falta aprobación de desempate |
+| Ranking administrativo | Tabla individual por categoría con puntos, pruebas y plazas Race to Master | `/admin/ranking`; corte compartido por helper probado; el desempate deportivo sigue pendiente de aprobación |
 | Gestión de contenidos | Crear borradores de noticias, filtrar y publicar/retirar | `/admin/contenidos` |
 | Filtros de torneos | Búsqueda, estado, temporada y rango de fechas | `/admin/torneos`; fechas filtran por fecha de inicio del torneo |
 | Creación de cuadros y captura/corrección de resultados | Pendiente; el área de partidos solo programa horarios/pistas y consulta marcadores | Diseñar con validación oficial e historial de cambios antes de habilitar mutaciones |
@@ -34,8 +34,8 @@ Este registro contrasta la Especificación Definitiva, el Documento Maestro v1.1
 | Inscripciones concurrentes y capacidad sin máximo | Migración y RPC preparadas, no aplicadas | Revisar transacciones, permisos y aceptación de pareja en Supabase local/staging |
 | Calendario 2026–2027 | Fechas confirmadas; seed preparado | `supabase/seed/official-calendar-2026-2027.sql`; no ejecutado. Las sedes/horas quedan vacías |
 | Categorías y aforo configurable | Confirmado; esquema preparado | `supabase/migrations/20261001000200_unlimited_category_capacity.sql` permite `NULL` sin máximo |
-| Master Final / Race to Master | Vista pública implementada por categoría | Muestra top 4 individual y empates en el corte; falta validar datos reales y desempate oficial |
-| Tabla de puntos v1.1 | Conservada en constantes y lógica de ranking | Validar la asignación de resultados con fixtures/casos de integración |
+| Master Final / Race to Master | Vista pública implementada por categoría; calcula corte sobre ranking completo antes de filtrar perfiles públicos | Pruebas unitarias locales cubren privado en el corte, ranking corto y empate; falta validar datos reales e integración con resultados |
+| Tabla de puntos v1.1 | Conservada en constantes y lógica de ranking | Pruebas unitarias locales cubren categorías, tramos y rondas; asignación integrada desde resultados sigue pendiente |
 | Cuadros, resultados y recalculado de puntos | Parcial | Hay lógica de dominio/servicios; faltan flujos operativos conectados y pruebas de extremo a extremo |
 | RLS en todas las tablas | No verificado completamente | Revisar matches, ranking, grants y matriz completa de roles; ninguna migración aplicada |
 | QA local histórico (2 oct 2026) | Sustituido por la verificación del 4 oct 2026 al final de este documento | Los avisos de ese día no representan el estado actual |

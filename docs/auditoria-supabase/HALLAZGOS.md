@@ -34,11 +34,14 @@ Estados: **Confirmado local** significa demostrado por el código/SQL versionado
 - **Preparación:** existe borrador `propuestas/REPARACION_TEMPORADAS.sql` con preflight fail-fast. Falta compararlo con la migración 006 y catálogo remoto; no está listo para promover/aplicar.
 - **Preparación:** existe borrador `propuestas/REPARACION_TEMPORADAS.sql` con preflight fail-fast. Falta compararlo con la migración 006 y catálogo remoto; no está listo para promover/aplicar.
 
-## H-04 — Hallazgo histórico: lectura pública de contenido multimedia
+## H-04 — Hallazgo histórico: objetos heredados de galería
 
-- **Estado actual:** fuera del alcance de la aplicación por decisión del propietario. Se retiraron página, navegación, consulta y helpers de frontend. La propuesta SQL se retiró y no se aplicará.
-- **Evidencia histórica:** el SQL pegado anteriormente por el usuario mostraba una policy pública `USING (true)` sobre la tabla multimedia. Ese material no verifica el estado remoto actual.
-- **Límite:** no se borró ni modificó ninguna tabla, policy, bucket, archivo ni dato de Supabase. No se continuará con su diagnóstico mientras la base esté en pausa. Este registro conserva evidencia histórica, no una tarea activa de producto.
+- **Estado actual:** galería descartada en la aplicación. Rutas, navegación, servicios y consumo frontend retirados en un cambio anterior; búsqueda del código de producto actual no encontró referencias funcionales.
+- **Objetos indicados por el esquema pegado por el propietario:** `public.gallery_items` contiene contenido multimedia por torneo; `public.gallery_upload_access` almacena tokens de colaborador para permitir cargas por torneo. El mismo extracto muestra políticas de lectura/administración, índices, relaciones y un trigger de actualización en `gallery_items`.
+- **Dependencias a conservar:** `public.set_updated_at()` es genérica y compartida, no debe eliminarse. Las FKs de ambas tablas apuntan a torneos (y `gallery_items` también a jugadores); desaparecen con las tablas si se aprueba retirarlas. No se observó una RPC en el extracto disponible.
+- **Propuesta local:** `propuestas/ELIMINAR_OBJETOS_GALERIA.sql`, fuera de migraciones activas, aborta ante filas y no usa `CASCADE`. No ejecutada; revisar dependencias y retención de datos primero.
+- **Storage:** código histórico identificaba el bucket `gallery`, pero existencia, archivos y policies remotos son desconocidos. No eliminar metadatos mediante SQL; confirmar vacío y sin consumidores y retirar desde Storage UI/API.
+- **Límite:** no se consultó ni modificó Supabase. Nombres y detalles reflejan evidencia local/anterior, no un inventario remoto certificado; no se continuará el diagnóstico hasta que el propietario lo solicite.
 ## H-05 — Privilegios de tabla y privilegios por defecto demasiado amplios
 
 - **Severidad:** Medio/observación. **Estado:** GRANT amplio confirmado en SQL pegado anteriormente; acceso efectivo remoto pendiente, archivo fuente ausente del checkout.

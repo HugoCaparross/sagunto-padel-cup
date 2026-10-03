@@ -1,7 +1,8 @@
 import {
+    MASTER,
     RANKING_POINTS,
     RANKING_RETENTION,
-} from "@/lib/constants";
+} from "../constants.ts";
 
 /* -------------------------------------------------------------------------- */
 /* TYPES                                                                      */
@@ -70,7 +71,7 @@ export type RankingPointsResult = {
 function assertCategory(
     category: string,
 ): asserts category is RankingCategory {
-    if (!(category in RANKING_POINTS)) {
+    if (!Object.prototype.hasOwnProperty.call(RANKING_POINTS, category)) {
         throw new Error(
             `Categoría de ranking no válida: ${category}`,
         );
@@ -431,6 +432,7 @@ export function createRankingPointEvent(
     params: {
         playerId: string;
         tournamentId: string;
+        categoryId: string;
         seasonId?: string | null;
         category: RankingCategory;
         tier: RankingTier;
@@ -441,12 +443,17 @@ export function createRankingPointEvent(
     const {
         playerId,
         tournamentId,
+        categoryId,
         seasonId = null,
         category,
         tier,
         position,
         fecha = new Date().toISOString(),
     } = params;
+
+    assertRequiredIdentifier(playerId, "playerId");
+    assertRequiredIdentifier(tournamentId, "tournamentId");
+    assertRequiredIdentifier(categoryId, "categoryId");
 
     const result =
         calculateRankingPoints({
@@ -458,13 +465,12 @@ export function createRankingPointEvent(
     return {
         player_id: playerId,
         tournament_id: tournamentId,
-        categoria_id: null,
+        categoria_id: categoryId,
         puntos_obtenidos:
             result.points,
         ronda_alcanzada:
             result.finish,
         fecha,
-        fecha_caducidad: null,
         season_id: seasonId,
         source: "tournament",
         metadata: {
@@ -483,6 +489,7 @@ export function createGroupPhaseRankingPointEvent(
     params: {
         playerId: string;
         tournamentId: string;
+        categoryId: string;
         seasonId?: string | null;
         category: RankingCategory;
         fecha?: string;
@@ -491,15 +498,20 @@ export function createGroupPhaseRankingPointEvent(
     const {
         playerId,
         tournamentId,
+        categoryId,
         seasonId = null,
         category,
         fecha = new Date().toISOString(),
     } = params;
 
+    assertRequiredIdentifier(playerId, "playerId");
+    assertRequiredIdentifier(tournamentId, "tournamentId");
+    assertRequiredIdentifier(categoryId, "categoryId");
+
     return {
         player_id: playerId,
         tournament_id: tournamentId,
-        categoria_id: null,
+        categoria_id: categoryId,
         puntos_obtenidos:
             getGroupEliminationPoints(
                 category,
@@ -507,7 +519,6 @@ export function createGroupPhaseRankingPointEvent(
         ronda_alcanzada:
             "fase_grupos",
         fecha,
-        fecha_caducidad: null,
         season_id: seasonId,
         source: "tournament",
         metadata: {
@@ -616,6 +627,12 @@ export type RankingEntry = {
     position: number;
 };
 
+export type MasterQualificationSummary = {
+    cutoffPoints: number | null;
+    qualifiedPlayerIds: string[];
+    hasCutoffTie: boolean;
+};
+
 /**
  * Ordena las entradas del ranking por puntos descendentes.
  *
@@ -628,6 +645,11 @@ export function sortRankingEntries(
         points: number;
     }>,
 ): RankingEntry[] {
+    for (const entry of entries) {
+        assertRequiredIdentifier(entry.playerId, "playerId");
+        assertValidRankingPoints(entry.points);
+    }
+
     return [...entries]
         .sort(
             (a, b) =>
@@ -662,18 +684,17 @@ export function aggregateRankingPoints<
         new Map<string, number>();
 
     for (const event of events) {
+        assertRequiredIdentifier(event.player_id, "player_id");
+        assertValidRankingPoints(event.puntos_obtenidos);
+
         const current =
             totals.get(
                 event.player_id,
             ) ?? 0;
 
-        totals.set(
-            event.player_id,
-            current +
-            Number(
-                event.puntos_obtenidos,
-            ),
-        );
+        const total = current + event.puntos_obtenidos;
+        assertValidRankingPoints(total);
+        totals.set(event.player_id, total);
     }
 
     return sortRankingEntries(
@@ -784,4 +805,91 @@ export function validateOfficialRankingConfiguration(): boolean {
         expectedBands["4ª"].max &&
         validateRankingBands()
     );
+}
+
+/**
+ * Calcula rankings independientes por categoría. Tramos Oro/Plata/Bronce
+ * permanecen agregados dentro de la categoría y no se convierten en grupos
+ * de clasificación separados.
+ */
+export function aggregateRankingPointsByCategory<
+    T extends {
+        player_id: string;
+        categoria_id: string;
+        puntos_obtenidos: number;
+    },
+>(events: T[]): Map<string, RankingEntry[]> {
+    const eventsByCategory = new Map<string, T[]>();
+
+    for (const event of events) {
+        assertRequiredIdentifier(event.categoria_id, "categoria_id");
+        const categoryEvents = eventsByCategory.get(event.categoria_id) ?? [];
+        categoryEvents.push(event);
+        eventsByCategory.set(event.categoria_id, categoryEvents);
+    }
+
+    return new Map(
+        [...eventsByCategory.entries()].map(([categoryId, categoryEvents]) => [
+            categoryId,
+            aggregateRankingPoints(categoryEvents),
+        ]),
+    );
+}
+
+/**
+ * Devuelve plazas directas provisionales. Si hay empate por puntos en la
+ * posición de corte, incluye a todos los empatados sin resolverlo.
+ */
+export function getMasterQualification(
+    entries: Array<Pick<RankingEntry, "playerId" | "points" | "position">>,
+    limit: number = MASTER.topPlayersPerCategory,
+): MasterQualificationSummary {
+    if (!Number.isInteger(limit) || limit <= 0) {
+        throw new Error("El límite de clasificación debe ser un entero positivo.");
+    }
+
+    const playerIds = new Set<string>();
+    const positions = new Set<number>();
+
+    for (const entry of entries) {
+        assertRequiredIdentifier(entry.playerId, "playerId");
+        assertValidRankingPoints(entry.points);
+        if (!Number.isInteger(entry.position) || entry.position <= 0) {
+            throw new Error("La posición del ranking no es válida.");
+        }
+        if (playerIds.has(entry.playerId) || positions.has(entry.position)) {
+            throw new Error("El ranking contiene jugadores o posiciones duplicados.");
+        }
+        playerIds.add(entry.playerId);
+        positions.add(entry.position);
+    }
+
+    const ordered = [...entries].sort((a, b) => a.position - b.position);
+    if (ordered.some((entry, index) => entry.position !== index + 1)) {
+        throw new Error("El ranking está incompleto y no permite calcular el corte.");
+    }
+
+    const cutoffPoints = ordered.find((entry) => entry.position === limit)?.points ?? null;
+    const qualified = ordered.filter(
+        (entry) => entry.position <= limit || (cutoffPoints !== null && entry.points === cutoffPoints),
+    );
+
+    return {
+        cutoffPoints,
+        qualifiedPlayerIds: qualified.map((entry) => entry.playerId),
+        hasCutoffTie: cutoffPoints !== null &&
+            ordered.filter((entry) => entry.points === cutoffPoints).length > 1,
+    };
+}
+
+function assertRequiredIdentifier(value: string, label: string): void {
+    if (typeof value !== "string" || value.trim().length === 0) {
+        throw new Error(`Falta ${label}.`);
+    }
+}
+
+function assertValidRankingPoints(points: number): void {
+    if (!Number.isSafeInteger(points) || points < 0) {
+        throw new Error("La puntuación de ranking no es válida.");
+    }
 }
