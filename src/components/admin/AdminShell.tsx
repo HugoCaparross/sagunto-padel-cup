@@ -60,14 +60,14 @@ const navigationGroups: NavigationGroup[] = [
                 icon: Trophy,
             },
             {
-                label: "Jugadores",
-                href: "/admin/jugadores",
-                icon: Users,
+                label: "Inscripciones",
+                href: "/admin/inscripciones",
+                icon: ClipboardList,
             },
             {
-                label: "Parejas",
-                href: "/admin/parejas",
-                icon: ClipboardList,
+                label: "Partidos",
+                href: "/admin/competicion",
+                icon: Activity,
             },
             {
                 label: "Ranking",
@@ -83,6 +83,16 @@ const navigationGroups: NavigationGroup[] = [
                 label: "Master",
                 href: "/admin/master",
                 icon: Trophy,
+            },
+        ],
+    },
+    {
+        label: "Participantes",
+        items: [
+            {
+                label: "Jugadores",
+                href: "/admin/jugadores",
+                icon: Users,
             },
         ],
     },
@@ -110,8 +120,8 @@ const navigationGroups: NavigationGroup[] = [
         label: "Comunicación",
         items: [
             {
-                label: "Noticias",
-                href: "/admin/noticias",
+                label: "Contenidos",
+                href: "/admin/contenidos",
                 icon: Newspaper,
             },
             {
@@ -148,6 +158,11 @@ const navigationGroups: NavigationGroup[] = [
 const availableAdminRoutes = new Set([
     "/admin",
     "/admin/torneos",
+    "/admin/inscripciones",
+    "/admin/jugadores",
+    "/admin/ranking",
+    "/admin/contenidos",
+    "/admin/competicion",
 ]);
 
 function isActiveRoute(
@@ -307,7 +322,7 @@ export default function AdminShell({
                         </span>
                     </div>
 
-                    <LogoutButton />
+                    <LogoutButton compact={collapsed} />
                 </div>
             </aside>
 

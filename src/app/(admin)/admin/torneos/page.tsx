@@ -8,6 +8,9 @@ import styles from "./page.module.css";
 type SearchParams = Promise<{
     q?: string;
     estado?: string;
+    temporada?: string;
+    desde?: string;
+    hasta?: string;
 }>;
 
 const STATUS_LABELS: Record<string, string> = {
@@ -55,6 +58,9 @@ export default async function AdminTournamentsPage({
 
     const search = params.q?.trim() ?? "";
     const selectedStatus = params.estado ?? "";
+    const seasonId = params.temporada ?? "";
+    const fromDate = /^\d{4}-\d{2}-\d{2}$/.test(params.desde ?? "") ? params.desde : "";
+    const toDate = /^\d{4}-\d{2}-\d{2}$/.test(params.hasta ?? "") ? params.hasta : "";
 
     const validStatus = TOURNAMENT_STATES.includes(
         selectedStatus as (typeof TOURNAMENT_STATES)[number],
@@ -62,10 +68,19 @@ export default async function AdminTournamentsPage({
         ? (selectedStatus as (typeof TOURNAMENT_STATES)[number])
         : undefined;
 
-    const tournaments = await getTournaments({
-        search,
-        estado: validStatus,
-    });
+    const allTournaments = await getTournaments();
+    const seasons = Array.from(
+        new Map(allTournaments.flatMap((tournament) => tournament.season
+            ? [[tournament.season.id, tournament.season.name] as const]
+            : [])).entries(),
+    );
+    const tournaments = allTournaments.filter((tournament) =>
+        (!search || tournament.nombre.toLocaleLowerCase("es").includes(search.toLocaleLowerCase("es"))) &&
+        (!validStatus || tournament.estado === validStatus) &&
+        (!seasonId || tournament.season_id === seasonId) &&
+        (!fromDate || tournament.fecha_inicio >= fromDate) &&
+        (!toDate || tournament.fecha_inicio <= toDate),
+    );
 
     return (
         <main className={styles.page}>
@@ -158,6 +173,18 @@ export default async function AdminTournamentsPage({
                                 ))}
                             </select>
 
+                            <label htmlFor="tournament-season" className={styles.srOnly}>Filtrar por temporada</label>
+                            <select id="tournament-season" name="temporada" defaultValue={seasonId} className={styles.statusSelect}>
+                                <option value="">Todas las temporadas</option>
+                                {seasons.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+                            </select>
+
+                            <label htmlFor="tournament-from" className={styles.srOnly}>Desde fecha de inicio</label>
+                            <input id="tournament-from" type="date" name="desde" defaultValue={fromDate} className={styles.statusSelect} />
+
+                            <label htmlFor="tournament-to" className={styles.srOnly}>Hasta fecha de inicio</label>
+                            <input id="tournament-to" type="date" name="hasta" defaultValue={toDate} className={styles.statusSelect} />
+
                             <button
                                 type="submit"
                                 className={styles.filterButton}
@@ -165,7 +192,7 @@ export default async function AdminTournamentsPage({
                                 Filtrar
                             </button>
 
-                            {(search || validStatus) && (
+                            {(search || validStatus || seasonId || fromDate || toDate) && (
                                 <Link
                                     href="/admin/torneos"
                                     className={styles.clearButton}
@@ -187,12 +214,12 @@ export default async function AdminTournamentsPage({
                             </h3>
 
                             <p className={styles.emptyDescription}>
-                                {search || validStatus
+                                {search || validStatus || seasonId || fromDate || toDate
                                     ? "No se han encontrado torneos con los filtros seleccionados."
                                     : "Todavía no hay torneos registrados."}
                             </p>
 
-                            {!search && !validStatus && (
+                            {!search && !validStatus && !seasonId && !fromDate && !toDate && (
                                 <Link
                                     href="/admin/torneos/nuevo"
                                     className={styles.primaryButton}

@@ -1,510 +1,107 @@
 import Link from "next/link";
+import { Activity, ArrowRight, CalendarDays, ClipboardList, Newspaper, Plus, Users } from "lucide-react";
+import type { ReactNode } from "react";
 
-import {
-    getAdminDashboardSummary,
-} from "@/lib/services/admin";
-
+import { getAdminDashboardSummary } from "@/lib/services/admin";
+import { getTournaments } from "@/lib/services/tournaments";
 import styles from "./page.module.css";
 
+function saguntoToday(): string {
+    return new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Europe/Madrid",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+    }).format(new Date());
+}
+
+function formatDate(value: string): string {
+    return new Intl.DateTimeFormat("es-ES", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "Europe/Madrid",
+    }).format(new Date(`${value.slice(0, 10)}T12:00:00`));
+}
+
 export default async function AdminDashboardPage() {
-    const summary = await getAdminDashboardSummary();
+    const [summary, tournaments] = await Promise.all([
+        getAdminDashboardSummary(),
+        getTournaments(),
+    ]);
+    const nextTournament = tournaments.find((tournament) =>
+        tournament.fecha_inicio >= saguntoToday() && tournament.estado !== "archivado",
+    );
 
     return (
         <main className={styles.page}>
-            <div className={styles.container}>
-                <header className={styles.header}>
-                    <div>
-                        <span className={styles.eyebrow}>
-                            Administración
-                        </span>
+            <header className={styles.header}>
+                <div>
+                    <span className={styles.eyebrow}>Sagunto Padel Cup · Administración</span>
+                    <h1 className={styles.title}>Panel de control</h1>
+                    <p className={styles.description}>Revisa las prioridades de la competición y continúa con la siguiente tarea.</p>
+                </div>
+                <Link href="/admin/torneos/nuevo" className={styles.primaryButton}><Plus size={17} aria-hidden="true" /> Crear torneo</Link>
+            </header>
 
-                        <h1 className={styles.title}>
-                            Panel de control
-                        </h1>
+            <section className={styles.feature} aria-labelledby="next-tournament-heading">
+                <div className={styles.featureIcon}><CalendarDays size={21} aria-hidden="true" /></div>
+                <div className={styles.featureCopy}>
+                    <span className={styles.sectionLabel}>Próxima fecha del circuito</span>
+                    {nextTournament ? (
+                        <>
+                            <h2 id="next-tournament-heading">{nextTournament.nombre}</h2>
+                            <p>{formatDate(nextTournament.fecha_inicio)}{nextTournament.fecha_fin !== nextTournament.fecha_inicio ? ` – ${formatDate(nextTournament.fecha_fin)}` : ""} · {nextTournament.estado.replaceAll("_", " ")}</p>
+                        </>
+                    ) : (
+                        <>
+                            <h2 id="next-tournament-heading">No hay torneos futuros</h2>
+                            <p>Los torneos programados aparecerán aquí cuando tengan una fecha de inicio.</p>
+                        </>
+                    )}
+                </div>
+                {nextTournament && <Link href={`/admin/torneos/${nextTournament.id}`} className={styles.featureLink}>Abrir torneo <ArrowRight size={16} aria-hidden="true" /></Link>}
+            </section>
 
-                        <p className={styles.description}>
-                            Visión general de la actividad de
-                            Sagunto Padel Cup.
-                        </p>
-                    </div>
+            <section className={styles.section} aria-labelledby="priority-heading">
+                <div className={styles.sectionHeading}>
+                    <div><span className={styles.sectionLabel}>Atención prioritaria</span><h2 id="priority-heading">Tareas pendientes</h2></div>
+                    <span className={styles.dataNote}>Datos actuales de Supabase</span>
+                </div>
+                <div className={styles.priorityGrid}>
+                    <PriorityCard label="Pendientes de pago" value={summary.registrations.pendingPayment} href="/admin/inscripciones?estado=pendiente_pago" note="Revisar justificantes y actualizar el estado" tone="warning" />
+                    <PriorityCard label="En lista de espera" value={summary.registrations.waitingList} href="/admin/inscripciones?estado=lista_espera" note="Consultar disponibilidad por torneo" tone="neutral" />
+                    <PriorityCard label="Torneos con inscripción abierta" value={summary.tournaments.open} href="/admin/torneos?estado=inscripciones_abiertas" note="Revisar el estado de cada convocatoria" tone="info" />
+                </div>
+            </section>
 
-                    <Link
-                        href="/admin/torneos"
-                        className={styles.secondaryButton}
-                    >
-                        Gestionar torneos
-                    </Link>
-                </header>
-
-                <section
-                    className={styles.section}
-                    aria-labelledby="overview-heading"
-                >
-                    <div className={styles.sectionHeader}>
-                        <div>
-                            <span className={styles.sectionEyebrow}>
-                                Resumen
-                            </span>
-
-                            <h2
-                                id="overview-heading"
-                                className={styles.sectionTitle}
-                            >
-                                Estado de la competición
-                            </h2>
-                        </div>
-                    </div>
-
-                    <div className={styles.statsGrid}>
-                        <StatCard
-                            label="Torneos"
-                            value={summary.tournaments.total}
-                            href="/admin/torneos"
-                        />
-
-                        <StatCard
-                            label="Inscripciones abiertas"
-                            value={summary.tournaments.open}
-                            href="/admin/torneos"
-                            tone={
-                                summary.tournaments.open > 0
-                                    ? "brand"
-                                    : "default"
-                            }
-                        />
-
-                        <StatCard
-                            label="Torneos en juego"
-                            value={summary.tournaments.live}
-                            href="/admin/torneos"
-                            tone={
-                                summary.tournaments.live > 0
-                                    ? "brand"
-                                    : "default"
-                            }
-                        />
-
-                        <StatCard
-                            label="Torneos finalizados"
-                            value={summary.tournaments.finished}
-                            href="/admin/torneos"
-                            tone="success"
-                        />
-                    </div>
-                </section>
-
-                <section
-                    className={styles.section}
-                    aria-labelledby="participants-heading"
-                >
-                    <div className={styles.sectionHeader}>
-                        <div>
-                            <span className={styles.sectionEyebrow}>
-                                Participantes
-                            </span>
-
-                            <h2
-                                id="participants-heading"
-                                className={styles.sectionTitle}
-                            >
-                                Jugadores e inscripciones
-                            </h2>
-                        </div>
-
-                        <Link
-                            href="/admin/jugadores"
-                            className={styles.textLink}
-                        >
-                            Ver jugadores
-                        </Link>
-                    </div>
-
-                    <div className={styles.statsGrid}>
-                        <StatCard
-                            label="Jugadores registrados"
-                            value={summary.players.total}
-                            href="/admin/jugadores"
-                        />
-
-                        <StatCard
-                            label="Jugadores activos"
-                            value={summary.players.active}
-                            href="/admin/jugadores"
-                            tone="success"
-                        />
-
-                        <StatCard
-                            label="Inscripciones"
-                            value={summary.registrations.total}
-                            href="/admin/parejas"
-                        />
-
-                        <StatCard
-                            label="Inscripciones confirmadas"
-                            value={summary.registrations.confirmed}
-                            href="/admin/parejas"
-                            tone="success"
-                        />
-
-                        <StatCard
-                            label="Pendientes de pago"
-                            value={summary.registrations.pendingPayment}
-                            href="/admin/parejas"
-                            tone={
-                                summary.registrations.pendingPayment > 0
-                                    ? "warning"
-                                    : "default"
-                            }
-                        />
-
-                        <StatCard
-                            label="Lista de espera"
-                            value={summary.registrations.waitingList}
-                            href="/admin/parejas"
-                        />
-
-                        <StatCard
-                            label="Check-in realizado"
-                            value={summary.registrations.checkedIn}
-                            href="/admin/parejas"
-                        />
-                    </div>
-                </section>
-
-                <section
-                    className={styles.section}
-                    aria-labelledby="matches-heading"
-                >
-                    <div className={styles.sectionHeader}>
-                        <div>
-                            <span className={styles.sectionEyebrow}>
-                                Competición en pista
-                            </span>
-
-                            <h2
-                                id="matches-heading"
-                                className={styles.sectionTitle}
-                            >
-                                Estado de los partidos
-                            </h2>
-                        </div>
-                    </div>
-
-                    <div className={styles.statsGrid}>
-                        <StatCard
-                            label="Partidos totales"
-                            value={summary.matches.total}
-                            href="/admin/torneos"
-                        />
-
-                        <StatCard
-                            label="Pendientes"
-                            value={summary.matches.pending}
-                            href="/admin/torneos"
-                        />
-
-                        <StatCard
-                            label="En juego"
-                            value={summary.matches.live}
-                            href="/admin/torneos"
-                            tone={
-                                summary.matches.live > 0
-                                    ? "brand"
-                                    : "default"
-                            }
-                        />
-
-                        <StatCard
-                            label="Finalizados"
-                            value={summary.matches.finished}
-                            href="/admin/torneos"
-                            tone="success"
-                        />
-
-                        <StatCard
-                            label="Aplazados"
-                            value={summary.matches.postponed}
-                            href="/admin/torneos"
-                            tone={
-                                summary.matches.postponed > 0
-                                    ? "warning"
-                                    : "default"
-                            }
-                        />
-                    </div>
-
-                    <div className={styles.progressPanel}>
-                        <div className={styles.progressHeader}>
-                            <div>
-                                <h3 className={styles.panelTitle}>
-                                    Progreso de los partidos
-                                </h3>
-
-                                <p className={styles.panelDescription}>
-                                    Porcentaje de partidos finalizados
-                                    sobre el total registrado.
-                                </p>
-                            </div>
-
-                            <strong className={styles.progressValue}>
-                                {summary.matches.total > 0
-                                    ? `${Math.round(
-                                        (summary.matches.finished /
-                                            summary.matches.total) *
-                                        100,
-                                    )}%`
-                                    : "—"}
-                            </strong>
-                        </div>
-
-                        <div
-                            className={styles.progressTrack}
-                            role="progressbar"
-                            aria-label="Partidos finalizados"
-                            aria-valuemin={0}
-                            aria-valuemax={100}
-                            aria-valuenow={
-                                summary.matches.total > 0
-                                    ? Math.round(
-                                        (summary.matches.finished /
-                                            summary.matches.total) *
-                                        100,
-                                    )
-                                    : 0
-                            }
-                        >
-                            <div
-                                className={styles.progressFill}
-                                style={{
-                                    width: `${summary.matches.total > 0
-                                            ? Math.min(
-                                                100,
-                                                (summary.matches.finished /
-                                                    summary.matches.total) *
-                                                100,
-                                            )
-                                            : 0
-                                        }%`,
-                                }}
-                            />
-                        </div>
-
-                        <div className={styles.progressFooter}>
-                            <span>
-                                {summary.matches.finished} finalizados
-                            </span>
-
-                            <span>
-                                {Math.max(
-                                    0,
-                                    summary.matches.total -
-                                    summary.matches.finished,
-                                )}{" "}
-                                restantes
-                            </span>
-                        </div>
-                    </div>
-                </section>
-
-                <section
-                    className={styles.section}
-                    aria-labelledby="ranking-heading"
-                >
-                    <div className={styles.sectionHeader}>
-                        <div>
-                            <span className={styles.sectionEyebrow}>
-                                Circuito
-                            </span>
-
-                            <h2
-                                id="ranking-heading"
-                                className={styles.sectionTitle}
-                            >
-                                Ranking
-                            </h2>
-                        </div>
-
-                        <Link
-                            href="/admin/ranking"
-                            className={styles.textLink}
-                        >
-                            Gestionar ranking
-                        </Link>
-                    </div>
-
-                    <div className={styles.rankingCard}>
-                        <div className={styles.rankingMetric}>
-                            <span className={styles.rankingLabel}>
-                                Jugadores con ranking
-                            </span>
-
-                            <strong className={styles.rankingValue}>
-                                {summary.ranking.totalPlayers}
-                            </strong>
-                        </div>
-
-                        <div className={styles.rankingMetric}>
-                            <span className={styles.rankingLabel}>
-                                Puntos registrados
-                            </span>
-
-                            <strong className={styles.rankingValue}>
-                                {summary.ranking.totalPoints.toLocaleString(
-                                    "es-ES",
-                                )}
-                            </strong>
-                        </div>
-                    </div>
-                </section>
-
-                <section
-                    className={styles.section}
-                    aria-labelledby="quick-access-heading"
-                >
-                    <div className={styles.sectionHeader}>
-                        <div>
-                            <span className={styles.sectionEyebrow}>
-                                Administración
-                            </span>
-
-                            <h2
-                                id="quick-access-heading"
-                                className={styles.sectionTitle}
-                            >
-                                Accesos directos
-                            </h2>
-                        </div>
-                    </div>
-
-                    <div className={styles.linksGrid}>
-                        <AdminLink
-                            href="/admin/torneos"
-                            title="Torneos"
-                            description="Crear, configurar y gestionar las pruebas."
-                        />
-
-                        <AdminLink
-                            href="/admin/jugadores"
-                            title="Jugadores"
-                            description="Consultar y gestionar participantes."
-                        />
-
-                        <AdminLink
-                            href="/admin/parejas"
-                            title="Parejas e inscripciones"
-                            description="Gestionar parejas, altas y participación."
-                        />
-
-                        <AdminLink
-                            href="/admin/ranking"
-                            title="Ranking"
-                            description="Consultar y administrar la clasificación."
-                        />
-
-                        <AdminLink
-                            href="/admin/clubes"
-                            title="Clubes"
-                            description="Gestionar los clubes del circuito."
-                        />
-
-                        <AdminLink
-                            href="/admin/patrocinadores"
-                            title="Patrocinadores"
-                            description="Consultar y gestionar colaboraciones."
-                        />
-
-                        <AdminLink
-                            href="/admin/noticias"
-                            title="Noticias"
-                            description="Crear y administrar publicaciones."
-                        />
-
-                        <AdminLink
-                            href="/admin/galeria"
-                            title="Galería"
-                            description="Gestionar imágenes y álbumes."
-                        />
-
-                        <AdminLink
-                            href="/admin/master"
-                            title="Master"
-                            description="Gestionar la fase final del circuito."
-                        />
-
-                        <AdminLink
-                            href="/admin/ajustes"
-                            title="Ajustes"
-                            description="Configurar el entorno administrativo."
-                        />
-                    </div>
-                </section>
-            </div>
+            <section className={styles.section} aria-labelledby="shortcuts-heading">
+                <div className={styles.sectionHeading}>
+                    <div><span className={styles.sectionLabel}>Accesos rápidos</span><h2 id="shortcuts-heading">Gestión diaria</h2></div>
+                </div>
+                <div className={styles.shortcutGrid}>
+                    <Shortcut href="/admin/torneos" icon={<CalendarDays size={19} aria-hidden="true" />} title="Torneos" description="Consultar calendario, estados y configuración." />
+                    <Shortcut href="/admin/inscripciones" icon={<ClipboardList size={19} aria-hidden="true" />} title="Inscripciones" description="Revisar pagos y check-in de participantes." />
+                    <Shortcut href="/admin/jugadores" icon={<Users size={19} aria-hidden="true" />} title="Jugadores" description="Buscar jugadores y consultar su categoría." />
+                    <Shortcut href="/admin/ranking" icon={<ClipboardList size={19} aria-hidden="true" />} title="Ranking" description="Consultar puntos y plazas Race to Master." />
+                    <Shortcut href="/admin/contenidos" icon={<Newspaper size={19} aria-hidden="true" />} title="Contenidos" description="Crear borradores y gestionar noticias públicas." />
+                    <Shortcut href="/admin/competicion" icon={<Activity size={19} aria-hidden="true" />} title="Partidos" description="Programar horarios y pistas; consultar resultados." />
+                </div>
+            </section>
         </main>
     );
 }
 
-function StatCard({
-    label,
-    value,
-    href,
-    tone = "default",
-}: {
-    label: string;
-    value: number;
-    href: string;
-    tone?: "default" | "brand" | "success" | "warning";
-}) {
+function PriorityCard({ label, value, href, note, tone }: { label: string; value: number; href: string; note: string; tone: "warning" | "neutral" | "info" }) {
     return (
-        <Link
-            href={href}
-            className={`${styles.statCard} ${styles[`statCard_${tone}`]}`}
-        >
-            <span className={styles.statLabel}>
-                {label}
-            </span>
-
-            <strong className={styles.statValue}>
-                {value.toLocaleString("es-ES")}
-            </strong>
-
-            <span className={styles.statAction}>
-                Consultar
-                <span aria-hidden="true"> →</span>
-            </span>
+        <Link href={href} className={`${styles.priorityCard} ${styles[`tone_${tone}`]}`}>
+            <span className={styles.cardTop}><span>{label}</span><ArrowRight size={16} aria-hidden="true" /></span>
+            <strong>{value.toLocaleString("es-ES")}</strong>
+            <span className={styles.cardNote}>{note}</span>
         </Link>
     );
 }
 
-function AdminLink({
-    href,
-    title,
-    description,
-}: {
-    href: string;
-    title: string;
-    description: string;
-}) {
-    return (
-        <Link
-            href={href}
-            className={styles.adminLink}
-        >
-            <div>
-                <h3 className={styles.adminLinkTitle}>
-                    {title}
-                </h3>
-
-                <p className={styles.adminLinkDescription}>
-                    {description}
-                </p>
-            </div>
-
-            <span
-                className={styles.adminLinkArrow}
-                aria-hidden="true"
-            >
-                →
-            </span>
-        </Link>
-    );
+function Shortcut({ href, icon, title, description }: { href: string; icon: ReactNode; title: string; description: string }) {
+    return <Link href={href} className={styles.shortcut}>{icon}<span><strong>{title}</strong><small>{description}</small></span><ArrowRight className={styles.shortcutArrow} size={17} aria-hidden="true" /></Link>;
 }

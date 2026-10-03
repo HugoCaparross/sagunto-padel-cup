@@ -1,4 +1,4 @@
-
+﻿
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -61,68 +61,10 @@ function Metric({
 
 const sections = [
     {
-        title: "Configuración",
+        title: "Operativa disponible",
         links: [
-            {
-                label: "Editar torneo",
-                description: "Datos generales, fechas y configuración.",
-                href: (id: string) => `/admin/torneos/${id}/editar`,
-            },
-            {
-                label: "Categorías",
-                description: "Categorías incluidas en la prueba.",
-                href: (id: string) => `/admin/torneos/${id}/categorias`,
-            },
-        ],
-    },
-    {
-        title: "Competición",
-        links: [
-            {
-                label: "Inscripciones",
-                description: "Parejas inscritas, pagos y check-in.",
-                href: (id: string) => `/admin/torneos/${id}/inscripciones`,
-            },
-            {
-                label: "Sorteo",
-                description: "Organización de grupos y sorteos.",
-                href: (id: string) => `/admin/torneos/${id}/sorteo`,
-            },
-            {
-                label: "Cuadros",
-                description: "Cuadros eliminatorios y tramos.",
-                href: (id: string) => `/admin/torneos/${id}/cuadros`,
-            },
-            {
-                label: "Horarios",
-                description: "Programación de partidos y pistas.",
-                href: (id: string) => `/admin/torneos/${id}/horarios`,
-            },
-            {
-                label: "Resultados",
-                description: "Seguimiento de partidos y resultados.",
-                href: (id: string) => `/admin/torneos/${id}/resultados`,
-            },
-        ],
-    },
-    {
-        title: "Contenido y organización",
-        links: [
-            {
-                label: "Patrocinadores",
-                description: "Patrocinadores asociados a esta prueba.",
-                href: (id: string) => `/admin/torneos/${id}/patrocinadores`,
-            },
-            {
-                label: "Premios",
-                description: "Premios por categoría y posición.",
-                href: (id: string) => `/admin/torneos/${id}/premios`,
-            },
-            {
-                label: "Galería",
-                description: "Imágenes y contenido visual del torneo.",
-                href: (id: string) => `/admin/torneos/${id}/galeria`,
-            },
+            { label: "Inscripciones", description: "Consulta y gestiona pagos y check-in de este torneo.", href: (id: string) => `/admin/inscripciones?torneo=${id}` },
+            { label: "Partidos y resultados", description: "Programa horarios y pistas; los marcadores actuales son de solo lectura.", href: (id: string) => `/admin/competicion?torneo=${id}` },
         ],
     },
 ];
@@ -160,7 +102,7 @@ export default async function TournamentDetailPage({
                     className={styles.breadcrumbs}
                     aria-label="Migas de pan"
                 >
-                    <Link href="/admin">Administración</Link>
+                    <Link href="/admin">AdministraciÃ³n</Link>
                     <span aria-hidden="true">/</span>
                     <Link href="/admin/torneos">Torneos</Link>
                     <span aria-hidden="true">/</span>
@@ -190,7 +132,7 @@ export default async function TournamentDetailPage({
                         <p className={styles.subtitle}>
                             {summary.season?.name ??
                                 "Temporada sin asignar"}
-                            {" · "}
+                            {" Â· "}
                             {summary.club?.nombre ?? "Club sin asignar"}
                         </p>
                     </div>
@@ -205,7 +147,7 @@ export default async function TournamentDetailPage({
 
                 <section
                     className={styles.infoGrid}
-                    aria-label="Información general del torneo"
+                    aria-label="InformaciÃ³n general del torneo"
                 >
                     <article className={styles.infoCard}>
                         <span className={styles.infoLabel}>
@@ -218,7 +160,7 @@ export default async function TournamentDetailPage({
 
                     <article className={styles.infoCard}>
                         <span className={styles.infoLabel}>
-                            Fecha de finalización
+                            Fecha de finalizaciÃ³n
                         </span>
                         <strong>
                             {formatDate(tournament.fecha_fin)}
@@ -252,7 +194,7 @@ export default async function TournamentDetailPage({
                             <span className={styles.sectionEyebrow}>
                                 Resumen
                             </span>
-                            <h2>Estado de la competición</h2>
+                            <h2>Estado de la competiciÃ³n</h2>
                         </div>
                     </div>
 
@@ -272,7 +214,7 @@ export default async function TournamentDetailPage({
                         <Metric
                             label="Pendientes de pago"
                             value={summary.pending_payment_pairs}
-                            description="Requieren revisión"
+                            description="Requieren revisiÃ³n"
                         />
 
                         <Metric
@@ -308,33 +250,24 @@ export default async function TournamentDetailPage({
                     <div className={styles.sectionHeading}>
                         <div>
                             <span className={styles.sectionEyebrow}>
-                                Categorías
+                                CategorÃ­as
                             </span>
-                            <h2>Categorías del torneo</h2>
+                            <h2>CategorÃ­as del torneo</h2>
                         </div>
 
-                        <Link
-                            href={`/admin/torneos/${id}/categorias`}
-                            className={styles.textLink}
-                        >
-                            Gestionar categorías →
-                        </Link>
+                        <Link href={`/admin/torneos/${id}/categorias`} className={styles.textLink}>Gestionar categorias</Link>
                     </div>
 
                     {summary.categories.length === 0 ? (
                         <div className={styles.emptyState}>
-                            <h3>Todavía no hay categorías</h3>
+                            <h3>TodavÃ­a no hay categorÃ­as</h3>
                             <p>
-                                Añade las categorías que formarán parte
+                                AÃ±ade las categorÃ­as que formarÃ¡n parte
                                 de esta prueba.
                             </p>
+                            <Link href={`/admin/torneos/${id}/categorias`} className={styles.secondaryButton}>Configurar categor?as</Link>
 
-                            <Link
-                                href={`/admin/torneos/${id}/categorias`}
-                                className={styles.secondaryButton}
-                            >
-                                Configurar categorías
-                            </Link>
+
                         </div>
                     ) : (
                         <div className={styles.categoryList}>
@@ -346,11 +279,11 @@ export default async function TournamentDetailPage({
                                     <div>
                                         <h3>
                                             {item.category?.nombre ??
-                                                "Categoría sin nombre"}
+                                                "CategorÃ­a sin nombre"}
                                         </h3>
                                         <p>
                                             {item.pair_count} parejas
-                                            {" · "}
+                                            {" Â· "}
                                             {item.confirmed_pair_count}
                                             {" confirmadas"}
                                         </p>
@@ -405,7 +338,7 @@ export default async function TournamentDetailPage({
                                         className={styles.linkArrow}
                                         aria-hidden="true"
                                     >
-                                        →
+                                        â†’
                                     </span>
                                 </Link>
                             ))}

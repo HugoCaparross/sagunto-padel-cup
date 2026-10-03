@@ -510,7 +510,6 @@ export type NotificationType =
 export const NEWS_STATUSES = [
     "borrador",
     "publicado",
-    "archivado",
 ] as const;
 
 export type NewsStatus =

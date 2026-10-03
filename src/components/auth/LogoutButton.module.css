@@ -1,3 +1,8 @@
+.logoutWrap {
+    display: grid;
+    gap: 6px;
+}
+
 .button,
 .mobile {
     display: inline-flex;
@@ -53,4 +58,33 @@
     .loader {
         animation: none;
     }
+}
+
+.compact {
+    display: inline-grid;
+    width: 40px;
+    min-height: 40px;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, .2);
+    background: transparent;
+    color: var(--white);
+    cursor: pointer;
+}
+
+.compact span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.compact:hover:not(:disabled) { border-color: rgba(255, 255, 255, .55); }
+.compact:disabled { cursor: wait; opacity: .65; }
+
+.error {
+    color: #ffd2d4;
+    font-size: 0.72rem;
+    line-height: 1.4;
 }

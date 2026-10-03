@@ -67,9 +67,10 @@ flujos deportivos.
 
 ## Estado conocido
 
-El pago de inscripciones se realiza fuera de la plataforma. El panel actualmente
-incluye el dashboard y la gestión de torneos; otros módulos de administración aún
-no tienen páginas implementadas. `schema.sql` es una exportación y no una secuencia
-de migraciones. La migración de perfiles públicos no se ha aplicado: debe probarse
-en local/staging y el resto de políticas RLS debe revisarse antes de operar con
-datos reales.
+El pago de inscripciones se realiza fuera de la plataforma. El panel incluye
+dashboard, torneos, listados de jugadores e inscripciones, programación de
+partidos, ranking y noticias. La operación de cuadros/captura de resultados,
+perfiles detallados, galería y configuración aún necesita páginas propias.
+`schema.sql` es una exportación y no una secuencia
+de migraciones. Las migraciones nuevas deben probarse en local/staging y el resto
+de políticas RLS debe revisarse antes de operar con datos reales.

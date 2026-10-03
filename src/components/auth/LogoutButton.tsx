@@ -15,11 +15,13 @@ import styles from "./LogoutButton.module.css";
 
 type Props = {
     mobile?: boolean;
+    compact?: boolean;
     onDone?: () => void;
 };
 
 export default function LogoutButton({
     mobile = false,
+    compact = false,
     onDone,
 }: Props) {
     const router =
@@ -29,6 +31,7 @@ export default function LogoutButton({
         loading,
         setLoading,
     ] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     async function handleLogout() {
         if (loading) {
@@ -36,6 +39,7 @@ export default function LogoutButton({
         }
 
         setLoading(true);
+        setErrorMessage("");
 
         try {
             await signOut();
@@ -50,18 +54,23 @@ export default function LogoutButton({
                 error,
             );
 
+            setErrorMessage("No se ha podido cerrar la sesión. Inténtalo de nuevo.");
             setLoading(false);
         }
     }
 
     return (
+        <div className={styles.logoutWrap}>
         <button
             type="button"
             className={
                 mobile
                     ? styles.mobile
-                    : styles.button
+                    : compact
+                        ? styles.compact
+                        : styles.button
             }
+            aria-label={loading ? "Cerrando sesión" : "Cerrar sesión"}
             onClick={handleLogout}
             disabled={loading}
             aria-busy={loading}
@@ -84,5 +93,9 @@ export default function LogoutButton({
                     : "Salir"}
             </span>
         </button>
+            {errorMessage && (
+                <span className={styles.error} role="alert">{errorMessage}</span>
+            )}
+        </div>
     );
 }

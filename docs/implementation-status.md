@@ -1,4 +1,4 @@
-# Estado de implementación — 1 de octubre de 2026
+# Estado de implementación — 2 de octubre de 2026
 
 Este registro contrasta la Especificación Definitiva, el Documento Maestro v1.1 y las decisiones posteriores del organizador con el código. La elección expresa del organizador fue conservar la tabla de puntos v1.1. Las migraciones y los datos iniciales de este repositorio son propuestas revisables: no se han aplicado a Supabase.
 
@@ -18,7 +18,17 @@ Este registro contrasta la Especificación Definitiva, el Documento Maestro v1.1
 | Portada conectada a datos publicados y próximos | Implementado; build previa verificada | `src/app/(public)/page.tsx`; probar con staging y zona Europe/Madrid |
 | Alta de torneo con validación, errores y estado de envío | Implementado; build previa verificada | `src/app/(admin)/admin/torneos/nuevo/` |
 | Actividad privada del jugador | Implementado a nivel de consulta | `/app` usa partidos finalizados; falta validar contra staging |
-| Navegación administrativa | Corregidos enlaces visibles a rutas inexistentes | `src/components/admin/AdminShell.tsx`; los módulos restantes aún no están implementados |
+| Dashboard administrativo | Rediseñado con próxima fecha, prioridades y accesos reales | `/admin`; métricas del servicio administrativo y torneo siguiente desde Supabase |
+| Navegación y cierre de sesión | Enlaces limitados a páginas implementadas; error de logout visible | `src/components/admin/AdminShell.tsx`, `LogoutButton.tsx` |
+| Gestión de jugadores | Listado real con búsqueda y estado; no muestra email/teléfono | `/admin/jugadores`; ficha individual e historial siguen pendientes |
+| Gestión de inscripciones | Filtros por torneo/estado/pago, verificar pago, confirmar pareja pagada y check-in | `/admin/inscripciones`; confirmar requiere pareja completa y el servicio valida el pago |
+| Operación de partidos | Filtros por torneo/categoría/estado; editar programación y pista; resultado en solo lectura | `/admin/competicion`; la captura/corrección de marcador requiere un flujo de validación dedicado |
+| Ranking administrativo | Tabla individual por categoría con puntos, pruebas y plazas Race to Master | `/admin/ranking`; empate de corte se identifica, falta aprobación de desempate |
+| Gestión de contenidos | Crear borradores de noticias, filtrar y publicar/retirar | `/admin/contenidos`; gestión de galería y carga de imágenes siguen pendientes |
+| Filtros de torneos | Búsqueda, estado, temporada y rango de fechas | `/admin/torneos`; fechas filtran por fecha de inicio del torneo |
+| Creación de cuadros y captura/corrección de resultados | Pendiente; el área de partidos solo programa horarios/pistas y consulta marcadores | Diseñar con validación oficial e historial de cambios antes de habilitar mutaciones |
+| Fichas completas de jugadores/parejas, historial deportivo | Pendiente | El listado de jugadores no expone datos privados y no tiene ficha detallada |
+| Galería, categorías, Master y configuración | Pendiente de páginas operativas | Se mantienen fuera del menú para evitar destinos vacíos |
 | Perfiles públicos y privacidad | Migración preparada, no aplicada | `public_player_profiles` requiere despliegue controlado y pruebas de roles |
 | Campos sensibles de inscripción | Protección preparada, no aplicada | Trigger en migración; comprobar con pruebas de integración |
 | Inscripciones concurrentes y capacidad sin máximo | Migración y RPC preparadas, no aplicadas | Revisar transacciones, permisos y aceptación de pareja en Supabase local/staging |
@@ -28,7 +38,7 @@ Este registro contrasta la Especificación Definitiva, el Documento Maestro v1.1
 | Tabla de puntos v1.1 | Conservada en constantes y lógica de ranking | Validar la asignación de resultados con fixtures/casos de integración |
 | Cuadros, resultados y recalculado de puntos | Parcial | Hay lógica de dominio/servicios; faltan flujos operativos conectados y pruebas de extremo a extremo |
 | RLS en todas las tablas | No verificado completamente | Revisar matches, ranking, grants y matriz completa de roles; ninguna migración aplicada |
-| QA local | Pendiente de repetición tras los últimos cambios | Ejecutar `npm run qa` y `npm run build` en esta revisión |
+| QA local (2 oct 2026) | `npm run qa`: 0 errores; `npm run build`: correcta con 39 rutas | ESLint 16 avisos; QA conserva 4 avisos por validadores opcionales ausentes; faltan pruebas integradas de Supabase |
 
 ## Decisiones todavía pendientes
 
@@ -46,3 +56,34 @@ Este registro contrasta la Especificación Definitiva, el Documento Maestro v1.1
 - `official-calendar-2026-2027.sql`: datos de temporada, cuatro categorías y siete torneos confirmados.
 - Aplicar primero las migraciones en Supabase local/staging, luego el seed; verificar estructura existente y ejecutar pruebas anónimas, jugador propio/ajeno y administrador. No aplicar directamente en producción.
 - Antes de publicar: probar Auth, variables de entorno, políticas RLS, flujos de inscripción/resultados/ranking, textos legales, copias de seguridad, dominio y HTTPS. La web aún no está lista para operación completa mientras falten esos flujos y validaciones.
+
+
+## Continuaci?n de auditor?a ? 2 de octubre de 2026
+
+- Se verific? el ?rbol real de rutas administrativas: la ficha enlazaba a subsecciones que no exist?an. Se retiraron esos destinos ficticios; inscripciones y partidos enlazan ahora a las p?ginas existentes con filtro de torneo.
+- Se a?adi? una ruta de edici?n general de torneo. La acci?n exige sesi?n de administrador, valida identificador, campos y fechas, actualiza mediante el servicio existente, escribe una entrada de auditor?a y revalida ficha, listado y portada.
+- El formulario de edici?n requiere al menos una temporada y un club; no altera el estado del torneo ni aplica reglas deportivas.
+- El flujo de escritura real, permisos RLS y entrada de auditor?a no se pudieron comprobar sin credenciales de Supabase local/staging. La ficha de torneo queda parcialmente implementada hasta completar categor?as, transiciones operativas y prueba de integraci?n.
+
+
+## Auditoria de cobertura del panel - 2 de octubre de 2026
+
+| Area | Estado observado | Evidencia / limitacion |
+| --- | --- | --- |
+| Dashboard | Parcial, consulta servicios y enlaza operaciones actuales | `src/app/(admin)/admin/page.tsx`; falta validacion de datos en entorno Supabase |
+| Torneos: alta y ficha | Alta y edicion general implementadas; categorias asignables con cupo opcional y activacion/desactivacion | `src/app/(admin)/admin/torneos/[id]/editar/`, `src/app/(admin)/admin/torneos/[id]/categorias/`; grupos siguen pendientes |
+| Torneos: transiciones y archivo | No verificado desde interfaz de ficha | Hay servicios de estado; no se expusieron acciones que permitan mutaciones de estado sin flujo claro |
+| Inscripciones | Parcial; consulta, verificacion de pago, confirmacion y check-in | No incluye baja, lista de espera ni promocion probadas |
+| Jugadores | Parcial; listado con busqueda/estado, sin ficha deportiva | `/admin/jugadores` |
+| Parejas | Parcial; lectura contextual, sin modulo CRUD dedicado | Inscripciones y partidos muestran parejas |
+| Categorias y grupos | CRUD parcial implementado para asignar categoria al torneo, actualizar cupos opcionales y activar/desactivar inscripcion; gestion de grupos pendiente | `src/app/(admin)/admin/torneos/[id]/categorias/`; sin borrado fisico para preservar relaciones |
+| Cuadros | Pendiente; logica de dominio no esta conectada a una herramienta de generacion | No existe ruta administrativa dedicada |
+| Partidos y resultados | Parcial; filtro, horario/pista editables, resultados solo lectura | `/admin/competicion`; sin captura/correccion de marcador |
+| Clasificacion / Race to Master | Parcial; vistas con ranking y plazas; recalculo/historial admin incompletos | `/admin/ranking`, `/master-final`; empate de corte pendiente |
+| Master Final administrativo | Pendiente | La vista publica no configura participantes, formato ni premios |
+| Noticias | Parcial; borradores y publicacion disponibles | `/admin/contenidos` |
+| FAQ, contacto, galeria y configuracion | Pendiente de gestion desde panel | No hay rutas administrativas operativas comprobadas |
+| Sesion y permisos | Proteccion de layout/acciones identificada; matriz completa de roles/RLS no verificada | La edicion nueva comprueba admin tanto al cargar como al mutar |
+| UX compartida | Navegacion apunta a areas activas; ficha de torneo ya no enlaza a subsecciones inexistentes | Quedan estados/tablas y flujos pendientes en los modulos aun parciales |
+
+Las rutas nuevas de edicion general y gestion de categorias guardan por los servicios existentes, revalidan las vistas afectadas y registran eventos en `audit_log`. Si guardar tiene exito pero falla el registro de auditoria, el formulario informa que los datos si se guardaron y la auditoria no. La prueba no se ha ejecutado contra Supabase: la existencia de RLS y las credenciales disponibles no bastan para demostrar el resultado en una sesion real.
