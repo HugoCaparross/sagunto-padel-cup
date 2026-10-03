@@ -20,15 +20,15 @@ Este registro contrasta la Especificación Definitiva, el Documento Maestro v1.1
 | Actividad privada del jugador | Implementado a nivel de consulta | `/app` usa partidos finalizados; falta validar contra staging |
 | Dashboard administrativo | Rediseñado con próxima fecha, prioridades y accesos reales | `/admin`; métricas del servicio administrativo y torneo siguiente desde Supabase |
 | Navegación y cierre de sesión | Enlaces limitados a páginas implementadas; error de logout visible | `src/components/admin/AdminShell.tsx`, `LogoutButton.tsx` |
-| Gestión de jugadores | Listado real con búsqueda y estado; no muestra email/teléfono | `/admin/jugadores`; ficha individual e historial siguen pendientes |
+| Gestión de jugadores | Listado y ficha deportiva de solo consulta con actividad, inscripciones y puntos | `/admin/jugadores`, `/admin/jugadores/[id]`; faltan edición administrativa autorizada y pruebas de extremo a extremo |
 | Gestión de inscripciones | Filtros por torneo/estado/pago, verificar pago, confirmar pareja pagada y check-in | `/admin/inscripciones`; confirmar requiere pareja completa y el servicio valida el pago |
 | Operación de partidos | Filtros por torneo/categoría/estado; editar programación y pista; resultado en solo lectura | `/admin/competicion`; la captura/corrección de marcador requiere un flujo de validación dedicado |
 | Ranking administrativo | Tabla individual por categoría con puntos, pruebas y plazas Race to Master | `/admin/ranking`; empate de corte se identifica, falta aprobación de desempate |
-| Gestión de contenidos | Crear borradores de noticias, filtrar y publicar/retirar | `/admin/contenidos`; gestión de galería y carga de imágenes siguen pendientes |
+| Gestión de contenidos | Crear borradores de noticias, filtrar y publicar/retirar | `/admin/contenidos` |
 | Filtros de torneos | Búsqueda, estado, temporada y rango de fechas | `/admin/torneos`; fechas filtran por fecha de inicio del torneo |
 | Creación de cuadros y captura/corrección de resultados | Pendiente; el área de partidos solo programa horarios/pistas y consulta marcadores | Diseñar con validación oficial e historial de cambios antes de habilitar mutaciones |
-| Fichas completas de jugadores/parejas, historial deportivo | Pendiente | El listado de jugadores no expone datos privados y no tiene ficha detallada |
-| Galería, categorías, Master y configuración | Pendiente de páginas operativas | Se mantienen fuera del menú para evitar destinos vacíos |
+| Fichas de jugadores/parejas | Consulta deportiva implementada; acciones de modificación de pareja no disponibles | `/admin/jugadores/[id]`, `/admin/parejas/[id]`; sustituciones requieren regla aprobada |
+| Categorías, Master y configuración | Pendiente de páginas operativas | Se mantienen fuera del menú para evitar destinos vacíos |
 | Perfiles públicos y privacidad | Migración preparada, no aplicada | `public_player_profiles` requiere despliegue controlado y pruebas de roles |
 | Campos sensibles de inscripción | Protección preparada, no aplicada | Trigger en migración; comprobar con pruebas de integración |
 | Inscripciones concurrentes y capacidad sin máximo | Migración y RPC preparadas, no aplicadas | Revisar transacciones, permisos y aceptación de pareja en Supabase local/staging |
@@ -38,7 +38,7 @@ Este registro contrasta la Especificación Definitiva, el Documento Maestro v1.1
 | Tabla de puntos v1.1 | Conservada en constantes y lógica de ranking | Validar la asignación de resultados con fixtures/casos de integración |
 | Cuadros, resultados y recalculado de puntos | Parcial | Hay lógica de dominio/servicios; faltan flujos operativos conectados y pruebas de extremo a extremo |
 | RLS en todas las tablas | No verificado completamente | Revisar matches, ranking, grants y matriz completa de roles; ninguna migración aplicada |
-| QA local (2 oct 2026) | `npm run qa`: 0 errores; `npm run build`: correcta con 39 rutas | ESLint 16 avisos; QA conserva 4 avisos por validadores opcionales ausentes; faltan pruebas integradas de Supabase |
+| QA local histórico (2 oct 2026) | Sustituido por la verificación del 4 oct 2026 al final de este documento | Los avisos de ese día no representan el estado actual |
 
 ## Decisiones todavía pendientes
 
@@ -82,7 +82,7 @@ Este registro contrasta la Especificación Definitiva, el Documento Maestro v1.1
 | Clasificacion / Race to Master | Parcial; vistas con ranking y plazas; recalculo/historial admin incompletos | `/admin/ranking`, `/master-final`; empate de corte pendiente |
 | Master Final administrativo | Pendiente | La vista publica no configura participantes, formato ni premios |
 | Noticias | Parcial; borradores y publicacion disponibles | `/admin/contenidos` |
-| FAQ, contacto, galeria y configuracion | Pendiente de gestion desde panel | No hay rutas administrativas operativas comprobadas |
+| FAQ, contacto y configuracion | Pendiente de gestion desde panel | No hay rutas administrativas operativas comprobadas |
 | Sesion y permisos | Proteccion de layout/acciones identificada; matriz completa de roles/RLS no verificada | La edicion nueva comprueba admin tanto al cargar como al mutar |
 | UX compartida | Navegacion apunta a areas activas; ficha de torneo ya no enlaza a subsecciones inexistentes | Quedan estados/tablas y flujos pendientes en los modulos aun parciales |
 
@@ -240,3 +240,9 @@ La migracion 006 incluye comprobaciones previas: aborta si encuentra duplicados 
 Decisiones aplicadas: al archivar, el ranking pasa a histórico inmutable; el trigger serializa escrituras autenticadas de puntos con el cierre, de forma que la escritura queda dentro del snapshot o se rechaza. El service role sigue siendo una vía privilegiada de mantenimiento. Se mantienen pendientes consentimiento del segundo jugador y transiciones de inscripción/pago, devoluciones y reserva de plaza. No se implementó alta de inscripciones desde la aplicación: `registrar_pareja` no tiene consumidor encontrado y el formulario público actual completa el perfil.
 
 Verificación de esta ampliación: `npm run qa` completado con 0 errores (4 avisos de validadores ausentes; ESLint informa 15 advertencias); `npm run build` completado correctamente con generación de 40 páginas. `git diff --check` sin errores. Las pruebas SQL de regresión, RLS, permisos y concurrencia no se ejecutaron: requieren una base desechable de staging con los fixtures descritos. No se ha aplicado ninguna migración remota.
+
+## Estado tras retirar contenido multimedia — 4 de octubre de 2026
+
+- Se retiraron la ruta pública, su CSS, enlaces de navegación, helper de consulta, helpers de Storage y tipos de aplicación específicos. No hay ruta administrativa para ese módulo. No se modificó el esquema, los datos ni la configuración de Supabase.
+- QA: 0 errores, 4 warnings del verificador (validadores opcionales ausentes); ESLint ejecutado con 0 errores y 14 warnings; TypeScript pasó; tests 4/4; build de producción pasó con 39 páginas.
+- Las fichas admin de jugador y pareja sí existen y son de consulta; las descripciones antiguas que las marcaban inexistentes quedan corregidas arriba.

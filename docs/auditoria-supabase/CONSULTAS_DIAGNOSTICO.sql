@@ -1,4 +1,5 @@
--- Diagnóstico remoto de solo lectura. Ejecutar en SQL Editor conectado a STAGING.
+-- ARCHIVADO — no ejecutar mientras la auditoría de Supabase esté en pausa.
+-- Diagnóstico remoto de solo lectura preparado anteriormente para SQL Editor de STAGING.
 -- Ejecuta un bloque cada vez; no incluye DDL, DML, RPC de escritura ni transacciones.
 -- Bloques 1-8 consultan catálogo. Bloque 9 agrega datos y puede escanear tablas grandes.
 -- No compartas resultados sin revisarlos: las definiciones de funciones/policies son código.
@@ -9,19 +10,7 @@ select current_database() as database_name,
        current_user as execution_role,
        current_setting('server_version') as postgres_version;
 
--- BLOQUE 2 — Historial de migraciones (opcional).
--- Si `supabase_migrations.schema_migrations` no existe o el rol no tiene SELECT,
--- registra esa limitación y continúa con el bloque 3. El historial no prueba el catálogo real.
-select version
-from supabase_migrations.schema_migrations
-where version in (
-    '20261001000100', '20261001000200', '20261003000100',
-    '20261003000200', '20261003000300', '20261003000400',
-    '20261003000500', '20261003000600'
-)
-order by version;
-
--- BLOQUE 3 — Relaciones públicas y flags RLS.
+-- BLOQUE 3 — Relaciones públicas y Storage, y flags RLS.
 select n.nspname as schema_name,
        c.relname as object_name,
        c.relkind,
@@ -30,7 +19,7 @@ select n.nspname as schema_name,
        pg_get_userbyid(c.relowner) as owner
 from pg_class c
 join pg_namespace n on n.oid = c.relnamespace
-where n.nspname = 'public'
+where n.nspname in ('public', 'storage')
   and c.relkind in ('r', 'p', 'v', 'm', 'f')
 order by c.relkind, c.relname;
 
@@ -57,12 +46,12 @@ select n.nspname as schema_name,
 from pg_class c
 join pg_namespace n on n.oid = c.relnamespace
 cross join pg_roles r
-where n.nspname = 'public'
+where n.nspname in ('public', 'storage')
   and c.relkind in ('r', 'p', 'v', 'm', 'S')
   and r.rolname in ('anon', 'authenticated', 'service_role', 'postgres')
 order by c.relname, r.rolname;
 
--- BLOQUE 5B — Privilegios de columna declarados para tablas sensibles.
+-- BLOQUE 5B — Privilegios de columna declarados para tablas sensibles y Storage.
 -- Complementa 5A; no reemplaza grants/herencia/ownership ni comportamiento RLS.
 select table_name, column_name, grantee, privilege_type, is_grantable
 from information_schema.column_privileges
@@ -70,6 +59,13 @@ where table_schema = 'public'
   and grantee in ('anon', 'authenticated', 'service_role', 'postgres')
   and table_name in ('players', 'registrations', 'pairs', 'notifications',
                      'ranking_points', 'seasons', 'gallery_items')
+order by table_name, column_name, grantee, privilege_type;
+
+select table_schema, table_name, column_name, grantee, privilege_type, is_grantable
+from information_schema.column_privileges
+where table_schema = 'storage'
+  and grantee in ('anon', 'authenticated', 'service_role', 'postgres')
+  and table_name in ('objects', 'buckets')
 order by table_name, column_name, grantee, privilege_type;
 
 -- BLOQUE 5C — Privilegios de esquema y ACL por defecto.
@@ -87,7 +83,7 @@ select defaclnamespace::regnamespace as schema_name,
        defaclobjtype as object_type,
        defaclacl as default_acl
 from pg_default_acl
-where defaclnamespace = 'public'::regnamespace;
+where defaclnamespace in ('public'::regnamespace, 'storage'::regnamespace);
 
 -- BLOQUE 6 — Funciones/procedimientos públicos y EXECUTE efectivo.
 -- Definiciones pueden contener lógica interna: revisar antes de compartir resultados.
@@ -204,28 +200,10 @@ with active_registrations as (
     union all
     select tournament_id, categoria_id, player_2_id, pair_id
     from active_registrations
-), candidate_pairs as (
-    select p.id as pair_id, p.tournament_id, p.player_1_id, p.player_2_id
-    from public.pairs p
-    join public.registrations r
-      on r.pair_id = p.id and r.tournament_id = p.tournament_id
-    where p.estado in ('confirmada', 'pendiente_pago', 'lista_espera')
-      and r.estado in ('confirmada', 'pendiente_pago', 'lista_espera')
-), candidate_players as (
-    select tournament_id, player_1_id as player_id, pair_id
-    from candidate_pairs where player_1_id is not null
-    union all
-    select tournament_id, player_2_id, pair_id
-    from candidate_pairs where player_2_id is not null
 ), duplicates as (
     select tournament_id, categoria_id, player_id
     from players_in_pairs
     group by tournament_id, categoria_id, player_id
-    having count(distinct pair_id) > 1
-), tournament_duplicates as (
-    select tournament_id, player_id
-    from candidate_players
-    group by tournament_id, player_id
     having count(distinct pair_id) > 1
 ), capacity as (
     select tc.tournament_id, tc.categoria_id, tc.cupo_maximo,
@@ -238,7 +216,6 @@ with active_registrations as (
 )
 select
     (select count(*) from duplicates) as duplicate_active_players_same_category,
-    (select count(*) from tournament_duplicates) as duplicate_active_players_tournament_wide,
     (select count(*) from capacity
       where cupo_maximo is not null and occupied > cupo_maximo) as categories_over_capacity,
     (select count(*) from public.registrations r
@@ -255,15 +232,3 @@ select
       where estado = 'cancelada'
         and payment_status = 'verificado'
         and fecha_pago is null) as cancelled_paid_without_date;
-
--- RESULTADOS PARA CERRAR HALLAZGOS
--- H-01/H-02 son locales: validar con los tests de aplicación, no con este SQL.
--- H-03: bloques 2, 6, 8A, 8B, 9A; se requieren enum, definición real de ambas RPC,
--- constraints de ranking_points y estados observados.
--- H-04: bloques 3, 4, 5A, 8D y 9A; verificar policy efectiva de galería y borradores.
--- H-05: bloques 5A-5C y 6; obtener grants efectivos, defaults y EXECUTE para cada RPC.
--- H-06: bloques 6-7; la atomicidad requiere después pruebas transaccionales en staging.
--- H-07/H-08/H-09: bloques 4-8 y 9B; los conteos no prueban carreras ni regla deportiva.
--- H-10: local; comprobar guards con pruebas HTTP/acciones de staging.
--- H-11: bloques 3-5, 8D; cerrar unicidad/baja solo después de revisar conteos y requisitos.
--- H-12: inventario Storage/Auth del Dashboard sigue siendo manual; estos bloques no lo certifican.

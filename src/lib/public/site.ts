@@ -7,7 +7,6 @@ type Category = Tables["categories"]["Row"];
 type Tournament = Tables["tournaments"]["Row"];
 type Club = Tables["clubs"]["Row"];
 type News = Tables["news"]["Row"];
-type GalleryItem = Tables["gallery_items"]["Row"];
 type RankingPoint = Tables["ranking_points"]["Row"];
 type Match = Tables["matches"]["Row"];
 type Pair = Tables["pairs"]["Row"];
@@ -1124,35 +1123,6 @@ export async function getPublicSponsors(
         .eq("active", true)
         .order("orden", {
             ascending: true,
-        });
-
-    if (error) {
-        return {
-            data: null,
-            error: asError(error),
-        };
-    }
-
-    return {
-        data: data ?? [],
-        error: null,
-    };
-}
-
-export async function getPublicGallery(): Promise<
-    PublicResult<GalleryItem[]>
-> {
-    const supabase = await createClient();
-
-    const { data, error } = await supabase
-        .from("gallery_items")
-        .select("*")
-        .eq("published", true)
-        .order("orden", {
-            ascending: true,
-        })
-        .order("created_at", {
-            ascending: false,
         });
 
     if (error) {

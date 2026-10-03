@@ -130,11 +130,6 @@ const navigationGroups: NavigationGroup[] = [
                 icon: Newspaper,
             },
             {
-                label: "Galería",
-                href: "/admin/galeria",
-                icon: FolderOpen,
-            },
-            {
                 label: "Notificaciones",
                 href: "/admin/notificaciones",
                 icon: Bell,

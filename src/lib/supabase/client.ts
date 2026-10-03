@@ -429,26 +429,6 @@ export function subscribeToRanking(
 }
 
 // =============================================================================
-// STORAGE
-// =============================================================================
-
-export function getGalleryBucket() {
-    const supabase = createClient();
-
-    return supabase.storage.from(
-        "gallery",
-    );
-}
-
-export function getPublicAssetsBucket() {
-    const supabase = createClient();
-
-    return supabase.storage.from(
-        "public",
-    );
-}
-
-// =============================================================================
 // ERROR HELPERS
 // =============================================================================
 

@@ -45,9 +45,6 @@ const requiredFiles = [
     "src/app/(public)/noticias/[slug]/page.tsx",
     "src/app/(public)/noticias/[slug]/page.module.css",
 
-    "src/app/(public)/galeria/page.tsx",
-    "src/app/(public)/galeria/page.module.css",
-
     "src/app/(public)/privacidad/page.tsx",
     "src/app/(public)/privacidad/page.module.css",
     "src/app/(public)/cookies/page.tsx",
@@ -179,7 +176,6 @@ if (publicSite === null) {
         "getPublicPlayer",
         "getPublicNews",
         "getPublicNewsBySlug",
-        "getPublicGallery",
     ];
 
     for (const functionName of requiredPublicFunctions) {
@@ -232,26 +228,9 @@ if (newsDetailPage?.includes("notFound")) {
 console.log("");
 
 /**
- * 5. Galería publicada
+ * 5. SEO
  */
-console.log("5. Galería pública");
-
-const galleryPage = readText("src/app/(public)/galeria/page.tsx");
-
-if (galleryPage?.includes("getPublicGallery") && publicSiteContent?.includes(".eq(") && publicSiteContent?.includes("published")) {
-    logOk("Galería contempla contenido publicado");
-} else {
-    logWarning(
-        "No se ha detectado explícitamente el filtro published",
-    );
-}
-
-console.log("");
-
-/**
- * 6. SEO
- */
-console.log("6. SEO");
+console.log("5. SEO");
 
 const robots = readText("src/app/robots.ts");
 const sitemap = readText("src/app/sitemap.ts");
@@ -292,7 +271,7 @@ console.log("");
 /**
  * 7. Estados básicos
  */
-console.log("7. Estados de aplicación");
+console.log("6. Estados de aplicación");
 
 const loading = readText("src/app/loading.tsx");
 const errorPage = readText("src/app/error.tsx");
@@ -321,7 +300,7 @@ console.log("");
 /**
  * 8. package.json
  */
-console.log("8. Scripts del proyecto");
+console.log("7. Scripts del proyecto");
 
 const packagePath = join(root, "package.json");
 
@@ -350,11 +329,11 @@ if (!existsSync(packagePath)) {
 console.log("");
 
 /**
- * 9. Lint
+ * 8. Lint
  *
  * Se ejecuta únicamente si existe el script.
  */
-console.log("9. Lint");
+console.log("8. Lint");
 
 const packageJson = JSON.parse(
     readFileSync(packagePath, "utf8"),
@@ -383,9 +362,9 @@ if (packageJson.scripts?.lint) {
 console.log("");
 
 /**
- * 10. TypeScript
+ * 9. TypeScript
  */
-console.log("10. TypeScript");
+console.log("9. TypeScript");
 
 const tscResult = spawnSync(
     process.platform === "win32" ? "npx.cmd" : "npx",

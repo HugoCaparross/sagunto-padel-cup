@@ -15,7 +15,7 @@ Estados: **Confirmado local** significa demostrado por el código/SQL versionado
 ## H-02 — Cambio de rol administrativo bloqueado por trigger
 
 - **Severidad:** Medio (integridad/funcionalidad). **Estado:** Helper eliminado localmente; necesidad de un flujo de roles pendiente de producto.
-- **Componente:** migración `20261003000400_registration_rls_hardening.sql`/trigger `prevent_self_role_escalation`; helpers `changePlayerRoleAdmin()` y `updatePlayerRole()`.
+- **Componente:** definición del trigger `prevent_self_role_escalation` en la migración previamente auditada (archivo ausente del checkout); helpers `changePlayerRoleAdmin()` y `updatePlayerRole()`.
 - **Evidencia:** el trigger versionado rechaza cambios de `role` salvo actor `service_role`; ambos helpers llamaban a `updatePlayer({ role })`. Búsqueda global bajo `src` encontró solo sus definiciones: no había consumidores. `updatePlayerRole()` además documentaba protección `requireAdmin()` que no ejecutaba por sí mismo.
 - **Impacto/condición:** la operación que exponía el helper habría fallado en la BD; no existía un flujo de usuario activo. El trigger sigue protegiendo el rol.
 - **Corrección aplicada:** se eliminaron ambos helpers muertos. No se añadió RPC ni se relajó el trigger.
@@ -24,28 +24,25 @@ Estados: **Confirmado local** significa demostrado por el código/SQL versionado
 
 ## H-03 — Cierre y rollover incompatibles con el esquema base
 
-- **Severidad:** Alto funcional. **Estado:** Confirmado en SQL base de `HEAD`; remoto pendiente.
-- **Componente:** `supabase/schema.sql` de `HEAD`, `close_season(uuid)`, `create_season_from_previous(...)`, tabla `seasons`, `ranking_points`.
+- **Severidad:** Alto funcional. **Estado:** Confirmado en el SQL base pegado anteriormente por el usuario; remoto pendiente, archivos fuente ausentes del checkout.
+- **Componente:** extracto previo de schema, `close_season(uuid)`, `create_season_from_previous(...)`, tabla `seasons`, `ranking_points`.
 - **Evidencia:** enum `season_status` no contiene `finalizada`, pero ambas funciones la usan; la columna `ranking_points.tournament_id` es `NOT NULL`, mientras rollover inserta `NULL`.
 - **Impacto/condición:** el cierre/creación derivada no puede completarse con ese esquema sin una reparación posterior. Dado que las migraciones posteriores fueron borradas localmente, no se conoce la definición remota vigente.
 - **Corrección:** verificar migraciones y catálogo remotos; en una migración revisada, usar `archivada` terminal, permitir puntos de operación de temporada mediante constraint explícito, hacer rollover idempotente y bloquear escrituras tardías contra temporadas archivadas.
 - **Efectos secundarios:** cambiar `NOT NULL` afecta todas las escrituras y tipos generados; requiere reconciliar filas antiguas y probar ranking por torneo/temporada.
 - **Prueba:** cierre con snapshot, retry idempotente, rollover una sola vez, rechazo de corrección en temporada archivada y concurrencia cierre/escritura.
+- **Preparación:** existe borrador `propuestas/REPARACION_TEMPORADAS.sql` con preflight fail-fast. Falta compararlo con la migración 006 y catálogo remoto; no está listo para promover/aplicar.
+- **Preparación:** existe borrador `propuestas/REPARACION_TEMPORADAS.sql` con preflight fail-fast. Falta compararlo con la migración 006 y catálogo remoto; no está listo para promover/aplicar.
 
-## H-04 — Lectura pública de elementos no publicados de galería
+## H-04 — Hallazgo histórico: lectura pública de contenido multimedia
 
-- **Severidad:** Medio. **Estado:** Confirmado en esquema base de `HEAD`; remoto pendiente.
-- **Componente:** `gallery_items`, política base `lectura publica galeria`; `src/lib/public/site.ts:getPublicGallery()`.
-- **Evidencia:** política pública `USING (true)`; la aplicación filtra `published=true`, pero PostgREST permite consultar la tabla según grants/policies.
-- **Impacto/condición:** fotos en borrador, metadatos, etiquetas o autor podrían ser consultables directamente si la política base está desplegada. Condicionado a que datos no publicados se consideren privados.
-- **Corrección:** limitar SELECT público a `published=true`; reducir columnas expuestas mediante vista segura si se deben ocultar `metadata`, uploader o etiquetas.
-- **Efectos secundarios:** algunas páginas admin consultan filas no publicadas y necesitarán acceso admin explícito; confirmar compatibilidad con políticas OR.
-- **Prueba:** anon no ve borradores; admin sí; público solo ve columnas autorizadas.
-
+- **Estado actual:** fuera del alcance de la aplicación por decisión del propietario. Se retiraron página, navegación, consulta y helpers de frontend. La propuesta SQL se retiró y no se aplicará.
+- **Evidencia histórica:** el SQL pegado anteriormente por el usuario mostraba una policy pública `USING (true)` sobre la tabla multimedia. Ese material no verifica el estado remoto actual.
+- **Límite:** no se borró ni modificó ninguna tabla, policy, bucket, archivo ni dato de Supabase. No se continuará con su diagnóstico mientras la base esté en pausa. Este registro conserva evidencia histórica, no una tarea activa de producto.
 ## H-05 — Privilegios de tabla y privilegios por defecto demasiado amplios
 
-- **Severidad:** Medio. **Estado:** Confirmado en dump de `HEAD`; efecto remoto pendiente.
-- **Componente:** `supabase/schema.sql`, grants sobre tablas/funciones y `ALTER DEFAULT PRIVILEGES`.
+- **Severidad:** Medio/observación. **Estado:** GRANT amplio confirmado en SQL pegado anteriormente; acceso efectivo remoto pendiente, archivo fuente ausente del checkout.
+- **Componente:** extracto previo de schema, grants sobre tablas/funciones y `ALTER DEFAULT PRIVILEGES`.
 - **Evidencia:** `GRANT ALL` a `anon` y `authenticated` aparece para tablas públicas; default privileges vuelven a conceder ALL para futuras tablas, funciones y secuencias.
 - **Impacto/condición:** hoy RLS sigue aplicando a los roles normales, por lo que el grant amplio no demuestra acceso no autorizado por sí solo. Aumenta riesgo por políticas amplias, futuras tablas sin RLS y funciones ejecutables accidentalmente.
 - **Corrección:** inventariar privilegios efectivos e ownership; revocar por defecto y conceder solo operaciones necesarias por tabla/columna/RPC. Mantener `service_role` solo en sistemas de backend confiables.
@@ -54,17 +51,18 @@ Estados: **Confirmado local** significa demostrado por el código/SQL versionado
 
 ## H-06 — Auditoría de operaciones de inscripción no transaccional
 
-- **Severidad:** Medio. **Estado:** Confirmado en flujo de aplicación.
+- **Severidad:** Medio. **Estado:** Defecto local confirmado; propuesta DB y refactor local preparados, validación transaccional pendiente en staging.
 - **Componente:** `src/app/(admin)/admin/inscripciones/actions.ts:writeRegistrationAudit` y RPCs invocadas desde `src/lib/services/admin.ts`/`registrations.ts`.
-- **Evidencia:** la operación principal se realiza por RPC y el registro se inserta después mediante otra llamada; el código reconoce `auditoria_error` aunque el cambio de negocio ya pudo confirmarse.
+- **Evidencia original:** la operación principal se realizaba por RPC/UPDATE y el log se insertaba después en otra llamada; el código reconocía `auditoria_error` aunque el cambio de negocio ya pudo confirmarse.
 - **Impacto/condición:** el historial puede omitir una cancelación, promoción, pago o check-in si falla la segunda llamada.
-- **Corrección:** mover mutación y audit insert a una RPC transaccional que valide admin, o crear mecanismo de outbox; capturar actor, entidad, antes/después y resultado.
-- **Efectos secundarios:** RPC unificada debe mantener compatibilidad de respuestas/errores y bloquear de forma coherente filas relacionadas.
-- **Prueba:** forzar error de escritura de auditoría en staging; comprobar rollback o reintento recuperable sin duplicar acción.
+- **Corrección preparada:** trigger `AFTER` sobre `registrations` registra los campos de estado/pago/check-in en `audit_log` dentro de la transacción de la mutación. Las Server Actions dejan de insertar un segundo evento. El borrador está en `propuestas/AUDITORIA_INSCRIPCIONES_ATOMICA.sql`.
+- **Dependencia de despliegue:** aplicar y verificar el trigger en staging antes de publicar el código actualizado; de lo contrario, el nuevo código no generaría audit rows.
+- **Efectos secundarios:** registrar también insert/delete directos de inscripciones; los snapshots excluyen PII de jugadores y notas. La escritura de audit pasa a ser obligatoria y un fallo hace rollback de la mutación.
+- **Prueba:** forzar fallo de insert a `audit_log` y verificar rollback conjunto; verificar una acción de cada tipo, actor, una fila por mutación y ausencia de duplicado.
 
 ## H-07 — Restricciones relacionales incompletas para alcance de torneo/categoría
 
-- **Severidad:** Medio. **Estado:** Confirmado en esquema base; reglas cruzadas pendientes.
+- **Severidad:** Medio. **Estado:** Confirmado en SQL base pegado anteriormente; reglas cruzadas pendientes, archivo fuente ausente del checkout.
 - **Componente:** FKs de `registrations`, `pairs`, `matches`, `groups`, `group_standings`, `brackets`, `ranking_points`.
 - **Evidencia:** FKs independientes a torneo, categoría y pareja/grupo no garantizan que sus IDs pertenezcan al mismo torneo/categoría. Algunos flujos comparan alcance desde aplicación/RPC.
 - **Impacto/condición:** una escritura administrativa, error de servicio o futura RPC defectuosa puede crear relaciones cruzadas que consultas y cuadros interpreten mal.
@@ -120,3 +118,10 @@ Estados: **Confirmado local** significa demostrado por el código/SQL versionado
 - **Impacto:** no se puede comparar esquema aplicado, permisos efectivos, settings Auth ni Storage.
 - **Acción:** una persona con acceso al dashboard debe confirmar explícitamente staging y ejecutar las consultas SQL de diagnóstico en una sesión de solo lectura.
 - **Prueba:** entregar resultados de bloques identificados en `CONSULTAS_DIAGNOSTICO.sql`; revisar con responsable antes de preparar migraciones.
+
+## Riesgos que no son vulnerabilidades confirmadas por sí solos
+
+- **RLS no forzado:** `relforcerowsecurity=false` no prueba un bypass para `anon`/`authenticated`. Esos roles siguen sujetos a RLS. Owners, `BYPASSRLS` y `service_role` sí requieren tratarse como privilegiados; no se recomienda `FORCE RLS` global sin analizar funciones/ownership.
+- **GRANT amplio:** tener `INSERT/UPDATE/DELETE` concedido no supera una policy RLS que deniega esas operaciones. El dump local concede capacidad excesiva y defaults riesgosos, pero no se recibieron resultados de acceso efectivo remoto ni prueba de escritura. El impacto explotable queda pendiente de policies/grants reales.
+- **Contadores P0 en cero:** el usuario comunicó cero en seis indicadores de integridad. Eso descarta esas seis clases de inconsistencias en el momento de la consulta reportada; no valida RLS, grants, funciones ni concurrencia.
+- **`public_player_profiles`:** el código/migración local muestra intención de filtrar por visibilidad y columnas. Sin definición/privilegios remotos y request anónimo no se declara exposición confirmada.

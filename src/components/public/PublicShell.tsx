@@ -21,7 +21,6 @@ const columns = [
             ["Calendario", "/calendario"],
             ["Master Final", "/master-final"],
             ["Comparar", "/comparar"],
-            ["Galería", "/galeria"],
         ],
     },
     {
