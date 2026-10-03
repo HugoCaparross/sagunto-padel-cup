@@ -7,6 +7,10 @@ import {
     checkInPlayerAdmin,
     confirmRegistrationPaymentAdmin,
     confirmRegistrationAdmin,
+    cancelRegistrationAdmin,
+    moveRegistrationToWaitingListAdmin,
+    promoteRegistrationAdmin,
+    writeAdminAuditLog,
 } from "@/lib/services/admin";
 
 function readText(formData: FormData, key: string): string {
@@ -25,12 +29,70 @@ function safeReturnTo(value: string): string {
     }
 }
 
-async function finish(returnTo: string, result: "actualizada" | "error"): Promise<never> {
+async function finish(returnTo: string, result: "actualizada" | "error" | "auditoria_error"): Promise<never> {
     revalidatePath("/admin");
     revalidatePath("/admin/inscripciones");
     const url = new URL(returnTo, "http://localhost");
     url.searchParams.set("resultado", result);
     redirect(`${url.pathname}${url.search}`);
+}
+
+async function writeRegistrationAudit(registrationId: string, operation: string, metadata: Record<string, unknown>): Promise<boolean> {
+    try {
+        await writeAdminAuditLog({ accion: "registration_update", entityType: "registration", entityId: registrationId, metadata: { operation, ...metadata } });
+        return true;
+    } catch (error) {
+        console.error(`[Admin] La operacion ${operation} se completo, pero fallo la auditoria`, error);
+        return false;
+    }
+}
+
+export async function cancelRegistrationAction(formData: FormData): Promise<void> {
+    const registrationId = readText(formData, "registrationId");
+    const returnTo = safeReturnTo(readText(formData, "returnTo"));
+    if (!registrationId) await finish(returnTo, "error");
+    let previousStatus: string | undefined;
+    try {
+        const result = await cancelRegistrationAdmin(registrationId);
+        previousStatus = result?.previous_status;
+    } catch (error) {
+        console.error("[Admin] No se pudo cancelar la inscripcion", error);
+        await finish(returnTo, "error");
+    }
+    if (!await writeRegistrationAudit(registrationId, "cancel", { previousStatus, status: "cancelada" })) await finish(returnTo, "auditoria_error");
+    await finish(returnTo, "actualizada");
+}
+
+export async function promoteWaitingRegistrationAction(formData: FormData): Promise<void> {
+    const registrationId = readText(formData, "registrationId");
+    const returnTo = safeReturnTo(readText(formData, "returnTo"));
+    if (!registrationId) await finish(returnTo, "error");
+    let previousStatus: string | undefined;
+    try {
+        const result = await promoteRegistrationAdmin(registrationId);
+        previousStatus = result?.previous_status;
+    } catch (error) {
+        console.error("[Admin] No se pudo promover manualmente la inscripcion", error);
+        await finish(returnTo, "error");
+    }
+    if (!await writeRegistrationAudit(registrationId, "manual_waiting_list_promotion", { previousStatus, status: "pendiente_pago" })) await finish(returnTo, "auditoria_error");
+    await finish(returnTo, "actualizada");
+}
+
+export async function moveRegistrationToWaitingListAction(formData: FormData): Promise<void> {
+    const registrationId = readText(formData, "registrationId");
+    const returnTo = safeReturnTo(readText(formData, "returnTo"));
+    if (!registrationId) await finish(returnTo, "error");
+    let previousStatus: string | undefined;
+    try {
+        const result = await moveRegistrationToWaitingListAdmin(registrationId);
+        previousStatus = result?.previous_status;
+    } catch (error) {
+        console.error("[Admin] No se pudo mover la inscripcion a lista de espera", error);
+        await finish(returnTo, "error");
+    }
+    if (!await writeRegistrationAudit(registrationId, "moved_to_waiting_list", { previousStatus, status: "lista_espera" })) await finish(returnTo, "auditoria_error");
+    await finish(returnTo, "actualizada");
 }
 
 export async function verifyPaymentAction(formData: FormData): Promise<void> {
@@ -54,6 +116,8 @@ export async function verifyPaymentAction(formData: FormData): Promise<void> {
         await finish(returnTo, "error");
     }
 
+    if (!await writeRegistrationAudit(registrationId, "payment_verified", { method, status: "verificado" })) await finish(returnTo, "auditoria_error");
+
     await finish(returnTo, "actualizada");
 }
 
@@ -69,6 +133,8 @@ export async function checkInAction(formData: FormData): Promise<void> {
         await finish(returnTo, "error");
     }
 
+    if (!await writeRegistrationAudit(registrationId, "check_in", { checkedIn: true })) await finish(returnTo, "auditoria_error");
+
     await finish(returnTo, "actualizada");
 }
 
@@ -83,6 +149,8 @@ export async function confirmRegistrationAction(formData: FormData): Promise<voi
         console.error("[Admin] No se pudo confirmar la inscripción", error);
         await finish(returnTo, "error");
     }
+
+    if (!await writeRegistrationAudit(registrationId, "registration_confirmed", { status: "confirmada" })) await finish(returnTo, "auditoria_error");
 
     await finish(returnTo, "actualizada");
 }

@@ -1067,7 +1067,24 @@ export type Database = {
             };
         };
 
-        Functions: Record<string, never>;
+        Functions: {
+            admin_cancel_registration: {
+                Args: { p_registration_id: string };
+                Returns: { previous_status: string; pair_id: string }[];
+            };
+            admin_promote_waiting_registration: {
+                Args: { p_registration_id: string };
+                Returns: { previous_status: string; pair_id: string; available_after: number | null }[];
+            };
+            admin_confirm_registration: {
+                Args: { p_registration_id: string };
+                Returns: { previous_status: string }[];
+            };
+            admin_move_registration_to_waiting_list: {
+                Args: { p_registration_id: string };
+                Returns: { previous_status: string }[];
+            };
+        };
 
         /**
          * PostgreSQL enums that are explicitly present in the current SQL schema.

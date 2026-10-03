@@ -43,11 +43,31 @@
 .empty p { max-width: 480px; margin: 0 auto; color: var(--muted); line-height: 1.55; }
 .feedback { margin: 0 0 16px; border-left: 3px solid var(--success); padding: 12px 14px; background: var(--success-soft); color: var(--success); font-size: .85rem; font-weight: 650; }
 .feedback.danger { border-left-color: var(--danger); background: var(--danger-soft); color: var(--danger); }
+.feedback.warning { border-left-color: var(--warning); background: var(--warning-soft); color: var(--warning); }
 .privateNote { margin: 16px 0 0; color: var(--muted); font-size: .77rem; }
+.breadcrumbs { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 24px; color: var(--muted); font-size: .82rem; }
+.breadcrumbs a:hover { color: var(--brand); }
+.panel h2 { margin: 0; padding: 18px 20px; border-bottom: 1px solid var(--line); font-size: 1.05rem; }
+.detailGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin: 0; }
+.detailGrid > div { min-width: 0; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+.detailGrid dt { margin-bottom: 5px; color: var(--muted); font-size: .76rem; font-weight: 650; }
+.detailGrid dd { margin: 0; overflow-wrap: anywhere; font-size: .9rem; font-weight: 650; }
+.detailGrid code { font-size: .8rem; }
+.historyList { display: grid; gap: 0; margin: 0; padding: 0 20px; list-style: none; }
+.historyList li { display: grid; gap: 5px; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: .84rem; }
+.historyList time,.historyList span,.historyList small { color: var(--muted); }
+.metricsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0; }
+.metric { display: grid; gap: 8px; min-height: 104px; align-content: center; padding: 16px 20px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.metric span { color: var(--muted); font-size: .76rem; font-weight: 650; }
+.metric strong { font-size: 1.7rem; line-height: 1; }
+.pagination { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: .82rem; }
+.pagination > div { display: flex; gap: 8px; }
 @media (max-width: 700px) {
  .header { align-items: flex-start; flex-direction: column; gap: 14px; margin-bottom: 22px; }
  .toolbar { padding: 14px; }
  .field { flex-basis: 100%; }
  .toolbar > .button, .toolbar > .quietButton { flex: 1; }
  .count { white-space: normal; }
+ .detailGrid { grid-template-columns: 1fr; }
+ .pagination { align-items: flex-start; flex-direction: column; }
 }

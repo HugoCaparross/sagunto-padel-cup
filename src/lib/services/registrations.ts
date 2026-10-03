@@ -210,42 +210,6 @@ async function getPairIdsForPlayer(
     return (data ?? []).map((pair) => pair.id);
 }
 
-async function getRegistrationCategoryIds(
-    registrations: Registration[],
-): Promise<Map<string, string>> {
-    const pairIds = Array.from(
-        new Set(
-            registrations
-                .map((registration) => registration.pair_id)
-                .filter(Boolean),
-        ),
-    );
-
-    if (pairIds.length === 0) {
-        return new Map();
-    }
-
-    const supabase = await createClient();
-
-    const { data, error } = await supabase
-        .from("pairs")
-        .select("id, categoria_id")
-        .in("id", pairIds);
-
-    if (error) {
-        throw new Error(
-            `No se pudieron obtener las categorías de las parejas: ${error.message}`,
-        );
-    }
-
-    return new Map(
-        (data ?? []).map((pair) => [
-            pair.id,
-            pair.categoria_id,
-        ]),
-    );
-}
-
 async function enrichRegistrations(
     registrations: Registration[],
 ): Promise<RegistrationWithRelationsExtended[]> {
@@ -1353,45 +1317,21 @@ export async function updateRegistrationStatus(
     estado: RegistrationStatus,
 ): Promise<Registration> {
     assertId(registrationId, "registrationId");
-
-    const registration =
-        await getRegistrationById(
-            registrationId,
-        );
-
-    if (!registration) {
-        throw new Error(
-            "La inscripción no existe.",
-        );
+    const procedures = {
+        confirmada: "admin_confirm_registration",
+        lista_espera: "admin_move_registration_to_waiting_list",
+        cancelada: "admin_cancel_registration",
+    } as const;
+    const procedure = procedures[estado as keyof typeof procedures];
+    if (!procedure) {
+        throw new Error("Esta transicion de inscripcion no esta disponible.");
     }
-
-    if (
-        registration.estado ===
-        CANCELLED_STATUS
-    ) {
-        throw new Error(
-            "Una inscripción cancelada no puede modificarse desde esta operación.",
-        );
-    }
-
     const supabase = await createClient();
-
-    const { data, error } = await supabase
-        .from("registrations")
-        .update({
-            estado,
-        })
-        .eq("id", registrationId)
-        .select("*")
-        .single();
-
-    if (error) {
-        throw new Error(
-            `No se pudo actualizar el estado de la inscripción: ${error.message}`,
-        );
-    }
-
-    return data as Registration;
+    const { error } = await supabase.rpc(procedure, { p_registration_id: registrationId });
+    if (error) throw new Error(`No se pudo actualizar la inscripcion: ${error.message}`);
+    const registration = await getRegistrationById(registrationId);
+    if (!registration) throw new Error("La inscripcion se actualizo, pero no se pudo volver a consultar.");
+    return registration;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1543,6 +1483,7 @@ export async function checkInRegistration(
         .from("registrations")
         .update({
             checked_in: true,
+            checked_in_at: new Date().toISOString(),
         })
         .eq("id", registrationId)
         .select("*")
@@ -1560,24 +1501,15 @@ export async function checkInRegistration(
 export async function undoCheckInRegistration(
     registrationId: string,
 ): Promise<Registration> {
+    assertId(registrationId, "registrationId");
     const supabase = await createClient();
-
     const { data, error } = await supabase
         .from("registrations")
-        .update({
-            checked_in: false,
-            payment_status: "pendiente",
-        })
+        .update({ checked_in: false, checked_in_at: null })
         .eq("id", registrationId)
         .select("*")
         .single();
-
-    if (error) {
-        throw new Error(
-            `No se pudo revertir el check-in: ${error.message}`,
-        );
-    }
-
+    if (error) throw new Error(`No se pudo revertir el check-in: ${error.message}`);
     return data as Registration;
 }
 
@@ -1588,171 +1520,30 @@ export async function undoCheckInRegistration(
 export async function cancelRegistration(
     registrationId: string,
 ): Promise<Registration> {
-    const registration =
-        await getRegistrationById(
-            registrationId,
-        );
-
-    if (!registration) {
-        throw new Error(
-            "La inscripción no existe.",
-        );
-    }
-
-    if (
-        !canCancelRegistration(
-            registration.estado,
-        )
-    ) {
-        throw new Error(
-            "La inscripción ya está cancelada.",
-        );
-    }
-
+    assertId(registrationId, "registrationId");
     const supabase = await createClient();
-
-    const { data, error } = await supabase
-        .from("registrations")
-        .update({
-            estado:
-                CANCELLED_STATUS,
-        })
-        .eq("id", registrationId)
-        .select("*")
-        .single();
-
+    const { error } = await supabase.rpc("admin_cancel_registration", {
+        p_registration_id: registrationId,
+    });
     if (error) {
-        throw new Error(
-            `No se pudo cancelar la inscripción: ${error.message}`,
-        );
+        throw new Error(`No se pudo cancelar la inscripcion: ${error.message}`);
     }
-
-    const pair = registration.pair;
-
-    if (pair) {
-        const playerIds = [
-            pair.player_1_id,
-            pair.player_2_id,
-        ].filter(
-            (id): id is string =>
-                Boolean(id),
-        );
-
-        for (const playerId of playerIds) {
-            await removePlayerFromPartnerPool(
-                playerId,
-                registration.tournament_id,
-                pair.categoria_id,
-            );
-        }
+    const registration = await getRegistrationById(registrationId);
+    if (!registration) {
+        throw new Error("La inscripcion se cancelo, pero no se pudo volver a consultar.");
     }
-
-    return data as Registration;
+    return registration;
 }
 
 /* -------------------------------------------------------------------------- */
 /* WAITING LIST                                                               */
 /* -------------------------------------------------------------------------- */
 
-export async function promoteFromWaitingList(
-    registrationId: string,
-): Promise<Registration> {
-    const registration =
-        await getRegistrationById(
-            registrationId,
-        );
-
-    if (!registration) {
-        throw new Error(
-            "La inscripción no existe.",
-        );
-    }
-
-    if (
-        registration.estado !==
-        "lista_espera"
-    ) {
-        throw new Error(
-            "La inscripción no está en lista de espera.",
-        );
-    }
-
-    const categoryId =
-        registration.categoria_id ??
-        registration.pair?.categoria_id;
-
-    if (!categoryId) {
-        throw new Error(
-            "No se pudo determinar la categoría de la inscripción.",
-        );
-    }
-
-    const capacity =
-        await getRegistrationCapacity(
-            registration.tournament_id,
-            categoryId,
-        );
-
-    if (capacity.isFull) {
-        throw new Error(
-            "La categoría continúa completa.",
-        );
-    }
-
-    return updateRegistrationStatus(
-        registrationId,
-        "pendiente_pago",
-    );
-}
-
-export async function promoteWaitingList(
-    tournamentId: string,
-    categoryId: string,
-): Promise<Registration[]> {
-    const capacity =
-        await getRegistrationCapacity(
-            tournamentId,
-            categoryId,
-        );
-
-    if (
-        capacity.available === null ||
-        capacity.available <= 0
-    ) {
-        return [];
-    }
-
-    const waiting =
-        await getRegistrations({
-            tournamentId,
-            categoryId,
-            estado:
-                "lista_espera",
-        });
-
-    const amount =
-        Math.min(
-            capacity.available,
-            waiting.length,
-        );
-
-    const promoted: Registration[] = [];
-
-    for (
-        let index = 0;
-        index < amount;
-        index += 1
-    ) {
-        const registration =
-            await promoteFromWaitingList(
-                waiting[index].id,
-            );
-
-        promoted.push(registration);
-    }
-
-    return promoted;
-}
+/**
+ * Automatic or non-transactional wait-list promotion is intentionally not
+ * exposed. Admin promotion runs through admin_promote_waiting_registration,
+ * which serializes capacity checks and requires an explicit selected entry.
+ */
 
 /* -------------------------------------------------------------------------- */
 /* SUMMARY                                                                    */

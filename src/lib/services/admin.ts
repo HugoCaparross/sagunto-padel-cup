@@ -6,6 +6,8 @@ import type {
     Category,
     Club,
     Match,
+    Pair,
+    PairStatus,
     News,
     Player,
     Prize,
@@ -44,7 +46,6 @@ import {
     getRegistrationSummary,
     verifyRegistrationPayment,
     checkInRegistration,
-    updateRegistrationStatus,
     adminConfirmRegistration,
 } from "@/lib/services/registrations";
 
@@ -143,6 +144,7 @@ export type AdminPaymentStatus =
 export type AdminRegistrationFilters = {
     tournamentId?: string;
     categoryId?: string;
+    playerId?: string;
     estado?: AdminRegistrationStatus;
     paymentStatus?: AdminPaymentStatus;
     checkIn?: boolean;
@@ -642,6 +644,9 @@ export async function getAdminRegistrations(
         categoryId:
             filters.categoryId,
 
+        playerId:
+            filters.playerId,
+
         estado:
             filters.estado
                 ? toServiceRegistrationStatus(
@@ -685,26 +690,146 @@ export async function moveRegistrationToWaitingListAdmin(
     registrationId: string,
 ) {
     await requireAdminContext();
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("admin_move_registration_to_waiting_list", { p_registration_id: registrationId });
+    if (error) throw new Error(`No se pudo mover la inscripcion a lista de espera: ${error.message}`);
+    return data?.[0] ?? null;
+}
 
-    return updateRegistrationStatus(
-        registrationId,
-        toServiceRegistrationStatus(
-            "lista_espera",
-        ),
-    );
+export async function getAdminPlayersByIds(playerIds: string[]) {
+    await requireAdminContext();
+    const ids = Array.from(new Set(playerIds.filter(Boolean)));
+    if (ids.length === 0) return [];
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("players").select("id, nombre, apellidos").in("id", ids);
+    if (error) throw new Error(`No se pudieron consultar los integrantes de las parejas: ${error.message}`);
+    return data ?? [];
+}
+
+export type AdminPairFilters = {
+    search?: string;
+    tournamentId?: string;
+    categoryId?: string;
+    estado?: PairStatus;
+    page?: number;
+    pageSize?: number;
+};
+
+export type AdminPairRow = Pair & {
+    player1Name: string | null;
+    player2Name: string | null;
+    tournamentName: string | null;
+    categoryName: string | null;
+};
+
+export async function getAdminPairs(filters: AdminPairFilters = {}) {
+    await requireAdminContext();
+    const supabase = await createClient();
+    const page = Math.max(1, Math.floor(filters.page ?? 1));
+    const pageSize = Math.min(100, Math.max(1, Math.floor(filters.pageSize ?? 50)));
+    let query = supabase.from("pairs").select("*", { count: "exact" }).order("fecha_inscripcion", { ascending: false });
+    if (filters.tournamentId) query = query.eq("tournament_id", filters.tournamentId);
+    if (filters.categoryId) query = query.eq("categoria_id", filters.categoryId);
+    if (filters.estado) query = query.eq("estado", filters.estado);
+
+    const search = filters.search?.trim().slice(0, 100);
+    if (search) {
+        const [nameResult, surnameResult] = await Promise.all([
+            supabase.from("players").select("id").ilike("nombre", `%${search}%`).limit(500),
+            supabase.from("players").select("id").ilike("apellidos", `%${search}%`).limit(500),
+        ]);
+        if (nameResult.error || surnameResult.error) throw new Error("No se pudieron buscar los integrantes de las parejas.");
+        const playerIds = Array.from(new Set([...(nameResult.data ?? []), ...(surnameResult.data ?? [])].map((player) => player.id)));
+        if (!playerIds.length) return { rows: [] as AdminPairRow[], total: 0, page, pageSize };
+        const ids = playerIds.join(",");
+        query = query.or(`player_1_id.in.(${ids}),player_2_id.in.(${ids})`);
+    }
+
+    const { data, error, count } = await query.range((page - 1) * pageSize, page * pageSize - 1);
+    if (error) throw new Error(`No se pudieron obtener las parejas: ${error.message}`);
+    const pairs = (data ?? []) as Pair[];
+    if (!pairs.length) return { rows: [] as AdminPairRow[], total: count ?? 0, page, pageSize };
+
+    const playerIds = Array.from(new Set(pairs.flatMap((pair) => [pair.player_1_id, pair.player_2_id].filter((id): id is string => Boolean(id)))));
+    const tournamentIds = Array.from(new Set(pairs.map((pair) => pair.tournament_id)));
+    const categoryIds = Array.from(new Set(pairs.map((pair) => pair.categoria_id)));
+    const [playersResult, tournamentsResult, categoriesResult] = await Promise.all([
+        supabase.from("players").select("id, nombre, apellidos").in("id", playerIds),
+        supabase.from("tournaments").select("id, nombre").in("id", tournamentIds),
+        supabase.from("categories").select("id, nombre").in("id", categoryIds),
+    ]);
+    if (playersResult.error || tournamentsResult.error || categoriesResult.error) throw new Error("No se pudieron obtener los datos relacionados de las parejas.");
+    const players = new Map((playersResult.data ?? []).map((player) => [player.id, `${player.nombre} ${player.apellidos ?? ""}`.trim()]));
+    const tournaments = new Map((tournamentsResult.data ?? []).map((tournament) => [tournament.id, tournament.nombre]));
+    const categories = new Map((categoriesResult.data ?? []).map((category) => [category.id, category.nombre]));
+    return {
+        rows: pairs.map((pair) => ({ ...pair, player1Name: pair.player_1_id ? players.get(pair.player_1_id) ?? null : null, player2Name: pair.player_2_id ? players.get(pair.player_2_id) ?? null : null, tournamentName: tournaments.get(pair.tournament_id) ?? null, categoryName: categories.get(pair.categoria_id) ?? null })),
+        total: count ?? pairs.length,
+        page,
+        pageSize,
+    };
+}
+
+export async function getAdminPairDetail(pairId: string) {
+    await requireAdminContext();
+    const supabase = await createClient();
+    const { data: pair, error } = await supabase.from("pairs").select("*").eq("id", pairId).maybeSingle();
+    if (error) throw new Error(`No se pudo consultar la pareja: ${error.message}`);
+    if (!pair) return null;
+    const [playersResult, tournamentResult, categoryResult, registrationsResult, matchesResult] = await Promise.all([
+        supabase.from("players").select("id, nombre, apellidos").in("id", [pair.player_1_id, pair.player_2_id].filter((id): id is string => Boolean(id))),
+        supabase.from("tournaments").select("id, nombre, fecha_inicio, fecha_fin").eq("id", pair.tournament_id).maybeSingle(),
+        supabase.from("categories").select("id, nombre").eq("id", pair.categoria_id).maybeSingle(),
+        supabase.from("registrations").select("*").eq("pair_id", pair.id).order("updated_at", { ascending: false }),
+        supabase.from("matches").select("*").eq("tournament_id", pair.tournament_id).or(`pair_1_id.eq.${pair.id},pair_2_id.eq.${pair.id}`).order("created_at", { ascending: false }),
+    ]);
+    const failed = [playersResult, tournamentResult, categoryResult, registrationsResult, matchesResult].find((result) => result.error);
+    if (failed?.error) throw new Error(`No se pudieron consultar las relaciones de la pareja: ${failed.error.message}`);
+    const players = new Map((playersResult.data ?? []).map((player) => [player.id, player]));
+    return {
+        pair: pair as Pair,
+        player1: pair.player_1_id ? players.get(pair.player_1_id) ?? null : null,
+        player2: pair.player_2_id ? players.get(pair.player_2_id) ?? null : null,
+        tournament: tournamentResult.data,
+        category: categoryResult.data,
+        registrations: registrationsResult.data ?? [],
+        matches: matchesResult.data ?? [],
+    };
 }
 
 export async function cancelRegistrationAdmin(
     registrationId: string,
 ) {
     await requireAdminContext();
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("admin_cancel_registration", { p_registration_id: registrationId });
+    if (error) throw new Error(`No se pudo cancelar la inscripcion: ${error.message}`);
+    return data?.[0] ?? null;
+}
 
-    return updateRegistrationStatus(
-        registrationId,
-        toServiceRegistrationStatus(
-            "cancelada",
-        ),
-    );
+export async function getAdminRegistrationHistory(registrationId: string) {
+    await requireAdminContext();
+    if (!registrationId) throw new Error("Falta el identificador de la inscripcion.");
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .from("audit_log")
+        .select("*")
+        .eq("entidad", "registration")
+        .eq("entidad_id", registrationId)
+        .order("fecha", { ascending: false })
+        .limit(50);
+    if (error) throw new Error(`No se pudo consultar el historial: ${error.message}`);
+    return data ?? [];
+}
+
+export async function promoteRegistrationAdmin(
+    registrationId: string,
+) {
+    await requireAdminContext();
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("admin_promote_waiting_registration", { p_registration_id: registrationId });
+    if (error) throw new Error(`No se pudo promover la inscripcion: ${error.message}`);
+    return data?.[0] ?? null;
 }
 
 export async function checkInPlayerAdmin(

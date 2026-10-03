@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { PlayerStatus } from "@/types/database";
 import { getAdminPlayers } from "@/lib/services/admin";
 
@@ -44,7 +45,7 @@ export default async function AdminPlayersPage({ searchParams }: { searchParams:
                         </select>
                     </div>
                     <button className={styles.button} type="submit">Aplicar filtros</button>
-                    {(search || status) && <a className={styles.quietButton} href="/admin/jugadores">Limpiar</a>}
+                    {(search || status) && <Link className={styles.quietButton} href="/admin/jugadores">Limpiar</Link>}
                 </form>
 
                 {players.length === 0 ? (
@@ -59,7 +60,7 @@ export default async function AdminPlayersPage({ searchParams }: { searchParams:
                             <tbody>
                                 {players.map((player) => (
                                     <tr key={player.id}>
-                                        <td><span className={styles.primaryText}>{player.nombre} {player.apellidos}</span></td>
+                                        <td><Link className={styles.primaryText} href={`/admin/jugadores/${player.id}`}>{player.nombre} {player.apellidos}</Link></td>
                                         <td>{player.category?.nombre ?? "Sin categoría"}</td>
                                         <td>{player.ciudad || "—"}</td>
                                         <td><span className={`${styles.badge} ${player.estado === "activo" ? styles.success : player.estado === "suspendido" ? styles.warning : styles.neutral}`}>{STATE_LABELS[player.estado]}</span></td>

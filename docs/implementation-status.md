@@ -74,7 +74,7 @@ Este registro contrasta la Especificación Definitiva, el Documento Maestro v1.1
 | Torneos: alta y ficha | Alta y edicion general implementadas; categorias asignables con cupo opcional y activacion/desactivacion | `src/app/(admin)/admin/torneos/[id]/editar/`, `src/app/(admin)/admin/torneos/[id]/categorias/`; grupos siguen pendientes |
 | Torneos: transiciones y archivo | No verificado desde interfaz de ficha | Hay servicios de estado; no se expusieron acciones que permitan mutaciones de estado sin flujo claro |
 | Inscripciones | Parcial; consulta, verificacion de pago, confirmacion y check-in | No incluye baja, lista de espera ni promocion probadas |
-| Jugadores | Parcial; listado con busqueda/estado, sin ficha deportiva | `/admin/jugadores` |
+| Jugadores | Listado y ficha deportiva implementados; estadisticas agregadas, inscripciones, parejas relacionadas y ledger reciente. Sin edicion de datos ni historial individual de partidos | `/admin/jugadores`, `/admin/jugadores/[id]`; no probado con datos Supabase reales |
 | Parejas | Parcial; lectura contextual, sin modulo CRUD dedicado | Inscripciones y partidos muestran parejas |
 | Categorias y grupos | CRUD parcial implementado para asignar categoria al torneo, actualizar cupos opcionales y activar/desactivar inscripcion; gestion de grupos pendiente | `src/app/(admin)/admin/torneos/[id]/categorias/`; sin borrado fisico para preservar relaciones |
 | Cuadros | Pendiente; logica de dominio no esta conectada a una herramienta de generacion | No existe ruta administrativa dedicada |
@@ -87,3 +87,44 @@ Este registro contrasta la Especificación Definitiva, el Documento Maestro v1.1
 | UX compartida | Navegacion apunta a areas activas; ficha de torneo ya no enlaza a subsecciones inexistentes | Quedan estados/tablas y flujos pendientes en los modulos aun parciales |
 
 Las rutas nuevas de edicion general y gestion de categorias guardan por los servicios existentes, revalidan las vistas afectadas y registran eventos en `audit_log`. Si guardar tiene exito pero falla el registro de auditoria, el formulario informa que los datos si se guardaron y la auditoria no. La prueba no se ha ejecutado contra Supabase: la existencia de RLS y las credenciales disponibles no bastan para demostrar el resultado en una sesion real.
+
+
+## Continuacion - 3 de octubre de 2026 - inscripciones
+
+| Operacion | Estado | Verificacion y limitaciones |
+| --- | --- | --- |
+| Listado y detalle de inscripciones por categoria | Implementados; el detalle incluye participantes, estados y eventos de auditoria disponibles | `/admin/inscripciones?categoria=...`, `/admin/inscripciones/[id]`; compilacion verificada |
+| Cancelacion administrativa | Implementado mediante RPC transaccional preparado en `20261003000100_admin_registration_operations.sql` | Valida rol, check-in, estado del torneo y partidos; conserva el registro y el estado de pago, cancela la pareja y limpia la busqueda de companero. No inicia reembolsos. La migracion no esta aplicada ni validada en Supabase |
+| Promocion manual desde espera | Implementado mediante RPC transaccional preparado en la misma migracion | El administrador elige cada pareja; no se aplica prioridad automatica. Valida cupo, pareja completa, categoria abierta y ausencia de partidos |
+| Auditoria de cancelacion/promocion | Implementada en acciones con aviso si la mutacion se completo y fallo el log | Requiere validar permisos/RLS en local o staging |
+| Funcion SQL antigua `cancelar_inscripcion(uuid)` | Revocada a `anon` y `authenticated` en la migracion nueva | La funcion SECURITY DEFINER anterior permitia mutacion sin control suficiente; el reemplazo administrativo valida `is_admin()` |
+
+| Ficha detallada de inscripcion | Implementada, incluidos jugadores, pago, check-in y auditoria disponible | `/admin/inscripciones/[id]`; el historial solo contiene eventos instrumentados |
+| Confirmacion, movimiento manual a espera, cancelacion y promocion manual | RPC transaccionales preparadas; sincronizan estado de pareja e inscripcion | Requieren aplicar migracion en local/staging y probar con sesion admin |
+
+La fecha de inscripcion no esta disponible en el tipo actual de `registrations`, asi que no se agrega un filtro de fecha inventado. No hay una instancia local Supabase escuchando en el puerto 54321; la migracion no pudo validarse con PostgreSQL en este entorno. El flujo de confirmacion de pago sigue separado de la confirmacion de la inscripcion. La elegibilidad real de operaciones administrativas continua pendiente de pruebas con Supabase autenticado.
+
+
+Verificacion tecnica del bloque de inscripciones (3 oct 2026): `npm run qa` finalizo con 0 errores y 4 avisos; ESLint encontro 0 errores y 15 avisos globales; `npx tsc --noEmit` y `npm run build` finalizaron correctamente. Build genero 39 paginas estaticas/dinamicas. `git diff --check` queda registrado tras el repaso final. No hay pruebas automatizadas de servicios Supabase ni PostgreSQL local; las RPC y RLS solo estan revisadas contra `supabase/schema.sql`, no ejecutadas.
+
+
+Verificacion final tras agregar ficha de inscripcion (3 oct 2026): `npm run qa` y `npm run build` pasaron. El build incluye `/admin/inscripciones/[id]`. SQL de la migracion no se ejecuta porque no hay PostgreSQL/Supabase local ni CLI; requiere validacion en entorno local o staging antes de aplicar.
+
+
+## Continuacion - ficha deportiva de jugadores - 3 de octubre de 2026
+
+- El listado enlaza a fichas privadas del panel y el filtro de limpieza usa navegacion Next. La ficha muestra estado/categoria y datos deportivos permitidos; omite contacto.
+- La actividad usa partidos finalizados y puntos presentes en el ledger; no recalcula ranking. Las inscripciones enlazan a su ficha administrativa.
+- La consulta de estadisticas ahora restringe partidos a parejas del jugador en la base de datos, en vez de descargar todos los partidos finalizados.
+- Cambios de categoria, sustituciones, incidencias y edicion de datos siguen pendientes de reglas o flujo aprobado; no se habilitaron mutaciones desde la ficha.
+
+## Continuacion - parejas - 3 de octubre de 2026
+
+| Funcion | Estado | Evidencia / limite |
+| --- | --- | --- |
+| Consulta administrativa de parejas | Implementada con busqueda por integrante, filtros de torneo/categoria/estado y paginacion | `/admin/parejas`; protegido por contexto de administrador |
+| Ficha de pareja | Implementada en modo consulta con integrantes, torneo, categoria, inscripciones y partidos relacionados | `/admin/parejas/[id]`; no modifica integrantes ni estado deportivo |
+| Navegacion del modulo | Disponible dentro de Participantes; rutas activas añadidas a `AdminShell` | La paginacion es adaptable en movil |
+| Reglas de cambios de integrante | Pendientes | No hay sustituciones ni edicion de pareja hasta aprobar reglas |
+
+Verificacion de esta continuacion (3 oct 2026): `npm run qa` finalizo con 0 errores, 4 avisos del verificador y 15 avisos ESLint. `npm run build` genero 40 rutas, incluidas las fichas de jugadores y parejas. `git diff --check` no encontro errores de whitespace. Falta probar consultas con una sesion real de administrador en Supabase local/staging; no se ejecuto ninguna migracion.

@@ -1492,55 +1492,27 @@ export async function getPlayerStats(
     }
 
     /*
-     * Retrieve completed matches.
+     * Query only completed matches involving this player's pairs.
      */
-    const {
-        data:
-        rawMatches,
-        error:
-        matchesError,
-    } = await supabase
-        .from("matches")
-        .select(
-            `
-                id,
-                pair_1_id,
-                pair_2_id,
-                estado,
-                resultado_json
-            `,
-        )
-        .eq(
-            "estado",
-            "finalizado",
-        );
-
-    if (matchesError) {
-        throw new Error(
-            `No se pudieron obtener los partidos del jugador: ${matchesError.message}`,
-        );
+    const pairIdList = Array.from(pairIds);
+    const [pair1Result, pair2Result] = await Promise.all([
+        supabase.from("matches")
+            .select("id, pair_1_id, pair_2_id, estado, resultado_json")
+            .eq("estado", "finalizado")
+            .in("pair_1_id", pairIdList),
+        supabase.from("matches")
+            .select("id, pair_1_id, pair_2_id, estado, resultado_json")
+            .eq("estado", "finalizado")
+            .in("pair_2_id", pairIdList),
+    ]);
+    if (pair1Result.error || pair2Result.error) {
+        throw new Error(`No se pudieron obtener los partidos del jugador: ${pair1Result.error?.message ?? pair2Result.error?.message}`);
     }
-
-    const matches =
-        (rawMatches ??
-            []) as unknown as MatchStatsRow[];
-
-    const playerMatches =
-        matches.filter(
-            (match) =>
-                (
-                    match.pair_1_id !== null &&
-                    pairIds.has(
-                        match.pair_1_id,
-                    )
-                ) ||
-                (
-                    match.pair_2_id !== null &&
-                    pairIds.has(
-                        match.pair_2_id,
-                    )
-                ),
-        );
+    const matchMap = new Map<string, MatchStatsRow>();
+    for (const match of [...(pair1Result.data ?? []), ...(pair2Result.data ?? [])] as unknown as MatchStatsRow[]) {
+        matchMap.set(match.id, match);
+    }
+    const playerMatches = Array.from(matchMap.values());
 
     let matchesWon = 0;
     let matchesLost = 0;

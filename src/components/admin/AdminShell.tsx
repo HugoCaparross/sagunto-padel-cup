@@ -94,6 +94,11 @@ const navigationGroups: NavigationGroup[] = [
                 href: "/admin/jugadores",
                 icon: Users,
             },
+            {
+                label: "Parejas",
+                href: "/admin/parejas",
+                icon: Handshake,
+            },
         ],
     },
     {
@@ -160,6 +165,7 @@ const availableAdminRoutes = new Set([
     "/admin/torneos",
     "/admin/inscripciones",
     "/admin/jugadores",
+    "/admin/parejas",
     "/admin/ranking",
     "/admin/contenidos",
     "/admin/competicion",

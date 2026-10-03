@@ -137,7 +137,7 @@ export async function getPublicTournaments(): Promise<
     const rows: PublicTournament[] = (
         data ?? []
     ).map((row) => {
-        const raw = row as Tournament & {
+        const raw = row as unknown as Tournament & {
             clubs?: Club | null;
         };
 
