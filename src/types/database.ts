@@ -55,7 +55,7 @@ export type PaymentStatus =
     | "pendiente"
     | "verificado"
     | "rechazado"
-    | "no_requerido";
+    | "no_aplicable";
 
 export type MatchPhase =
     | "grupos"

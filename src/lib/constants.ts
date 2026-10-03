@@ -173,7 +173,7 @@ export const PAYMENT_STATUSES = [
     "pendiente",
     "verificado",
     "rechazado",
-    "no_requerido",
+    "no_aplicable",
 ] as const;
 
 export type PaymentStatus =

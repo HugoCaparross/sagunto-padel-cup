@@ -147,7 +147,10 @@ begin
       join public.pairs p on p.id = r.pair_id
      where r.tournament_id = v_registration.tournament_id
        and coalesce(r.categoria_id, p.categoria_id) = v_category.categoria_id
-       and r.estado in ('confirmada', 'pendiente_pago');
+       and r.estado in ('confirmada', 'pendiente_pago')
+       and p.estado in ('confirmada', 'pendiente_pago')
+       and p.player_1_id is not null
+       and p.player_2_id is not null;
 
     if v_category.cupo_maximo is not null and v_occupied >= v_category.cupo_maximo then
         raise exception 'No seats are currently available in this category.' using errcode = 'P0001';
@@ -177,6 +180,7 @@ as $$
 declare
     v_registration public.registrations%rowtype;
     v_pair public.pairs%rowtype;
+    v_category public.tournament_categories%rowtype;
     v_category_id uuid;
     v_tournament_state text;
 begin
@@ -188,7 +192,7 @@ begin
     if v_registration.estado <> 'pendiente_pago' then
         raise exception 'Only a payment-pending registration can be confirmed.' using errcode = 'P0001';
     end if;
-    if v_registration.payment_status not in ('verificado', 'no_requerido') then
+    if v_registration.payment_status not in ('verificado', 'no_aplicable') then
         raise exception 'Payment must be verified before confirmation.' using errcode = 'P0001';
     end if;
     select t.estado into v_tournament_state from public.tournaments t where t.id = v_registration.tournament_id;
@@ -200,6 +204,14 @@ begin
         raise exception 'A complete pair is required.' using errcode = 'P0001';
     end if;
     v_category_id := coalesce(v_registration.categoria_id, v_pair.categoria_id);
+    select * into v_category
+      from public.tournament_categories tc
+     where tc.tournament_id = v_registration.tournament_id
+       and tc.categoria_id = v_category_id
+     for update;
+    if not found or not v_category.enabled then
+        raise exception 'Tournament category is not open for registration.' using errcode = 'P0001';
+    end if;
     if exists (select 1 from public.matches m where m.tournament_id = v_registration.tournament_id and m.categoria_id = v_category_id) then
         raise exception 'The category draw already exists; confirmation is blocked.' using errcode = 'P0001';
     end if;

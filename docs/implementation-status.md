@@ -128,3 +128,34 @@ Verificacion final tras agregar ficha de inscripcion (3 oct 2026): `npm run qa` 
 | Reglas de cambios de integrante | Pendientes | No hay sustituciones ni edicion de pareja hasta aprobar reglas |
 
 Verificacion de esta continuacion (3 oct 2026): `npm run qa` finalizo con 0 errores, 4 avisos del verificador y 15 avisos ESLint. `npm run build` genero 40 rutas, incluidas las fichas de jugadores y parejas. `git diff --check` no encontro errores de whitespace. Falta probar consultas con una sesion real de administrador en Supabase local/staging; no se ejecuto ninguna migracion.
+
+
+## Auditoria de esquema y RPC de inscripciones - 3 de octubre de 2026
+
+| Hallazgo | Estado | Evidencia / accion |
+| --- | --- | --- |
+| Enum de pago discrepante | Corregido en TypeScript/UI y RPC: schema.sql usa no_aplicable, no no_requerido | Tipos, constantes, servicios, panel y migraciones administrativas |
+| Conteo de cupo en promocion/inscripcion | Unificado: pareja completa y activa confirmada o con reserva pendiente de pago; la fila de categoria serializa promociones/altas | Migraciones administrativas `20261003000200` y `20261003000300` |
+| Confirmacion de inscripcion | Exige pago verificado/no aplicable, torneo abierto, pareja completa, categoria habilitada y ausencia de partidos en categoria | RPC transaccional; pendiente de prueba PostgreSQL |
+| Despliegue de correccion | Migraciones incrementales preparadas para instalaciones que ya aplicaron migraciones previas | No ejecutadas en Supabase |
+| Integridad/concurrencia de base real | No verificada | No hay Supabase local disponible ni se aplicaron migraciones |
+
+Las decisiones deportivas/organizativas que bloquean cambios se consolidan en docs/pending-decisions.md. Mantener como no verificadas las escrituras, concurrencia, permisos y RLS hasta ejecutar pruebas con PostgreSQL/Supabase autenticado.
+
+Verificacion tras corregir el enum y las RPC (3 oct 2026): `npm run qa` completo con 0 errores, 4 avisos del verificador y 15 avisos ESLint; `npm run build` correcto con 40 rutas. Las migraciones 001 y 002 se inspeccionaron contra `schema.sql`, pero no se ejecutaron ni analizaron con un servidor PostgreSQL; estado de validacion SQL: pendiente.
+
+## Tarea P0: auditoria de seguridad y consistencia - 3 de octubre de 2026
+
+| Hallazgo | Estado | Correccion preparada |
+| --- | --- | --- |
+| Insert/update directo de parejas desde RLS permitia cambiar estado/categoria sin RPC | Corregido mediante retiro de politicas self_insert/self_update | Migracion 20261003000400_registration_rls_hardening.sql |
+| Insert directo de inscripcion permitia elegir estados operativos sin transaccion | Corregido mediante retiro de registrations_self_insert | Usar RPC transaccional; servicios de insercion individual no tienen consumidores UI |
+| Cancelacion directa del propietario podia saltarse check-in, estado de torneo y partidos y no sincronizaba pareja | Corregido en trigger: valida esas condiciones, conserva pago y deja pareja incompleta/retira bolsa de companero | Migracion 20261003000400_registration_rls_hardening.sql |
+| RPC admin con permiso service_role pero comprobacion is_admin() | Permiso innecesario retirado | Migracion 20261003000400_registration_rls_hardening.sql; solo authenticated pasa por is_admin() |
+| Prueba de RLS, triggers y concurrencia | Pendiente de validacion | No hay PostgreSQL/Supabase local ni CLI; no ejecutar en remoto |
+
+El flujo directo actual soportado por base es registrar_pareja, transaccional y solo para usuario autenticado que registra su propio jugador (o admin). El alta individual compuesta por inserciones directas del servicio no tiene consumidores en la aplicacion; queda bloqueada por las nuevas politicas hasta que exista un RPC transaccional aprobado para ese flujo.
+Actualizacion Tarea P0 (3 oct 2026): la migracion 20261003000400_registration_rls_hardening.sql tambien retira insercion/edicion directa de parejas e insercion directa de inscripciones por jugadores. Conserva la edicion autorizada del perfil personal, pero bloquea cambios propios de estado de cuenta, categoria actual, rol, identidad de Auth, alta y metadatos internos. Las RPC administrativas siguen pasando por is_admin().
+
+Estado de verificacion P0: correcciones implementadas en el repositorio; pendientes de aplicar y probar en Supabase local/staging. La ruta de registro individual del servicio no tiene consumidores y depende de inserciones directas ahora bloqueadas; no debe presentarse como flujo disponible hasta sustituirla por una RPC atomica.
+Verificacion Tarea P0 (3 oct 2026): npm run qa: 0 errores, 4 avisos del verificador; ESLint: 0 errores y 15 avisos; TypeScript: correcto. npm run build: correcto, 40 rutas. git diff --check: sin errores. No hay script de pruebas en package.json; psql y Supabase CLI no estan instalados. Docker CLI existe, pero no hay daemon accesible. Por ello no se ejecutaron SQL, RLS ni pruebas de concurrencia y las 5 tareas P0 siguen pendientes de validacion de base real.

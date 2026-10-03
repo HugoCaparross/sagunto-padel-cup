@@ -1264,8 +1264,8 @@ export function getPaymentStatusLabel(
         case "rechazado":
             return "Pago rechazado";
 
-        case "no_requerido":
-            return "Pago no requerido";
+        case "no_aplicable":
+            return "Pago no aplicable";
     }
 }
 

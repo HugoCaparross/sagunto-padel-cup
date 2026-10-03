@@ -12,7 +12,7 @@ function dateLabel(value: string | null | undefined): string {
 }
 
 function stateLabel(value: string): string {
-    return ({ confirmada: "Confirmada", lista_espera: "Lista de espera", pendiente_pago: "Pendiente de pago", cancelada: "Cancelada", verificado: "Verificado", rechazado: "Rechazado", pendiente: "Pendiente", no_requerido: "No requerido" } as Record<string, string>)[value] ?? value;
+    return ({ confirmada: "Confirmada", lista_espera: "Lista de espera", pendiente_pago: "Pendiente de pago", cancelada: "Cancelada", verificado: "Verificado", rechazado: "Rechazado", pendiente: "Pendiente", no_aplicable: "No aplicable" } as Record<string, string>)[value] ?? value;
 }
 
 function metadataLabel(value: unknown): string {

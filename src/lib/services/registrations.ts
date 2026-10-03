@@ -23,7 +23,7 @@ export type PaymentStatus =
     | "pendiente"
     | "verificado"
     | "rechazado"
-    | "no_requerido";
+    | "no_aplicable";
 
 export type PartnerAvailability =
     | "buscando"
@@ -150,7 +150,7 @@ function getPaymentStatus(
 ): PaymentStatus {
     if (registration.payment_status === "verificado") return "verificado";
     if (registration.payment_status === "rechazado") return "rechazado";
-    if (registration.payment_status === "no_requerido") return "no_requerido";
+    if (registration.payment_status === "no_aplicable") return "no_aplicable";
     return registration.fecha_pago ? "verificado" : "pendiente";
 }
 
@@ -678,7 +678,7 @@ export async function getRegistrationCapacity(
     const { data: pairs, error: pairsError } =
         await supabase
             .from("pairs")
-            .select("id")
+            .select("id, estado, player_1_id, player_2_id")
             .eq("tournament_id", tournamentId)
             .eq("categoria_id", categoryId);
 
@@ -688,9 +688,13 @@ export async function getRegistrationCapacity(
         );
     }
 
-    const pairIds = (pairs ?? []).map(
-        (pair) => pair.id,
+    const capacityPairs = (pairs ?? []).filter(
+        (pair) =>
+            (pair.estado === "confirmada" || pair.estado === "pendiente_pago") &&
+            pair.player_1_id !== null &&
+            pair.player_2_id !== null,
     );
+    const pairIds = capacityPairs.map((pair) => pair.id);
 
     if (pairIds.length === 0) {
         return {
@@ -1791,7 +1795,7 @@ export async function adminConfirmRegistration(
     }
 
     const paymentStatus = registration.payment_status ?? getPaymentStatus(registration);
-    if (paymentStatus !== "verificado" && paymentStatus !== "no_requerido") {
+    if (paymentStatus !== "verificado" && paymentStatus !== "no_aplicable") {
         throw new Error("El pago debe estar verificado antes de confirmar la inscripción.");
     }
 

@@ -139,7 +139,7 @@ export type AdminPaymentStatus =
     | "pendiente"
     | "rechazado"
     | "verificado"
-    | "no_requerido";
+    | "no_aplicable";
 
 export type AdminRegistrationFilters = {
     tournamentId?: string;

@@ -9,7 +9,7 @@ import styles from "../admin-list.module.css";
 
 type SearchParams = Promise<{ q?: string; torneo?: string; categoria?: string; estado?: string; pago?: string; resultado?: string }>;
 const REGISTRATION_STATES: RegistrationStatus[] = ["confirmada", "lista_espera", "pendiente_pago", "cancelada"];
-const PAYMENT_STATES = ["pendiente", "verificado", "rechazado", "no_requerido"] as const;
+const PAYMENT_STATES = ["pendiente", "verificado", "rechazado", "no_aplicable"] as const;
 const REGISTRATION_LABELS: Record<RegistrationStatus, string> = {
     confirmada: "Confirmada",
     lista_espera: "Lista de espera",
@@ -27,7 +27,7 @@ function getBadgeTone(status: string): string {
 function getPaymentLabel(status: string | undefined): string {
     if (status === "verificado") return "Verificado";
     if (status === "rechazado") return "Rechazado";
-    if (status === "no_requerido") return "No requerido";
+    if (status === "no_aplicable") return "No aplicable";
     return "Pendiente";
 }
 
@@ -158,7 +158,7 @@ export default async function AdminRegistrationsPage({ searchParams }: { searchP
                                                             <button className={styles.smallButton} type="submit">Registrar check-in</button>
                                                         </form>
                                                     )}
-                                                    {registrationState === "pendiente_pago" && ["verificado", "no_requerido"].includes(paymentState) && registration.pair?.player_2_id && (
+                                                    {registrationState === "pendiente_pago" && ["verificado", "no_aplicable"].includes(paymentState) && registration.pair?.player_2_id && (
                                                         <form action={confirmRegistrationAction}>
                                                             <input type="hidden" name="registrationId" value={registration.id} />
                                                             <input type="hidden" name="returnTo" value={returnTo} />
