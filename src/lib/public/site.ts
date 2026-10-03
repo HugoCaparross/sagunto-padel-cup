@@ -1031,9 +1031,9 @@ export async function getPublicRanking(
         current.points +=
             point.puntos_obtenidos;
 
-        current.tournaments.add(
-            point.tournament_id,
-        );
+        if (point.tournament_id) {
+            current.tournaments.add(point.tournament_id);
+        }
 
         totals.set(
             point.player_id,
@@ -1288,9 +1288,8 @@ export async function getPublicPlayer(
 
     const tournamentIds = [
         ...new Set(
-            allPoints.map(
-                (point) =>
-                    point.tournament_id,
+            allPoints.flatMap((point) =>
+                point.tournament_id ? [point.tournament_id] : [],
             ),
         ),
     ];
@@ -1352,9 +1351,8 @@ export async function getPublicPlayer(
 
             tournaments:
                 new Set(
-                    currentPoints.map(
-                        (item) =>
-                            item.tournament_id,
+                    currentPoints.flatMap((item) =>
+                        item.tournament_id ? [item.tournament_id] : [],
                     ),
                 ).size,
 
@@ -1362,10 +1360,9 @@ export async function getPublicPlayer(
                 allPoints.map(
                     (item) => ({
                         ...item,
-                        tournament:
-                            tournamentsById.get(
-                                item.tournament_id,
-                            ) ?? null,
+                        tournament: item.tournament_id
+                            ? tournamentsById.get(item.tournament_id) ?? null
+                            : null,
                     }),
                 ),
 

@@ -1762,31 +1762,6 @@ export async function getActivePlayerCount(): Promise<number> {
     });
 }
 
-/**
- * Admin operation for changing the player's role.
- *
- * RLS and requireAdmin() must protect the caller.
- */
-export async function updatePlayerRole(
-    playerId: string,
-    role: Player["role"],
-): Promise<Player> {
-    if (
-        role !== "player" &&
-        role !== "admin"
-    ) {
-        throw new Error(
-            "Rol de jugador no válido.",
-        );
-    }
-
-    return updatePlayer(
-        playerId,
-        {
-            role,
-        },
-    );
-}
 
 /* -------------------------------------------------------------------------- */
 /* CATEGORY CHANGE REQUEST                                                    */

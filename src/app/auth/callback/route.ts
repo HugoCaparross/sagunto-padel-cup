@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 
 import {
     getAuthenticatedDestination,
-    getSafeNextPath,
 } from "@/lib/auth/flow";
+import { getSafeNextPath } from "@/lib/auth/safe-next-path";
 
 import {
     createClient,

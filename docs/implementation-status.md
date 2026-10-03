@@ -224,3 +224,19 @@ Preparar un torneo y categoria de prueba aislados, con capacidad pequena configu
 | A11 | Ejecutar contadores de integridad antes y despues: todos cero, incluido `players_in_multiple_active_pairs_across_tournament`; repetir lecturas como roles anon, jugador y admin. |
 
 Para cerrar el P0 falta: (a) recibir las salidas remotas de enum, RLS/politicas, privilegios de tablas, vista de perfiles, firmas/grants RPC, triggers, restricciones e indices, (b) ejecutar el contador adicional entre categorias, (c) ejecutar los casos A1-A11 en staging con usuarios de prueba y (d) resolver/documentar la regla de una o varias categorias por torneo y la semantica `confirmada` frente a pago pendiente. Hasta entonces las seis cifras quedan como verificadas por reporte, pero las operaciones permanecen pendientes de prueba.
+
+## Auditoria ampliada: temporadas, notificaciones e inscripciones - 3 de octubre de 2026
+
+El encargo de auditoria amplificada autorizo preparar cambios locales, pero no migrar remoto. La conectividad/credenciales SQL siguen sin estar disponibles; no se verifico el esquema remoto y no se hicieron escrituras remotas.
+
+| Cambio local preparado | Archivos | Estado de prueba |
+| --- | --- | --- |
+| Limitar cambios de notificacion propia al estado de lectura; `read_at` lo asigna el trigger; permite leer/no leer, mantiene el camino admin/service | `supabase/migrations/20261003000500_protect_notification_content.sql` | Regresion de staging preparada en `supabase/tests/notification_update_guard.sql`; no ejecutada sin PostgreSQL/Supabase de prueba |
+| Alinear estado final de temporada con `archivada`; permitir torneo nulo solo para `season_operation`; rollover 30% con source tipado y metadata; bloqueo/idempotencia para cierre y temporada hija; impedir cambios de puntos en temporadas archivadas; permisos anon/service retirados | `supabase/migrations/20261003000600_repair_season_rollover.sql`, `src/types/database.ts`, `src/lib/competition/seasons.ts`, `src/lib/services/ranking.ts`, `src/lib/public/site.ts`, `src/app/(admin)/admin/jugadores/[id]/page.tsx` | Prueba SQL preparada en `supabase/tests/season_rollover_regression.sql`; no ejecutada sin fixture admin/temporada/puntos en PostgreSQL de prueba |
+| Auditoria solo lectura extendida a season_status, `ranking_points.tournament_id`, notificaciones, grants por columna, CREATE en public y RPC de temporada | `supabase/audits/p0_registration_readonly.sql` | No ejecutada contra remoto |
+
+La migracion 006 incluye comprobaciones previas: aborta si encuentra duplicados de rollover/temporadas derivadas o puntos sin torneo con source no permitido. Normaliza el source legacy `rollover` a `season_operation` preservando filas y metadatos, y marca la operacion en metadata. Revisar la salida de esas comprobaciones antes de aplicarla en staging.
+
+Decisiones aplicadas: al archivar, el ranking pasa a histórico inmutable; el trigger serializa escrituras autenticadas de puntos con el cierre, de forma que la escritura queda dentro del snapshot o se rechaza. El service role sigue siendo una vía privilegiada de mantenimiento. Se mantienen pendientes consentimiento del segundo jugador y transiciones de inscripción/pago, devoluciones y reserva de plaza. No se implementó alta de inscripciones desde la aplicación: `registrar_pareja` no tiene consumidor encontrado y el formulario público actual completa el perfil.
+
+Verificación de esta ampliación: `npm run qa` completado con 0 errores (4 avisos de validadores ausentes; ESLint informa 15 advertencias); `npm run build` completado correctamente con generación de 40 páginas. `git diff --check` sin errores. Las pruebas SQL de regresión, RLS, permisos y concurrencia no se ejecutaron: requieren una base desechable de staging con los fixtures descritos. No se ha aplicado ninguna migración remota.

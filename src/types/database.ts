@@ -88,7 +88,7 @@ export type TournamentType =
 export type SeasonStatus =
     | "planificada"
     | "activa"
-    | "finalizada"
+    | "cerrada"
     | "archivada";
 
 export type SponsorType =
@@ -700,7 +700,7 @@ export type RankingPointSource =
 export type RankingPoint = {
     id: string;
     player_id: string;
-    tournament_id: string;
+    tournament_id: string | null;
     categoria_id: string;
     puntos_obtenidos: number;
     ronda_alcanzada: string;
@@ -715,7 +715,7 @@ export type RankingPoint = {
 export type RankingPointInsert = {
     id?: string;
     player_id: string;
-    tournament_id: string;
+    tournament_id: string | null;
     categoria_id: string;
     puntos_obtenidos: number;
     ronda_alcanzada: string;
