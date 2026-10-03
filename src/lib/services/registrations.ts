@@ -688,13 +688,15 @@ export async function getRegistrationCapacity(
         );
     }
 
-    const capacityPairs = (pairs ?? []).filter(
+    const allPairs = pairs ?? [];
+    const capacityPairs = allPairs.filter(
         (pair) =>
             (pair.estado === "confirmada" || pair.estado === "pendiente_pago") &&
             pair.player_1_id !== null &&
             pair.player_2_id !== null,
     );
-    const pairIds = capacityPairs.map((pair) => pair.id);
+    const capacityPairIds = new Set(capacityPairs.map((pair) => pair.id));
+    const pairIds = allPairs.map((pair) => pair.id);
 
     if (pairIds.length === 0) {
         return {
@@ -727,14 +729,18 @@ export async function getRegistrationCapacity(
     const active =
         registrations ?? [];
 
-    const confirmed = active.filter(
+    const reservations = active.filter(
         (item) =>
-            item.estado === "confirmada",
+            capacityPairIds.has(item.pair_id) &&
+            (item.estado === "confirmada" || item.estado === "pendiente_pago"),
+    );
+
+    const confirmed = reservations.filter(
+        (item) => item.estado === "confirmada",
     ).length;
 
-    const pendingPayment = active.filter(
-        (item) =>
-            item.estado === "pendiente_pago",
+    const pendingPayment = reservations.filter(
+        (item) => item.estado === "pendiente_pago",
     ).length;
 
     const waitingList = active.filter(
@@ -1406,6 +1412,8 @@ export async function verifyRegistrationPayment(
                 "verificado",
         })
         .eq("id", input.registrationId)
+        // Avoid a payment write racing with an admin cancellation.
+        .neq("estado", CANCELLED_STATUS)
         .select("*")
         .single();
 
@@ -1490,6 +1498,9 @@ export async function checkInRegistration(
             checked_in_at: new Date().toISOString(),
         })
         .eq("id", registrationId)
+        // Rechecked after a row-lock wait, preventing check-in after cancellation.
+        .eq("estado", "confirmada")
+        .eq("checked_in", false)
         .select("*")
         .single();
 
