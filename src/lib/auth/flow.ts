@@ -6,6 +6,8 @@ import {
     getUser,
 } from "@/lib/supabase/server";
 
+export { getSafeNextPath } from "@/lib/auth/safe-next-path";
+
 export type AuthDestination =
     | "/login"
     | "/registro/confirma"
@@ -59,22 +61,4 @@ export async function getAuthenticatedDestination(): Promise<AuthDestination> {
     }
 
     return "/app/perfil";
-}
-
-export function getSafeNextPath(
-    value: string | null,
-): string | null {
-    if (!value) {
-        return null;
-    }
-
-    if (!value.startsWith("/")) {
-        return null;
-    }
-
-    if (value.startsWith("//")) {
-        return null;
-    }
-
-    return value;
 }

@@ -46,7 +46,6 @@ export const ROUTES = {
     regulation: "/reglamento",
     contact: "/contacto",
     sponsors: "/patrocinadores",
-    gallery: "/galeria",
 
     compare: "/comparar",
 
@@ -72,7 +71,6 @@ export const ROUTES = {
     adminClubs: "/admin/clubes",
     adminSponsors: "/admin/patrocinadores",
     adminNews: "/admin/noticias",
-    adminGallery: "/admin/galeria",
     adminSettings: "/admin/configuracion",
 } as const;
 
@@ -539,7 +537,6 @@ export const PAGINATION = {
     rankingPageSize: 50,
     playersPageSize: 24,
     newsPageSize: 12,
-    galleryPageSize: 24,
 } as const;
 
 /* -------------------------------------------------------------------------- */

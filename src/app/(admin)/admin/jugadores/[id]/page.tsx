@@ -73,7 +73,7 @@ export default async function AdminPlayerDetailPage({ params }: { params: Promis
         <section className={styles.panel} aria-labelledby="player-points"><h2 id="player-points">Historial de puntos</h2>
             {!points.length ? <div className={styles.empty}><h3>Sin puntos registrados</h3><p>El ledger no contiene puntos para este jugador.</p></div> : <div className={styles.tableWrap}><table className={styles.table}>
                 <thead><tr><th scope="col">Fecha</th><th scope="col">Torneo</th><th scope="col">Categoria</th><th scope="col">Ronda</th><th scope="col">Puntos</th></tr></thead>
-                <tbody>{points.slice(0, 50).map((point) => <tr key={point.id}><td>{point.fecha}</td><td>{tournamentNames.get(point.tournament_id) ?? "Torneo no disponible"}</td><td>{categoryNames.get(point.categoria_id) ?? "Categoria no disponible"}</td><td>{point.ronda_alcanzada}</td><td>{point.puntos_obtenidos}</td></tr>)}</tbody>
+                <tbody>{points.slice(0, 50).map((point) => <tr key={point.id}><td>{point.fecha}</td><td>{point.tournament_id ? tournamentNames.get(point.tournament_id) ?? "Torneo no disponible" : "Operación de temporada"}</td><td>{categoryNames.get(point.categoria_id) ?? "Categoria no disponible"}</td><td>{point.ronda_alcanzada}</td><td>{point.puntos_obtenidos}</td></tr>)}</tbody>
             </table></div>}
             {points.length > 50 && <p className={styles.privateNote}>Se muestran los 50 registros mas recientes de {points.length}.</p>}
         </section>

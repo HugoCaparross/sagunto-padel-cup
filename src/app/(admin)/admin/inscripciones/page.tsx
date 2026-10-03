@@ -71,7 +71,6 @@ export default async function AdminRegistrationsPage({ searchParams }: { searchP
             {params.resultado === "actualizada" && <p className={styles.feedback} role="status">La inscripción se ha actualizado.</p>}
             {params.resultado === "error" && <p className={`${styles.feedback} ${styles.danger}`} role="alert">No se pudo completar la operación. Comprueba el estado y vuelve a intentarlo.</p>}
 
-            {params.resultado === "auditoria_error" && <p className={`${styles.feedback} ${styles.warning}`} role="alert">La operaciÃ³n se completÃ³, pero no se pudo guardar su registro de auditorÃ­a.</p>}
             {status === "lista_espera" && <p className={`${styles.feedback} ${styles.warning}`} role="note">La promociÃ³n es manual: selecciona una pareja concreta. No hay una prioridad oficial documentada, por lo que la lista no se promueve automÃ¡ticamente.</p>}
 
             <section className={styles.panel} aria-label="Listado de inscripciones">

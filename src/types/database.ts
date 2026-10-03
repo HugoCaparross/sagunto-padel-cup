@@ -88,7 +88,7 @@ export type TournamentType =
 export type SeasonStatus =
     | "planificada"
     | "activa"
-    | "finalizada"
+    | "cerrada"
     | "archivada";
 
 export type SponsorType =
@@ -119,12 +119,6 @@ export type AuditAction =
     | "category_change"
     | "registration_update"
     | "other";
-
-export type GalleryItemType =
-    | "foto"
-    | "video";
-
-export type GalleryPositionSlot = 1 | 2;
 
 // -----------------------------------------------------------------------------
 // GENERIC TABLE HELPERS
@@ -700,7 +694,7 @@ export type RankingPointSource =
 export type RankingPoint = {
     id: string;
     player_id: string;
-    tournament_id: string;
+    tournament_id: string | null;
     categoria_id: string;
     puntos_obtenidos: number;
     ronda_alcanzada: string;
@@ -715,7 +709,7 @@ export type RankingPoint = {
 export type RankingPointInsert = {
     id?: string;
     player_id: string;
-    tournament_id: string;
+    tournament_id: string | null;
     categoria_id: string;
     puntos_obtenidos: number;
     ronda_alcanzada: string;
@@ -940,73 +934,6 @@ export type AuditLogUpdate =
     Partial<AuditLogInsert>;
 
 // -----------------------------------------------------------------------------
-// GALLERY UPLOAD ACCESS
-// -----------------------------------------------------------------------------
-
-export type GalleryUploadAccess = {
-    id: string;
-    tournament_id: string;
-    nombre_colaborador: string;
-    token_acceso: string;
-    fecha_expiracion: string | null;
-    active: boolean;
-    created_by: string | null;
-    created_at: string;
-};
-
-export type GalleryUploadAccessInsert = {
-    id?: string;
-    tournament_id: string;
-    nombre_colaborador: string;
-    token_acceso?: string;
-    fecha_expiracion?: string | null;
-    active?: boolean;
-    created_by?: string | null;
-    created_at?: string;
-};
-
-export type GalleryUploadAccessUpdate =
-    Partial<GalleryUploadAccessInsert>;
-
-// -----------------------------------------------------------------------------
-// GALLERY ITEMS
-// -----------------------------------------------------------------------------
-
-export type GalleryItem = {
-    id: string;
-    tournament_id: string;
-    url: string;
-    tipo: GalleryItemType;
-    subido_por: string | null;
-    player_tag_id: string | null;
-    created_at: string;
-    title: string | null;
-    caption: string | null;
-    orden: number;
-    published: boolean;
-    metadata: Json;
-    updated_at: string;
-};
-
-export type GalleryItemInsert = {
-    id?: string;
-    tournament_id: string;
-    url: string;
-    tipo?: GalleryItemType;
-    subido_por?: string | null;
-    player_tag_id?: string | null;
-    created_at?: string;
-    title?: string | null;
-    caption?: string | null;
-    orden?: number;
-    published?: boolean;
-    metadata?: Json;
-    updated_at?: string;
-};
-
-export type GalleryItemUpdate =
-    Partial<GalleryItemInsert>;
-
 // -----------------------------------------------------------------------------
 // BADGES
 // -----------------------------------------------------------------------------
@@ -1054,8 +981,6 @@ export type Database = {
             news: TableDefinition<News, NewsInsert, NewsUpdate>;
             notifications: TableDefinition<Notification, NotificationInsert, NotificationUpdate>;
             audit_log: TableDefinition<AuditLog, AuditLogInsert, AuditLogUpdate>;
-            gallery_upload_access: TableDefinition<GalleryUploadAccess, GalleryUploadAccessInsert, GalleryUploadAccessUpdate>;
-            gallery_items: TableDefinition<GalleryItem, GalleryItemInsert, GalleryItemUpdate>;
             seasons: TableDefinition<Season, SeasonInsert, SeasonUpdate>;
             badges: TableDefinition<Badge, BadgeInsert, BadgeUpdate>;
         };

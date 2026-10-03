@@ -26,7 +26,7 @@ Este registro separa las decisiones de organización de las implementaciones té
 | 20 | Acceso y suplencias del Master Final | Pendiente | Master Final | Consulta pública provisional | Selección incorrecta de participantes |
 | 21 | Formato, grupos y cuadros del Master | Pendiente | Master Final | Preparar gestión informativa | Rehacer competición publicada |
 | 22 | Premios y condiciones | Pendiente | Premios, contenidos | Gestionar contenido solo cuando esté aprobado | Compromisos económicos no autorizados |
-| 23 | Consentimiento para imágenes y procedimiento de retirada | Pendiente | Galería, perfiles | No añadir publicaciones administrativas sin autorización registrada | Exposición de imagen no consentida |
+| 23 | Consentimiento para imágenes de perfil y procedimiento de retirada | Pendiente | Perfiles de jugadores | No publicar fotos de perfil sin autorización registrada | Exposición de imagen no consentida |
 | 24 | Datos públicos de participantes | Pendiente de definición granular | Jugadores, privacidad, web pública | Aplicar opt-in disponible y limitar datos | Exposición de datos personales |
 | 25 | Conservación, rectificación y borrado de datos | Pendiente | Jugadores, contacto, privacidad | Evitar borrados en cascada desde el panel | Pérdida de obligaciones o historial |
 | 26 | Canales, preferencias y tipos de comunicación | Pendiente | Emails, notificaciones | Preparar eventos sin simular entregas | Comunicaciones duplicadas o no deseadas |
@@ -44,4 +44,4 @@ Este registro separa las decisiones de organización de las implementaciones té
 - Cancelar una inscripción conserva el estado y los datos del pago; no hay devolución automática.
 - La lista de espera usa elección administrativa manual y no aplica orden automático.
 - Cambios de pareja después de actividad deportiva no deben modificar filas históricas.
-- La galería pública requiere definir consentimiento, retirada y conservación antes de habilitar publicación operativa.
+- Las fotos de perfil requieren definir consentimiento, retirada y conservación antes de habilitar su publicación.

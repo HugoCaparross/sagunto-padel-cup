@@ -16,7 +16,7 @@ import {
 export type SeasonStatus =
     | "planificada"
     | "activa"
-    | "finalizada"
+    | "cerrada"
     | "archivada";
 
 export type SeasonInput = {
@@ -237,9 +237,7 @@ export function canArchiveSeason(
 ): boolean {
     return (
         season.status ===
-        "finalizada" ||
-        season.status ===
-        "archivada"
+        "cerrada"
     );
 }
 
@@ -251,7 +249,7 @@ export function activateSeason() {
 
 export function closeSeason() {
     return {
-        status: "finalizada" as const,
+        status: "archivada" as const,
         closedAt: new Date().toISOString(),
     };
 }

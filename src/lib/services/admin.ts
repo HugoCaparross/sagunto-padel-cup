@@ -605,29 +605,6 @@ export async function deactivatePlayerAdmin(
     );
 }
 
-export async function changePlayerRoleAdmin(
-    playerId: string,
-    role: Player["role"],
-): Promise<Player> {
-    await requireAdminContext();
-
-    if (
-        role !== "player" &&
-        role !== "admin"
-    ) {
-        throw new Error(
-            "Rol no válido.",
-        );
-    }
-
-    return updatePlayer(
-        playerId,
-        {
-            role,
-        },
-    );
-}
-
 /* -------------------------------------------------------------------------- */
 /* REGISTRATION ADMIN                                                         */
 /* -------------------------------------------------------------------------- */

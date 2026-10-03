@@ -1,5 +1,9 @@
 import type { Database, Json, PublicPlayerProfileRow } from "@/types/database";
 import { createClient } from "@/lib/supabase/server";
+import {
+    aggregateRankingPointsByCategory,
+    getMasterQualification,
+} from "@/lib/competition/ranking";
 
 type Tables = Database["public"]["Tables"];
 type Player = Database["public"]["Views"]["public_player_profiles"]["Row"];
@@ -7,7 +11,6 @@ type Category = Tables["categories"]["Row"];
 type Tournament = Tables["tournaments"]["Row"];
 type Club = Tables["clubs"]["Row"];
 type News = Tables["news"]["Row"];
-type GalleryItem = Tables["gallery_items"]["Row"];
 type RankingPoint = Tables["ranking_points"]["Row"];
 type Match = Tables["matches"]["Row"];
 type Pair = Tables["pairs"]["Row"];
@@ -863,6 +866,7 @@ export async function getPublicRanking(
             points: number;
             tournaments: number;
         }>;
+        qualification: ReturnType<typeof getMasterQualification>;
     }>
 > {
     const supabase = await createClient();
@@ -895,6 +899,7 @@ export async function getPublicRanking(
                 season: null,
                 category: null,
                 entries: [],
+                qualification: getMasterQualification([]),
             },
             error: null,
         };
@@ -937,6 +942,7 @@ export async function getPublicRanking(
                 season,
                 category: null,
                 entries: [],
+                qualification: getMasterQualification([]),
             },
             error: null,
         };
@@ -963,14 +969,10 @@ export async function getPublicRanking(
         };
     }
 
-    const playerIds = [
-        ...new Set(
-            (pointsQ.data ?? []).map(
-                (point) =>
-                    point.player_id,
-            ),
-        ),
-    ];
+    const pointsByCategory = aggregateRankingPointsByCategory(pointsQ.data ?? []);
+    const allEntries = pointsByCategory.get(category.id) ?? [];
+    const qualification = getMasterQualification(allEntries);
+    const playerIds = allEntries.map((entry) => entry.playerId);
 
     if (!playerIds.length) {
         return {
@@ -978,6 +980,7 @@ export async function getPublicRanking(
                 season,
                 category,
                 entries: [],
+                qualification,
             },
             error: null,
         };
@@ -1009,92 +1012,33 @@ export async function getPublicRanking(
             ]),
         );
 
-    const totals = new Map<
-        string,
-        {
-            points: number;
-            tournaments: Set<string>;
-        }
-    >();
-
-    for (const point of
-        pointsQ.data ?? []) {
-        const current =
-            totals.get(
-                point.player_id,
-            ) ?? {
-                points: 0,
-                tournaments:
-                    new Set<string>(),
-            };
-
-        current.points +=
-            point.puntos_obtenidos;
-
-        current.tournaments.add(
-            point.tournament_id,
-        );
-
-        totals.set(
-            point.player_id,
-            current,
-        );
+    const tournamentCounts = new Map<string, Set<string>>();
+    for (const point of pointsQ.data ?? []) {
+        if (!point.tournament_id) continue;
+        const ids = tournamentCounts.get(point.player_id) ?? new Set<string>();
+        ids.add(point.tournament_id);
+        tournamentCounts.set(point.player_id, ids);
     }
 
-    const entries = [
-        ...totals.entries(),
-    ]
-        .map(
-            ([playerId, value]) => ({
-                player:
-                    playersById.get(
-                        playerId,
-                    ),
-                points:
-                    value.points,
-                tournaments:
-                    value.tournaments
-                        .size,
-            }),
-        )
-        .filter(
-            (
-                entry,
-            ): entry is {
-                player: Player;
-                points: number;
-                tournaments: number;
-            } =>
-                Boolean(
-                    entry.player,
-                ),
-        )
-        .sort(
-            (a, b) =>
-                b.points -
-                a.points ||
-                publicPlayerName(
-                    a.player,
-                ).localeCompare(
-                    publicPlayerName(
-                        b.player,
-                    ),
-                    "es",
-                ),
-        )
-        .map(
-            (entry, index) => ({
-                position:
-                    index + 1,
-                ...entry,
-            }),
-        );
+    // Rank every ledger player before applying public profile visibility. A
+    // hidden profile must not move another player into a direct qualification.
+    const entries = allEntries.flatMap((entry) => {
+        const player = playersById.get(entry.playerId);
+        if (!player) return [];
+        return [{
+            position: entry.position,
+            player,
+            points: entry.points,
+            tournaments: tournamentCounts.get(entry.playerId)?.size ?? 0,
+        }];
+    });
 
     return {
         data: {
             season,
             category,
             entries,
+            qualification,
         },
         error: null,
     };
@@ -1124,35 +1068,6 @@ export async function getPublicSponsors(
         .eq("active", true)
         .order("orden", {
             ascending: true,
-        });
-
-    if (error) {
-        return {
-            data: null,
-            error: asError(error),
-        };
-    }
-
-    return {
-        data: data ?? [],
-        error: null,
-    };
-}
-
-export async function getPublicGallery(): Promise<
-    PublicResult<GalleryItem[]>
-> {
-    const supabase = await createClient();
-
-    const { data, error } = await supabase
-        .from("gallery_items")
-        .select("*")
-        .eq("published", true)
-        .order("orden", {
-            ascending: true,
-        })
-        .order("created_at", {
-            ascending: false,
         });
 
     if (error) {
@@ -1288,9 +1203,8 @@ export async function getPublicPlayer(
 
     const tournamentIds = [
         ...new Set(
-            allPoints.map(
-                (point) =>
-                    point.tournament_id,
+            allPoints.flatMap((point) =>
+                point.tournament_id ? [point.tournament_id] : [],
             ),
         ),
     ];
@@ -1352,9 +1266,8 @@ export async function getPublicPlayer(
 
             tournaments:
                 new Set(
-                    currentPoints.map(
-                        (item) =>
-                            item.tournament_id,
+                    currentPoints.flatMap((item) =>
+                        item.tournament_id ? [item.tournament_id] : [],
                     ),
                 ).size,
 
@@ -1362,10 +1275,9 @@ export async function getPublicPlayer(
                 allPoints.map(
                     (item) => ({
                         ...item,
-                        tournament:
-                            tournamentsById.get(
-                                item.tournament_id,
-                            ) ?? null,
+                        tournament: item.tournament_id
+                            ? tournamentsById.get(item.tournament_id) ?? null
+                            : null,
                     }),
                 ),
 

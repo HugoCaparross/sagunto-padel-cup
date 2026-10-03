@@ -2040,9 +2040,9 @@ export function validateStoredRankingPoint(
 ): boolean {
     if (
         !point.player_id ||
-        !point.tournament_id ||
         !point.season_id ||
-        !point.categoria_id
+        !point.categoria_id ||
+        (!point.tournament_id && point.source !== "season_operation")
     ) {
         return false;
     }
