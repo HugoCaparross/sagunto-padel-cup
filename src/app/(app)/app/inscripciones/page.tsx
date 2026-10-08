@@ -1,114 +1,128 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-
-import type { RegistrationStatus } from "@/types/database";
-
 import {
-    getAdminPlayersByIds,
-    getAdminRegistrations,
-    getCategories,
-} from "@/lib/services/admin";
+    ArrowRight,
+    CalendarDays,
+    CheckCircle2,
+    CircleDollarSign,
+    Clock3,
+    Info,
+    MapPin,
+    Search,
+    Trophy,
+    Users,
+    XCircle,
+} from "lucide-react";
 
-import { getTournaments } from "@/lib/services/tournaments";
-
+import { getAuthenticatedContext } from "@/lib/auth/flow";
 import {
-    cancelRegistrationAction,
-    checkInAction,
-    confirmRegistrationAction,
-    markPaymentPendingAction,
-    moveRegistrationToWaitingListAction,
-    promoteWaitingRegistrationAction,
-    verifyPaymentAction,
-} from "./actions";
+    canCancelRegistration,
+    getRegistrations,
+} from "@/lib/services/registrations";
+import { getPlayerById } from "@/lib/services/players";
+import CancelRegistrationButton from "./CancelRegistrationButton";
 
-import RegistrationMutationForm from "./RegistrationMutationForm";
+import styles from "./page.module.css";
 
-import styles from "../admin-list.module.css";
+export const metadata: Metadata = {
+    title: "Mis inscripciones",
+    description:
+        "Consulta tus inscripciones en Sagunto Padel Cup.",
+    robots: {
+        index: false,
+        follow: false,
+    },
+};
 
 type SearchParams = Promise<{
-    q?: string;
-    torneo?: string;
-    categoria?: string;
-    estado?: string;
-    pago?: string;
     resultado?: string;
 }>;
 
-const REGISTRATION_STATES: RegistrationStatus[] = [
-    "confirmada",
-    "lista_espera",
-    "pendiente_pago",
-    "cancelada",
-];
-
-const PAYMENT_STATES = [
-    "pendiente",
-    "verificado",
-    "rechazado",
-    "no_aplicable",
-] as const;
-
-type PaymentStatus = (typeof PAYMENT_STATES)[number];
-
-const REGISTRATION_LABELS: Record<
-    RegistrationStatus,
-    string
-> = {
-    confirmada: "Confirmada",
-    lista_espera: "Lista de espera",
-    pendiente_pago: "Pendiente de pago",
-    cancelada: "Cancelada",
-};
-
-function getBadgeTone(
-    status: string,
+function formatDate(
+    value:
+        | string
+        | null
+        | undefined,
 ): string {
-    if (
-        [
-            "confirmada",
-            "verificado",
-        ].includes(status)
-    ) {
-        return styles.success;
+    if (!value) {
+        return "Sin fecha";
     }
 
-    if (
-        [
-            "pendiente_pago",
-            "pendiente",
-            "lista_espera",
-        ].includes(status)
-    ) {
-        return styles.warning;
-    }
+    const date =
+        new Date(value);
 
     if (
-        [
-            "cancelada",
-            "rechazado",
-        ].includes(status)
+        Number.isNaN(
+            date.getTime(),
+        )
     ) {
-        return styles.danger;
+        return "Sin fecha";
     }
 
-    return styles.neutral;
+    return new Intl.DateTimeFormat(
+        "es-ES",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+        },
+    ).format(date);
 }
 
-function getPaymentLabel(
-    status: string | undefined,
+function formatDateRange(
+    start:
+        | string
+        | null
+        | undefined,
+    end:
+        | string
+        | null
+        | undefined,
 ): string {
-    if (status === "verificado") {
-        return "Pagado";
+    if (!start) {
+        return "Fecha pendiente";
     }
 
-    if (status === "rechazado") {
-        return "Rechazado";
+    const startDate =
+        new Date(start);
+
+    if (
+        Number.isNaN(
+            startDate.getTime(),
+        )
+    ) {
+        return "Fecha pendiente";
     }
 
-    if (status === "no_aplicable") {
-        return "No aplica";
+    if (!end || start === end) {
+        return formatDate(start);
     }
 
-    return "Pendiente";
+    const endDate =
+        new Date(end);
+
+    if (
+        Number.isNaN(
+            endDate.getTime(),
+        )
+    ) {
+        return formatDate(start);
+    }
+
+    return `${new Intl.DateTimeFormat(
+        "es-ES",
+        {
+            day: "2-digit",
+            month: "short",
+        },
+    ).format(startDate)} – ${new Intl.DateTimeFormat(
+        "es-ES",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+        },
+    ).format(endDate)}`;
 }
 
 function getPlayerName(
@@ -124,243 +138,203 @@ function getPlayerName(
         return "Jugador no disponible";
     }
 
-    return `${player.nombre} ${player.apellidos ?? ""
-        }`.trim();
+    return [
+        player.nombre,
+        player.apellidos,
+    ]
+        .filter(Boolean)
+        .join(" ")
+        .trim();
 }
 
-function getPairNames(
-    registration: {
-        player?: {
-            nombre: string;
-            apellidos?: string | null;
-        } | null;
-        pair?: {
-            player_2_id?: string | null;
-        } | null;
-    },
-    player2Names: Map<string, string>,
-): {
-    player1: string;
-    player2: string | null;
-} {
-    const player1 = getPlayerName(
-        registration.player,
-    );
+function getRegistrationLabel(
+    status: string,
+): string {
+    switch (status) {
+        case "confirmada":
+            return "Confirmada";
 
-    const player2Id =
-        registration.pair?.player_2_id ?? null;
+        case "pendiente_pago":
+            return "Pendiente de pago";
 
-    const player2 = player2Id
-        ? player2Names.get(player2Id) ??
-        "Jugador no disponible"
-        : null;
+        case "lista_espera":
+            return "Lista de espera";
 
-    return {
-        player1,
-        player2,
-    };
+        case "cancelada":
+            return "Cancelada";
+
+        default:
+            return status;
+    }
 }
 
-export default async function AdminRegistrationsPage({
+function getRegistrationClass(
+    status: string,
+): string {
+    switch (status) {
+        case "confirmada":
+            return styles.statusConfirmed;
+
+        case "pendiente_pago":
+            return styles.statusPending;
+
+        case "lista_espera":
+            return styles.statusWaiting;
+
+        case "cancelada":
+            return styles.statusCancelled;
+
+        default:
+            return styles.statusCancelled;
+    }
+}
+
+function getPaymentLabel(
+    status:
+        | string
+        | undefined,
+): string {
+    switch (status) {
+        case "verificado":
+            return "Pagado";
+
+        case "rechazado":
+            return "Rechazado";
+
+        case "no_aplicable":
+            return "No aplica";
+
+        default:
+            return "Pendiente";
+    }
+}
+
+function getPaymentClass(
+    status:
+        | string
+        | undefined,
+): string {
+    switch (status) {
+        case "verificado":
+            return styles.paymentVerified;
+
+        case "rechazado":
+            return styles.paymentRejected;
+
+        case "no_aplicable":
+            return styles.paymentNotApplicable;
+
+        default:
+            return styles.paymentPending;
+    }
+}
+
+export default async function MisInscripcionesPage({
     searchParams,
 }: {
     searchParams: SearchParams;
 }) {
-    const params = await searchParams;
+    const params =
+        await searchParams;
 
-    const search =
-        params.q?.trim() ?? "";
+    const {
+        user,
+        player,
+    } =
+        await getAuthenticatedContext();
 
-    const tournamentId =
-        params.torneo ?? "";
+    if (!user || !player) {
+        return null;
+    }
 
-    const status =
-        REGISTRATION_STATES.includes(
-            params.estado as RegistrationStatus,
-        )
-            ? (params.estado as RegistrationStatus)
-            : undefined;
-
-    const payment =
-        PAYMENT_STATES.includes(
-            params.pago as PaymentStatus,
-        )
-            ? (params.pago as PaymentStatus)
-            : undefined;
-
-    const [
-        categories,
-        tournaments,
-    ] = await Promise.all([
-        getCategories(),
-        getTournaments(),
-    ]);
-
-    const categoryId =
-        categories.some(
-            (category) =>
-                category.id ===
-                params.categoria,
-        )
-            ? params.categoria
-            : "";
-
-    const allRegistrations =
-        await getAdminRegistrations({
-            tournamentId:
-                tournamentId || undefined,
-
-            categoryId:
-                categoryId || undefined,
-
-            estado: status,
-
-            paymentStatus:
-                payment,
+    const registrations =
+        await getRegistrations({
+            playerId: player.id,
         });
 
-    /*
-     * getRegistrations() ya devuelve el jugador principal
-     * de la pareja. Para poder buscar y mostrar correctamente
-     * la pareja completa necesitamos consultar también al
-     * segundo jugador cuando exista.
-     */
-    const player2Ids =
+    const partnerIds =
         Array.from(
             new Set(
-                allRegistrations
+                registrations
                     .map(
-                        (registration) =>
-                            registration.pair
-                                ?.player_2_id,
+                        (registration) => {
+                            const pair =
+                                registration.pair;
+
+                            if (!pair) {
+                                return null;
+                            }
+
+                            if (
+                                pair.player_1_id ===
+                                player.id
+                            ) {
+                                return pair.player_2_id;
+                            }
+
+                            return pair.player_1_id;
+                        },
                     )
                     .filter(
                         (
                             id,
                         ): id is string =>
-                            Boolean(id),
+                            Boolean(id) &&
+                            id !== player.id,
                     ),
             ),
         );
 
-    const player2Rows =
-        player2Ids.length > 0
-            ? await getAdminPlayersByIds(
-                player2Ids,
-            )
-            : [];
-
-    const player2Names =
-        new Map(
-            player2Rows.map(
-                (player) => [
-                    player.id,
-                    `${player.nombre} ${player.apellidos ??
-                        ""
-                        }`.trim(),
-                ],
+    const partnerRows =
+        await Promise.all(
+            partnerIds.map(
+                (id) =>
+                    getPlayerById(id),
             ),
         );
 
-    /*
-     * La búsqueda se hace sobre los dos jugadores
-     * y también sobre el torneo.
-     */
-    const query =
-        search.toLocaleLowerCase(
-            "es",
+    const partners =
+        new Map(
+            partnerRows
+                .filter(
+                    (
+                        partner,
+                    ): partner is NonNullable<
+                        typeof partner
+                    > =>
+                        Boolean(partner),
+                )
+                .map(
+                    (partner) => [
+                        partner.id,
+                        partner,
+                    ],
+                ),
         );
 
-    const registrations =
-        allRegistrations.filter(
-            (registration) => {
-                if (!query) {
-                    return true;
-                }
+    const total =
+        registrations.length;
 
-                const {
-                    player1,
-                    player2,
-                } = getPairNames(
-                    registration,
-                    player2Names,
-                );
+    const pendingPayment =
+        registrations.filter(
+            (registration) =>
+                registration.payment_status ===
+                "pendiente",
+        ).length;
 
-                const tournamentName =
-                    registration
-                        .tournament
-                        ?.nombre ??
-                    "";
+    const confirmed =
+        registrations.filter(
+            (registration) =>
+                registration.estado ===
+                "confirmada",
+        ).length;
 
-                const searchableText =
-                    [
-                        player1,
-                        player2 ?? "",
-                        tournamentName,
-                    ]
-                        .join(" ")
-                        .toLocaleLowerCase(
-                            "es",
-                        );
-
-                return searchableText.includes(
-                    query,
-                );
-            },
-        );
-
-    const activeFilters =
-        new URLSearchParams();
-
-    if (search) {
-        activeFilters.set(
-            "q",
-            search,
-        );
-    }
-
-    if (tournamentId) {
-        activeFilters.set(
-            "torneo",
-            tournamentId,
-        );
-    }
-
-    if (categoryId) {
-        activeFilters.set(
-            "categoria",
-            categoryId,
-        );
-    }
-
-    if (status) {
-        activeFilters.set(
-            "estado",
-            status,
-        );
-    }
-
-    if (payment) {
-        activeFilters.set(
-            "pago",
-            payment,
-        );
-    }
-
-    const returnTo =
-        `/admin/inscripciones${activeFilters.size
-            ? `?${activeFilters.toString()}`
-            : ""
-        }`;
-
-    const hasFilters =
-        Boolean(
-            search ||
-            tournamentId ||
-            categoryId ||
-            status ||
-            payment,
-        );
+    const paid =
+        registrations.filter(
+            (registration) =>
+                registration.payment_status ===
+                "verificado",
+        ).length;
 
     return (
         <main
@@ -368,752 +342,687 @@ export default async function AdminRegistrationsPage({
                 styles.page
             }
         >
-            <header
+            <div
                 className={
-                    styles.header
+                    styles.container
                 }
             >
-                <div>
-                    <span
-                        className={
-                            styles.eyebrow
-                        }
-                    >
-                        Competición
-                    </span>
-
-                    <h1
-                        className={
-                            styles.title
-                        }
-                    >
-                        Inscripciones
-                    </h1>
-
-                    <p
-                        className={
-                            styles.description
-                        }
-                    >
-                        Gestiona las parejas inscritas,
-                        verifica los pagos presenciales
-                        y controla el estado operativo
-                        de cada inscripción.
-                    </p>
-                </div>
-
-                <span
+                <header
                     className={
-                        styles.count
+                        styles.pageHeader
                     }
                 >
-                    {registrations.length}{" "}
-                    {registrations.length ===
-                        1
-                        ? "inscripción"
-                        : "inscripciones"}
-                </span>
-            </header>
-
-            {params.resultado ===
-                "actualizada" && (
-                    <p
-                        className={
-                            styles.feedback
-                        }
-                        role="status"
-                    >
-                        La inscripción se ha
-                        actualizado correctamente.
-                    </p>
-                )}
-
-            {params.resultado ===
-                "error" && (
-                    <p
-                        className={`${styles.feedback} ${styles.danger}`}
-                        role="alert"
-                    >
-                        No se pudo completar la
-                        operación. Comprueba el
-                        estado de la inscripción
-                        y vuelve a intentarlo.
-                    </p>
-                )}
-
-            {status ===
-                "lista_espera" && (
-                    <p
-                        className={`${styles.feedback} ${styles.warning}`}
-                        role="note"
-                    >
-                        La promoción desde la lista
-                        de espera es manual. Selecciona
-                        siempre una pareja concreta.
-                    </p>
-                )}
-
-            <section
-                className={
-                    styles.panel
-                }
-                aria-label="Listado de inscripciones"
-            >
-                <form
-                    action="/admin/inscripciones"
-                    method="GET"
-                    className={
-                        styles.toolbar
-                    }
-                >
-                    <div
-                        className={
-                            styles.field
-                        }
-                    >
-                        <label
-                            htmlFor="registration-search"
-                        >
-                            Buscar
-                        </label>
-
-                        <input
-                            id="registration-search"
+                    <div>
+                        <span
                             className={
-                                styles.input
+                                styles.eyebrow
                             }
-                            type="search"
-                            name="q"
-                            defaultValue={
-                                search
-                            }
-                            placeholder="Jugador, pareja o torneo"
+                        >
+                            MI CUENTA
+                        </span>
+
+                        <h1>
+                            Mis inscripciones
+                        </h1>
+
+                        <p>
+                            Consulta tus
+                            participaciones,
+                            el estado de cada
+                            inscripción y la
+                            situación del pago.
+                        </p>
+                    </div>
+
+                    <Link
+                        href="/torneos"
+                        className={
+                            styles.findTournamentLink
+                        }
+                    >
+                        <Search
+                            size={15}
+                            aria-hidden="true"
                         />
-                    </div>
 
-                    <div
-                        className={
-                            styles.field
-                        }
-                    >
-                        <label
-                            htmlFor="registration-tournament"
-                        >
-                            Torneo
-                        </label>
+                        Buscar torneos
 
-                        <select
-                            id="registration-tournament"
+                        <ArrowRight
+                            size={14}
+                            aria-hidden="true"
+                        />
+                    </Link>
+                </header>
+
+                {params.resultado ===
+                    "cancelada" && (
+                        <div
                             className={
-                                styles.select
+                                styles.feedbackSuccess
                             }
-                            name="torneo"
-                            defaultValue={
-                                tournamentId
-                            }
+                            role="status"
                         >
-                            <option value="">
-                                Todos los torneos
-                            </option>
+                            <CheckCircle2
+                                size={18}
+                                aria-hidden="true"
+                            />
 
-                            {tournaments.map(
-                                (
-                                    tournament,
-                                ) => (
-                                    <option
-                                        key={
-                                            tournament.id
-                                        }
-                                        value={
-                                            tournament.id
-                                        }
-                                    >
-                                        {
-                                            tournament.nombre
-                                        }
-                                    </option>
-                                ),
-                            )}
-                        </select>
-                    </div>
+                            <div>
+                                <strong>
+                                    Inscripción cancelada
+                                </strong>
 
-                    <div
-                        className={
-                            styles.field
-                        }
-                    >
-                        <label
-                            htmlFor="registration-category"
-                        >
-                            Categoría
-                        </label>
-
-                        <select
-                            id="registration-category"
-                            className={
-                                styles.select
-                            }
-                            name="categoria"
-                            defaultValue={
-                                categoryId
-                            }
-                        >
-                            <option value="">
-                                Todas
-                            </option>
-
-                            {categories.map(
-                                (
-                                    category,
-                                ) => (
-                                    <option
-                                        key={
-                                            category.id
-                                        }
-                                        value={
-                                            category.id
-                                        }
-                                    >
-                                        {
-                                            category.nombre
-                                        }
-                                    </option>
-                                ),
-                            )}
-                        </select>
-                    </div>
-
-                    <div
-                        className={
-                            styles.field
-                        }
-                    >
-                        <label
-                            htmlFor="registration-state"
-                        >
-                            Estado
-                        </label>
-
-                        <select
-                            id="registration-state"
-                            className={
-                                styles.select
-                            }
-                            name="estado"
-                            defaultValue={
-                                status ?? ""
-                            }
-                        >
-                            <option value="">
-                                Todos
-                            </option>
-
-                            {REGISTRATION_STATES.map(
-                                (value) => (
-                                    <option
-                                        key={
-                                            value
-                                        }
-                                        value={
-                                            value
-                                        }
-                                    >
-                                        {
-                                            REGISTRATION_LABELS[
-                                            value
-                                            ]
-                                        }
-                                    </option>
-                                ),
-                            )}
-                        </select>
-                    </div>
-
-                    <div
-                        className={
-                            styles.field
-                        }
-                    >
-                        <label
-                            htmlFor="registration-payment"
-                        >
-                            Pago
-                        </label>
-
-                        <select
-                            id="registration-payment"
-                            className={
-                                styles.select
-                            }
-                            name="pago"
-                            defaultValue={
-                                payment ?? ""
-                            }
-                        >
-                            <option value="">
-                                Todos
-                            </option>
-
-                            {PAYMENT_STATES.map(
-                                (value) => (
-                                    <option
-                                        key={
-                                            value
-                                        }
-                                        value={
-                                            value
-                                        }
-                                    >
-                                        {
-                                            getPaymentLabel(
-                                                value,
-                                            )
-                                        }
-                                    </option>
-                                ),
-                            )}
-                        </select>
-                    </div>
-
-                    <button
-                        className={
-                            styles.button
-                        }
-                        type="submit"
-                    >
-                        Filtrar
-                    </button>
-
-                    {hasFilters && (
-                        <Link
-                            className={
-                                styles.quietButton
-                            }
-                            href="/admin/inscripciones"
-                        >
-                            Limpiar
-                        </Link>
+                                <span>
+                                    La inscripción se ha
+                                    cancelado correctamente.
+                                </span>
+                            </div>
+                        </div>
                     )}
-                </form>
+
+                {params.resultado ===
+                    "error" && (
+                        <div
+                            className={
+                                styles.feedbackError
+                            }
+                            role="alert"
+                        >
+                            <XCircle
+                                size={18}
+                                aria-hidden="true"
+                            />
+
+                            <div>
+                                <strong>
+                                    No se pudo cancelar
+                                    la inscripción
+                                </strong>
+
+                                <span>
+                                    Comprueba el estado
+                                    de la inscripción o
+                                    contacta con la
+                                    organización.
+                                </span>
+                            </div>
+                        </div>
+                    )}
+
+                {total > 0 && (
+                    <section
+                        className={
+                            styles.summary
+                        }
+                        aria-label="Resumen"
+                    >
+                        <div
+                            className={
+                                styles.summaryItem
+                            }
+                        >
+                            <span>
+                                INSCRIPCIONES
+                            </span>
+
+                            <strong>
+                                {total}
+                            </strong>
+                        </div>
+
+                        <div
+                            className={
+                                styles.summaryItem
+                            }
+                        >
+                            <span>
+                                PENDIENTES DE PAGO
+                            </span>
+
+                            <strong>
+                                {pendingPayment}
+                            </strong>
+                        </div>
+
+                        <div
+                            className={
+                                styles.summaryItem
+                            }
+                        >
+                            <span>
+                                CONFIRMADAS
+                            </span>
+
+                            <strong>
+                                {confirmed}
+                            </strong>
+                        </div>
+
+                        <div
+                            className={
+                                styles.summaryItem
+                            }
+                        >
+                            <span>
+                                PAGADAS
+                            </span>
+
+                            <strong>
+                                {paid}
+                            </strong>
+                        </div>
+                    </section>
+                )}
 
                 {registrations.length ===
                     0 ? (
-                    <div
+                    <section
                         className={
-                            styles.empty
+                            styles.emptyState
                         }
                     >
+                        <div
+                            className={
+                                styles.emptyIcon
+                            }
+                        >
+                            <Trophy
+                                size={21}
+                                aria-hidden="true"
+                            />
+                        </div>
+
+                        <span
+                            className={
+                                styles.eyebrow
+                            }
+                        >
+                            SIN INSCRIPCIONES
+                        </span>
+
                         <h2>
-                            {hasFilters
-                                ? "No hay resultados"
-                                : "Aún no hay inscripciones"}
+                            Todavía no tienes
+                            ninguna inscripción
                         </h2>
 
                         <p>
-                            {hasFilters
-                                ? "Cambia o limpia los filtros para consultar otras inscripciones."
-                                : "Las inscripciones recibidas aparecerán aquí."}
+                            Cuando te inscribas a
+                            un torneo del circuito,
+                            podrás consultar aquí
+                            toda la información de
+                            tu participación.
                         </p>
-                    </div>
-                ) : (
-                    <div
-                        className={
-                            styles.tableWrap
-                        }
-                    >
-                        <table
+
+                        <Link
+                            href="/torneos"
                             className={
-                                styles.table
+                                styles.primaryButton
                             }
                         >
-                            <thead>
-                                <tr>
-                                    <th scope="col">
-                                        Jugador /
-                                        pareja
-                                    </th>
+                            Ver torneos
 
-                                    <th scope="col">
-                                        Torneo
-                                    </th>
+                            <ArrowRight
+                                size={15}
+                                aria-hidden="true"
+                            />
+                        </Link>
+                    </section>
+                ) : (
+                    <section
+                        className={
+                            styles.registrationList
+                        }
+                        aria-label="Mis inscripciones"
+                    >
+                        {registrations.map(
+                            (
+                                registration,
+                            ) => {
+                                const pair =
+                                    registration.pair;
 
-                                    <th scope="col">
-                                        Categoría
-                                    </th>
+                                const partnerId =
+                                    pair?.player_1_id ===
+                                        player.id
+                                        ? pair?.player_2_id
+                                        : pair?.player_1_id;
 
-                                    <th scope="col">
-                                        Estado
-                                    </th>
+                                const partner =
+                                    partnerId
+                                        ? partners.get(
+                                            partnerId,
+                                        )
+                                        : null;
 
-                                    <th scope="col">
-                                        Pago
-                                    </th>
+                                const categoryName =
+                                    registration
+                                        .tournamentCategory
+                                        ?.categoria_id ===
+                                        registration.categoria_id
+                                        ? "Categoría"
+                                        : "Categoría";
 
-                                    <th scope="col">
-                                        Check-in
-                                    </th>
+                                const paymentStatus =
+                                    registration.payment_status ??
+                                    "pendiente";
 
-                                    <th scope="col">
-                                        Acciones
-                                    </th>
-                                </tr>
-                            </thead>
+                                const isCancelled =
+                                    registration.estado ===
+                                    "cancelada";
 
-                            <tbody>
-                                {registrations.map(
-                                    (
-                                        registration,
-                                    ) => {
-                                        const registrationState =
-                                            registration.estado;
+                                const canCancel =
+                                    canCancelRegistration(
+                                        registration.estado,
+                                    );
 
-                                        const paymentState =
-                                            registration.payment_status ??
-                                            "pendiente";
-
-                                        const {
-                                            player1,
-                                            player2,
-                                        } =
-                                            getPairNames(
-                                                registration,
-                                                player2Names,
-                                            );
-
-                                        const category =
-                                            categories.find(
-                                                (
-                                                    item,
-                                                ) =>
-                                                    item.id ===
-                                                    (registration.categoria_id ??
-                                                        registration
-                                                            .pair
-                                                            ?.categoria_id),
-                                            );
-
-                                        const isCancelled =
-                                            registrationState ===
-                                            "cancelada";
-
-                                        const isPaid =
-                                            paymentState ===
-                                            "verificado";
-
-                                        return (
-                                            <tr
-                                                key={
-                                                    registration.id
+                                return (
+                                    <article
+                                        key={
+                                            registration.id
+                                        }
+                                        className={[
+                                            styles.registrationCard,
+                                            isCancelled
+                                                ? styles.registrationCancelled
+                                                : "",
+                                        ].join(" ")}
+                                    >
+                                        <header
+                                            className={
+                                                styles.cardHeader
+                                            }
+                                        >
+                                            <div
+                                                className={
+                                                    styles.cardHeading
                                                 }
                                             >
-                                                <td>
-                                                    <Link
-                                                        className={
-                                                            styles.primaryText
-                                                        }
-                                                        href={`/admin/inscripciones/${registration.id}`}
-                                                    >
-                                                        {player1}
-                                                    </Link>
+                                                <span
+                                                    className={
+                                                        styles.cardEyebrow
+                                                    }
+                                                >
+                                                    INSCRIPCIÓN
+                                                </span>
 
-                                                    {player2 ? (
-                                                        <span
-                                                            className={
-                                                                styles.secondaryText
-                                                            }
-                                                        >
-                                                            {player2}
-                                                        </span>
-                                                    ) : (
-                                                        <span
-                                                            className={
-                                                                styles.secondaryText
-                                                            }
-                                                        >
-                                                            Segundo jugador
-                                                            pendiente
-                                                        </span>
-                                                    )}
-                                                </td>
-
-                                                <td>
+                                                <h2>
                                                     {
                                                         registration
                                                             .tournament
                                                             ?.nombre ??
-                                                        "Torneo no disponible"
+                                                        "Torneo"
                                                     }
-                                                </td>
+                                                </h2>
+                                            </div>
 
-                                                <td>
-                                                    {
-                                                        category?.nombre ??
-                                                        "Sin categoría"
-                                                    }
-                                                </td>
-
-                                                <td>
-                                                    <span
-                                                        className={`${styles.badge} ${getBadgeTone(
-                                                            registrationState,
-                                                        )}`}
-                                                    >
-                                                        {
-                                                            REGISTRATION_LABELS[
-                                                            registrationState
-                                                            ]
-                                                        }
-                                                    </span>
-                                                </td>
-
-                                                <td>
-                                                    <span
-                                                        className={`${styles.badge} ${getBadgeTone(
-                                                            paymentState,
-                                                        )}`}
-                                                    >
-                                                        {
-                                                            getPaymentLabel(
-                                                                paymentState,
-                                                            )
-                                                        }
-                                                    </span>
-                                                </td>
-
-                                                <td>
-                                                    {registration.checked_in ? (
-                                                        <span
-                                                            className={`${styles.badge} ${styles.success}`}
-                                                        >
-                                                            Realizado
-                                                        </span>
-                                                    ) : (
-                                                        <span
-                                                            className={`${styles.badge} ${styles.neutral}`}
-                                                        >
-                                                            Pendiente
-                                                        </span>
+                                            <div
+                                                className={
+                                                    styles.cardStatusGroup
+                                                }
+                                            >
+                                                <span
+                                                    className={[
+                                                        styles.statusBadge,
+                                                        getRegistrationClass(
+                                                            registration.estado,
+                                                        ),
+                                                    ].join(" ")}
+                                                >
+                                                    {getRegistrationLabel(
+                                                        registration.estado,
                                                     )}
-                                                </td>
+                                                </span>
 
-                                                <td>
-                                                    <div
-                                                        className={
-                                                            styles.rowActions
-                                                        }
-                                                    >
-                                                        {!isPaid &&
-                                                            !isCancelled &&
-                                                            paymentState !==
-                                                            "no_aplicable" && (
-                                                                <form
-                                                                    action={
-                                                                        verifyPaymentAction
-                                                                    }
-                                                                >
-                                                                    <input
-                                                                        type="hidden"
-                                                                        name="registrationId"
-                                                                        value={
-                                                                            registration.id
-                                                                        }
-                                                                    />
+                                                <span
+                                                    className={[
+                                                        styles.paymentBadge,
+                                                        getPaymentClass(
+                                                            paymentStatus,
+                                                        ),
+                                                    ].join(" ")}
+                                                >
+                                                    {getPaymentLabel(
+                                                        paymentStatus,
+                                                    )}
+                                                </span>
+                                            </div>
+                                        </header>
 
-                                                                    <input
-                                                                        type="hidden"
-                                                                        name="returnTo"
-                                                                        value={
-                                                                            returnTo
-                                                                        }
-                                                                    />
+                                        <div
+                                            className={
+                                                styles.cardMeta
+                                            }
+                                        >
+                                            <div>
+                                                <CalendarDays
+                                                    size={14}
+                                                    aria-hidden="true"
+                                                />
 
-                                                                    <button
-                                                                        className={
-                                                                            styles.smallButton
-                                                                        }
-                                                                        type="submit"
-                                                                    >
-                                                                        Marcar pagado
-                                                                    </button>
-                                                                </form>
-                                                            )}
+                                                <span>
+                                                    {formatDateRange(
+                                                        registration
+                                                            .tournament
+                                                            ?.fecha_inicio,
+                                                        registration
+                                                            .tournament
+                                                            ?.fecha_fin,
+                                                    )}
+                                                </span>
+                                            </div>
 
-                                                        {isPaid &&
-                                                            !isCancelled && (
-                                                                <RegistrationMutationForm
-                                                                    action={
-                                                                        markPaymentPendingAction
-                                                                    }
-                                                                    registrationId={
-                                                                        registration.id
-                                                                    }
-                                                                    returnTo={
-                                                                        returnTo
-                                                                    }
-                                                                    confirmation="¿Quieres desmarcar este pago y devolverlo a estado pendiente?"
-                                                                >
-                                                                    Desmarcar pago
-                                                                </RegistrationMutationForm>
-                                                            )}
+                                            <div>
+                                                <Trophy
+                                                    size={14}
+                                                    aria-hidden="true"
+                                                />
 
-                                                        {registrationState ===
-                                                            "pendiente_pago" &&
-                                                            isPaid &&
-                                                            Boolean(
-                                                                registration
-                                                                    .pair
-                                                                    ?.player_2_id,
-                                                            ) && (
-                                                                <form
-                                                                    action={
-                                                                        confirmRegistrationAction
-                                                                    }
-                                                                >
-                                                                    <input
-                                                                        type="hidden"
-                                                                        name="registrationId"
-                                                                        value={
-                                                                            registration.id
-                                                                        }
-                                                                    />
+                                                <span>
+                                                    {categoryName}
+                                                </span>
+                                            </div>
+                                        </div>
 
-                                                                    <input
-                                                                        type="hidden"
-                                                                        name="returnTo"
-                                                                        value={
-                                                                            returnTo
-                                                                        }
-                                                                    />
+                                        <div
+                                            className={
+                                                styles.detailsGrid
+                                            }
+                                        >
+                                            <div
+                                                className={
+                                                    styles.detail
+                                                }
+                                            >
+                                                <span>
+                                                    JUGADOR
+                                                </span>
 
-                                                                    <button
-                                                                        className={
-                                                                            styles.smallButton
-                                                                        }
-                                                                        type="submit"
-                                                                    >
-                                                                        Confirmar inscripción
-                                                                    </button>
-                                                                </form>
-                                                            )}
+                                                <strong>
+                                                    {
+                                                        getPlayerName(
+                                                            player,
+                                                        )
+                                                    }
+                                                </strong>
 
-                                                        {registrationState ===
-                                                            "confirmada" &&
-                                                            !registration.checked_in && (
-                                                                <form
-                                                                    action={
-                                                                        checkInAction
-                                                                    }
-                                                                >
-                                                                    <input
-                                                                        type="hidden"
-                                                                        name="registrationId"
-                                                                        value={
-                                                                            registration.id
-                                                                        }
-                                                                    />
+                                                <small>
+                                                    Jugador
+                                                    inscrito
+                                                </small>
+                                            </div>
 
-                                                                    <input
-                                                                        type="hidden"
-                                                                        name="returnTo"
-                                                                        value={
-                                                                            returnTo
-                                                                        }
-                                                                    />
+                                            <div
+                                                className={
+                                                    styles.detail
+                                                }
+                                            >
+                                                <span>
+                                                    PAREJA
+                                                </span>
 
-                                                                    <button
-                                                                        className={
-                                                                            styles.smallButton
-                                                                        }
-                                                                        type="submit"
-                                                                    >
-                                                                        Registrar check-in
-                                                                    </button>
-                                                                </form>
-                                                            )}
+                                                <strong>
+                                                    {partner
+                                                        ? getPlayerName(
+                                                            partner,
+                                                        )
+                                                        : "Sin pareja"}
+                                                </strong>
 
-                                                        {registrationState ===
-                                                            "lista_espera" &&
-                                                            registration
-                                                                .pair
-                                                                ?.player_1_id &&
-                                                            registration
-                                                                .pair
-                                                                ?.player_2_id && (
-                                                                <RegistrationMutationForm
-                                                                    action={
-                                                                        promoteWaitingRegistrationAction
-                                                                    }
-                                                                    registrationId={
-                                                                        registration.id
-                                                                    }
-                                                                    returnTo={
-                                                                        returnTo
-                                                                    }
-                                                                    confirmation="¿Confirmas promover esta pareja a pendiente de pago? Solo se completará si hay cupo y se cumplen las condiciones operativas del torneo."
-                                                                >
-                                                                    Promover
-                                                                </RegistrationMutationForm>
-                                                            )}
+                                                <small>
+                                                    {partner
+                                                        ? "Pareja asociada"
+                                                        : "Buscando pareja o pendiente de completar"}
+                                                </small>
+                                            </div>
 
-                                                        {[
-                                                            "pendiente_pago",
-                                                            "confirmada",
-                                                        ].includes(
-                                                            registrationState,
-                                                        ) &&
-                                                            !registration.checked_in && (
-                                                                <RegistrationMutationForm
-                                                                    action={
-                                                                        moveRegistrationToWaitingListAction
-                                                                    }
-                                                                    registrationId={
-                                                                        registration.id
-                                                                    }
-                                                                    returnTo={
-                                                                        returnTo
-                                                                    }
-                                                                    confirmation="¿Confirmas mover esta inscripción a lista de espera?"
-                                                                >
-                                                                    Mover a espera
-                                                                </RegistrationMutationForm>
-                                                            )}
+                                            <div
+                                                className={
+                                                    styles.detail
+                                                }
+                                            >
+                                                <span>
+                                                    INSCRITO EL
+                                                </span>
 
-                                                        {!isCancelled && (
-                                                            <RegistrationMutationForm
-                                                                action={
-                                                                    cancelRegistrationAction
-                                                                }
-                                                                registrationId={
-                                                                    registration.id
-                                                                }
-                                                                returnTo={
-                                                                    returnTo
-                                                                }
-                                                                confirmation="¿Confirmas cancelar esta inscripción? Se conservará el historial y la cancelación no inicia ningún reembolso."
-                                                            >
-                                                                Cancelar
-                                                            </RegistrationMutationForm>
-                                                        )}
+                                                <strong>
+                                                    {formatDate(
+                                                        pair?.fecha_inscripcion,
+                                                    )}
+                                                </strong>
 
-                                                        <Link
-                                                            className={
-                                                                styles.quietButton
-                                                            }
-                                                            href={`/admin/inscripciones/${registration.id}`}
-                                                        >
-                                                            Ver
-                                                        </Link>
+                                                <small>
+                                                    Fecha de registro
+                                                </small>
+                                            </div>
+
+                                            <div
+                                                className={
+                                                    styles.detail
+                                                }
+                                            >
+                                                <span>
+                                                    PAGO
+                                                </span>
+
+                                                <strong>
+                                                    {getPaymentLabel(
+                                                        paymentStatus,
+                                                    )}
+                                                </strong>
+
+                                                <small>
+                                                    Pago presencial
+                                                </small>
+                                            </div>
+                                        </div>
+
+                                        {paymentStatus ===
+                                            "pendiente" &&
+                                            !isCancelled && (
+                                                <div
+                                                    className={
+                                                        styles.paymentNotice
+                                                    }
+                                                >
+                                                    <CircleDollarSign
+                                                        size={17}
+                                                        aria-hidden="true"
+                                                    />
+
+                                                    <div>
+                                                        <strong>
+                                                            Pago presencial
+                                                            pendiente
+                                                        </strong>
+
+                                                        <p>
+                                                            El pago de la
+                                                            inscripción se
+                                                            realizará de forma
+                                                            presencial. La
+                                                            organización
+                                                            verificará
+                                                            manualmente el
+                                                            pago.
+                                                        </p>
                                                     </div>
-                                                </td>
-                                            </tr>
-                                        );
-                                    },
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                                                </div>
+                                            )}
+
+                                        {registration.estado ===
+                                            "lista_espera" &&
+                                            !isCancelled && (
+                                                <div
+                                                    className={
+                                                        styles.waitingNotice
+                                                    }
+                                                >
+                                                    <Clock3
+                                                        size={17}
+                                                        aria-hidden="true"
+                                                    />
+
+                                                    <div>
+                                                        <strong>
+                                                            Estás en lista de
+                                                            espera
+                                                        </strong>
+
+                                                        <p>
+                                                            La organización
+                                                            gestionará las
+                                                            plazas disponibles
+                                                            y podrá promocionar
+                                                            la inscripción
+                                                            cuando corresponda.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                        {registration.checked_in &&
+                                            !isCancelled && (
+                                                <div
+                                                    className={
+                                                        styles.paymentNotice
+                                                    }
+                                                >
+                                                    <CheckCircle2
+                                                        size={17}
+                                                        aria-hidden="true"
+                                                    />
+
+                                                    <div>
+                                                        <strong>
+                                                            Check-in realizado
+                                                        </strong>
+
+                                                        <p>
+                                                            La organización ha
+                                                            registrado tu
+                                                            llegada al torneo.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                        <footer
+                                            className={
+                                                styles.cardFooter
+                                            }
+                                        >
+                                            <div
+                                                className={
+                                                    styles.footerInfo
+                                                }
+                                            >
+                                                {registration
+                                                    .tournament
+                                                    ?.club_id ? (
+                                                    <>
+                                                        <MapPin
+                                                            size={13}
+                                                            aria-hidden="true"
+                                                        />
+
+                                                        <span>
+                                                            Consulta los
+                                                            detalles del
+                                                            torneo.
+                                                        </span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Info
+                                                            size={13}
+                                                            aria-hidden="true"
+                                                        />
+
+                                                        <span>
+                                                            Inscripción
+                                                            registrada en
+                                                            Sagunto Padel
+                                                            Cup.
+                                                        </span>
+                                                    </>
+                                                )}
+                                            </div>
+
+                                            <div
+                                                className={
+                                                    styles.cardActions
+                                                }
+                                            >
+                                                {registration
+                                                    .tournament
+                                                    ?.slug && (
+                                                        <Link
+                                                            href={`/torneos/${registration.tournament.slug}`}
+                                                            className={
+                                                                styles.secondaryButton
+                                                            }
+                                                        >
+                                                            Ver torneo
+
+                                                            <ArrowRight
+                                                                size={14}
+                                                                aria-hidden="true"
+                                                            />
+                                                        </Link>
+                                                    )}
+
+                                                {canCancel &&
+                                                    !isCancelled && (
+                                                        <CancelRegistrationButton
+                                                            registrationId={
+                                                                registration.id
+                                                            }
+                                                        />
+                                                    )}
+                                            </div>
+                                        </footer>
+                                    </article>
+                                );
+                            },
+                        )}
+                    </section>
                 )}
-            </section>
+
+                <div
+                    className={
+                        styles.bottomHelp
+                    }
+                >
+                    <Users
+                        size={19}
+                        aria-hidden="true"
+                    />
+
+                    <div>
+                        <strong>
+                            ¿Necesitas ayuda con tu
+                            inscripción?
+                        </strong>
+
+                        <p>
+                            Si necesitas modificar
+                            tu pareja, categoría o
+                            resolver cualquier duda,
+                            contacta con la
+                            organización.
+                        </p>
+                    </div>
+
+                    <Link href="/contacto">
+                        Contactar
+
+                        <ArrowRight
+                            size={14}
+                            aria-hidden="true"
+                        />
+                    </Link>
+                </div>
+            </div>
         </main>
     );
 }

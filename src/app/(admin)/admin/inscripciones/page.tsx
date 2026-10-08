@@ -5,6 +5,7 @@ import type {
 } from "@/types/database";
 
 import {
+    getAdminPlayersByIds,
     getAdminRegistrations,
     getCategories,
 } from "@/lib/services/admin";
@@ -105,28 +106,41 @@ function getBadgeTone(
 function getPaymentLabel(
     status: string | undefined,
 ): string {
-    if (
-        status ===
-        "verificado"
-    ) {
-        return "Pagado";
+    switch (status) {
+        case "verificado":
+            return "Pagado";
+
+        case "rechazado":
+            return "Rechazado";
+
+        case "no_aplicable":
+            return "No aplicable";
+
+        default:
+            return "Pendiente";
+    }
+}
+
+function getPlayerFullName(
+    player:
+        | {
+            nombre: string;
+            apellidos?: string | null;
+        }
+        | null
+        | undefined,
+): string {
+    if (!player) {
+        return "";
     }
 
-    if (
-        status ===
-        "rechazado"
-    ) {
-        return "Rechazado";
-    }
-
-    if (
-        status ===
-        "no_aplicable"
-    ) {
-        return "No aplicable";
-    }
-
-    return "Pendiente";
+    return [
+        player.nombre,
+        player.apellidos,
+    ]
+        .filter(Boolean)
+        .join(" ")
+        .trim();
 }
 
 export default async function AdminRegistrationsPage({
@@ -193,6 +207,67 @@ export default async function AdminRegistrationsPage({
                 payment,
         });
 
+    /*
+     * -----------------------------------------------------------------------
+     * OBTENER LOS DOS JUGADORES DE CADA PAREJA
+     * -----------------------------------------------------------------------
+     *
+     * getAdminRegistrations() ya nos devuelve registration.pair.
+     * El servicio también devuelve registration.player, pero ese campo
+     * representa el jugador principal (player_1).
+     *
+     * Para el panel administrativo necesitamos mostrar ambos jugadores.
+     */
+
+    const playerIds =
+        Array.from(
+            new Set(
+                allRegistrations.flatMap(
+                    (
+                        registration,
+                    ) => [
+                        registration
+                            .pair
+                            ?.player_1_id,
+                        registration
+                            .pair
+                            ?.player_2_id,
+                    ].filter(
+                        (
+                            id,
+                        ): id is string =>
+                            Boolean(id),
+                    ),
+                ),
+            ),
+        );
+
+    const adminPlayers =
+        await getAdminPlayersByIds(
+            playerIds,
+        );
+
+    const playersMap =
+        new Map(
+            adminPlayers.map(
+                (player) => [
+                    player.id,
+                    player,
+                ],
+            ),
+        );
+
+    /*
+     * -----------------------------------------------------------------------
+     * BÚSQUEDA
+     * -----------------------------------------------------------------------
+     *
+     * La búsqueda encuentra:
+     * - jugador 1
+     * - jugador 2
+     * - nombre del torneo
+     */
+
     const query =
         search.toLocaleLowerCase(
             "es",
@@ -207,18 +282,57 @@ export default async function AdminRegistrationsPage({
                     return true;
                 }
 
-                const playerName =
-                    `${registration.player?.nombre ?? ""} ${registration.player?.apellidos ?? ""}`;
+                const player1 =
+                    registration
+                        .pair
+                        ?.player_1_id
+                        ? playersMap.get(
+                            registration
+                                .pair
+                                .player_1_id,
+                        )
+                        : null;
 
-                return `${playerName} ${registration.tournament?.nombre ?? ""}`
-                    .toLocaleLowerCase(
-                        "es",
-                    )
-                    .includes(
-                        query,
-                    );
+                const player2 =
+                    registration
+                        .pair
+                        ?.player_2_id
+                        ? playersMap.get(
+                            registration
+                                .pair
+                                .player_2_id,
+                        )
+                        : null;
+
+                const searchableText =
+                    [
+                        getPlayerFullName(
+                            player1,
+                        ),
+                        getPlayerFullName(
+                            player2,
+                        ),
+                        registration
+                            .tournament
+                            ?.nombre ??
+                        "",
+                    ]
+                        .join(" ")
+                        .toLocaleLowerCase(
+                            "es",
+                        );
+
+                return searchableText.includes(
+                    query,
+                );
             },
         );
+
+    /*
+     * -----------------------------------------------------------------------
+     * FILTROS ACTIVOS
+     * -----------------------------------------------------------------------
+     */
 
     const activeFilters =
         new URLSearchParams();
@@ -298,12 +412,11 @@ export default async function AdminRegistrationsPage({
                         }
                     >
                         Revisa el estado de
-                        las solicitudes,
-                        verifica pagos
+                        las inscripciones,
+                        verifica los pagos
                         presenciales y
-                        registra el check-in
-                        de parejas
-                        confirmadas.
+                        gestiona el check-in
+                        de las parejas.
                     </p>
                 </div>
 
@@ -330,8 +443,8 @@ export default async function AdminRegistrationsPage({
                         }
                         role="status"
                     >
-                        La inscripción se
-                        ha actualizado.
+                        La inscripción se ha
+                        actualizado correctamente.
                     </p>
                 )}
 
@@ -341,9 +454,9 @@ export default async function AdminRegistrationsPage({
                         className={`${styles.feedback} ${styles.danger}`}
                         role="alert"
                     >
-                        No se pudo completar
-                        la operación.
-                        Comprueba el estado y
+                        No se pudo completar la
+                        operación. Comprueba el
+                        estado de la inscripción y
                         vuelve a intentarlo.
                     </p>
                 )}
@@ -354,14 +467,12 @@ export default async function AdminRegistrationsPage({
                         className={`${styles.feedback} ${styles.warning}`}
                         role="note"
                     >
-                        La promoción es
-                        manual: selecciona
-                        una pareja concreta.
-                        No hay una prioridad
-                        oficial documentada,
-                        por lo que la lista
-                        no se promueve
-                        automáticamente.
+                        La promoción es manual.
+                        Selecciona una pareja
+                        concreta. No se aplica
+                        ninguna prioridad
+                        automática no definida por
+                        el reglamento.
                     </p>
                 )}
 
@@ -397,7 +508,7 @@ export default async function AdminRegistrationsPage({
                             defaultValue={
                                 search
                             }
-                            placeholder="Jugador o torneo"
+                            placeholder="Jugador, pareja o torneo"
                         />
                     </div>
 
@@ -421,8 +532,7 @@ export default async function AdminRegistrationsPage({
                             }
                         >
                             <option value="">
-                                Todos los
-                                torneos
+                                Todos los torneos
                             </option>
 
                             {tournaments.map(
@@ -619,6 +729,7 @@ export default async function AdminRegistrationsPage({
                         <h2>
                             {search ||
                                 tournamentId ||
+                                categoryId ||
                                 status ||
                                 payment
                                 ? "No hay resultados"
@@ -628,6 +739,7 @@ export default async function AdminRegistrationsPage({
                         <p>
                             {search ||
                                 tournamentId ||
+                                categoryId ||
                                 status ||
                                 payment
                                 ? "Cambia o limpia los filtros para consultar otras inscripciones."
@@ -683,6 +795,9 @@ export default async function AdminRegistrationsPage({
                                     (
                                         registration,
                                     ) => {
+                                        const pair =
+                                            registration.pair;
+
                                         const registrationState =
                                             registration.estado;
 
@@ -690,10 +805,45 @@ export default async function AdminRegistrationsPage({
                                             registration.payment_status ??
                                             "pendiente";
 
-                                        const playerName =
-                                            registration.player
-                                                ? `${registration.player.nombre} ${registration.player.apellidos}`
-                                                : "Jugador sin perfil";
+                                        const player1 =
+                                            pair?.player_1_id
+                                                ? playersMap.get(
+                                                    pair.player_1_id,
+                                                )
+                                                : null;
+
+                                        const player2 =
+                                            pair?.player_2_id
+                                                ? playersMap.get(
+                                                    pair.player_2_id,
+                                                )
+                                                : null;
+
+                                        const player1Name =
+                                            getPlayerFullName(
+                                                player1,
+                                            ) ||
+                                            "Jugador sin perfil";
+
+                                        const player2Name =
+                                            getPlayerFullName(
+                                                player2,
+                                            );
+
+                                        const categoryIdForRegistration =
+                                            registration.categoria_id ??
+                                            pair?.categoria_id;
+
+                                        const categoryName =
+                                            categories.find(
+                                                (
+                                                    category,
+                                                ) =>
+                                                    category.id ===
+                                                    categoryIdForRegistration,
+                                            )
+                                                ?.nombre ??
+                                            "Sin categoría";
 
                                         return (
                                             <tr
@@ -709,21 +859,31 @@ export default async function AdminRegistrationsPage({
                                                         href={`/admin/inscripciones/${registration.id}`}
                                                     >
                                                         {
-                                                            playerName
+                                                            player1Name
                                                         }
                                                     </Link>
 
-                                                    <span
-                                                        className={
-                                                            styles.secondaryText
-                                                        }
-                                                    >
-                                                        {registration
-                                                            .pair
-                                                            ?.player_2_id
-                                                            ? "Inscripción en pareja"
-                                                            : "Inscripción individual"}
-                                                    </span>
+                                                    {player2Name ? (
+                                                        <span
+                                                            className={
+                                                                styles.secondaryText
+                                                            }
+                                                        >
+                                                            +{" "}
+                                                            {
+                                                                player2Name
+                                                            }
+                                                        </span>
+                                                    ) : (
+                                                        <span
+                                                            className={
+                                                                styles.secondaryText
+                                                            }
+                                                        >
+                                                            Sin pareja
+                                                            todavía
+                                                        </span>
+                                                    )}
                                                 </td>
 
                                                 <td>
@@ -736,18 +896,9 @@ export default async function AdminRegistrationsPage({
                                                 </td>
 
                                                 <td>
-                                                    {categories.find(
-                                                        (
-                                                            category,
-                                                        ) =>
-                                                            category.id ===
-                                                            (registration.categoria_id ??
-                                                                registration
-                                                                    .pair
-                                                                    ?.categoria_id),
-                                                    )
-                                                        ?.nombre ??
-                                                        "Sin categoría"}
+                                                    {
+                                                        categoryName
+                                                    }
                                                 </td>
 
                                                 <td>
@@ -800,9 +951,11 @@ export default async function AdminRegistrationsPage({
                                                             styles.rowActions
                                                         }
                                                     >
-                                                        {/* ---------------------------------------------------------------- */}
-                                                        {/* PAGO PRESENCIAL                                               */}
-                                                        {/* ---------------------------------------------------------------- */}
+                                                        {/*
+                                                         * ================================================================
+                                                         * PAGO PRESENCIAL
+                                                         * ================================================================
+                                                         */}
 
                                                         {paymentState !==
                                                             "verificado" &&
@@ -837,7 +990,7 @@ export default async function AdminRegistrationsPage({
                                                                             styles.inlineSelect
                                                                         }
                                                                         name="method"
-                                                                        aria-label={`Método de pago de ${playerName}`}
+                                                                        aria-label={`Método de pago de ${player1Name}`}
                                                                         defaultValue="fisico"
                                                                     >
                                                                         <option value="fisico">
@@ -886,9 +1039,11 @@ export default async function AdminRegistrationsPage({
                                                                 </RegistrationMutationForm>
                                                             )}
 
-                                                        {/* ---------------------------------------------------------------- */}
-                                                        {/* CHECK-IN                                                       */}
-                                                        {/* ---------------------------------------------------------------- */}
+                                                        {/*
+                                                         * ================================================================
+                                                         * CHECK-IN
+                                                         * ================================================================
+                                                         */}
 
                                                         {registrationState ===
                                                             "confirmada" &&
@@ -926,9 +1081,11 @@ export default async function AdminRegistrationsPage({
                                                                 </form>
                                                             )}
 
-                                                        {/* ---------------------------------------------------------------- */}
-                                                        {/* CONFIRMAR INSCRIPCIÓN                                         */}
-                                                        {/* ---------------------------------------------------------------- */}
+                                                        {/*
+                                                         * ================================================================
+                                                         * CONFIRMAR INSCRIPCIÓN
+                                                         * ================================================================
+                                                         */}
 
                                                         {registrationState ===
                                                             "pendiente_pago" &&
@@ -938,9 +1095,7 @@ export default async function AdminRegistrationsPage({
                                                             ].includes(
                                                                 paymentState,
                                                             ) &&
-                                                            registration
-                                                                .pair
-                                                                ?.player_2_id && (
+                                                            pair?.player_2_id && (
                                                                 <form
                                                                     action={
                                                                         confirmRegistrationAction
@@ -974,18 +1129,16 @@ export default async function AdminRegistrationsPage({
                                                                 </form>
                                                             )}
 
-                                                        {/* ---------------------------------------------------------------- */}
-                                                        {/* LISTA DE ESPERA                                               */}
-                                                        {/* ---------------------------------------------------------------- */}
+                                                        {/*
+                                                         * ================================================================
+                                                         * LISTA DE ESPERA
+                                                         * ================================================================
+                                                         */}
 
                                                         {registrationState ===
                                                             "lista_espera" &&
-                                                            registration
-                                                                .pair
-                                                                ?.player_1_id &&
-                                                            registration
-                                                                .pair
-                                                                .player_2_id && (
+                                                            pair?.player_1_id &&
+                                                            pair?.player_2_id && (
                                                                 <RegistrationMutationForm
                                                                     action={
                                                                         promoteWaitingRegistrationAction
@@ -1027,9 +1180,11 @@ export default async function AdminRegistrationsPage({
                                                                 </RegistrationMutationForm>
                                                             )}
 
-                                                        {/* ---------------------------------------------------------------- */}
-                                                        {/* CANCELACIÓN                                                    */}
-                                                        {/* ---------------------------------------------------------------- */}
+                                                        {/*
+                                                         * ================================================================
+                                                         * CANCELAR
+                                                         * ================================================================
+                                                         */}
 
                                                         {registrationState !==
                                                             "cancelada" && (
@@ -1043,7 +1198,7 @@ export default async function AdminRegistrationsPage({
                                                                     returnTo={
                                                                         returnTo
                                                                     }
-                                                                    confirmation="¿Confirmas cancelar esta inscripción? Se conservará el historial y cualquier pago verificado; esta acción no inicia un reembolso. La cancelación se bloquea si ya hay check-in, el torneo empezó o la pareja tiene partidos."
+                                                                    confirmation="¿Confirmas cancelar esta inscripción? Se conservará el historial y cualquier pago verificado; esta acción no inicia ningún reembolso."
                                                                 >
                                                                     Cancelar
                                                                 </RegistrationMutationForm>

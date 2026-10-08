@@ -146,12 +146,26 @@ function isActiveStatus(estado: RegistrationStatus): boolean {
 }
 
 function getPaymentStatus(
-    registration: Pick<Registration, "fecha_pago" | "metodo_pago" | "payment_status">,
+    registration: Pick<
+        Registration,
+        "fecha_pago" | "metodo_pago" | "payment_status"
+    >,
 ): PaymentStatus {
-    if (registration.payment_status === "verificado") return "verificado";
-    if (registration.payment_status === "rechazado") return "rechazado";
-    if (registration.payment_status === "no_aplicable") return "no_aplicable";
-    return registration.fecha_pago ? "verificado" : "pendiente";
+    if (registration.payment_status === "verificado") {
+        return "verificado";
+    }
+
+    if (registration.payment_status === "rechazado") {
+        return "rechazado";
+    }
+
+    if (registration.payment_status === "no_aplicable") {
+        return "no_aplicable";
+    }
+
+    return registration.fecha_pago
+        ? "verificado"
+        : "pendiente";
 }
 
 function withComputedFields(
@@ -169,13 +183,25 @@ function withComputedFields(
 
     return {
         ...registration,
-        ...(categoryId ? { categoria_id: categoryId } : {}),
-        payment_status: getPaymentStatus(registration),
-        pair: relations?.pair ?? null,
-        player: relations?.player ?? null,
-        tournament: relations?.tournament ?? null,
+        ...(categoryId
+            ? {
+                categoria_id: categoryId,
+            }
+            : {}),
+        payment_status:
+            getPaymentStatus(registration),
+        pair:
+            relations?.pair ??
+            null,
+        player:
+            relations?.player ??
+            null,
+        tournament:
+            relations?.tournament ??
+            null,
         tournamentCategory:
-            relations?.tournamentCategory ?? null,
+            relations?.tournamentCategory ??
+            null,
     };
 }
 
@@ -196,10 +222,16 @@ async function getPairIdsForPlayer(
         );
 
     if (tournamentId) {
-        query = query.eq("tournament_id", tournamentId);
+        query = query.eq(
+            "tournament_id",
+            tournamentId,
+        );
     }
 
-    const { data, error } = await query;
+    const {
+        data,
+        error,
+    } = await query;
 
     if (error) {
         throw new Error(
@@ -207,7 +239,9 @@ async function getPairIdsForPlayer(
         );
     }
 
-    return (data ?? []).map((pair) => pair.id);
+    return (data ?? []).map(
+        (pair) => pair.id,
+    );
 }
 
 async function enrichRegistrations(
@@ -222,7 +256,10 @@ async function enrichRegistrations(
     const pairIds = Array.from(
         new Set(
             registrations
-                .map((registration) => registration.pair_id)
+                .map(
+                    (registration) =>
+                        registration.pair_id,
+                )
                 .filter(Boolean),
         ),
     );
@@ -230,7 +267,10 @@ async function enrichRegistrations(
     const tournamentIds = Array.from(
         new Set(
             registrations
-                .map((registration) => registration.tournament_id)
+                .map(
+                    (registration) =>
+                        registration.tournament_id,
+                )
                 .filter(Boolean),
         ),
     );
@@ -244,14 +284,23 @@ async function enrichRegistrations(
                 .from("pairs")
                 .select("*")
                 .in("id", pairIds)
-            : Promise.resolve({ data: [], error: null }),
+            : Promise.resolve({
+                data: [],
+                error: null,
+            }),
 
         tournamentIds.length > 0
             ? supabase
                 .from("tournaments")
                 .select("*")
-                .in("id", tournamentIds)
-            : Promise.resolve({ data: [], error: null }),
+                .in(
+                    "id",
+                    tournamentIds,
+                )
+            : Promise.resolve({
+                data: [],
+                error: null,
+            }),
     ]);
 
     if (pairsResult.error) {
@@ -266,22 +315,42 @@ async function enrichRegistrations(
         );
     }
 
-    const pairs = (pairsResult.data ?? []) as Pair[];
+    const pairs =
+        (pairsResult.data ?? []) as Pair[];
+
     const tournaments =
         (tournamentsResult.data ?? []) as Tournament[];
 
     const categoryIds = Array.from(
-        new Set(pairs.map((pair) => pair.categoria_id)),
+        new Set(
+            pairs.map(
+                (pair) =>
+                    pair.categoria_id,
+            ),
+        ),
     );
 
-    const tournamentCategoryMap = new Map<string, TournamentCategory>();
+    const tournamentCategoryMap =
+        new Map<string, TournamentCategory>();
 
-    if (categoryIds.length > 0 && tournamentIds.length > 0) {
-        const { data, error } = await supabase
+    if (
+        categoryIds.length > 0 &&
+        tournamentIds.length > 0
+    ) {
+        const {
+            data,
+            error,
+        } = await supabase
             .from("tournament_categories")
             .select("*")
-            .in("tournament_id", tournamentIds)
-            .in("categoria_id", categoryIds);
+            .in(
+                "tournament_id",
+                tournamentIds,
+            )
+            .in(
+                "categoria_id",
+                categoryIds,
+            );
 
         if (error) {
             throw new Error(
@@ -289,7 +358,10 @@ async function enrichRegistrations(
             );
         }
 
-        for (const item of (data ?? []) as TournamentCategory[]) {
+        for (
+            const item of
+            (data ?? []) as TournamentCategory[]
+        ) {
             tournamentCategoryMap.set(
                 `${item.tournament_id}:${item.categoria_id}`,
                 item,
@@ -299,21 +371,35 @@ async function enrichRegistrations(
 
     const playerIds = Array.from(
         new Set(
-            pairs.flatMap((pair) =>
-                [pair.player_1_id, pair.player_2_id].filter(
-                    (id): id is string => Boolean(id),
-                ),
+            pairs.flatMap(
+                (pair) =>
+                    [
+                        pair.player_1_id,
+                        pair.player_2_id,
+                    ].filter(
+                        (
+                            id,
+                        ): id is string =>
+                            Boolean(id),
+                    ),
             ),
         ),
     );
 
-    const playersMap = new Map<string, Player>();
+    const playersMap =
+        new Map<string, Player>();
 
     if (playerIds.length > 0) {
-        const { data, error } = await supabase
+        const {
+            data,
+            error,
+        } = await supabase
             .from("players")
             .select("*")
-            .in("id", playerIds);
+            .in(
+                "id",
+                playerIds,
+            );
 
         if (error) {
             throw new Error(
@@ -321,54 +407,90 @@ async function enrichRegistrations(
             );
         }
 
-        for (const player of (data ?? []) as Player[]) {
-            playersMap.set(player.id, player);
+        for (
+            const player of
+            (data ?? []) as Player[]
+        ) {
+            playersMap.set(
+                player.id,
+                player,
+            );
         }
     }
 
     const pairsMap = new Map(
-        pairs.map((pair) => [pair.id, pair]),
+        pairs.map(
+            (pair) => [
+                pair.id,
+                pair,
+            ],
+        ),
     );
 
     const tournamentsMap = new Map(
-        tournaments.map((tournament) => [
-            tournament.id,
-            tournament,
-        ]),
+        tournaments.map(
+            (tournament) => [
+                tournament.id,
+                tournament,
+            ],
+        ),
     );
 
-    return registrations.map((registration) => {
-        const pair = pairsMap.get(registration.pair_id) ?? null;
-        const tournament =
-            tournamentsMap.get(registration.tournament_id) ?? null;
+    return registrations.map(
+        (registration) => {
+            const pair =
+                pairsMap.get(
+                    registration.pair_id,
+                ) ?? null;
 
-        const categoryId = pair?.categoria_id ?? null;
+            const tournament =
+                tournamentsMap.get(
+                    registration.tournament_id,
+                ) ?? null;
 
-        const tournamentCategory =
-            pair && categoryId
-                ? tournamentCategoryMap.get(
-                    `${registration.tournament_id}:${categoryId}`,
-                ) ?? null
-                : null;
+            const categoryId =
+                pair?.categoria_id ??
+                null;
 
-        const player =
-            pair?.player_1_id
-                ? playersMap.get(pair.player_1_id) ?? null
-                : null;
+            const tournamentCategory =
+                pair && categoryId
+                    ? tournamentCategoryMap.get(
+                        `${registration.tournament_id}:${categoryId}`,
+                    ) ?? null
+                    : null;
 
-        return withComputedFields(registration, {
-            pair,
-            player,
-            tournament,
-            tournamentCategory,
-        });
-    });
+            const player =
+                pair?.player_1_id
+                    ? playersMap.get(
+                        pair.player_1_id,
+                    ) ?? null
+                    : null;
+
+            return withComputedFields(
+                registration,
+                {
+                    pair,
+                    player,
+                    tournament,
+                    tournamentCategory,
+                },
+            );
+        },
+    );
 }
 
 function normalizePartnerAvailability(
-    value: PartnerAvailability | null | undefined,
+    value:
+        | PartnerAvailability
+        | null
+        | undefined,
 ): PartnerAvailability {
-    if (value && PARTNER_POOL_AVAILABILITY.includes(value)) {
+    if (
+        value &&
+        PARTNER_POOL_AVAILABILITY.includes(
+            value,
+        )
+    ) {
         return value;
     }
 
@@ -409,9 +531,12 @@ export async function getRegistrations(
     let query = supabase
         .from("registrations")
         .select("*")
-        .order("updated_at", {
-            ascending: false,
-        });
+        .order(
+            "updated_at",
+            {
+                ascending: false,
+            },
+        );
 
     if (filters.tournamentId) {
         query = query.eq(
@@ -435,10 +560,11 @@ export async function getRegistrations(
     }
 
     if (filters.playerId) {
-        const pairIds = await getPairIdsForPlayer(
-            filters.playerId,
-            filters.tournamentId,
-        );
+        const pairIds =
+            await getPairIdsForPlayer(
+                filters.playerId,
+                filters.tournamentId,
+            );
 
         if (pairIds.length === 0) {
             return [];
@@ -450,7 +576,10 @@ export async function getRegistrations(
         );
     }
 
-    const { data, error } = await query;
+    const {
+        data,
+        error,
+    } = await query;
 
     if (error) {
         throw new Error(
@@ -461,24 +590,29 @@ export async function getRegistrations(
     const registrations =
         (data ?? []) as Registration[];
 
-    let enriched = await enrichRegistrations(
-        registrations,
-    );
+    let enriched =
+        await enrichRegistrations(
+            registrations,
+        );
 
     if (filters.categoryId) {
-        enriched = enriched.filter(
-            (registration) =>
-                registration.categoria_id ===
-                filters.categoryId,
-        );
+        enriched =
+            enriched.filter(
+                (registration) =>
+                    registration.categoria_id ===
+                    filters.categoryId,
+            );
     }
 
     if (filters.paymentStatus) {
-        enriched = enriched.filter(
-            (registration) =>
-                getPaymentStatus(registration) ===
-                filters.paymentStatus,
-        );
+        enriched =
+            enriched.filter(
+                (registration) =>
+                    getPaymentStatus(
+                        registration,
+                    ) ===
+                    filters.paymentStatus,
+            );
     }
 
     return enriched;
@@ -495,12 +629,19 @@ export async function getRegistrationById(
         return null;
     }
 
-    const supabase = await createClient();
+    const supabase =
+        await createClient();
 
-    const { data, error } = await supabase
+    const {
+        data,
+        error,
+    } = await supabase
         .from("registrations")
         .select("*")
-        .eq("id", registrationId)
+        .eq(
+            "id",
+            registrationId,
+        )
         .maybeSingle();
 
     if (error) {
@@ -513,9 +654,10 @@ export async function getRegistrationById(
         return null;
     }
 
-    const enriched = await enrichRegistrations([
-        data as Registration,
-    ]);
+    const enriched =
+        await enrichRegistrations([
+            data as Registration,
+        ]);
 
     return enriched[0] ?? null;
 }
@@ -524,10 +666,11 @@ export async function getPlayerRegistration(
     playerId: string,
     tournamentId: string,
 ): Promise<RegistrationWithRelationsExtended | null> {
-    const registrations = await getRegistrations({
-        playerId,
-        tournamentId,
-    });
+    const registrations =
+        await getRegistrations({
+            playerId,
+            tournamentId,
+        });
 
     return registrations[0] ?? null;
 }
@@ -548,7 +691,9 @@ export async function hasPlayerRegisteredForTournament(
 
     return Boolean(
         registration &&
-        isActiveStatus(registration.estado),
+        isActiveStatus(
+            registration.estado,
+        ),
     );
 }
 
@@ -557,14 +702,18 @@ export async function hasPlayerRegisteredInCategory(
     tournamentId: string,
     categoryId: string,
 ): Promise<boolean> {
-    const registrations = await getRegistrations({
-        playerId,
-        tournamentId,
-        categoryId,
-    });
+    const registrations =
+        await getRegistrations({
+            playerId,
+            tournamentId,
+            categoryId,
+        });
 
-    return registrations.some((registration) =>
-        isActiveStatus(registration.estado),
+    return registrations.some(
+        (registration) =>
+            isActiveStatus(
+                registration.estado,
+            ),
     );
 }
 
@@ -586,14 +735,22 @@ export async function validatePlayerTournamentEligibility(
         };
     }
 
-    const supabase = await createClient();
+    const supabase =
+        await createClient();
 
-    const { data: player, error: playerError } =
-        await supabase
-            .from("players")
-            .select("id, estado, onboarding_completado")
-            .eq("id", playerId)
-            .maybeSingle();
+    const {
+        data: player,
+        error: playerError,
+    } = await supabase
+        .from("players")
+        .select(
+            "id, estado, onboarding_completado",
+        )
+        .eq(
+            "id",
+            playerId,
+        )
+        .maybeSingle();
 
     if (playerError) {
         throw new Error(
@@ -604,14 +761,16 @@ export async function validatePlayerTournamentEligibility(
     if (!player) {
         return {
             eligible: false,
-            reason: "El jugador no existe.",
+            reason:
+                "El jugador no existe.",
         };
     }
 
     if (player.estado !== "activo") {
         return {
             eligible: false,
-            reason: "El jugador no está activo.",
+            reason:
+                "El jugador no está activo.",
         };
     }
 
@@ -637,7 +796,9 @@ export async function validatePlayerTournamentEligibility(
         };
     }
 
-    return { eligible: true };
+    return {
+        eligible: true,
+    };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -648,10 +809,18 @@ export async function getRegistrationCapacity(
     tournamentId: string,
     categoryId: string,
 ): Promise<RegistrationCapacity> {
-    assertId(tournamentId, "tournamentId");
-    assertId(categoryId, "categoryId");
+    assertId(
+        tournamentId,
+        "tournamentId",
+    );
 
-    const supabase = await createClient();
+    assertId(
+        categoryId,
+        "categoryId",
+    );
+
+    const supabase =
+        await createClient();
 
     const {
         data: tournamentCategory,
@@ -659,8 +828,14 @@ export async function getRegistrationCapacity(
     } = await supabase
         .from("tournament_categories")
         .select("*")
-        .eq("tournament_id", tournamentId)
-        .eq("categoria_id", categoryId)
+        .eq(
+            "tournament_id",
+            tournamentId,
+        )
+        .eq(
+            "categoria_id",
+            categoryId,
+        )
         .maybeSingle();
 
     if (categoryError) {
@@ -675,12 +850,22 @@ export async function getRegistrationCapacity(
         );
     }
 
-    const { data: pairs, error: pairsError } =
-        await supabase
-            .from("pairs")
-            .select("id, estado, player_1_id, player_2_id")
-            .eq("tournament_id", tournamentId)
-            .eq("categoria_id", categoryId);
+    const {
+        data: pairs,
+        error: pairsError,
+    } = await supabase
+        .from("pairs")
+        .select(
+            "id, estado, player_1_id, player_2_id",
+        )
+        .eq(
+            "tournament_id",
+            tournamentId,
+        )
+        .eq(
+            "categoria_id",
+            categoryId,
+        );
 
     if (pairsError) {
         throw new Error(
@@ -688,15 +873,35 @@ export async function getRegistrationCapacity(
         );
     }
 
-    const allPairs = pairs ?? [];
-    const capacityPairs = allPairs.filter(
-        (pair) =>
-            (pair.estado === "confirmada" || pair.estado === "pendiente_pago") &&
-            pair.player_1_id !== null &&
-            pair.player_2_id !== null,
-    );
-    const capacityPairIds = new Set(capacityPairs.map((pair) => pair.id));
-    const pairIds = allPairs.map((pair) => pair.id);
+    const allPairs =
+        pairs ?? [];
+
+    const capacityPairs =
+        allPairs.filter(
+            (pair) =>
+                (
+                    pair.estado ===
+                    "confirmada" ||
+                    pair.estado ===
+                    "pendiente_pago"
+                ) &&
+                pair.player_1_id !== null &&
+                pair.player_2_id !== null,
+        );
+
+    const capacityPairIds =
+        new Set(
+            capacityPairs.map(
+                (pair) =>
+                    pair.id,
+            ),
+        );
+
+    const pairIds =
+        allPairs.map(
+            (pair) =>
+                pair.id,
+        );
 
     if (pairIds.length === 0) {
         return {
@@ -710,15 +915,23 @@ export async function getRegistrationCapacity(
             available:
                 tournamentCategory.cupo_maximo,
             isFull:
-                tournamentCategory.cupo_maximo === 0,
+                tournamentCategory.cupo_maximo ===
+                0,
         };
     }
 
-    const { data: registrations, error } =
-        await supabase
-            .from("registrations")
-            .select("estado, pair_id")
-            .in("pair_id", pairIds);
+    const {
+        data: registrations,
+        error,
+    } = await supabase
+        .from("registrations")
+        .select(
+            "estado, pair_id",
+        )
+        .in(
+            "pair_id",
+            pairIds,
+        );
 
     if (error) {
         throw new Error(
@@ -729,24 +942,40 @@ export async function getRegistrationCapacity(
     const active =
         registrations ?? [];
 
-    const reservations = active.filter(
-        (item) =>
-            capacityPairIds.has(item.pair_id) &&
-            (item.estado === "confirmada" || item.estado === "pendiente_pago"),
-    );
+    const reservations =
+        active.filter(
+            (item) =>
+                capacityPairIds.has(
+                    item.pair_id,
+                ) &&
+                (
+                    item.estado ===
+                    "confirmada" ||
+                    item.estado ===
+                    "pendiente_pago"
+                ),
+        );
 
-    const confirmed = reservations.filter(
-        (item) => item.estado === "confirmada",
-    ).length;
+    const confirmed =
+        reservations.filter(
+            (item) =>
+                item.estado ===
+                "confirmada",
+        ).length;
 
-    const pendingPayment = reservations.filter(
-        (item) => item.estado === "pendiente_pago",
-    ).length;
+    const pendingPayment =
+        reservations.filter(
+            (item) =>
+                item.estado ===
+                "pendiente_pago",
+        ).length;
 
-    const waitingList = active.filter(
-        (item) =>
-            item.estado === "lista_espera",
-    ).length;
+    const waitingList =
+        active.filter(
+            (item) =>
+                item.estado ===
+                "lista_espera",
+        ).length;
 
     const maxCapacity =
         tournamentCategory.cupo_maximo;
@@ -760,7 +989,8 @@ export async function getRegistrationCapacity(
             ? null
             : Math.max(
                 0,
-                maxCapacity - occupied,
+                maxCapacity -
+                occupied,
             );
 
     return {
@@ -786,23 +1016,48 @@ export async function addPlayerToPartnerPool(
         playerId: string;
         tournamentId: string;
         categoryId: string;
-        availability?: PartnerAvailability | null;
+        availability?:
+        | PartnerAvailability
+        | null;
     },
 ): Promise<void> {
-    assertId(input.playerId, "playerId");
-    assertId(input.tournamentId, "tournamentId");
-    assertId(input.categoryId, "categoryId");
+    assertId(
+        input.playerId,
+        "playerId",
+    );
 
-    const supabase = await createClient();
+    assertId(
+        input.tournamentId,
+        "tournamentId",
+    );
 
-    const { data: existing, error: existingError } =
-        await supabase
-            .from("partner_pool")
-            .select("id")
-            .eq("player_id", input.playerId)
-            .eq("tournament_id", input.tournamentId)
-            .eq("categoria_id", input.categoryId)
-            .maybeSingle();
+    assertId(
+        input.categoryId,
+        "categoryId",
+    );
+
+    const supabase =
+        await createClient();
+
+    const {
+        data: existing,
+        error: existingError,
+    } = await supabase
+        .from("partner_pool")
+        .select("id")
+        .eq(
+            "player_id",
+            input.playerId,
+        )
+        .eq(
+            "tournament_id",
+            input.tournamentId,
+        )
+        .eq(
+            "categoria_id",
+            input.categoryId,
+        )
+        .maybeSingle();
 
     if (existingError) {
         throw new Error(
@@ -819,15 +1074,21 @@ export async function addPlayerToPartnerPool(
      * The richer domain availability value is intentionally kept at the
      * service boundary and normalized to "available" here.
      */
-    const { error } = await supabase
-        .from("partner_pool")
-        .insert({
-            player_id: input.playerId,
-            tournament_id: input.tournamentId,
-            categoria_id: input.categoryId,
-            disponible: true,
-            disponibilidad: input.availability ?? "buscando",
-        });
+    const { error } =
+        await supabase
+            .from("partner_pool")
+            .insert({
+                player_id:
+                    input.playerId,
+                tournament_id:
+                    input.tournamentId,
+                categoria_id:
+                    input.categoryId,
+                disponible: true,
+                disponibilidad:
+                    input.availability ??
+                    "buscando",
+            });
 
     if (error) {
         throw new Error(
@@ -841,14 +1102,26 @@ export async function removePlayerFromPartnerPool(
     tournamentId: string,
     categoryId: string,
 ): Promise<void> {
-    const supabase = await createClient();
+    const supabase =
+        await createClient();
 
-    const { error } = await supabase
+    const {
+        error,
+    } = await supabase
         .from("partner_pool")
         .delete()
-        .eq("player_id", playerId)
-        .eq("tournament_id", tournamentId)
-        .eq("categoria_id", categoryId);
+        .eq(
+            "player_id",
+            playerId,
+        )
+        .eq(
+            "tournament_id",
+            tournamentId,
+        )
+        .eq(
+            "categoria_id",
+            categoryId,
+        );
 
     if (error) {
         throw new Error(
@@ -868,9 +1141,13 @@ export async function getPartnerPool(
         availability: PartnerAvailability;
     }>
 > {
-    const supabase = await createClient();
+    const supabase =
+        await createClient();
 
-    const { data, error } = await supabase
+    const {
+        data,
+        error,
+    } = await supabase
         .from("partner_pool")
         .select(
             `
@@ -881,12 +1158,24 @@ export async function getPartnerPool(
             fecha_publicacion
         `,
         )
-        .eq("tournament_id", tournamentId)
-        .eq("categoria_id", categoryId)
-        .eq("disponible", true)
-        .order("fecha_publicacion", {
-            ascending: true,
-        });
+        .eq(
+            "tournament_id",
+            tournamentId,
+        )
+        .eq(
+            "categoria_id",
+            categoryId,
+        )
+        .eq(
+            "disponible",
+            true,
+        )
+        .order(
+            "fecha_publicacion",
+            {
+                ascending: true,
+            },
+        );
 
     if (error) {
         throw new Error(
@@ -894,11 +1183,14 @@ export async function getPartnerPool(
         );
     }
 
-    const playerIds = (data ?? []).map(
-        (item) => item.player_id,
-    );
+    const playerIds =
+        (data ?? []).map(
+            (item) =>
+                item.player_id,
+        );
 
-    const playersMap = new Map<string, Player>();
+    const playersMap =
+        new Map<string, Player>();
 
     if (playerIds.length > 0) {
         const {
@@ -907,7 +1199,10 @@ export async function getPartnerPool(
         } = await supabase
             .from("players")
             .select("*")
-            .in("id", playerIds);
+            .in(
+                "id",
+                playerIds,
+            );
 
         if (playersError) {
             throw new Error(
@@ -915,22 +1210,35 @@ export async function getPartnerPool(
             );
         }
 
-        for (const player of (players ?? []) as Player[]) {
-            playersMap.set(player.id, player);
+        for (
+            const player of
+            (players ?? []) as Player[]
+        ) {
+            playersMap.set(
+                player.id,
+                player,
+            );
         }
     }
 
     return (data ?? []).map(
         (item) => ({
             id: item.id,
-            playerId: item.player_id,
+            playerId:
+                item.player_id,
             player:
-                playersMap.get(item.player_id) ??
-                null,
+                playersMap.get(
+                    item.player_id,
+                ) ?? null,
             availability:
                 normalizePartnerAvailability(
                     item.disponible
-                        ? ((item.disponibilidad ?? "buscando") as PartnerAvailability)
+                        ? (
+                            (
+                                item.disponibilidad ??
+                                "buscando"
+                            ) as PartnerAvailability
+                        )
                         : "no_busca",
                 ),
         }),
@@ -948,17 +1256,27 @@ export async function createIncompletePair(
         playerId: string;
     },
 ): Promise<Pair> {
-    const supabase = await createClient();
+    const supabase =
+        await createClient();
 
-    const { data, error } = await supabase
+    const {
+        data,
+        error,
+    } = await supabase
         .from("pairs")
         .insert({
-            tournament_id: input.tournamentId,
-            categoria_id: input.categoryId,
-            player_1_id: input.playerId,
-            player_2_id: null,
-            estado: "incompleta",
-            cabeza_de_serie: false,
+            tournament_id:
+                input.tournamentId,
+            categoria_id:
+                input.categoryId,
+            player_1_id:
+                input.playerId,
+            player_2_id:
+                null,
+            estado:
+                "incompleta",
+            cabeza_de_serie:
+                false,
         })
         .select("*")
         .single();
@@ -995,17 +1313,27 @@ export async function createCompletePair(
         input.player2Id,
     );
 
-    const supabase = await createClient();
+    const supabase =
+        await createClient();
 
-    const { data, error } = await supabase
+    const {
+        data,
+        error,
+    } = await supabase
         .from("pairs")
         .insert({
-            tournament_id: input.tournamentId,
-            categoria_id: input.categoryId,
-            player_1_id: input.player1Id,
-            player_2_id: input.player2Id,
-            estado: "pendiente_pago",
-            cabeza_de_serie: false,
+            tournament_id:
+                input.tournamentId,
+            categoria_id:
+                input.categoryId,
+            player_1_id:
+                input.player1Id,
+            player_2_id:
+                input.player2Id,
+            estado:
+                "pendiente_pago",
+            cabeza_de_serie:
+                false,
         })
         .select("*")
         .single();
@@ -1022,8 +1350,15 @@ export async function createCompletePair(
 export async function completePair(
     input: CompleteRegistrationInput,
 ): Promise<Pair> {
-    assertId(input.registrationId, "registrationId");
-    assertId(input.partnerId, "partnerId");
+    assertId(
+        input.registrationId,
+        "registrationId",
+    );
+
+    assertId(
+        input.partnerId,
+        "partnerId",
+    );
 
     const registration =
         await getRegistrationById(
@@ -1036,7 +1371,8 @@ export async function completePair(
         );
     }
 
-    const pair = registration.pair;
+    const pair =
+        registration.pair;
 
     if (!pair) {
         throw new Error(
@@ -1046,7 +1382,8 @@ export async function completePair(
 
     if (
         pair.player_2_id &&
-        pair.player_2_id !== input.partnerId
+        pair.player_2_id !==
+        input.partnerId
     ) {
         throw new Error(
             "La pareja ya está completa.",
@@ -1054,7 +1391,8 @@ export async function completePair(
     }
 
     if (
-        pair.player_1_id === input.partnerId
+        pair.player_1_id ===
+        input.partnerId
     ) {
         throw new Error(
             "El jugador ya pertenece a la pareja.",
@@ -1067,37 +1405,88 @@ export async function completePair(
         );
     }
 
+    if (
+        pair.estado !==
+        "incompleta"
+    ) {
+        throw new Error(
+            "Esta pareja ya no está disponible para completarse.",
+        );
+    }
+
     await validatePairPlayers(
         pair.tournament_id,
         pair.player_1_id,
         input.partnerId,
     );
 
-    const supabase = await createClient();
+    const supabase =
+        await createClient();
 
-    const { data, error } = await supabase
-        .from("pairs")
-        .update({
-            player_2_id: input.partnerId,
-            estado: "pendiente_pago",
-        })
-        .eq("id", pair.id)
-        .select("*")
-        .single();
+    /*
+     * El Partner Pool se reclama mediante una función PostgreSQL SECURITY
+     * DEFINER para que la operación sea atómica y pueda retirar del pool a
+     * un jugador distinto del usuario que está completando la pareja.
+     *
+     * No hacemos primero un UPDATE de pairs y después un DELETE de
+     * partner_pool porque dos usuarios podrían intentar seleccionar al mismo
+     * jugador simultáneamente.
+     *
+     * La función de BD hace ambas operaciones dentro de una única transacción
+     * y solamente uno de los intentos puede reclamar la entrada.
+     *
+     * El tipo generado de Supabase puede no contener todavía este RPC.
+     * Por eso el estrechamiento está limitado exclusivamente a esta llamada.
+     */
+    const rpc =
+        supabase.rpc as unknown as (
+            functionName: string,
+            args: {
+                p_pair_id: string;
+                p_partner_id: string;
+            },
+        ) => Promise<{
+            data: unknown;
+            error:
+            | {
+                message: string;
+            }
+            | null;
+        }>;
 
-    if (error) {
+    const {
+        data: claimedData,
+        error: claimError,
+    } = await rpc(
+        "claim_partner_pool_for_pair",
+        {
+            p_pair_id:
+                pair.id,
+            p_partner_id:
+                input.partnerId,
+        },
+    );
+
+    if (claimError) {
         throw new Error(
-            `No se pudo completar la pareja: ${error.message}`,
+            claimError.message,
         );
     }
 
-    await removePlayerFromPartnerPool(
-        input.partnerId,
-        pair.tournament_id,
-        pair.categoria_id,
-    );
+    const claimedPair =
+        Array.isArray(
+            claimedData,
+        )
+            ? claimedData[0]
+            : claimedData;
 
-    return data as Pair;
+    if (!claimedPair) {
+        throw new Error(
+            "El jugador seleccionado ya no está disponible en el Partner Pool.",
+        );
+    }
+
+    return claimedPair as Pair;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1120,15 +1509,21 @@ export async function createIndividualRegistration(
         );
     }
 
-    const supabase = await createClient();
+    const supabase =
+        await createClient();
 
     const {
         data: tournament,
         error: tournamentError,
     } = await supabase
         .from("tournaments")
-        .select("id, estado")
-        .eq("id", input.tournamentId)
+        .select(
+            "id, estado",
+        )
+        .eq(
+            "id",
+            input.tournamentId,
+        )
         .maybeSingle();
 
     if (tournamentError) {
@@ -1156,11 +1551,22 @@ export async function createIndividualRegistration(
         data: tournamentCategory,
         error: categoryError,
     } = await supabase
-        .from("tournament_categories")
+        .from(
+            "tournament_categories",
+        )
         .select("*")
-        .eq("tournament_id", input.tournamentId)
-        .eq("categoria_id", input.categoryId)
-        .eq("enabled", true)
+        .eq(
+            "tournament_id",
+            input.tournamentId,
+        )
+        .eq(
+            "categoria_id",
+            input.categoryId,
+        )
+        .eq(
+            "enabled",
+            true,
+        )
         .maybeSingle();
 
     if (categoryError) {
@@ -1182,17 +1588,26 @@ export async function createIndividualRegistration(
         );
 
     const hasSpace =
-        capacity.maxCapacity === null ||
+        capacity.maxCapacity ===
+        null ||
         (
-            capacity.available !== null &&
+            capacity.available !==
+            null &&
             capacity.available > 0
         );
 
-    const registrationStatus: RegistrationStatus =
+    const registrationStatus:
+        RegistrationStatus =
         hasSpace
             ? "pendiente_pago"
             : "lista_espera";
 
+    /*
+     * Caso 1:
+     * El usuario ya ha elegido directamente a su pareja.
+     *
+     * Aquí NO usamos Partner Pool.
+     */
     if (input.partnerId) {
         const partnerEligibility =
             await validatePlayerTournamentEligibility(
@@ -1200,7 +1615,9 @@ export async function createIndividualRegistration(
                 input.tournamentId,
             );
 
-        if (!partnerEligibility.eligible) {
+        if (
+            !partnerEligibility.eligible
+        ) {
             throw new Error(
                 partnerEligibility.reason ??
                 "El jugador seleccionado como pareja no puede participar.",
@@ -1233,6 +1650,10 @@ export async function createIndividualRegistration(
         });
     }
 
+    /*
+     * Caso 2:
+     * El usuario se inscribe sin pareja.
+     */
     const pair =
         await createIncompletePair({
             tournamentId:
@@ -1257,6 +1678,10 @@ export async function createIndividualRegistration(
                 input.shirtSize,
         });
 
+    /*
+     * Caso 3:
+     * El usuario quiere aparecer en el Partner Pool.
+     */
     if (input.partnerSearch) {
         await addPlayerToPartnerPool({
             playerId:
@@ -1275,14 +1700,23 @@ async function createRegistrationRecord(
     input: {
         tournamentId: string;
         pairId: string;
-        categoryId?: string | null;
-        estado: RegistrationStatus;
-        shirtSize?: string | null;
+        categoryId?:
+        | string
+        | null;
+        estado:
+        RegistrationStatus;
+        shirtSize?:
+        | string
+        | null;
     },
 ): Promise<Registration> {
-    const supabase = await createClient();
+    const supabase =
+        await createClient();
 
-    const { data, error } = await supabase
+    const {
+        data,
+        error,
+    } = await supabase
         .from("registrations")
         .insert({
             tournament_id:
@@ -1290,7 +1724,8 @@ async function createRegistrationRecord(
             pair_id:
                 input.pairId,
             categoria_id:
-                input.categoryId ?? null,
+                input.categoryId ??
+                null,
             estado:
                 input.estado,
             metodo_pago:
@@ -1300,7 +1735,8 @@ async function createRegistrationRecord(
             importe:
                 null,
             talla_camiseta:
-                input.shirtSize ?? null,
+                input.shirtSize ??
+                null,
             qr_code:
                 null,
             checked_in:
@@ -1326,21 +1762,61 @@ export async function updateRegistrationStatus(
     registrationId: string,
     estado: RegistrationStatus,
 ): Promise<Registration> {
-    assertId(registrationId, "registrationId");
+    assertId(
+        registrationId,
+        "registrationId",
+    );
+
     const procedures = {
-        confirmada: "admin_confirm_registration",
-        lista_espera: "admin_move_registration_to_waiting_list",
-        cancelada: "admin_cancel_registration",
+        confirmada:
+            "admin_confirm_registration",
+        lista_espera:
+            "admin_move_registration_to_waiting_list",
+        cancelada:
+            "admin_cancel_registration",
     } as const;
-    const procedure = procedures[estado as keyof typeof procedures];
+
+    const procedure =
+        procedures[
+        estado as keyof typeof procedures
+        ];
+
     if (!procedure) {
-        throw new Error("Esta transicion de inscripcion no esta disponible.");
+        throw new Error(
+            "Esta transicion de inscripcion no esta disponible.",
+        );
     }
-    const supabase = await createClient();
-    const { error } = await supabase.rpc(procedure, { p_registration_id: registrationId });
-    if (error) throw new Error(`No se pudo actualizar la inscripcion: ${error.message}`);
-    const registration = await getRegistrationById(registrationId);
-    if (!registration) throw new Error("La inscripcion se actualizo, pero no se pudo volver a consultar.");
+
+    const supabase =
+        await createClient();
+
+    const {
+        error,
+    } = await supabase.rpc(
+        procedure,
+        {
+            p_registration_id:
+                registrationId,
+        },
+    );
+
+    if (error) {
+        throw new Error(
+            `No se pudo actualizar la inscripcion: ${error.message}`,
+        );
+    }
+
+    const registration =
+        await getRegistrationById(
+            registrationId,
+        );
+
+    if (!registration) {
+        throw new Error(
+            "La inscripcion se actualizo, pero no se pudo volver a consultar.",
+        );
+    }
+
     return registration;
 }
 
@@ -1396,9 +1872,13 @@ export async function verifyRegistrationPayment(
         );
     }
 
-    const supabase = await createClient();
+    const supabase =
+        await createClient();
 
-    const { data, error } = await supabase
+    const {
+        data,
+        error,
+    } = await supabase
         .from("registrations")
         .update({
             metodo_pago:
@@ -1407,13 +1887,20 @@ export async function verifyRegistrationPayment(
                 input.paymentDate ??
                 new Date().toISOString(),
             importe:
-                input.amount ?? null,
+                input.amount ??
+                null,
             payment_status:
                 "verificado",
         })
-        .eq("id", input.registrationId)
+        .eq(
+            "id",
+            input.registrationId,
+        )
         // Avoid a payment write racing with an admin cancellation.
-        .neq("estado", CANCELLED_STATUS)
+        .neq(
+            "estado",
+            CANCELLED_STATUS,
+        )
         .select("*")
         .single();
 
@@ -1440,16 +1927,26 @@ export async function markPaymentPending(
         );
     }
 
-    const supabase = await createClient();
+    const supabase =
+        await createClient();
 
-    const { data, error } = await supabase
+    const {
+        data,
+        error,
+    } = await supabase
         .from("registrations")
         .update({
-            fecha_pago: null,
-            metodo_pago: "fisico",
-            payment_status: "pendiente",
+            fecha_pago:
+                null,
+            metodo_pago:
+                "fisico",
+            payment_status:
+                "pendiente",
         })
-        .eq("id", registrationId)
+        .eq(
+            "id",
+            registrationId,
+        )
         .select("*")
         .single();
 
@@ -1489,18 +1986,33 @@ export async function checkInRegistration(
         );
     }
 
-    const supabase = await createClient();
+    const supabase =
+        await createClient();
 
-    const { data, error } = await supabase
+    const {
+        data,
+        error,
+    } = await supabase
         .from("registrations")
         .update({
-            checked_in: true,
-            checked_in_at: new Date().toISOString(),
+            checked_in:
+                true,
+            checked_in_at:
+                new Date().toISOString(),
         })
-        .eq("id", registrationId)
+        .eq(
+            "id",
+            registrationId,
+        )
         // Rechecked after a row-lock wait, preventing check-in after cancellation.
-        .eq("estado", "confirmada")
-        .eq("checked_in", false)
+        .eq(
+            "estado",
+            "confirmada",
+        )
+        .eq(
+            "checked_in",
+            false,
+        )
         .select("*")
         .single();
 
@@ -1516,15 +2028,38 @@ export async function checkInRegistration(
 export async function undoCheckInRegistration(
     registrationId: string,
 ): Promise<Registration> {
-    assertId(registrationId, "registrationId");
-    const supabase = await createClient();
-    const { data, error } = await supabase
+    assertId(
+        registrationId,
+        "registrationId",
+    );
+
+    const supabase =
+        await createClient();
+
+    const {
+        data,
+        error,
+    } = await supabase
         .from("registrations")
-        .update({ checked_in: false, checked_in_at: null })
-        .eq("id", registrationId)
+        .update({
+            checked_in:
+                false,
+            checked_in_at:
+                null,
+        })
+        .eq(
+            "id",
+            registrationId,
+        )
         .select("*")
         .single();
-    if (error) throw new Error(`No se pudo revertir el check-in: ${error.message}`);
+
+    if (error) {
+        throw new Error(
+            `No se pudo revertir el check-in: ${error.message}`,
+        );
+    }
+
     return data as Registration;
 }
 
@@ -1535,18 +2070,41 @@ export async function undoCheckInRegistration(
 export async function cancelRegistration(
     registrationId: string,
 ): Promise<Registration> {
-    assertId(registrationId, "registrationId");
-    const supabase = await createClient();
-    const { error } = await supabase.rpc("admin_cancel_registration", {
-        p_registration_id: registrationId,
-    });
+    assertId(
+        registrationId,
+        "registrationId",
+    );
+
+    const supabase =
+        await createClient();
+
+    const {
+        error,
+    } = await supabase.rpc(
+        "admin_cancel_registration",
+        {
+            p_registration_id:
+                registrationId,
+        },
+    );
+
     if (error) {
-        throw new Error(`No se pudo cancelar la inscripcion: ${error.message}`);
+        throw new Error(
+            `No se pudo cancelar la inscripcion: ${error.message}`,
+        );
     }
-    const registration = await getRegistrationById(registrationId);
+
+    const registration =
+        await getRegistrationById(
+            registrationId,
+        );
+
     if (!registration) {
-        throw new Error("La inscripcion se cancelo, pero no se pudo volver a consultar.");
+        throw new Error(
+            "La inscripcion se cancelo, pero no se pudo volver a consultar.",
+        );
     }
+
     return registration;
 }
 
@@ -1628,7 +2186,7 @@ export async function getRegistrationSummary(
 }
 
 /* -------------------------------------------------------------------------- */
-/* QR                                                                        */
+/* QR                                                                         */
 /* -------------------------------------------------------------------------- */
 
 export async function getRegistrationByQrCode(
@@ -1638,12 +2196,19 @@ export async function getRegistrationByQrCode(
         return null;
     }
 
-    const supabase = await createClient();
+    const supabase =
+        await createClient();
 
-    const { data, error } = await supabase
+    const {
+        data,
+        error,
+    } = await supabase
         .from("registrations")
         .select("*")
-        .eq("qr_code", qrCode.trim())
+        .eq(
+            "qr_code",
+            qrCode.trim(),
+        )
         .maybeSingle();
 
     if (error) {
@@ -1656,9 +2221,10 @@ export async function getRegistrationByQrCode(
         return null;
     }
 
-    const enriched = await enrichRegistrations([
-        data as Registration,
-    ]);
+    const enriched =
+        await enrichRegistrations([
+            data as Registration,
+        ]);
 
     return enriched[0] ?? null;
 }
@@ -1684,14 +2250,22 @@ export async function generateRegistrationQr(
     const token =
         `SPC-${registration.id}-${crypto.randomUUID()}`;
 
-    const supabase = await createClient();
+    const supabase =
+        await createClient();
 
-    const { data, error } = await supabase
+    const {
+        data,
+        error,
+    } = await supabase
         .from("registrations")
         .update({
-            qr_code: token,
+            qr_code:
+                token,
         })
-        .eq("id", registrationId)
+        .eq(
+            "id",
+            registrationId,
+        )
         .select("*")
         .single();
 
@@ -1713,19 +2287,30 @@ export async function validatePairPlayers(
     player1Id: string,
     player2Id?: string | null,
 ): Promise<void> {
-    assertId(tournamentId, "tournamentId");
-    assertId(player1Id, "player1Id");
+    assertId(
+        tournamentId,
+        "tournamentId",
+    );
+
+    assertId(
+        player1Id,
+        "player1Id",
+    );
 
     const playerIds = [
         player1Id,
         player2Id,
     ].filter(
-        (id): id is string =>
+        (
+            id,
+        ): id is string =>
             Boolean(id),
     );
 
     if (
-        new Set(playerIds).size !==
+        new Set(
+            playerIds,
+        ).size !==
         playerIds.length
     ) {
         throw new Error(
@@ -1733,25 +2318,31 @@ export async function validatePairPlayers(
         );
     }
 
-    const supabase = await createClient();
+    const supabase =
+        await createClient();
 
-    for (const playerId of playerIds) {
-        const { data: pairs, error } =
-            await supabase
-                .from("pairs")
-                .select(
-                    "id, estado, tournament_id",
-                )
-                .eq(
-                    "tournament_id",
-                    tournamentId,
-                )
-                .or(
-                    [
-                        `player_1_id.eq.${playerId}`,
-                        `player_2_id.eq.${playerId}`,
-                    ].join(","),
-                );
+    for (
+        const playerId of
+        playerIds
+    ) {
+        const {
+            data: pairs,
+            error,
+        } = await supabase
+            .from("pairs")
+            .select(
+                "id, estado, tournament_id",
+            )
+            .eq(
+                "tournament_id",
+                tournamentId,
+            )
+            .or(
+                [
+                    `player_1_id.eq.${playerId}`,
+                    `player_2_id.eq.${playerId}`,
+                ].join(","),
+            );
 
         if (error) {
             throw new Error(
@@ -1801,13 +2392,30 @@ export async function adminConfirmRegistration(
         );
     }
 
-    if (!registration.pair?.player_1_id || !registration.pair?.player_2_id) {
-        throw new Error("No se puede confirmar una inscripción con la pareja incompleta.");
+    if (
+        !registration.pair?.player_1_id ||
+        !registration.pair?.player_2_id
+    ) {
+        throw new Error(
+            "No se puede confirmar una inscripción con la pareja incompleta.",
+        );
     }
 
-    const paymentStatus = registration.payment_status ?? getPaymentStatus(registration);
-    if (paymentStatus !== "verificado" && paymentStatus !== "no_aplicable") {
-        throw new Error("El pago debe estar verificado antes de confirmar la inscripción.");
+    const paymentStatus =
+        registration.payment_status ??
+        getPaymentStatus(
+            registration,
+        );
+
+    if (
+        paymentStatus !==
+        "verificado" &&
+        paymentStatus !==
+        "no_aplicable"
+    ) {
+        throw new Error(
+            "El pago debe estar verificado antes de confirmar la inscripción.",
+        );
     }
 
     return updateRegistrationStatus(
@@ -1823,7 +2431,8 @@ export async function adminConfirmRegistration(
 export function getRegistrationFlowState(
     registration: RegistrationWithRelationsExtended,
 ): RegistrationFlowState {
-    const pair = registration.pair;
+    const pair =
+        registration.pair;
 
     const hasPartner =
         Boolean(

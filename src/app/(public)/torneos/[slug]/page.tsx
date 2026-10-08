@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { ArrowUpRight } from "lucide-react";
 
 import PublicShell from "@/components/public/PublicShell";
 import {
@@ -164,7 +165,29 @@ export default async function TournamentPage({
                     tournament.descripcion ??
                     "Toda la información del torneo, categorías, parejas, partidos y clasificación."
                 }
-            />
+            >
+                {tournament.estado ===
+                    "inscripciones_abiertas" && (
+                        <Link
+                            href={`/app/torneos/${tournament.slug}/inscribirse`}
+                            className={styles.registrationCta}
+                        >
+                            <span>Inscribirme</span>
+
+                            <ArrowUpRight
+                                size={17}
+                                aria-hidden="true"
+                            />
+                        </Link>
+                    )}
+
+                <Link
+                    href="/torneos"
+                    className={styles.secondaryCta}
+                >
+                    Ver calendario
+                </Link>
+            </PageIntro>
 
             <section className={styles.content}>
                 <script

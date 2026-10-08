@@ -4,18 +4,19 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import {
-    checkInPlayerAdmin,
-    confirmRegistrationPaymentAdmin,
-    confirmRegistrationAdmin,
     cancelRegistrationAdmin,
+    checkInPlayerAdmin,
+    confirmRegistrationAdmin,
     moveRegistrationToWaitingListAdmin,
     promoteRegistrationAdmin,
     requireAdminContext,
+    writeAdminAuditLog,
 } from "@/lib/services/admin";
 
 import {
-    markPaymentPending,
-} from "@/lib/services/registrations";
+    markRegistrationPaymentPendingAdmin,
+    verifyRegistrationPaymentAdmin,
+} from "@/lib/services/registration-payments";
 
 /* -------------------------------------------------------------------------- */
 /* HELPERS                                                                    */
@@ -64,6 +65,7 @@ async function finish(
         | "error",
 ): Promise<never> {
     revalidatePath("/admin");
+
     revalidatePath(
         "/admin/inscripciones",
     );
@@ -112,9 +114,27 @@ export async function cancelRegistrationAction(
     }
 
     try {
+        await requireAdminContext();
+
         await cancelRegistrationAdmin(
             registrationId,
         );
+
+        await writeAdminAuditLog({
+            accion:
+                "registration_update",
+
+            entityType:
+                "registration",
+
+            entityId:
+                registrationId,
+
+            metadata: {
+                operation:
+                    "registration_cancelled",
+            },
+        });
     } catch (error) {
         console.error(
             "[Admin] No se pudo cancelar la inscripción",
@@ -162,9 +182,27 @@ export async function promoteWaitingRegistrationAction(
     }
 
     try {
+        await requireAdminContext();
+
         await promoteRegistrationAdmin(
             registrationId,
         );
+
+        await writeAdminAuditLog({
+            accion:
+                "registration_update",
+
+            entityType:
+                "registration",
+
+            entityId:
+                registrationId,
+
+            metadata: {
+                operation:
+                    "registration_promoted_from_waiting_list",
+            },
+        });
     } catch (error) {
         console.error(
             "[Admin] No se pudo promover manualmente la inscripción",
@@ -212,9 +250,27 @@ export async function moveRegistrationToWaitingListAction(
     }
 
     try {
+        await requireAdminContext();
+
         await moveRegistrationToWaitingListAdmin(
             registrationId,
         );
+
+        await writeAdminAuditLog({
+            accion:
+                "registration_update",
+
+            entityType:
+                "registration",
+
+            entityId:
+                registrationId,
+
+            metadata: {
+                operation:
+                    "registration_moved_to_waiting_list",
+            },
+        });
     } catch (error) {
         console.error(
             "[Admin] No se pudo mover la inscripción a lista de espera",
@@ -275,7 +331,7 @@ export async function verifyPaymentAction(
     }
 
     try {
-        await confirmRegistrationPaymentAdmin(
+        await verifyRegistrationPaymentAdmin(
             {
                 registrationId,
 
@@ -285,7 +341,8 @@ export async function verifyPaymentAction(
                     | "transferencia"
                     | "otro",
 
-                amount: null,
+                amount:
+                    null,
 
                 paymentDate:
                     null,
@@ -323,8 +380,8 @@ export async function verifyPaymentAction(
  * No realiza ninguna operación bancaria.
  * No conecta con ningún proveedor de pagos.
  *
- * Solo modifica el estado de la inscripción después de comprobar
- * que la operación procede de un administrador autenticado.
+ * El servicio administrativo registra además la operación
+ * en audit_log.
  */
 export async function markPaymentPendingAction(
     formData: FormData,
@@ -351,14 +408,7 @@ export async function markPaymentPendingAction(
     }
 
     try {
-        /*
-         * La función original markPaymentPending() pertenece al servicio
-         * de registros. Antes de ejecutarla comprobamos explícitamente
-         * que el usuario actual tenga contexto administrativo.
-         */
-        await requireAdminContext();
-
-        await markPaymentPending(
+        await markRegistrationPaymentPendingAdmin(
             registrationId,
         );
     } catch (error) {
@@ -408,9 +458,27 @@ export async function checkInAction(
     }
 
     try {
+        await requireAdminContext();
+
         await checkInPlayerAdmin(
             registrationId,
         );
+
+        await writeAdminAuditLog({
+            accion:
+                "registration_update",
+
+            entityType:
+                "registration",
+
+            entityId:
+                registrationId,
+
+            metadata: {
+                operation:
+                    "check_in_registered",
+            },
+        });
     } catch (error) {
         console.error(
             "[Admin] No se pudo registrar el check-in",
@@ -458,9 +526,27 @@ export async function confirmRegistrationAction(
     }
 
     try {
+        await requireAdminContext();
+
         await confirmRegistrationAdmin(
             registrationId,
         );
+
+        await writeAdminAuditLog({
+            accion:
+                "registration_update",
+
+            entityType:
+                "registration",
+
+            entityId:
+                registrationId,
+
+            metadata: {
+                operation:
+                    "registration_confirmed",
+            },
+        });
     } catch (error) {
         console.error(
             "[Admin] No se pudo confirmar la inscripción",

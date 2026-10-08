@@ -3,449 +3,166 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import {
-    cancelRegistrationAdmin,
-    checkInPlayerAdmin,
-    confirmRegistrationAdmin,
-    confirmRegistrationPaymentAdmin,
-    markRegistrationPaymentPendingAdmin,
-    moveRegistrationToWaitingListAdmin,
-    promoteRegistrationAdmin,
-} from "@/lib/services/admin";
+import { getAuthenticatedContext } from "@/lib/auth/flow";
+import { getRegistrationById } from "@/lib/services/registrations";
+import { createClient } from "@/lib/supabase/server";
 
 function readText(
     formData: FormData,
-    key: string,
+    name: string,
 ): string {
-    const value =
-        formData.get(key);
+    const value = formData.get(name);
 
-    return typeof value ===
-        "string"
+    return typeof value === "string"
         ? value.trim()
         : "";
 }
 
-function safeReturnTo(
-    value: string,
-): string {
+export async function cancelMyRegistrationAction(
+    formData: FormData,
+): Promise<void> {
+    const registrationId = readText(
+        formData,
+        "registrationId",
+    );
+
+    if (!registrationId) {
+        redirect(
+            "/app/inscripciones?resultado=error",
+        );
+    }
+
+    const {
+        user,
+        player,
+    } = await getAuthenticatedContext();
+
+    if (!user || !player) {
+        redirect(
+            `/login?redirectTo=${encodeURIComponent(
+                "/app/inscripciones",
+            )}`,
+        );
+    }
+
     try {
-        const parsed =
-            new URL(
-                value ||
-                "/admin/inscripciones",
-                "http://localhost",
+        const registration =
+            await getRegistrationById(
+                registrationId,
             );
 
-        if (
-            parsed.origin ===
-            "http://localhost" &&
-            parsed.pathname ===
-            "/admin/inscripciones"
-        ) {
-            return `${parsed.pathname}${parsed.search}`;
+        if (!registration) {
+            throw new Error(
+                "La inscripción no existe.",
+            );
         }
 
-        return "/admin/inscripciones";
-    } catch {
-        return "/admin/inscripciones";
-    }
-}
+        const pair = registration.pair;
 
-async function finish(
-    returnTo: string,
-    result:
-        | "actualizada"
-        | "error",
-    registrationId?: string,
-): Promise<never> {
-    revalidatePath(
-        "/admin",
-    );
+        if (!pair) {
+            throw new Error(
+                "La inscripción no tiene una pareja asociada.",
+            );
+        }
 
-    revalidatePath(
-        "/admin/inscripciones",
-    );
+        const belongsToPlayer =
+            pair.player_1_id === player.id ||
+            pair.player_2_id === player.id;
 
-    if (registrationId) {
-        revalidatePath(
-            `/admin/inscripciones/${registrationId}`,
+        if (!belongsToPlayer) {
+            throw new Error(
+                "No puedes modificar esta inscripción.",
+            );
+        }
+
+        if (
+            registration.estado ===
+            "cancelada"
+        ) {
+            throw new Error(
+                "La inscripción ya está cancelada.",
+            );
+        }
+
+        if (
+            registration.estado !==
+            "confirmada" &&
+            registration.estado !==
+            "pendiente_pago" &&
+            registration.estado !==
+            "lista_espera"
+        ) {
+            throw new Error(
+                "Esta inscripción no se puede cancelar.",
+            );
+        }
+
+        const supabase =
+            await createClient();
+
+        const {
+            error,
+        } = await supabase
+            .from("registrations")
+            .update({
+                estado: "cancelada",
+            })
+            .eq(
+                "id",
+                registrationId,
+            );
+
+        if (error) {
+            throw new Error(
+                `No se pudo cancelar la inscripción: ${error.message}`,
+            );
+        }
+
+        /*
+         * Si el jugador estaba buscando pareja,
+         * dejamos de mostrarlo en el Partner Pool.
+         *
+         * No creamos ningún registro nuevo:
+         * utilizamos el partner_pool existente.
+         */
+        await supabase
+            .from("partner_pool")
+            .update({
+                disponible: false,
+            })
+            .eq(
+                "player_id",
+                player.id,
+            )
+            .eq(
+                "tournament_id",
+                registration.tournament_id,
+            )
+            .eq(
+                "categoria_id",
+                registration.categoria_id ??
+                pair.categoria_id,
+            );
+    } catch (error) {
+        console.error(
+            "[App] No se pudo cancelar la inscripción",
+            error,
+        );
+
+        redirect(
+            "/app/inscripciones?resultado=error",
         );
     }
 
-    const url =
-        new URL(
-            returnTo,
-            "http://localhost",
-        );
+    revalidatePath(
+        "/app/inscripciones",
+    );
 
-    url.searchParams.set(
-        "resultado",
-        result,
+    revalidatePath(
+        "/app",
     );
 
     redirect(
-        `${url.pathname}${url.search}`,
-    );
-}
-
-export async function cancelRegistrationAction(
-    formData: FormData,
-): Promise<void> {
-    const registrationId =
-        readText(
-            formData,
-            "registrationId",
-        );
-
-    const returnTo =
-        safeReturnTo(
-            readText(
-                formData,
-                "returnTo",
-            ),
-        );
-
-    if (!registrationId) {
-        await finish(
-            returnTo,
-            "error",
-        );
-    }
-
-    try {
-        await cancelRegistrationAdmin(
-            registrationId,
-        );
-    } catch (error) {
-        console.error(
-            "[Admin] No se pudo cancelar la inscripción",
-            error,
-        );
-
-        await finish(
-            returnTo,
-            "error",
-            registrationId,
-        );
-    }
-
-    await finish(
-        returnTo,
-        "actualizada",
-        registrationId,
-    );
-}
-
-export async function promoteWaitingRegistrationAction(
-    formData: FormData,
-): Promise<void> {
-    const registrationId =
-        readText(
-            formData,
-            "registrationId",
-        );
-
-    const returnTo =
-        safeReturnTo(
-            readText(
-                formData,
-                "returnTo",
-            ),
-        );
-
-    if (!registrationId) {
-        await finish(
-            returnTo,
-            "error",
-        );
-    }
-
-    try {
-        await promoteRegistrationAdmin(
-            registrationId,
-        );
-    } catch (error) {
-        console.error(
-            "[Admin] No se pudo promover manualmente la inscripción",
-            error,
-        );
-
-        await finish(
-            returnTo,
-            "error",
-            registrationId,
-        );
-    }
-
-    await finish(
-        returnTo,
-        "actualizada",
-        registrationId,
-    );
-}
-
-export async function moveRegistrationToWaitingListAction(
-    formData: FormData,
-): Promise<void> {
-    const registrationId =
-        readText(
-            formData,
-            "registrationId",
-        );
-
-    const returnTo =
-        safeReturnTo(
-            readText(
-                formData,
-                "returnTo",
-            ),
-        );
-
-    if (!registrationId) {
-        await finish(
-            returnTo,
-            "error",
-        );
-    }
-
-    try {
-        await moveRegistrationToWaitingListAdmin(
-            registrationId,
-        );
-    } catch (error) {
-        console.error(
-            "[Admin] No se pudo mover la inscripción a lista de espera",
-            error,
-        );
-
-        await finish(
-            returnTo,
-            "error",
-            registrationId,
-        );
-    }
-
-    await finish(
-        returnTo,
-        "actualizada",
-        registrationId,
-    );
-}
-
-/**
- * Marca el pago como verificado.
- *
- * IMPORTANTE:
- * El pago de SPC es presencial/manual.
- * Esta acción no inicia ningún gateway,
- * checkout ni operación bancaria.
- */
-export async function verifyPaymentAction(
-    formData: FormData,
-): Promise<void> {
-    const registrationId =
-        readText(
-            formData,
-            "registrationId",
-        );
-
-    const returnTo =
-        safeReturnTo(
-            readText(
-                formData,
-                "returnTo",
-            ),
-        );
-
-    if (!registrationId) {
-        await finish(
-            returnTo,
-            "error",
-        );
-    }
-
-    try {
-        await confirmRegistrationPaymentAdmin(
-            {
-                registrationId,
-
-                method: "fisico",
-
-                amount: null,
-
-                paymentDate: null,
-
-                note: null,
-            },
-        );
-    } catch (error) {
-        console.error(
-            "[Admin] No se pudo verificar el pago presencial",
-            error,
-        );
-
-        await finish(
-            returnTo,
-            "error",
-            registrationId,
-        );
-    }
-
-    await finish(
-        returnTo,
-        "actualizada",
-        registrationId,
-    );
-}
-
-/**
- * Revierte la verificación manual del pago.
- *
- * No borra la inscripción.
- * No modifica la pareja.
- * No inicia ningún reembolso.
- */
-export async function markPaymentPendingAction(
-    formData: FormData,
-): Promise<void> {
-    const registrationId =
-        readText(
-            formData,
-            "registrationId",
-        );
-
-    const returnTo =
-        safeReturnTo(
-            readText(
-                formData,
-                "returnTo",
-            ),
-        );
-
-    if (!registrationId) {
-        await finish(
-            returnTo,
-            "error",
-        );
-    }
-
-    try {
-        await markRegistrationPaymentPendingAdmin(
-            registrationId,
-        );
-    } catch (error) {
-        console.error(
-            "[Admin] No se pudo devolver el pago a pendiente",
-            error,
-        );
-
-        await finish(
-            returnTo,
-            "error",
-            registrationId,
-        );
-    }
-
-    await finish(
-        returnTo,
-        "actualizada",
-        registrationId,
-    );
-}
-
-export async function checkInAction(
-    formData: FormData,
-): Promise<void> {
-    const registrationId =
-        readText(
-            formData,
-            "registrationId",
-        );
-
-    const returnTo =
-        safeReturnTo(
-            readText(
-                formData,
-                "returnTo",
-            ),
-        );
-
-    if (!registrationId) {
-        await finish(
-            returnTo,
-            "error",
-        );
-    }
-
-    try {
-        await checkInPlayerAdmin(
-            registrationId,
-        );
-    } catch (error) {
-        console.error(
-            "[Admin] No se pudo registrar el check-in",
-            error,
-        );
-
-        await finish(
-            returnTo,
-            "error",
-            registrationId,
-        );
-    }
-
-    await finish(
-        returnTo,
-        "actualizada",
-        registrationId,
-    );
-}
-
-export async function confirmRegistrationAction(
-    formData: FormData,
-): Promise<void> {
-    const registrationId =
-        readText(
-            formData,
-            "registrationId",
-        );
-
-    const returnTo =
-        safeReturnTo(
-            readText(
-                formData,
-                "returnTo",
-            ),
-        );
-
-    if (!registrationId) {
-        await finish(
-            returnTo,
-            "error",
-        );
-    }
-
-    try {
-        await confirmRegistrationAdmin(
-            registrationId,
-        );
-    } catch (error) {
-        console.error(
-            "[Admin] No se pudo confirmar la inscripción",
-            error,
-        );
-
-        await finish(
-            returnTo,
-            "error",
-            registrationId,
-        );
-    }
-
-    await finish(
-        returnTo,
-        "actualizada",
-        registrationId,
+        "/app/inscripciones?resultado=cancelada",
     );
 }

@@ -21,10 +21,10 @@ export default function CancelRegistrationButton({
         startTransition,
     ] = useTransition();
 
-    function handleClick() {
+    function handleCancel() {
         const confirmed =
             window.confirm(
-                "¿Seguro que quieres cancelar esta inscripción? Esta acción no se puede deshacer.",
+                "¿Seguro que quieres cancelar esta inscripción?",
             );
 
         if (!confirmed) {
@@ -54,8 +54,9 @@ export default function CancelRegistrationButton({
             className={
                 styles.cancelButton
             }
-            onClick={handleClick}
+            onClick={handleCancel}
             disabled={isPending}
+            aria-disabled={isPending}
         >
             <XCircle
                 size={14}
