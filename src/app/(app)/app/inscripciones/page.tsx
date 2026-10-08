@@ -1,17 +1,14 @@
 import Link from "next/link";
 
-import type {
-    RegistrationStatus,
-} from "@/types/database";
+import type { RegistrationStatus } from "@/types/database";
 
 import {
+    getAdminPlayersByIds,
     getAdminRegistrations,
     getCategories,
 } from "@/lib/services/admin";
 
-import {
-    getTournaments,
-} from "@/lib/services/tournaments";
+import { getTournaments } from "@/lib/services/tournaments";
 
 import {
     cancelRegistrationAction,
@@ -36,13 +33,12 @@ type SearchParams = Promise<{
     resultado?: string;
 }>;
 
-const REGISTRATION_STATES: RegistrationStatus[] =
-    [
-        "confirmada",
-        "lista_espera",
-        "pendiente_pago",
-        "cancelada",
-    ];
+const REGISTRATION_STATES: RegistrationStatus[] = [
+    "confirmada",
+    "lista_espera",
+    "pendiente_pago",
+    "cancelada",
+];
 
 const PAYMENT_STATES = [
     "pendiente",
@@ -51,21 +47,16 @@ const PAYMENT_STATES = [
     "no_aplicable",
 ] as const;
 
+type PaymentStatus = (typeof PAYMENT_STATES)[number];
+
 const REGISTRATION_LABELS: Record<
     RegistrationStatus,
     string
 > = {
-    confirmada:
-        "Confirmada",
-
-    lista_espera:
-        "Lista de espera",
-
-    pendiente_pago:
-        "Pendiente de pago",
-
-    cancelada:
-        "Cancelada",
+    confirmada: "Confirmada",
+    lista_espera: "Lista de espera",
+    pendiente_pago: "Pendiente de pago",
+    cancelada: "Cancelada",
 };
 
 function getBadgeTone(
@@ -105,28 +96,69 @@ function getBadgeTone(
 function getPaymentLabel(
     status: string | undefined,
 ): string {
-    if (
-        status ===
-        "verificado"
-    ) {
+    if (status === "verificado") {
         return "Pagado";
     }
 
-    if (
-        status ===
-        "rechazado"
-    ) {
+    if (status === "rechazado") {
         return "Rechazado";
     }
 
-    if (
-        status ===
-        "no_aplicable"
-    ) {
-        return "No aplicable";
+    if (status === "no_aplicable") {
+        return "No aplica";
     }
 
     return "Pendiente";
+}
+
+function getPlayerName(
+    player:
+        | {
+            nombre: string;
+            apellidos?: string | null;
+        }
+        | null
+        | undefined,
+): string {
+    if (!player) {
+        return "Jugador no disponible";
+    }
+
+    return `${player.nombre} ${player.apellidos ?? ""
+        }`.trim();
+}
+
+function getPairNames(
+    registration: {
+        player?: {
+            nombre: string;
+            apellidos?: string | null;
+        } | null;
+        pair?: {
+            player_2_id?: string | null;
+        } | null;
+    },
+    player2Names: Map<string, string>,
+): {
+    player1: string;
+    player2: string | null;
+} {
+    const player1 = getPlayerName(
+        registration.player,
+    );
+
+    const player2Id =
+        registration.pair?.player_2_id ?? null;
+
+    const player2 = player2Id
+        ? player2Names.get(player2Id) ??
+        "Jugador no disponible"
+        : null;
+
+    return {
+        player1,
+        player2,
+    };
 }
 
 export default async function AdminRegistrationsPage({
@@ -134,16 +166,13 @@ export default async function AdminRegistrationsPage({
 }: {
     searchParams: SearchParams;
 }) {
-    const params =
-        await searchParams;
+    const params = await searchParams;
 
     const search =
-        params.q?.trim() ??
-        "";
+        params.q?.trim() ?? "";
 
     const tournamentId =
-        params.torneo ??
-        "";
+        params.torneo ?? "";
 
     const status =
         REGISTRATION_STATES.includes(
@@ -154,9 +183,9 @@ export default async function AdminRegistrationsPage({
 
     const payment =
         PAYMENT_STATES.includes(
-            params.pago as typeof PAYMENT_STATES[number],
+            params.pago as PaymentStatus,
         )
-            ? (params.pago as typeof PAYMENT_STATES[number])
+            ? (params.pago as PaymentStatus)
             : undefined;
 
     const [
@@ -179,20 +208,64 @@ export default async function AdminRegistrationsPage({
     const allRegistrations =
         await getAdminRegistrations({
             tournamentId:
-                tournamentId ||
-                undefined,
+                tournamentId || undefined,
 
             categoryId:
-                categoryId ||
-                undefined,
+                categoryId || undefined,
 
-            estado:
-                status,
+            estado: status,
 
             paymentStatus:
                 payment,
         });
 
+    /*
+     * getRegistrations() ya devuelve el jugador principal
+     * de la pareja. Para poder buscar y mostrar correctamente
+     * la pareja completa necesitamos consultar también al
+     * segundo jugador cuando exista.
+     */
+    const player2Ids =
+        Array.from(
+            new Set(
+                allRegistrations
+                    .map(
+                        (registration) =>
+                            registration.pair
+                                ?.player_2_id,
+                    )
+                    .filter(
+                        (
+                            id,
+                        ): id is string =>
+                            Boolean(id),
+                    ),
+            ),
+        );
+
+    const player2Rows =
+        player2Ids.length > 0
+            ? await getAdminPlayersByIds(
+                player2Ids,
+            )
+            : [];
+
+    const player2Names =
+        new Map(
+            player2Rows.map(
+                (player) => [
+                    player.id,
+                    `${player.nombre} ${player.apellidos ??
+                        ""
+                        }`.trim(),
+                ],
+            ),
+        );
+
+    /*
+     * La búsqueda se hace sobre los dos jugadores
+     * y también sobre el torneo.
+     */
     const query =
         search.toLocaleLowerCase(
             "es",
@@ -200,23 +273,39 @@ export default async function AdminRegistrationsPage({
 
     const registrations =
         allRegistrations.filter(
-            (
-                registration,
-            ) => {
+            (registration) => {
                 if (!query) {
                     return true;
                 }
 
-                const playerName =
-                    `${registration.player?.nombre ?? ""} ${registration.player?.apellidos ?? ""}`;
+                const {
+                    player1,
+                    player2,
+                } = getPairNames(
+                    registration,
+                    player2Names,
+                );
 
-                return `${playerName} ${registration.tournament?.nombre ?? ""}`
-                    .toLocaleLowerCase(
-                        "es",
-                    )
-                    .includes(
-                        query,
-                    );
+                const tournamentName =
+                    registration
+                        .tournament
+                        ?.nombre ??
+                    "";
+
+                const searchableText =
+                    [
+                        player1,
+                        player2 ?? "",
+                        tournamentName,
+                    ]
+                        .join(" ")
+                        .toLocaleLowerCase(
+                            "es",
+                        );
+
+                return searchableText.includes(
+                    query,
+                );
             },
         );
 
@@ -264,6 +353,15 @@ export default async function AdminRegistrationsPage({
             : ""
         }`;
 
+    const hasFilters =
+        Boolean(
+            search ||
+            tournamentId ||
+            categoryId ||
+            status ||
+            payment,
+        );
+
     return (
         <main
             className={
@@ -297,13 +395,10 @@ export default async function AdminRegistrationsPage({
                             styles.description
                         }
                     >
-                        Revisa el estado de
-                        las solicitudes,
-                        verifica pagos
-                        presenciales y
-                        registra el check-in
-                        de parejas
-                        confirmadas.
+                        Gestiona las parejas inscritas,
+                        verifica los pagos presenciales
+                        y controla el estado operativo
+                        de cada inscripción.
                     </p>
                 </div>
 
@@ -312,9 +407,7 @@ export default async function AdminRegistrationsPage({
                         styles.count
                     }
                 >
-                    {
-                        registrations.length
-                    }{" "}
+                    {registrations.length}{" "}
                     {registrations.length ===
                         1
                         ? "inscripción"
@@ -330,8 +423,8 @@ export default async function AdminRegistrationsPage({
                         }
                         role="status"
                     >
-                        La inscripción se
-                        ha actualizado.
+                        La inscripción se ha
+                        actualizado correctamente.
                     </p>
                 )}
 
@@ -341,10 +434,10 @@ export default async function AdminRegistrationsPage({
                         className={`${styles.feedback} ${styles.danger}`}
                         role="alert"
                     >
-                        No se pudo completar
-                        la operación.
-                        Comprueba el estado y
-                        vuelve a intentarlo.
+                        No se pudo completar la
+                        operación. Comprueba el
+                        estado de la inscripción
+                        y vuelve a intentarlo.
                     </p>
                 )}
 
@@ -354,14 +447,9 @@ export default async function AdminRegistrationsPage({
                         className={`${styles.feedback} ${styles.warning}`}
                         role="note"
                     >
-                        La promoción es
-                        manual: selecciona
-                        una pareja concreta.
-                        No hay una prioridad
-                        oficial documentada,
-                        por lo que la lista
-                        no se promueve
-                        automáticamente.
+                        La promoción desde la lista
+                        de espera es manual. Selecciona
+                        siempre una pareja concreta.
                     </p>
                 )}
 
@@ -383,7 +471,9 @@ export default async function AdminRegistrationsPage({
                             styles.field
                         }
                     >
-                        <label htmlFor="registration-search">
+                        <label
+                            htmlFor="registration-search"
+                        >
                             Buscar
                         </label>
 
@@ -397,7 +487,7 @@ export default async function AdminRegistrationsPage({
                             defaultValue={
                                 search
                             }
-                            placeholder="Jugador o torneo"
+                            placeholder="Jugador, pareja o torneo"
                         />
                     </div>
 
@@ -406,7 +496,9 @@ export default async function AdminRegistrationsPage({
                             styles.field
                         }
                     >
-                        <label htmlFor="registration-tournament">
+                        <label
+                            htmlFor="registration-tournament"
+                        >
                             Torneo
                         </label>
 
@@ -421,8 +513,7 @@ export default async function AdminRegistrationsPage({
                             }
                         >
                             <option value="">
-                                Todos los
-                                torneos
+                                Todos los torneos
                             </option>
 
                             {tournaments.map(
@@ -451,7 +542,9 @@ export default async function AdminRegistrationsPage({
                             styles.field
                         }
                     >
-                        <label htmlFor="registration-category">
+                        <label
+                            htmlFor="registration-category"
+                        >
                             Categoría
                         </label>
 
@@ -495,7 +588,9 @@ export default async function AdminRegistrationsPage({
                             styles.field
                         }
                     >
-                        <label htmlFor="registration-state">
+                        <label
+                            htmlFor="registration-state"
+                        >
                             Estado
                         </label>
 
@@ -506,8 +601,7 @@ export default async function AdminRegistrationsPage({
                             }
                             name="estado"
                             defaultValue={
-                                status ??
-                                ""
+                                status ?? ""
                             }
                         >
                             <option value="">
@@ -515,9 +609,7 @@ export default async function AdminRegistrationsPage({
                             </option>
 
                             {REGISTRATION_STATES.map(
-                                (
-                                    value,
-                                ) => (
+                                (value) => (
                                     <option
                                         key={
                                             value
@@ -542,7 +634,9 @@ export default async function AdminRegistrationsPage({
                             styles.field
                         }
                     >
-                        <label htmlFor="registration-payment">
+                        <label
+                            htmlFor="registration-payment"
+                        >
                             Pago
                         </label>
 
@@ -553,8 +647,7 @@ export default async function AdminRegistrationsPage({
                             }
                             name="pago"
                             defaultValue={
-                                payment ??
-                                ""
+                                payment ?? ""
                             }
                         >
                             <option value="">
@@ -562,9 +655,7 @@ export default async function AdminRegistrationsPage({
                             </option>
 
                             {PAYMENT_STATES.map(
-                                (
-                                    value,
-                                ) => (
+                                (value) => (
                                     <option
                                         key={
                                             value
@@ -593,20 +684,16 @@ export default async function AdminRegistrationsPage({
                         Filtrar
                     </button>
 
-                    {(search ||
-                        tournamentId ||
-                        categoryId ||
-                        status ||
-                        payment) && (
-                            <Link
-                                className={
-                                    styles.quietButton
-                                }
-                                href="/admin/inscripciones"
-                            >
-                                Limpiar
-                            </Link>
-                        )}
+                    {hasFilters && (
+                        <Link
+                            className={
+                                styles.quietButton
+                            }
+                            href="/admin/inscripciones"
+                        >
+                            Limpiar
+                        </Link>
+                    )}
                 </form>
 
                 {registrations.length ===
@@ -617,19 +704,13 @@ export default async function AdminRegistrationsPage({
                         }
                     >
                         <h2>
-                            {search ||
-                                tournamentId ||
-                                status ||
-                                payment
+                            {hasFilters
                                 ? "No hay resultados"
                                 : "Aún no hay inscripciones"}
                         </h2>
 
                         <p>
-                            {search ||
-                                tournamentId ||
-                                status ||
-                                payment
+                            {hasFilters
                                 ? "Cambia o limpia los filtros para consultar otras inscripciones."
                                 : "Las inscripciones recibidas aparecerán aquí."}
                         </p>
@@ -690,10 +771,34 @@ export default async function AdminRegistrationsPage({
                                             registration.payment_status ??
                                             "pendiente";
 
-                                        const playerName =
-                                            registration.player
-                                                ? `${registration.player.nombre} ${registration.player.apellidos}`
-                                                : "Jugador sin perfil";
+                                        const {
+                                            player1,
+                                            player2,
+                                        } =
+                                            getPairNames(
+                                                registration,
+                                                player2Names,
+                                            );
+
+                                        const category =
+                                            categories.find(
+                                                (
+                                                    item,
+                                                ) =>
+                                                    item.id ===
+                                                    (registration.categoria_id ??
+                                                        registration
+                                                            .pair
+                                                            ?.categoria_id),
+                                            );
+
+                                        const isCancelled =
+                                            registrationState ===
+                                            "cancelada";
+
+                                        const isPaid =
+                                            paymentState ===
+                                            "verificado";
 
                                         return (
                                             <tr
@@ -708,22 +813,27 @@ export default async function AdminRegistrationsPage({
                                                         }
                                                         href={`/admin/inscripciones/${registration.id}`}
                                                     >
-                                                        {
-                                                            playerName
-                                                        }
+                                                        {player1}
                                                     </Link>
 
-                                                    <span
-                                                        className={
-                                                            styles.secondaryText
-                                                        }
-                                                    >
-                                                        {registration
-                                                            .pair
-                                                            ?.player_2_id
-                                                            ? "Inscripción en pareja"
-                                                            : "Inscripción individual"}
-                                                    </span>
+                                                    {player2 ? (
+                                                        <span
+                                                            className={
+                                                                styles.secondaryText
+                                                            }
+                                                        >
+                                                            {player2}
+                                                        </span>
+                                                    ) : (
+                                                        <span
+                                                            className={
+                                                                styles.secondaryText
+                                                            }
+                                                        >
+                                                            Segundo jugador
+                                                            pendiente
+                                                        </span>
+                                                    )}
                                                 </td>
 
                                                 <td>
@@ -736,18 +846,10 @@ export default async function AdminRegistrationsPage({
                                                 </td>
 
                                                 <td>
-                                                    {categories.find(
-                                                        (
-                                                            category,
-                                                        ) =>
-                                                            category.id ===
-                                                            (registration.categoria_id ??
-                                                                registration
-                                                                    .pair
-                                                                    ?.categoria_id),
-                                                    )
-                                                        ?.nombre ??
-                                                        "Sin categoría"}
+                                                    {
+                                                        category?.nombre ??
+                                                        "Sin categoría"
+                                                    }
                                                 </td>
 
                                                 <td>
@@ -800,20 +902,13 @@ export default async function AdminRegistrationsPage({
                                                             styles.rowActions
                                                         }
                                                     >
-                                                        {/* ---------------------------------------------------------------- */}
-                                                        {/* PAGO PRESENCIAL                                               */}
-                                                        {/* ---------------------------------------------------------------- */}
-
-                                                        {paymentState !==
-                                                            "verificado" &&
-                                                            registrationState !==
-                                                            "cancelada" && (
+                                                        {!isPaid &&
+                                                            !isCancelled &&
+                                                            paymentState !==
+                                                            "no_aplicable" && (
                                                                 <form
                                                                     action={
                                                                         verifyPaymentAction
-                                                                    }
-                                                                    className={
-                                                                        styles.inlineForm
                                                                     }
                                                                 >
                                                                     <input
@@ -832,43 +927,19 @@ export default async function AdminRegistrationsPage({
                                                                         }
                                                                     />
 
-                                                                    <select
-                                                                        className={
-                                                                            styles.inlineSelect
-                                                                        }
-                                                                        name="method"
-                                                                        aria-label={`Método de pago de ${playerName}`}
-                                                                        defaultValue="fisico"
-                                                                    >
-                                                                        <option value="fisico">
-                                                                            Efectivo
-                                                                        </option>
-
-                                                                        <option value="transferencia">
-                                                                            Transferencia
-                                                                        </option>
-
-                                                                        <option value="otro">
-                                                                            Otro
-                                                                        </option>
-                                                                    </select>
-
                                                                     <button
                                                                         className={
                                                                             styles.smallButton
                                                                         }
                                                                         type="submit"
                                                                     >
-                                                                        Marcar
-                                                                        pagado
+                                                                        Marcar pagado
                                                                     </button>
                                                                 </form>
                                                             )}
 
-                                                        {paymentState ===
-                                                            "verificado" &&
-                                                            registrationState !==
-                                                            "cancelada" && (
+                                                        {isPaid &&
+                                                            !isCancelled && (
                                                                 <RegistrationMutationForm
                                                                     action={
                                                                         markPaymentPendingAction
@@ -879,16 +950,51 @@ export default async function AdminRegistrationsPage({
                                                                     returnTo={
                                                                         returnTo
                                                                     }
-                                                                    confirmation="¿Confirmas devolver el estado del pago a pendiente? Esta acción no realiza ningún reembolso; solo corrige el estado administrativo."
+                                                                    confirmation="¿Quieres desmarcar este pago y devolverlo a estado pendiente?"
                                                                 >
-                                                                    Desmarcar
-                                                                    pago
+                                                                    Desmarcar pago
                                                                 </RegistrationMutationForm>
                                                             )}
 
-                                                        {/* ---------------------------------------------------------------- */}
-                                                        {/* CHECK-IN                                                       */}
-                                                        {/* ---------------------------------------------------------------- */}
+                                                        {registrationState ===
+                                                            "pendiente_pago" &&
+                                                            isPaid &&
+                                                            Boolean(
+                                                                registration
+                                                                    .pair
+                                                                    ?.player_2_id,
+                                                            ) && (
+                                                                <form
+                                                                    action={
+                                                                        confirmRegistrationAction
+                                                                    }
+                                                                >
+                                                                    <input
+                                                                        type="hidden"
+                                                                        name="registrationId"
+                                                                        value={
+                                                                            registration.id
+                                                                        }
+                                                                    />
+
+                                                                    <input
+                                                                        type="hidden"
+                                                                        name="returnTo"
+                                                                        value={
+                                                                            returnTo
+                                                                        }
+                                                                    />
+
+                                                                    <button
+                                                                        className={
+                                                                            styles.smallButton
+                                                                        }
+                                                                        type="submit"
+                                                                    >
+                                                                        Confirmar inscripción
+                                                                    </button>
+                                                                </form>
+                                                            )}
 
                                                         {registrationState ===
                                                             "confirmada" &&
@@ -920,63 +1026,10 @@ export default async function AdminRegistrationsPage({
                                                                         }
                                                                         type="submit"
                                                                     >
-                                                                        Registrar
-                                                                        check-in
+                                                                        Registrar check-in
                                                                     </button>
                                                                 </form>
                                                             )}
-
-                                                        {/* ---------------------------------------------------------------- */}
-                                                        {/* CONFIRMAR INSCRIPCIÓN                                         */}
-                                                        {/* ---------------------------------------------------------------- */}
-
-                                                        {registrationState ===
-                                                            "pendiente_pago" &&
-                                                            [
-                                                                "verificado",
-                                                                "no_aplicable",
-                                                            ].includes(
-                                                                paymentState,
-                                                            ) &&
-                                                            registration
-                                                                .pair
-                                                                ?.player_2_id && (
-                                                                <form
-                                                                    action={
-                                                                        confirmRegistrationAction
-                                                                    }
-                                                                >
-                                                                    <input
-                                                                        type="hidden"
-                                                                        name="registrationId"
-                                                                        value={
-                                                                            registration.id
-                                                                        }
-                                                                    />
-
-                                                                    <input
-                                                                        type="hidden"
-                                                                        name="returnTo"
-                                                                        value={
-                                                                            returnTo
-                                                                        }
-                                                                    />
-
-                                                                    <button
-                                                                        className={
-                                                                            styles.smallButton
-                                                                        }
-                                                                        type="submit"
-                                                                    >
-                                                                        Confirmar
-                                                                        inscripción
-                                                                    </button>
-                                                                </form>
-                                                            )}
-
-                                                        {/* ---------------------------------------------------------------- */}
-                                                        {/* LISTA DE ESPERA                                               */}
-                                                        {/* ---------------------------------------------------------------- */}
 
                                                         {registrationState ===
                                                             "lista_espera" &&
@@ -985,7 +1038,7 @@ export default async function AdminRegistrationsPage({
                                                                 ?.player_1_id &&
                                                             registration
                                                                 .pair
-                                                                .player_2_id && (
+                                                                ?.player_2_id && (
                                                                 <RegistrationMutationForm
                                                                     action={
                                                                         promoteWaitingRegistrationAction
@@ -996,10 +1049,9 @@ export default async function AdminRegistrationsPage({
                                                                     returnTo={
                                                                         returnTo
                                                                     }
-                                                                    confirmation="¿Confirmas promover esta pareja a pendiente de pago? Solo se completará si hay cupo, las inscripciones siguen abiertas y no hay partidos creados en la categoría."
+                                                                    confirmation="¿Confirmas promover esta pareja a pendiente de pago? Solo se completará si hay cupo y se cumplen las condiciones operativas del torneo."
                                                                 >
                                                                     Promover
-                                                                    manualmente
                                                                 </RegistrationMutationForm>
                                                             )}
 
@@ -1020,34 +1072,37 @@ export default async function AdminRegistrationsPage({
                                                                     returnTo={
                                                                         returnTo
                                                                     }
-                                                                    confirmation="¿Confirmas mover esta inscripción a lista de espera? Se conserva cualquier pago registrado y no se promueve otra pareja automáticamente."
+                                                                    confirmation="¿Confirmas mover esta inscripción a lista de espera?"
                                                                 >
-                                                                    Mover a
-                                                                    espera
+                                                                    Mover a espera
                                                                 </RegistrationMutationForm>
                                                             )}
 
-                                                        {/* ---------------------------------------------------------------- */}
-                                                        {/* CANCELACIÓN                                                    */}
-                                                        {/* ---------------------------------------------------------------- */}
+                                                        {!isCancelled && (
+                                                            <RegistrationMutationForm
+                                                                action={
+                                                                    cancelRegistrationAction
+                                                                }
+                                                                registrationId={
+                                                                    registration.id
+                                                                }
+                                                                returnTo={
+                                                                    returnTo
+                                                                }
+                                                                confirmation="¿Confirmas cancelar esta inscripción? Se conservará el historial y la cancelación no inicia ningún reembolso."
+                                                            >
+                                                                Cancelar
+                                                            </RegistrationMutationForm>
+                                                        )}
 
-                                                        {registrationState !==
-                                                            "cancelada" && (
-                                                                <RegistrationMutationForm
-                                                                    action={
-                                                                        cancelRegistrationAction
-                                                                    }
-                                                                    registrationId={
-                                                                        registration.id
-                                                                    }
-                                                                    returnTo={
-                                                                        returnTo
-                                                                    }
-                                                                    confirmation="¿Confirmas cancelar esta inscripción? Se conservará el historial y cualquier pago verificado; esta acción no inicia un reembolso. La cancelación se bloquea si ya hay check-in, el torneo empezó o la pareja tiene partidos."
-                                                                >
-                                                                    Cancelar
-                                                                </RegistrationMutationForm>
-                                                            )}
+                                                        <Link
+                                                            className={
+                                                                styles.quietButton
+                                                            }
+                                                            href={`/admin/inscripciones/${registration.id}`}
+                                                        >
+                                                            Ver
+                                                        </Link>
                                                     </div>
                                                 </td>
                                             </tr>

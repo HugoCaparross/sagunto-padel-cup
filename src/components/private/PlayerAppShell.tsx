@@ -3,6 +3,7 @@
 import {
     CalendarDays,
     ChevronDown,
+    ClipboardList,
     LayoutDashboard,
     Menu,
     ShieldCheck,
@@ -11,7 +12,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import {
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 
 import LogoutButton from "@/components/auth/LogoutButton";
 
@@ -30,6 +35,11 @@ const navigation = [
         icon: LayoutDashboard,
     },
     {
+        label: "Mis inscripciones",
+        href: "/app/inscripciones",
+        icon: ClipboardList,
+    },
+    {
         label: "Mi perfil",
         href: "/app/perfil",
         icon: UserRound,
@@ -41,16 +51,28 @@ const navigation = [
     },
 ];
 
-function getPageTitle(pathname: string) {
-    const current = navigation.find(
-        (item) => item.href === pathname,
-    );
+function getPageTitle(
+    pathname: string,
+) {
+    const current =
+        navigation.find(
+            (item) =>
+                item.href === pathname,
+        );
 
-    return current?.label ?? "Área de jugador";
+    return (
+        current?.label ??
+        "Área de jugador"
+    );
 }
 
-function getInitials(name: string) {
-    const parts = name.trim().split(/\s+/).filter(Boolean);
+function getInitials(
+    name: string,
+) {
+    const parts = name
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
 
     if (parts.length === 0) {
         return "J";
@@ -58,7 +80,9 @@ function getInitials(name: string) {
 
     return parts
         .slice(0, 2)
-        .map((part) => part.charAt(0))
+        .map((part) =>
+            part.charAt(0),
+        )
         .join("")
         .toUpperCase();
 }
@@ -68,15 +92,29 @@ export default function PlayerAppShell({
     playerName,
     playerEmail,
 }: Props) {
-    const pathname = usePathname();
+    const pathname =
+        usePathname();
 
-    const [mobileOpen, setMobileOpen] = useState(false);
-    const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+    const [
+        mobileOpen,
+        setMobileOpen,
+    ] = useState(false);
 
-    const accountMenuRef = useRef<HTMLDivElement>(null);
+    const [
+        accountMenuOpen,
+        setAccountMenuOpen,
+    ] = useState(false);
 
-    const title = getPageTitle(pathname);
-    const initials = getInitials(playerName);
+    const accountMenuRef =
+        useRef<HTMLDivElement>(
+            null,
+        );
+
+    const title =
+        getPageTitle(pathname);
+
+    const initials =
+        getInitials(playerName);
 
     function closeMobileMenu() {
         setMobileOpen(false);
@@ -91,128 +129,240 @@ export default function PlayerAppShell({
             return;
         }
 
-        function handlePointerDown(event: PointerEvent) {
+        function handlePointerDown(
+            event: PointerEvent,
+        ) {
             if (
-                event.target instanceof Node &&
-                !accountMenuRef.current?.contains(event.target)
+                event.target instanceof
+                Node &&
+                !accountMenuRef.current?.contains(
+                    event.target,
+                )
             ) {
-                setAccountMenuOpen(false);
+                setAccountMenuOpen(
+                    false,
+                );
             }
         }
 
-        function handleKeyDown(event: KeyboardEvent) {
-            if (event.key === "Escape") {
-                setAccountMenuOpen(false);
+        function handleKeyDown(
+            event: KeyboardEvent,
+        ) {
+            if (
+                event.key ===
+                "Escape"
+            ) {
+                setAccountMenuOpen(
+                    false,
+                );
             }
         }
 
-        document.addEventListener("pointerdown", handlePointerDown);
-        document.addEventListener("keydown", handleKeyDown);
+        document.addEventListener(
+            "pointerdown",
+            handlePointerDown,
+        );
+
+        document.addEventListener(
+            "keydown",
+            handleKeyDown,
+        );
 
         return () => {
             document.removeEventListener(
                 "pointerdown",
                 handlePointerDown,
             );
+
             document.removeEventListener(
                 "keydown",
                 handleKeyDown,
             );
         };
-    }, [accountMenuOpen]);
+    }, [
+        accountMenuOpen,
+    ]);
 
     return (
-        <div className={styles.shell}>
+        <div
+            className={
+                styles.shell
+            }
+        >
             {mobileOpen && (
                 <button
                     type="button"
-                    className={styles.backdrop}
+                    className={
+                        styles.backdrop
+                    }
                     aria-label="Cerrar menú"
-                    onClick={closeMobileMenu}
+                    onClick={
+                        closeMobileMenu
+                    }
                 />
             )}
 
             <aside
                 id="player-sidebar"
-                className={`${styles.sidebar} ${mobileOpen ? styles.sidebarOpen : ""
+                className={`${styles.sidebar} ${mobileOpen
+                        ? styles.sidebarOpen
+                        : ""
                     }`}
                 aria-label="Navegación privada"
             >
-                <div className={styles.brand}>
+                <div
+                    className={
+                        styles.brand
+                    }
+                >
                     <Link
                         href="/app"
-                        className={styles.brandLink}
-                        onClick={closeMobileMenu}
+                        className={
+                            styles.brandLink
+                        }
+                        onClick={
+                            closeMobileMenu
+                        }
                         aria-label="Sagunto Padel Cup, inicio del área privada"
                     >
-                        <span className={styles.brandMark}>
+                        <span
+                            className={
+                                styles.brandMark
+                            }
+                        >
                             <CalendarDays
                                 size={20}
-                                strokeWidth={2.4}
+                                strokeWidth={
+                                    2.4
+                                }
                                 aria-hidden="true"
                             />
                         </span>
 
-                        <span className={styles.brandText}>
-                            <strong>SAGUNTO</strong>
-                            <span>PADEL CUP</span>
+                        <span
+                            className={
+                                styles.brandText
+                            }
+                        >
+                            <strong>
+                                SAGUNTO
+                            </strong>
+
+                            <span>
+                                PADEL CUP
+                            </span>
                         </span>
                     </Link>
 
                     <button
                         type="button"
-                        className={styles.closeMenu}
-                        onClick={closeMobileMenu}
+                        className={
+                            styles.closeMenu
+                        }
+                        onClick={
+                            closeMobileMenu
+                        }
                         aria-label="Cerrar navegación"
                     >
                         <X size={20} />
                     </button>
                 </div>
 
-                <div className={styles.navGroup}>
-                    <p className={styles.navLabel}>
+                <div
+                    className={
+                        styles.navGroup
+                    }
+                >
+                    <p
+                        className={
+                            styles.navLabel
+                        }
+                    >
                         ÁREA DE JUGADOR
                     </p>
 
-                    <nav className={styles.navigation}>
-                        {navigation.map((item) => {
-                            const Icon = item.icon;
-                            const active = pathname === item.href;
+                    <nav
+                        className={
+                            styles.navigation
+                        }
+                    >
+                        {navigation.map(
+                            (item) => {
+                                const Icon =
+                                    item.icon;
 
-                            return (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    onClick={closeMobileMenu}
-                                    className={`${styles.navLink} ${active
-                                            ? styles.navLinkActive
-                                            : ""
-                                        }`}
-                                    aria-current={
-                                        active ? "page" : undefined
-                                    }
-                                >
-                                    <Icon
-                                        size={18}
-                                        strokeWidth={1.9}
-                                        aria-hidden="true"
-                                    />
-                                    <span>{item.label}</span>
-                                </Link>
-                            );
-                        })}
+                                const active =
+                                    pathname ===
+                                    item.href;
+
+                                return (
+                                    <Link
+                                        key={
+                                            item.href
+                                        }
+                                        href={
+                                            item.href
+                                        }
+                                        onClick={
+                                            closeMobileMenu
+                                        }
+                                        className={`${styles.navLink} ${active
+                                                ? styles.navLinkActive
+                                                : ""
+                                            }`}
+                                        aria-current={
+                                            active
+                                                ? "page"
+                                                : undefined
+                                        }
+                                    >
+                                        <Icon
+                                            size={
+                                                18
+                                            }
+                                            strokeWidth={
+                                                1.9
+                                            }
+                                            aria-hidden="true"
+                                        />
+
+                                        <span>
+                                            {
+                                                item.label
+                                            }
+                                        </span>
+                                    </Link>
+                                );
+                            },
+                        )}
                     </nav>
                 </div>
 
-                <div className={styles.sidebarBottom}>
-                    <div className={styles.sidebarHelp}>
-                        <span className={styles.helpTitle}>
-                            ¿Necesitas ayuda?
+                <div
+                    className={
+                        styles.sidebarBottom
+                    }
+                >
+                    <div
+                        className={
+                            styles.sidebarHelp
+                        }
+                    >
+                        <span
+                            className={
+                                styles.helpTitle
+                            }
+                        >
+                            ¿Necesitas
+                            ayuda?
                         </span>
 
                         <p>
-                            Contacta con la organización si tienes
-                            alguna consulta sobre tu cuenta.
+                            Contacta con la
+                            organización si
+                            tienes alguna
+                            consulta sobre tu
+                            cuenta.
                         </p>
 
                         <Link href="/contacto">
@@ -220,176 +370,220 @@ export default function PlayerAppShell({
                         </Link>
                     </div>
 
-                    <div className={styles.account}>
+                    <div
+                        className={
+                            styles.account
+                        }
+                    >
                         <div
-                            className={styles.avatar}
+                            className={
+                                styles.avatar
+                            }
                             aria-hidden="true"
                         >
                             {initials}
                         </div>
 
-                        <div className={styles.accountInfo}>
-                            <span className={styles.accountName}>
-                                {playerName}
+                        <div
+                            className={
+                                styles.accountInfo
+                            }
+                        >
+                            <span
+                                className={
+                                    styles.accountName
+                                }
+                            >
+                                {
+                                    playerName
+                                }
                             </span>
 
-                            <span className={styles.accountEmail}>
-                                {playerEmail}
+                            <span
+                                className={
+                                    styles.accountEmail
+                                }
+                            >
+                                {
+                                    playerEmail
+                                }
                             </span>
                         </div>
                     </div>
                 </div>
             </aside>
 
-            <div className={styles.mainColumn}>
-                <header className={styles.topbar}>
-                    <div className={styles.topbarLeft}>
+            <div
+                className={
+                    styles.mainColumn
+                }
+            >
+                <header
+                    className={
+                        styles.topbar
+                    }
+                >
+                    <div
+                        className={
+                            styles.topbarLeft
+                        }
+                    >
                         <button
                             type="button"
-                            className={styles.menuButton}
-                            onClick={() => setMobileOpen(true)}
+                            className={
+                                styles.menuButton
+                            }
+                            onClick={() =>
+                                setMobileOpen(
+                                    true,
+                                )
+                            }
                             aria-label="Abrir menú"
                             aria-controls="player-sidebar"
-                            aria-expanded={mobileOpen}
+                            aria-expanded={
+                                mobileOpen
+                            }
                         >
-                            <Menu size={21} />
+                            <Menu
+                                size={
+                                    21
+                                }
+                            />
                         </button>
 
-                        <div className={styles.breadcrumb}>
-                            <span>Área de jugador</span>
-
-                            <span
-                                className={styles.breadcrumbDivider}
-                            >
-                                /
+                        <div
+                            className={
+                                styles.breadcrumb
+                            }
+                        >
+                            <span>
+                                Área de
+                                jugador
                             </span>
 
-                            <strong>{title}</strong>
+                            <ChevronDown
+                                size={
+                                    13
+                                }
+                                aria-hidden="true"
+                            />
+
+                            <strong>
+                                {title}
+                            </strong>
                         </div>
                     </div>
 
                     <div
-                        className={styles.accountMenuContainer}
-                        ref={accountMenuRef}
+                        ref={
+                            accountMenuRef
+                        }
+                        className={
+                            styles.topbarAccount
+                        }
                     >
                         <button
                             type="button"
-                            className={styles.topbarProfile}
-                            onClick={() =>
-                                setAccountMenuOpen((open) => !open)
+                            className={
+                                styles.topbarAccountButton
                             }
-                            aria-expanded={accountMenuOpen}
-                            aria-controls="account-dropdown"
-                            aria-haspopup="true"
+                            onClick={() =>
+                                setAccountMenuOpen(
+                                    (
+                                        current,
+                                    ) =>
+                                        !current,
+                                )
+                            }
+                            aria-expanded={
+                                accountMenuOpen
+                            }
+                            aria-haspopup="menu"
                         >
                             <span
-                                className={styles.topbarAvatar}
-                                aria-hidden="true"
+                                className={
+                                    styles.topbarAvatar
+                                }
                             >
-                                {initials}
+                                {
+                                    initials
+                                }
                             </span>
 
-                            <span>Mi cuenta</span>
+                            <span
+                                className={
+                                    styles.topbarAccountText
+                                }
+                            >
+                                {
+                                    playerName
+                                }
+                            </span>
 
                             <ChevronDown
-                                size={14}
-                                className={`${styles.topbarChevron
-                                    } ${accountMenuOpen
-                                        ? styles.topbarChevronOpen
-                                        : ""
-                                    }`}
+                                size={
+                                    14
+                                }
                                 aria-hidden="true"
                             />
                         </button>
 
                         {accountMenuOpen && (
                             <div
-                                id="account-dropdown"
-                                className={styles.accountDropdown}
+                                className={
+                                    styles.accountMenu
+                                }
+                                role="menu"
                             >
-                                <div
-                                    className={styles.dropdownHeader}
+                                <Link
+                                    href="/app/perfil"
+                                    role="menuitem"
+                                    onClick={
+                                        closeAccountMenu
+                                    }
                                 >
-                                    <span
-                                        className={styles.dropdownName}
-                                    >
-                                        {playerName}
-                                    </span>
+                                    Mi perfil
+                                </Link>
 
-                                    <span
-                                        className={styles.dropdownEmail}
-                                    >
-                                        {playerEmail}
-                                    </span>
-                                </div>
-
-                                <nav
-                                    className={styles.dropdownLinks}
-                                    aria-label="Opciones de cuenta"
+                                <Link
+                                    href="/app/inscripciones"
+                                    role="menuitem"
+                                    onClick={
+                                        closeAccountMenu
+                                    }
                                 >
-                                    <Link
-                                        href="/app/perfil"
-                                        className={styles.dropdownLink}
-                                        onClick={closeAccountMenu}
-                                    >
-                                        <UserRound
-                                            size={16}
-                                            aria-hidden="true"
-                                        />
-                                        <span>Mi perfil</span>
-                                    </Link>
+                                    Mis inscripciones
+                                </Link>
 
-                                    <Link
-                                        href="/app/seguridad"
-                                        className={styles.dropdownLink}
-                                        onClick={closeAccountMenu}
-                                    >
-                                        <ShieldCheck
-                                            size={16}
-                                            aria-hidden="true"
-                                        />
-                                        <span>Seguridad</span>
-                                    </Link>
-                                </nav>
+                                <Link
+                                    href="/app/seguridad"
+                                    role="menuitem"
+                                    onClick={
+                                        closeAccountMenu
+                                    }
+                                >
+                                    Seguridad
+                                </Link>
 
                                 <div
-                                    className={styles.dropdownLogout}
-                                >
-                                    <LogoutButton
-                                        onDone={closeAccountMenu}
-                                    />
-                                </div>
+                                    className={
+                                        styles.accountMenuDivider
+                                    }
+                                />
+
+                                <LogoutButton />
                             </div>
                         )}
                     </div>
                 </header>
 
-                <div className={styles.content}>
+                <div
+                    className={
+                        styles.content
+                    }
+                >
                     {children}
                 </div>
-
-                <footer className={styles.footer}>
-                    <span>
-                        © {new Date().getFullYear()} Sagunto Padel Cup
-                    </span>
-
-                    <nav
-                        className={styles.footerLinks}
-                        aria-label="Enlaces legales"
-                    >
-                        <Link href="/aviso-legal">
-                            Aviso legal
-                        </Link>
-
-                        <Link href="/privacidad">
-                            Privacidad
-                        </Link>
-
-                        <Link href="/contacto">
-                            Contacto
-                        </Link>
-                    </nav>
-                </footer>
             </div>
         </div>
     );

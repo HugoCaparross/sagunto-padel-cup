@@ -1,0 +1,653 @@
+.page {
+    width: 100%;
+    min-width: 0;
+    padding: 32px 0 64px;
+    color: var(--foreground);
+}
+
+.container {
+    width: min(100% - 48px, 1120px);
+    margin-inline: auto;
+}
+
+.pageHeader {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 26px;
+}
+
+.eyebrow {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--brand);
+    font-size: 0.66rem;
+    font-weight: 850;
+    letter-spacing: 0.12em;
+}
+
+.pageHeader h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3vw, 2.45rem);
+    font-weight: 850;
+    letter-spacing: -0.045em;
+    line-height: 1.08;
+}
+
+.pageHeader p {
+    max-width: 650px;
+    margin: 9px 0 0;
+    color: var(--muted);
+    font-size: 0.86rem;
+    line-height: 1.6;
+}
+
+.findTournamentLink {
+    display: inline-flex;
+    min-height: 40px;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 7px;
+    padding: 0 13px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--foreground);
+    font-size: 0.76rem;
+    font-weight: 750;
+    text-decoration: none;
+}
+
+.findTournamentLink:hover {
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+.feedbackSuccess,
+.feedbackError {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    margin-bottom: 20px;
+    padding: 13px 15px;
+    border-left: 3px solid;
+}
+
+.feedbackSuccess {
+    border-color: var(--accent-green);
+    background: rgba(124, 172, 80, 0.08);
+}
+
+.feedbackError {
+    border-color: var(--danger);
+    background: var(--danger-soft);
+}
+
+.feedbackSuccess svg {
+    color: var(--accent-green-dark);
+}
+
+.feedbackError svg {
+    color: var(--danger);
+}
+
+.feedbackSuccess strong,
+.feedbackError strong {
+    display: block;
+    font-size: 0.76rem;
+    font-weight: 800;
+}
+
+.feedbackSuccess span,
+.feedbackError span {
+    display: block;
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 0.7rem;
+    line-height: 1.45;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin-bottom: 26px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+
+.summaryItem {
+    min-width: 0;
+    padding: 17px 18px;
+    border-right: 1px solid var(--line);
+}
+
+.summaryItem:last-child {
+    border-right: 0;
+}
+
+.summaryItem span,
+.summaryItem strong {
+    display: block;
+}
+
+.summaryItem span {
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+}
+
+.summaryItem strong {
+    font-size: 1.3rem;
+    font-weight: 850;
+    letter-spacing: -0.03em;
+}
+
+.registrationList {
+    display: grid;
+    gap: 12px;
+}
+
+.registrationCard {
+    border: 1px solid var(--line);
+    background: var(--surface);
+}
+
+.registrationCard:hover {
+    border-color: var(--line-strong);
+}
+
+.registrationCancelled {
+    opacity: 0.72;
+}
+
+.cardHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 20px 15px;
+}
+
+.cardHeading {
+    min-width: 0;
+}
+
+.cardEyebrow {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: 0.58rem;
+    font-weight: 850;
+    letter-spacing: 0.1em;
+}
+
+.cardHeading h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 820;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+}
+
+.cardStatusGroup {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.statusBadge,
+.paymentBadge {
+    display: inline-flex;
+    min-height: 25px;
+    align-items: center;
+    padding: 0 8px;
+    border: 1px solid;
+    border-radius: 999px;
+    font-size: 0.57rem;
+    font-weight: 850;
+    letter-spacing: 0.055em;
+    white-space: nowrap;
+}
+
+.statusConfirmed {
+    border-color: rgba(124, 172, 80, 0.35);
+    background: rgba(124, 172, 80, 0.1);
+    color: var(--accent-green-dark);
+}
+
+.statusPending {
+    border-color: rgba(154, 104, 25, 0.28);
+    background: var(--warning-soft);
+    color: var(--warning);
+}
+
+.statusWaiting {
+    border-color: rgba(154, 104, 25, 0.28);
+    background: var(--warning-soft);
+    color: var(--warning);
+}
+
+.statusCancelled {
+    border-color: var(--line);
+    background: var(--surface-soft);
+    color: var(--muted);
+}
+
+.paymentVerified {
+    border-color: rgba(124, 172, 80, 0.35);
+    background: rgba(124, 172, 80, 0.08);
+    color: var(--accent-green-dark);
+}
+
+.paymentPending {
+    border-color: rgba(154, 104, 25, 0.28);
+    background: var(--warning-soft);
+    color: var(--warning);
+}
+
+.paymentRejected {
+    border-color: rgba(163, 59, 66, 0.28);
+    background: var(--danger-soft);
+    color: var(--danger);
+}
+
+.paymentNotApplicable {
+    border-color: var(--line);
+    background: var(--surface-soft);
+    color: var(--muted);
+}
+
+.cardMeta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 0 20px 17px;
+    color: var(--muted);
+    font-size: 0.7rem;
+}
+
+.cardMeta div {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.cardMeta svg {
+    flex: 0 0 auto;
+    color: var(--brand);
+}
+
+.detailsGrid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+
+.detail {
+    min-width: 0;
+    padding: 14px 16px;
+    border-right: 1px solid var(--line);
+}
+
+.detail:last-child {
+    border-right: 0;
+}
+
+.detail span,
+.detail strong,
+.detail small {
+    display: block;
+}
+
+.detail span {
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 0.57rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+}
+
+.detail strong {
+    overflow-wrap: anywhere;
+    font-size: 0.76rem;
+    font-weight: 780;
+    line-height: 1.4;
+}
+
+.detail small {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 0.64rem;
+    line-height: 1.4;
+}
+
+.paymentNotice,
+.waitingNotice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 14px 20px 0;
+    padding: 12px 13px;
+}
+
+.paymentNotice {
+    background: var(--surface-soft);
+}
+
+.waitingNotice {
+    background: var(--warning-soft);
+}
+
+.paymentNotice svg {
+    flex: 0 0 auto;
+    color: var(--brand);
+    margin-top: 1px;
+}
+
+.waitingNotice svg {
+    flex: 0 0 auto;
+    color: var(--warning);
+    margin-top: 1px;
+}
+
+.paymentNotice strong,
+.waitingNotice strong {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.paymentNotice p,
+.waitingNotice p {
+    max-width: 720px;
+    margin: 3px 0 0;
+    color: var(--muted);
+    font-size: 0.67rem;
+    line-height: 1.5;
+}
+
+.cardFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 20px 18px;
+}
+
+.footerInfo {
+    min-width: 0;
+    color: var(--muted);
+    font-size: 0.66rem;
+    line-height: 1.45;
+}
+
+.cardActions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 7px;
+}
+
+.secondaryButton,
+.cancelButton {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 11px;
+    border-radius: 7px;
+    font-size: 0.68rem;
+    font-weight: 750;
+    cursor: pointer;
+}
+
+.secondaryButton {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--foreground);
+    text-decoration: none;
+}
+
+.secondaryButton:hover {
+    border-color: var(--line-strong);
+    background: var(--surface-soft);
+}
+
+.cancelButton {
+    border: 1px solid rgba(163, 59, 66, 0.25);
+    background: transparent;
+    color: var(--danger);
+}
+
+.cancelButton:hover:not(:disabled) {
+    background: var(--danger-soft);
+}
+
+.cancelButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.emptyState {
+    display: flex;
+    min-height: 340px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 45px 24px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    text-align: center;
+}
+
+.emptyIcon {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 18px;
+    place-items: center;
+    border: 1px solid var(--line);
+    background: var(--surface-soft);
+    color: var(--brand);
+}
+
+.emptyState .eyebrow {
+    margin-bottom: 7px;
+}
+
+.emptyState h2 {
+    max-width: 520px;
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 820;
+    letter-spacing: -0.025em;
+}
+
+.emptyState p {
+    max-width: 540px;
+    margin: 8px 0 20px;
+    color: var(--muted);
+    font-size: 0.76rem;
+    line-height: 1.6;
+}
+
+.primaryButton {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    gap: 7px;
+    padding: 0 15px;
+    background: var(--accent-green);
+    color: var(--white);
+    font-size: 0.73rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.primaryButton:hover {
+    background: var(--accent-green-dark);
+}
+
+.bottomHelp {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 26px;
+    padding: 16px 0 0;
+    border-top: 1px solid var(--line);
+}
+
+.bottomHelp>svg {
+    flex: 0 0 auto;
+    color: var(--brand);
+}
+
+.bottomHelp>div {
+    min-width: 0;
+    flex: 1;
+}
+
+.bottomHelp strong {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.bottomHelp p {
+    max-width: 680px;
+    margin: 3px 0 0;
+    color: var(--muted);
+    font-size: 0.67rem;
+    line-height: 1.5;
+}
+
+.bottomHelp>a {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 5px;
+    color: var(--brand-dark);
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.bottomHelp>a:hover {
+    color: var(--brand);
+}
+
+@media (max-width: 900px) {
+    .detailsGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .detail:nth-child(2) {
+        border-right: 0;
+    }
+
+    .detail:nth-child(-n + 2) {
+        border-bottom: 1px solid var(--line);
+    }
+}
+
+@media (max-width: 720px) {
+    .container {
+        width: min(100% - 28px, 1120px);
+    }
+
+    .pageHeader {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .summaryItem:nth-child(2) {
+        border-right: 0;
+    }
+
+    .summaryItem:nth-child(-n + 2) {
+        border-bottom: 1px solid var(--line);
+    }
+
+    .cardHeader {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .cardStatusGroup {
+        justify-content: flex-start;
+    }
+
+    .cardFooter {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .cardActions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 520px) {
+    .page {
+        padding-top: 24px;
+    }
+
+    .container {
+        width: min(100% - 22px, 1120px);
+    }
+
+    .summaryItem {
+        padding-inline: 13px;
+    }
+
+    .detailsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .detail,
+    .detail:nth-child(2) {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .detail:last-child {
+        border-bottom: 0;
+    }
+
+    .cardHeader,
+    .cardMeta,
+    .cardFooter {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .paymentNotice,
+    .waitingNotice {
+        margin-left: 14px;
+        margin-right: 14px;
+    }
+
+    .bottomHelp {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .bottomHelp>a {
+        margin-left: 30px;
+    }
+}

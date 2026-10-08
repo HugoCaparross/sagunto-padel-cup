@@ -4,22 +4,14 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import {
-    checkInPlayerAdmin,
-    confirmRegistrationPaymentAdmin,
-    confirmRegistrationAdmin,
     cancelRegistrationAdmin,
+    checkInPlayerAdmin,
+    confirmRegistrationAdmin,
+    confirmRegistrationPaymentAdmin,
+    markRegistrationPaymentPendingAdmin,
     moveRegistrationToWaitingListAdmin,
     promoteRegistrationAdmin,
-    requireAdminContext,
 } from "@/lib/services/admin";
-
-import {
-    markPaymentPending,
-} from "@/lib/services/registrations";
-
-/* -------------------------------------------------------------------------- */
-/* HELPERS                                                                    */
-/* -------------------------------------------------------------------------- */
 
 function readText(
     formData: FormData,
@@ -38,20 +30,23 @@ function safeReturnTo(
     value: string,
 ): string {
     try {
-        const parsed = new URL(
-            value ||
-            "/admin/inscripciones",
-            "http://localhost",
-        );
+        const parsed =
+            new URL(
+                value ||
+                "/admin/inscripciones",
+                "http://localhost",
+            );
 
-        return (
+        if (
             parsed.origin ===
             "http://localhost" &&
             parsed.pathname ===
             "/admin/inscripciones"
-        )
-            ? `${parsed.pathname}${parsed.search}`
-            : "/admin/inscripciones";
+        ) {
+            return `${parsed.pathname}${parsed.search}`;
+        }
+
+        return "/admin/inscripciones";
     } catch {
         return "/admin/inscripciones";
     }
@@ -62,16 +57,27 @@ async function finish(
     result:
         | "actualizada"
         | "error",
+    registrationId?: string,
 ): Promise<never> {
-    revalidatePath("/admin");
+    revalidatePath(
+        "/admin",
+    );
+
     revalidatePath(
         "/admin/inscripciones",
     );
 
-    const url = new URL(
-        returnTo,
-        "http://localhost",
-    );
+    if (registrationId) {
+        revalidatePath(
+            `/admin/inscripciones/${registrationId}`,
+        );
+    }
+
+    const url =
+        new URL(
+            returnTo,
+            "http://localhost",
+        );
 
     url.searchParams.set(
         "resultado",
@@ -82,10 +88,6 @@ async function finish(
         `${url.pathname}${url.search}`,
     );
 }
-
-/* -------------------------------------------------------------------------- */
-/* CANCELAR INSCRIPCIÓN                                                       */
-/* -------------------------------------------------------------------------- */
 
 export async function cancelRegistrationAction(
     formData: FormData,
@@ -124,18 +126,16 @@ export async function cancelRegistrationAction(
         await finish(
             returnTo,
             "error",
+            registrationId,
         );
     }
 
     await finish(
         returnTo,
         "actualizada",
+        registrationId,
     );
 }
-
-/* -------------------------------------------------------------------------- */
-/* PROMOVER DESDE LISTA DE ESPERA                                             */
-/* -------------------------------------------------------------------------- */
 
 export async function promoteWaitingRegistrationAction(
     formData: FormData,
@@ -174,18 +174,16 @@ export async function promoteWaitingRegistrationAction(
         await finish(
             returnTo,
             "error",
+            registrationId,
         );
     }
 
     await finish(
         returnTo,
         "actualizada",
+        registrationId,
     );
 }
-
-/* -------------------------------------------------------------------------- */
-/* MOVER A LISTA DE ESPERA                                                    */
-/* -------------------------------------------------------------------------- */
 
 export async function moveRegistrationToWaitingListAction(
     formData: FormData,
@@ -224,19 +222,25 @@ export async function moveRegistrationToWaitingListAction(
         await finish(
             returnTo,
             "error",
+            registrationId,
         );
     }
 
     await finish(
         returnTo,
         "actualizada",
+        registrationId,
     );
 }
 
-/* -------------------------------------------------------------------------- */
-/* VERIFICAR PAGO PRESENCIAL                                                  */
-/* -------------------------------------------------------------------------- */
-
+/**
+ * Marca el pago como verificado.
+ *
+ * IMPORTANTE:
+ * El pago de SPC es presencial/manual.
+ * Esta acción no inicia ningún gateway,
+ * checkout ni operación bancaria.
+ */
 export async function verifyPaymentAction(
     formData: FormData,
 ): Promise<void> {
@@ -244,12 +248,6 @@ export async function verifyPaymentAction(
         readText(
             formData,
             "registrationId",
-        );
-
-    const method =
-        readText(
-            formData,
-            "method",
         );
 
     const returnTo =
@@ -260,14 +258,7 @@ export async function verifyPaymentAction(
             ),
         );
 
-    if (
-        !registrationId ||
-        ![
-            "fisico",
-            "transferencia",
-            "otro",
-        ].includes(method)
-    ) {
+    if (!registrationId) {
         await finish(
             returnTo,
             "error",
@@ -279,52 +270,41 @@ export async function verifyPaymentAction(
             {
                 registrationId,
 
-                method:
-                    method as
-                    | "fisico"
-                    | "transferencia"
-                    | "otro",
+                method: "fisico",
 
                 amount: null,
 
-                paymentDate:
-                    null,
+                paymentDate: null,
 
-                note:
-                    null,
+                note: null,
             },
         );
     } catch (error) {
         console.error(
-            "[Admin] No se pudo verificar el pago",
+            "[Admin] No se pudo verificar el pago presencial",
             error,
         );
 
         await finish(
             returnTo,
             "error",
+            registrationId,
         );
     }
 
     await finish(
         returnTo,
         "actualizada",
+        registrationId,
     );
 }
 
-/* -------------------------------------------------------------------------- */
-/* DESMARCAR PAGO                                                             */
-/* -------------------------------------------------------------------------- */
-
 /**
- * Devuelve el estado administrativo del pago a "pendiente".
+ * Revierte la verificación manual del pago.
  *
- * No realiza ningún reembolso.
- * No realiza ninguna operación bancaria.
- * No conecta con ningún proveedor de pagos.
- *
- * Solo modifica el estado de la inscripción después de comprobar
- * que la operación procede de un administrador autenticado.
+ * No borra la inscripción.
+ * No modifica la pareja.
+ * No inicia ningún reembolso.
  */
 export async function markPaymentPendingAction(
     formData: FormData,
@@ -351,14 +331,7 @@ export async function markPaymentPendingAction(
     }
 
     try {
-        /*
-         * La función original markPaymentPending() pertenece al servicio
-         * de registros. Antes de ejecutarla comprobamos explícitamente
-         * que el usuario actual tenga contexto administrativo.
-         */
-        await requireAdminContext();
-
-        await markPaymentPending(
+        await markRegistrationPaymentPendingAdmin(
             registrationId,
         );
     } catch (error) {
@@ -370,18 +343,16 @@ export async function markPaymentPendingAction(
         await finish(
             returnTo,
             "error",
+            registrationId,
         );
     }
 
     await finish(
         returnTo,
         "actualizada",
+        registrationId,
     );
 }
-
-/* -------------------------------------------------------------------------- */
-/* CHECK-IN                                                                   */
-/* -------------------------------------------------------------------------- */
 
 export async function checkInAction(
     formData: FormData,
@@ -420,18 +391,16 @@ export async function checkInAction(
         await finish(
             returnTo,
             "error",
+            registrationId,
         );
     }
 
     await finish(
         returnTo,
         "actualizada",
+        registrationId,
     );
 }
-
-/* -------------------------------------------------------------------------- */
-/* CONFIRMAR INSCRIPCIÓN                                                      */
-/* -------------------------------------------------------------------------- */
 
 export async function confirmRegistrationAction(
     formData: FormData,
@@ -470,11 +439,13 @@ export async function confirmRegistrationAction(
         await finish(
             returnTo,
             "error",
+            registrationId,
         );
     }
 
     await finish(
         returnTo,
         "actualizada",
+        registrationId,
     );
 }
