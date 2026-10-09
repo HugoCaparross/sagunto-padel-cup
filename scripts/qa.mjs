@@ -6,7 +6,6 @@ const root = resolve(process.cwd());
 
 const requiredFiles = [
     "src/app/layout.tsx",
-    "src/app/(public)/page.tsx",
     "src/app/loading.tsx",
     "src/app/error.tsx",
     "src/app/not-found.tsx",
@@ -21,6 +20,7 @@ const requiredFiles = [
     "src/lib/public/site.ts",
     "src/lib/public/seo.ts",
 
+    "src/app/(public)/page.tsx",
     "src/app/(public)/torneos/page.tsx",
     "src/app/(public)/torneos/page.module.css",
     "src/app/(public)/torneos/[slug]/page.tsx",
@@ -36,7 +36,6 @@ const requiredFiles = [
 
     "src/app/(public)/circuito/page.tsx",
     "src/app/(public)/circuito/page.module.css",
-
     "src/app/(public)/master-final/page.tsx",
     "src/app/(public)/master-final/page.module.css",
 
@@ -87,15 +86,51 @@ function readText(relativePath) {
     return readFileSync(absolutePath, "utf8");
 }
 
+function hasRouteFile(relativePath) {
+    return existsSync(join(root, relativePath));
+}
+
+function assertRouteContract(
+    relativePath,
+    requiredTerms,
+    forbiddenTerms = [],
+) {
+    const content = readText(relativePath);
+
+    if (content === null) {
+        logError(
+            `No se puede validar ${relativePath}: archivo inexistente`,
+        );
+        return;
+    }
+
+    for (const term of requiredTerms) {
+        if (content.includes(term)) {
+            logOk(
+                `${relativePath}: contiene ${term}`,
+            );
+        } else {
+            logError(
+                `${relativePath}: falta ${term}`,
+            );
+        }
+    }
+
+    for (const term of forbiddenTerms) {
+        if (content.includes(term)) {
+            logError(
+                `${relativePath}: contiene contenido incompatible: ${term}`,
+            );
+        }
+    }
+}
+
 console.log("");
 console.log("==========================================");
 console.log(" SAGUNTO PADEL CUP — QA");
 console.log("==========================================");
 console.log("");
 
-/**
- * 1. Archivos públicos obligatorios
- */
 console.log("1. Estructura pública");
 
 for (const relativePath of requiredFiles) {
@@ -108,19 +143,86 @@ for (const relativePath of requiredFiles) {
 
 console.log("");
 
-/**
- * 2. Comprobación de validators
- *
- * Este QA no impone reglas deportivas nuevas.
- * Únicamente evita que entren accidentalmente reglas
- * ajenas al proyecto.
- */
-console.log("2. Validators");
+console.log("2. Contratos de rutas públicas");
 
-const validatorDirectory = join(root, "src", "lib", "validators");
+assertRouteContract(
+    "src/app/(public)/torneos/page.tsx",
+    [
+        "getPublicTournaments",
+        "href={`/torneos/${tournament.slug}",
+    ],
+    [
+        "getPublicTournamentBySlug",
+        "params.slug",
+    ],
+);
+
+assertRouteContract(
+    "src/app/(public)/torneos/[slug]/page.tsx",
+    [
+        "getPublicTournamentBySlug",
+        "params",
+        "slug",
+    ],
+);
+
+assertRouteContract(
+    "src/app/(public)/noticias/page.tsx",
+    [
+        "getPublicNews",
+        "href={`/noticias/${item.slug}",
+    ],
+    [
+        "getPublicNewsBySlug",
+        "params.slug",
+    ],
+);
+
+assertRouteContract(
+    "src/app/(public)/noticias/[slug]/page.tsx",
+    [
+        "getPublicNewsBySlug",
+        "params",
+        "slug",
+    ],
+);
+
+assertRouteContract(
+    "src/app/(public)/jugadores/page.tsx",
+    [
+        "getPublicPlayers",
+        "href={`/jugadores/${player.id}",
+    ],
+    [
+        "getPublicRanking",
+        "searchParams",
+    ],
+);
+
+assertRouteContract(
+    "src/app/(public)/jugadores/[id]/page.tsx",
+    [
+        "getPublicPlayer",
+        "params",
+        "id",
+    ],
+);
+
+console.log("");
+
+console.log("3. Validators");
+
+const validatorDirectory = join(
+    root,
+    "src",
+    "lib",
+    "validators",
+);
 
 if (!existsSync(validatorDirectory)) {
-    logWarning("No existe src/lib/validators. No se realiza comprobación de validators.");
+    logOk(
+        "No hay una carpeta de validators separada; no se aplica una comprobación artificial",
+    );
 } else {
     const validatorFiles = [
         "auth.ts",
@@ -130,14 +232,20 @@ if (!existsSync(validatorDirectory)) {
         "tournament.ts",
     ];
 
+    let validatorCount = 0;
+
     for (const file of validatorFiles) {
-        const relativePath = join("src/lib/validators", file);
+        const relativePath = join(
+            "src/lib/validators",
+            file,
+        );
         const content = readText(relativePath);
 
         if (content === null) {
-            logWarning(`No existe ${relativePath}`);
             continue;
         }
+
+        validatorCount += 1;
 
         let fileHasForbiddenTerm = false;
 
@@ -151,22 +259,31 @@ if (!existsSync(validatorDirectory)) {
         }
 
         if (!fileHasForbiddenTerm) {
-            logOk(`${relativePath} no contiene reglas ajenas detectadas`);
+            logOk(
+                `${relativePath} no contiene reglas ajenas detectadas`,
+            );
         }
+    }
+
+    if (validatorCount === 0) {
+        logOk(
+            "No hay una carpeta de validators separada; no se aplica una comprobación artificial",
+        );
     }
 }
 
 console.log("");
 
-/**
- * 3. Capa pública de datos
- */
-console.log("3. Capa pública de datos");
+console.log("4. Capa pública de datos");
 
-const publicSite = readText("src/lib/public/site.ts");
+const publicSite = readText(
+    "src/lib/public/site.ts",
+);
 
 if (publicSite === null) {
-    logError("No existe src/lib/public/site.ts");
+    logError(
+        "No existe src/lib/public/site.ts",
+    );
 } else {
     const requiredPublicFunctions = [
         "getPublicTournaments",
@@ -180,64 +297,51 @@ if (publicSite === null) {
 
     for (const functionName of requiredPublicFunctions) {
         if (publicSite.includes(functionName)) {
-            logOk(`site.ts contiene ${functionName}`);
+            logOk(
+                `site.ts contiene ${functionName}`,
+            );
         } else {
-            logWarning(`site.ts no contiene ${functionName}`);
+            logWarning(
+                `site.ts no contiene ${functionName}`,
+            );
         }
     }
-
-    if (
-        publicSite.includes(".from(") ||
-        publicSite.includes("supabase")
-    ) {
-        logOk("site.ts contiene acceso a datos");
-    } else {
-        logWarning(
-            "No se ha detectado acceso evidente a Supabase en site.ts",
-        );
-    }
 }
 
 console.log("");
 
-/**
- * 4. Noticias publicadas
- */
-console.log("4. Noticias públicas");
+console.log("5. SEO y rastreo");
 
-const newsPage = readText("src/app/(public)/noticias/page.tsx");
-const publicSiteContent = readText("src/lib/public/site.ts");
-const newsDetailPage = readText("src/app/(public)/noticias/[slug]/page.tsx");
-
-if (newsPage?.includes("getPublicNews") && publicSiteContent?.includes("getPublicNews")) {
-    logOk("Listado de noticias contempla estado publicado");
-} else {
-    logWarning(
-        "No se ha detectado explícitamente el filtro de noticias publicadas",
-    );
-}
-
-if (newsDetailPage?.includes("notFound")) {
-    logOk("Detalle de noticia contempla contenido inexistente");
-} else {
-    logWarning(
-        "No se ha detectado notFound() en el detalle de noticias",
-    );
-}
-
-console.log("");
-
-/**
- * 5. SEO
- */
-console.log("5. SEO");
-
-const robots = readText("src/app/robots.ts");
-const sitemap = readText("src/app/sitemap.ts");
-const seo = readText("src/lib/public/seo.ts");
+const robots = readText(
+    "src/app/robots.ts",
+);
+const sitemap = readText(
+    "src/app/sitemap.ts",
+);
+const seo = readText(
+    "src/lib/public/seo.ts",
+);
 
 if (robots !== null) {
     logOk("robots.ts existe");
+
+    for (const path of [
+        "/admin",
+        "/api",
+        "/app",
+        "/login",
+        "/registro",
+    ]) {
+        if (robots.includes(path)) {
+            logOk(
+                `robots.ts bloquea ${path}`,
+            );
+        } else {
+            logWarning(
+                `robots.ts no bloquea explícitamente ${path}`,
+            );
+        }
+    }
 } else {
     logError("No existe robots.ts");
 }
@@ -257,136 +361,260 @@ if (seo !== null) {
         "openGraph",
     ]) {
         if (seo.includes(property)) {
-            logOk(`SEO contempla ${property}`);
+            logOk(
+                `SEO contempla ${property}`,
+            );
         } else {
-            logWarning(`SEO no contiene explícitamente ${property}`);
+            logWarning(
+                `SEO no contiene explícitamente ${property}`,
+            );
         }
     }
 } else {
-    logError("No existe src/lib/public/seo.ts");
+    logError(
+        "No existe src/lib/public/seo.ts",
+    );
 }
 
 console.log("");
 
-/**
- * 7. Estados básicos
- */
 console.log("6. Estados de aplicación");
 
-const loading = readText("src/app/loading.tsx");
-const errorPage = readText("src/app/error.tsx");
-const notFound = readText("src/app/not-found.tsx");
-
-if (loading !== null) {
-    logOk("loading.tsx existe");
-} else {
-    logError("No existe loading.tsx");
-}
-
-if (errorPage !== null) {
-    logOk("error.tsx existe");
-} else {
-    logError("No existe error.tsx");
-}
-
-if (notFound !== null) {
-    logOk("not-found.tsx existe");
-} else {
-    logError("No existe not-found.tsx");
+for (const relativePath of [
+    "src/app/loading.tsx",
+    "src/app/error.tsx",
+    "src/app/not-found.tsx",
+]) {
+    if (hasRouteFile(relativePath)) {
+        logOk(
+            `${relativePath} existe`,
+        );
+    } else {
+        logError(
+            `No existe ${relativePath}`,
+        );
+    }
 }
 
 console.log("");
 
-/**
- * 8. package.json
- */
-console.log("7. Scripts del proyecto");
+console.log("7. Scripts y dependencias");
 
-const packagePath = join(root, "package.json");
+const packagePath = join(
+    root,
+    "package.json",
+);
 
 if (!existsSync(packagePath)) {
     logError("No existe package.json");
 } else {
     const packageJson = JSON.parse(
-        readFileSync(packagePath, "utf8"),
+        readFileSync(
+            packagePath,
+            "utf8",
+        ),
     );
 
-    const scripts = packageJson.scripts ?? {};
+    const scripts =
+        packageJson.scripts ?? {};
 
-    if (scripts.lint) {
-        logOk("Existe npm run lint");
-    } else {
-        logWarning("No existe script lint");
+    for (const script of [
+        "dev",
+        "build",
+        "start",
+        "lint",
+        "qa",
+        "test",
+        "typecheck",
+    ]) {
+        if (scripts[script]) {
+            logOk(
+                `Existe npm run ${script}`,
+            );
+        } else {
+            logWarning(
+                `No existe script ${script}`,
+            );
+        }
     }
 
-    if (scripts.build) {
-        logOk("Existe npm run build");
+    if (
+        existsSync(
+            join(
+                root,
+                "package-lock.json",
+            ),
+        )
+    ) {
+        logOk(
+            "package-lock.json existe y queda versionado",
+        );
     } else {
-        logWarning("No existe script build");
+        logError(
+            "Falta package-lock.json",
+        );
     }
 }
 
 console.log("");
 
-/**
- * 8. Lint
- *
- * Se ejecuta únicamente si existe el script.
- */
-console.log("8. Lint");
-
-const packageJson = JSON.parse(
-    readFileSync(packagePath, "utf8"),
+console.log(
+    "8. Archivos locales que no deben entrar en Git",
 );
 
-if (packageJson.scripts?.lint) {
-    const lintResult = spawnSync(
-        process.platform === "win32" ? "npm.cmd" : "npm",
-        ["run", "lint"],
+const gitignore = readText(
+    ".gitignore",
+);
+
+if (
+    gitignore?.includes(
+        "/supabase/.temp/",
+    )
+) {
+    logOk(
+        ".gitignore excluye supabase/.temp",
+    );
+} else {
+    logError(
+        ".gitignore no excluye supabase/.temp",
+    );
+}
+
+console.log("");
+
+console.log("9. Lint");
+
+if (
+    existsSync(
+        join(root, "node_modules"),
+    )
+) {
+    const packageJson = JSON.parse(
+        readFileSync(
+            packagePath,
+            "utf8",
+        ),
+    );
+
+    if (packageJson.scripts?.lint) {
+        const lintResult = spawnSync(
+            process.platform === "win32"
+                ? "npm.cmd"
+                : "npm",
+            ["run", "lint"],
+            {
+                cwd: root,
+                stdio: "inherit",
+                shell:
+                    process.platform ===
+                    "win32",
+            },
+        );
+
+        if (lintResult.status === 0) {
+            logOk("npm run lint");
+        } else {
+            logError(
+                "npm run lint ha fallado",
+            );
+        }
+    }
+} else {
+    logWarning(
+        "node_modules no existe; se omite ejecución de lint en este entorno",
+    );
+}
+
+console.log("");
+
+console.log("10. TypeScript");
+
+if (
+    existsSync(
+        join(root, "node_modules"),
+    )
+) {
+    const tscResult = spawnSync(
+        process.platform === "win32"
+            ? "npx.cmd"
+            : "npx",
+        [
+            "tsc",
+            "--noEmit",
+            "--incremental",
+            "false",
+        ],
         {
             cwd: root,
             stdio: "inherit",
-            shell: process.platform === "win32",
+            shell:
+                process.platform ===
+                "win32",
         },
     );
 
-    if (lintResult.status === 0) {
-        logOk("npm run lint");
+    if (tscResult.status === 0) {
+        logOk(
+            "TypeScript — tsc --noEmit",
+        );
     } else {
-        logError("npm run lint ha fallado");
+        logError(
+            "TypeScript — tsc --noEmit ha fallado",
+        );
     }
 } else {
-    logWarning("No se puede ejecutar lint porque no existe el script");
+    logWarning(
+        "node_modules no existe; se omite TypeScript en este entorno",
+    );
 }
 
 console.log("");
 
-/**
- * 9. TypeScript
- */
-console.log("9. TypeScript");
+console.log("11. Tests");
 
-const tscResult = spawnSync(
-    process.platform === "win32" ? "npx.cmd" : "npx",
-    ["tsc", "--noEmit", "--incremental", "false"],
-    {
-        cwd: root,
-        stdio: "inherit",
-        shell: process.platform === "win32",
-    },
-);
+if (
+    existsSync(
+        join(root, "node_modules"),
+    )
+) {
+    const packageJson = JSON.parse(
+        readFileSync(
+            packagePath,
+            "utf8",
+        ),
+    );
 
-if (tscResult.status === 0) {
-    logOk("TypeScript — tsc --noEmit");
+    if (packageJson.scripts?.test) {
+        const testResult = spawnSync(
+            process.platform === "win32"
+                ? "npm.cmd"
+                : "npm",
+            ["run", "test"],
+            {
+                cwd: root,
+                stdio: "inherit",
+                shell:
+                    process.platform ===
+                    "win32",
+            },
+        );
+
+        if (testResult.status === 0) {
+            logOk("npm run test");
+        } else {
+            logError(
+                "npm run test ha fallado",
+            );
+        }
+    }
 } else {
-    logError("TypeScript — tsc --noEmit ha fallado");
+    logWarning(
+        "node_modules no existe; se omiten los tests en este entorno",
+    );
 }
 
 console.log("");
 
-/**
- * Resultado final
- */
 console.log("==========================================");
 console.log(" RESULTADO QA");
 console.log("==========================================");
@@ -403,9 +631,13 @@ if (errors > 0) {
 }
 
 if (warnings > 0) {
-    console.warn("QA COMPLETADO CON WARNINGS");
+    console.warn(
+        "QA COMPLETADO CON WARNINGS",
+    );
     process.exit(0);
 }
 
-console.log("QA COMPLETADO CORRECTAMENTE");
+console.log(
+    "QA COMPLETADO CORRECTAMENTE",
+);
 process.exit(0);

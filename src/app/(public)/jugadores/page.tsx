@@ -1,24 +1,135 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+
 import PublicShell from "@/components/public/PublicShell";
-import { EmptyPublic, ErrorPublic, PageIntro } from "@/components/public/PublicBlocks";
-import { getPublicCategories } from "@/lib/public/site";
-import { getPublicRanking } from "@/lib/public/site";
+import {
+    EmptyPublic,
+    ErrorPublic,
+    PageIntro,
+} from "@/components/public/PublicBlocks";
+import { getPublicPlayers } from "@/lib/public/site";
 import { buildMetadata } from "@/lib/public/seo";
+
 import styles from "./page.module.css";
 
-export const metadata = buildMetadata({ title: "Ranking", description: "Ranking individual de Sagunto Padel Cup por categoría y temporada.", path: "/ranking" });
+export const metadata: Metadata = buildMetadata({
+    title: "Jugadores",
+    description:
+        "Directorio público de jugadores de Sagunto Padel Cup con categoría y puntos de temporada.",
+    path: "/jugadores",
+});
 
-export default async function RankingPage({ searchParams }: { searchParams: Promise<{ categoria?: string }> }) {
-    const params = await searchParams;
-    const categories = await getPublicCategories();
-    const selected = params.categoria ?? categories.data?.[0]?.id;
-    const result = await getPublicRanking(selected);
+function playerName(player: {
+    nombre: string;
+    apellidos: string | null;
+}) {
+    return [player.nombre, player.apellidos]
+        .filter(Boolean)
+        .join(" ")
+        .trim();
+}
 
-    return <PublicShell>
-        <PageIntro eyebrow="RANKING" title="Clasificación individual" description="Los puntos se acumulan individualmente a lo largo de la temporada, aunque se obtengan jugando en pareja." />
-        <section className={styles.content}>
-            {categories.error ? <ErrorPublic message={categories.error.message} /> : <nav className={styles.categories} aria-label="Categorías">{categories.data.map((category) => <Link className={category.id === selected ? styles.active : ""} key={category.id} href={`/ranking?categoria=${encodeURIComponent(category.id)}`}>{category.nombre}</Link>)}</nav>}
-            {result.error ? <ErrorPublic message={result.error.message} /> : !result.data?.category ? <EmptyPublic title="Ranking no disponible" description="Todavía no existe una categoría con datos de ranking." /> : result.data.entries.length === 0 ? <EmptyPublic title="Sin puntos registrados" description={`Todavía no hay puntos publicados para ${result.data.category.nombre}.`} /> : <div className={styles.tableWrap}><table><thead><tr><th>#</th><th>Jugador</th><th>Pruebas</th><th>Puntos</th></tr></thead><tbody>{result.data.entries.map((entry) => <tr key={entry.player.id}><td>{entry.position}</td><td><Link href={`/jugadores/${entry.player.id}`}>{entry.player.nombre} {entry.player.apellidos ?? ""}</Link></td><td>{entry.tournaments}</td><td><strong>{entry.points}</strong></td></tr>)}</tbody></table></div>}
-        </section>
-    </PublicShell>;
+function initials(player: {
+    nombre: string;
+    apellidos: string | null;
+}) {
+    const name = playerName(player);
+
+    return name
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part.charAt(0).toUpperCase())
+        .join("");
+}
+
+export default async function PlayersPage() {
+    const result = await getPublicPlayers();
+
+    if (result.error) {
+        return (
+            <PublicShell>
+                <PageIntro
+                    eyebrow="JUGADORES"
+                    title="Directorio de jugadores"
+                    description="Consulta los perfiles deportivos que han decidido formar parte del directorio público del circuito."
+                />
+
+                <section className={styles.content}>
+                    <ErrorPublic message={result.error.message} />
+                </section>
+            </PublicShell>
+        );
+    }
+
+    const players = [...result.data].sort((a, b) => {
+        const nameA = playerName(a).toLocaleLowerCase("es");
+        const nameB = playerName(b).toLocaleLowerCase("es");
+
+        return nameA.localeCompare(nameB, "es");
+    });
+
+    return (
+        <PublicShell>
+            <PageIntro
+                eyebrow="JUGADORES"
+                title="Directorio de jugadores"
+                description="Perfiles deportivos públicos del circuito, con categoría y puntos acumulados durante la temporada activa."
+            />
+
+            <section className={styles.content}>
+                {players.length === 0 ? (
+                    <EmptyPublic
+                        title="Todavía no hay jugadores públicos"
+                        description="Los jugadores aparecerán aquí cuando tengan habilitada la visibilidad pública de su perfil."
+                    />
+                ) : (
+                    <div className={styles.grid}>
+                        {players.map((player) => (
+                            <Link
+                                href={`/jugadores/${player.id}`}
+                                className={styles.card}
+                                key={player.id}
+                            >
+                                <span
+                                    className={styles.avatar}
+                                    aria-hidden="true"
+                                >
+                                    {initials(player)}
+                                </span>
+
+                                <span className={styles.body}>
+                                    <strong className={styles.name}>
+                                        {playerName(player)}
+                                    </strong>
+
+                                    <span className={styles.category}>
+                                        {player.category?.nombre ??
+                                            "Categoría pendiente"}
+                                    </span>
+
+                                    <span className={styles.stats}>
+                                        <span>
+                                            {player.points} pts
+                                        </span>
+
+                                        {player.ciudad ? (
+                                            <span>{player.ciudad}</span>
+                                        ) : null}
+                                    </span>
+                                </span>
+
+                                <span
+                                    className={styles.arrow}
+                                    aria-hidden="true"
+                                >
+                                    →
+                                </span>
+                            </Link>
+                        ))}
+                    </div>
+                )}
+            </section>
+        </PublicShell>
+    );
 }
