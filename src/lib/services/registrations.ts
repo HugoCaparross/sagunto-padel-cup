@@ -480,16 +480,12 @@ async function enrichRegistrations(
 }
 
 function normalizePartnerAvailability(
-    value:
-        | PartnerAvailability
-        | null
-        | undefined,
+    value: string | null | undefined,
 ): PartnerAvailability {
     if (
-        value &&
-        PARTNER_POOL_AVAILABILITY.includes(
-            value,
-        )
+        value === "buscando" ||
+        value === "encontrada" ||
+        value === "no_busca"
     ) {
         return value;
     }
@@ -1092,7 +1088,7 @@ export async function addPlayerToPartnerPool(
 
     if (error) {
         throw new Error(
-            `No se pudo añadir el jugador a la bolsa de parejas: ${error.message}`,
+            `No se pudo añadir al jugador a la bolsa de parejas: ${error.message}`,
         );
     }
 }
@@ -1224,22 +1220,14 @@ export async function getPartnerPool(
     return (data ?? []).map(
         (item) => ({
             id: item.id,
-            playerId:
-                item.player_id,
+            playerId: item.player_id,
             player:
                 playersMap.get(
                     item.player_id,
                 ) ?? null,
             availability:
                 normalizePartnerAvailability(
-                    item.disponible
-                        ? (
-                            (
-                                item.disponibilidad ??
-                                "buscando"
-                            ) as PartnerAvailability
-                        )
-                        : "no_busca",
+                    item.disponibilidad,
                 ),
         }),
     );
@@ -1509,368 +1497,122 @@ export async function createIndividualRegistration(
         );
     }
 
-    const supabase =
-        await createClient();
-
-    const {
-        data: tournament,
-        error: tournamentError,
-    } = await supabase
-        .from("tournaments")
-        .select(
-            "id, estado",
-        )
-        .eq(
-            "id",
-            input.tournamentId,
-        )
-        .maybeSingle();
-
-    if (tournamentError) {
-        throw new Error(
-            `No se pudo comprobar el torneo: ${tournamentError.message}`,
-        );
-    }
-
-    if (!tournament) {
-        throw new Error(
-            "El torneo no existe.",
-        );
-    }
-
-    if (
-        tournament.estado !==
-        "inscripciones_abiertas"
-    ) {
-        throw new Error(
-            "Las inscripciones no están abiertas.",
-        );
-    }
-
-    const {
-        data: tournamentCategory,
-        error: categoryError,
-    } = await supabase
-        .from(
-            "tournament_categories",
-        )
-        .select("*")
-        .eq(
-            "tournament_id",
-            input.tournamentId,
-        )
-        .eq(
-            "categoria_id",
-            input.categoryId,
-        )
-        .eq(
-            "enabled",
-            true,
-        )
-        .maybeSingle();
-
-    if (categoryError) {
-        throw new Error(
-            `No se pudo comprobar la categoría: ${categoryError.message}`,
-        );
-    }
-
-    if (!tournamentCategory) {
-        throw new Error(
-            "La categoría no está disponible para este torneo.",
-        );
-    }
-
-    const capacity =
-        await getRegistrationCapacity(
-            input.tournamentId,
-            input.categoryId,
-        );
-
-    const hasSpace =
-        capacity.maxCapacity ===
-        null ||
-        (
-            capacity.available !==
-            null &&
-            capacity.available > 0
-        );
-
-    const registrationStatus:
-        RegistrationStatus =
-        hasSpace
-            ? "pendiente_pago"
-            : "lista_espera";
-
-    /*
-     * Caso 1:
-     * El usuario ya ha elegido directamente a su pareja.
-     *
-     * Aquí NO usamos Partner Pool.
-     */
     if (input.partnerId) {
+        if (input.partnerId === input.playerId) {
+            throw new Error(
+                "Un jugador no puede formar pareja consigo mismo.",
+            );
+        }
+
         const partnerEligibility =
             await validatePlayerTournamentEligibility(
                 input.partnerId,
                 input.tournamentId,
             );
 
-        if (
-            !partnerEligibility.eligible
-        ) {
+        if (!partnerEligibility.eligible) {
             throw new Error(
                 partnerEligibility.reason ??
                 "El jugador seleccionado como pareja no puede participar.",
             );
         }
-
-        const pair =
-            await createCompletePair({
-                tournamentId:
-                    input.tournamentId,
-                categoryId:
-                    input.categoryId,
-                player1Id:
-                    input.playerId,
-                player2Id:
-                    input.partnerId,
-            });
-
-        return createRegistrationRecord({
-            tournamentId:
-                input.tournamentId,
-            pairId:
-                pair.id,
-            categoryId:
-                input.categoryId,
-            estado:
-                registrationStatus,
-            shirtSize:
-                input.shirtSize,
-        });
     }
 
-    /*
-     * Caso 2:
-     * El usuario se inscribe sin pareja.
-     */
-    const pair =
-        await createIncompletePair({
-            tournamentId:
-                input.tournamentId,
-            categoryId:
-                input.categoryId,
-            playerId:
-                input.playerId,
-        });
-
-    const registration =
-        await createRegistrationRecord({
-            tournamentId:
-                input.tournamentId,
-            pairId:
-                pair.id,
-            categoryId:
-                input.categoryId,
-            estado:
-                registrationStatus,
-            shirtSize:
-                input.shirtSize,
-        });
+    const supabase = await createClient();
 
     /*
-     * Caso 3:
-     * El usuario quiere aparecer en el Partner Pool.
+     * La creación de pareja + inscripción + decisión de capacidad se ejecuta
+     * en registrar_pareja dentro de una única transacción PostgreSQL.
+     * No calculamos aquí el estado final porque una lectura previa no protege
+     * contra dos inscripciones concurrentes.
      */
-    if (input.partnerSearch) {
-        await addPlayerToPartnerPool({
-            playerId:
-                input.playerId,
-            tournamentId:
-                input.tournamentId,
-            categoryId:
-                input.categoryId,
-        });
-    }
+    const rpc = supabase.rpc as unknown as (
+        functionName: string,
+        args: {
+            p_tournament_id: string;
+            p_categoria_id: string;
+            p_player_1_id: string;
+            p_player_2_id: string | null;
+            p_talla_camiseta: string | null;
+        },
+    ) => Promise<{
+        data: unknown;
+        error: { message: string } | null;
+    }>;
 
-    return registration;
-}
+    const { data: result, error: rpcError } = await rpc(
+        "registrar_pareja",
+        {
+            p_tournament_id: input.tournamentId,
+            p_categoria_id: input.categoryId,
+            p_player_1_id: input.playerId,
+            p_player_2_id: input.partnerId ?? null,
+            p_talla_camiseta: input.shirtSize ?? null,
+        },
+    );
 
-async function createRegistrationRecord(
-    input: {
-        tournamentId: string;
-        pairId: string;
-        categoryId?:
-        | string
-        | null;
-        estado:
-        RegistrationStatus;
-        shirtSize?:
-        | string
-        | null;
-    },
-): Promise<Registration> {
-    const supabase =
-        await createClient();
-
-    const {
-        data,
-        error,
-    } = await supabase
-        .from("registrations")
-        .insert({
-            tournament_id:
-                input.tournamentId,
-            pair_id:
-                input.pairId,
-            categoria_id:
-                input.categoryId ??
-                null,
-            estado:
-                input.estado,
-            metodo_pago:
-                "fisico",
-            fecha_pago:
-                null,
-            importe:
-                null,
-            talla_camiseta:
-                input.shirtSize ??
-                null,
-            qr_code:
-                null,
-            checked_in:
-                false,
-        })
-        .select("*")
-        .single();
-
-    if (error) {
+    if (rpcError) {
         throw new Error(
-            `No se pudo crear la inscripción: ${error.message}`,
+            `No se pudo crear la inscripción: ${rpcError.message}`,
         );
     }
 
-    return data as Registration;
+    const rpcRow = Array.isArray(result)
+        ? result[0] as { pair_id?: string; estado_final?: string } | undefined
+        : result as { pair_id?: string; estado_final?: string } | null;
+
+    if (!rpcRow?.pair_id) {
+        throw new Error(
+            "La operación de inscripción no devolvió una pareja válida.",
+        );
+    }
+
+    const { data: registrationData, error: registrationError } = await supabase
+        .from("registrations")
+        .select("*")
+        .eq("pair_id", rpcRow.pair_id)
+        .eq("tournament_id", input.tournamentId)
+        .maybeSingle();
+
+    if (registrationError) {
+        throw new Error(
+            `La pareja se creó, pero no se pudo recuperar la inscripción: ${registrationError.message}`,
+        );
+    }
+
+    if (!registrationData) {
+        throw new Error(
+            "La pareja se creó, pero no se encontró su inscripción.",
+        );
+    }
+
+    if (
+        input.partnerSearch &&
+        !input.partnerId
+    ) {
+        await addPlayerToPartnerPool({
+            playerId: input.playerId,
+            tournamentId: input.tournamentId,
+            categoryId: input.categoryId,
+            availability: "buscando",
+        });
+    }
+
+    return registrationData as Registration;
 }
 
 /* -------------------------------------------------------------------------- */
-/* REGISTRATION STATUS                                                        */
+/* UPDATE STATUS                                                              */
 /* -------------------------------------------------------------------------- */
 
 export async function updateRegistrationStatus(
     registrationId: string,
-    estado: RegistrationStatus,
+    status: RegistrationStatus,
 ): Promise<Registration> {
     assertId(
         registrationId,
         "registrationId",
     );
-
-    const procedures = {
-        confirmada:
-            "admin_confirm_registration",
-        lista_espera:
-            "admin_move_registration_to_waiting_list",
-        cancelada:
-            "admin_cancel_registration",
-    } as const;
-
-    const procedure =
-        procedures[
-        estado as keyof typeof procedures
-        ];
-
-    if (!procedure) {
-        throw new Error(
-            "Esta transicion de inscripcion no esta disponible.",
-        );
-    }
-
-    const supabase =
-        await createClient();
-
-    const {
-        error,
-    } = await supabase.rpc(
-        procedure,
-        {
-            p_registration_id:
-                registrationId,
-        },
-    );
-
-    if (error) {
-        throw new Error(
-            `No se pudo actualizar la inscripcion: ${error.message}`,
-        );
-    }
-
-    const registration =
-        await getRegistrationById(
-            registrationId,
-        );
-
-    if (!registration) {
-        throw new Error(
-            "La inscripcion se actualizo, pero no se pudo volver a consultar.",
-        );
-    }
-
-    return registration;
-}
-
-/* -------------------------------------------------------------------------- */
-/* PAYMENT                                                                    */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Records external payment verification.
- *
- * No payment gateway is launched here.
- */
-export async function verifyRegistrationPayment(
-    input: VerifyPaymentInput,
-): Promise<Registration> {
-    assertId(
-        input.registrationId,
-        "registrationId",
-    );
-
-    const registration =
-        await getRegistrationById(
-            input.registrationId,
-        );
-
-    if (!registration) {
-        throw new Error(
-            "La inscripción no existe.",
-        );
-    }
-
-    if (
-        registration.estado ===
-        CANCELLED_STATUS
-    ) {
-        throw new Error(
-            "No se puede verificar el pago de una inscripción cancelada.",
-        );
-    }
-
-    if (
-        input.amount !== undefined &&
-        input.amount !== null &&
-        (
-            !Number.isFinite(
-                input.amount,
-            ) ||
-            input.amount < 0
-        )
-    ) {
-        throw new Error(
-            "El importe del pago no es válido.",
-        );
-    }
 
     const supabase =
         await createClient();
@@ -1881,25 +1623,89 @@ export async function verifyRegistrationPayment(
     } = await supabase
         .from("registrations")
         .update({
-            metodo_pago:
-                input.method,
+            estado: status,
+        })
+        .eq(
+            "id",
+            registrationId,
+        )
+        .select("*")
+        .single();
+
+    if (error) {
+        throw new Error(
+            `No se pudo actualizar el estado de la inscripción: ${error.message}`,
+        );
+    }
+
+    return data as Registration;
+}
+
+/* -------------------------------------------------------------------------- */
+/* PAYMENT                                                                    */
+/* -------------------------------------------------------------------------- */
+
+export async function markPaymentPending(
+    registrationId: string,
+): Promise<Registration> {
+    assertId(
+        registrationId,
+        "registrationId",
+    );
+
+    const supabase =
+        await createClient();
+
+    const {
+        data,
+        error,
+    } = await supabase
+        .from("registrations")
+        .update({
+            fecha_pago: null,
+        })
+        .eq(
+            "id",
+            registrationId,
+        )
+        .select("*")
+        .single();
+
+    if (error) {
+        throw new Error(
+            `No se pudo marcar el pago como pendiente: ${error.message}`,
+        );
+    }
+
+    return data as Registration;
+}
+
+export async function verifyPayment(
+    input: VerifyPaymentInput,
+): Promise<Registration> {
+    assertId(
+        input.registrationId,
+        "registrationId",
+    );
+
+    const supabase =
+        await createClient();
+
+    const {
+        data,
+        error,
+    } = await supabase
+        .from("registrations")
+        .update({
+            metodo_pago: input.method,
+            importe: input.amount ?? null,
             fecha_pago:
                 input.paymentDate ??
                 new Date().toISOString(),
-            importe:
-                input.amount ??
-                null,
-            payment_status:
-                "verificado",
         })
         .eq(
             "id",
             input.registrationId,
-        )
-        // Avoid a payment write racing with an admin cancellation.
-        .neq(
-            "estado",
-            CANCELLED_STATUS,
         )
         .select("*")
         .single();
@@ -1913,120 +1719,13 @@ export async function verifyRegistrationPayment(
     return data as Registration;
 }
 
-export async function markPaymentPending(
-    registrationId: string,
-): Promise<Registration> {
-    const registration =
-        await getRegistrationById(
-            registrationId,
-        );
-
-    if (!registration) {
-        throw new Error(
-            "La inscripción no existe.",
-        );
-    }
-
-    const supabase =
-        await createClient();
-
-    const {
-        data,
-        error,
-    } = await supabase
-        .from("registrations")
-        .update({
-            fecha_pago:
-                null,
-            metodo_pago:
-                "fisico",
-            payment_status:
-                "pendiente",
-        })
-        .eq(
-            "id",
-            registrationId,
-        )
-        .select("*")
-        .single();
-
-    if (error) {
-        throw new Error(
-            `No se pudo actualizar el estado del pago: ${error.message}`,
-        );
-    }
-
-    return data as Registration;
-}
-
 /* -------------------------------------------------------------------------- */
 /* CHECK-IN                                                                   */
 /* -------------------------------------------------------------------------- */
 
-export async function checkInRegistration(
+export async function markRegistrationCheckedIn(
     registrationId: string,
-): Promise<Registration> {
-    const registration =
-        await getRegistrationById(
-            registrationId,
-        );
-
-    if (!registration) {
-        throw new Error(
-            "La inscripción no existe.",
-        );
-    }
-
-    if (
-        registration.estado !==
-        "confirmada"
-    ) {
-        throw new Error(
-            "Solo una inscripción confirmada puede hacer check-in.",
-        );
-    }
-
-    const supabase =
-        await createClient();
-
-    const {
-        data,
-        error,
-    } = await supabase
-        .from("registrations")
-        .update({
-            checked_in:
-                true,
-            checked_in_at:
-                new Date().toISOString(),
-        })
-        .eq(
-            "id",
-            registrationId,
-        )
-        // Rechecked after a row-lock wait, preventing check-in after cancellation.
-        .eq(
-            "estado",
-            "confirmada",
-        )
-        .eq(
-            "checked_in",
-            false,
-        )
-        .select("*")
-        .single();
-
-    if (error) {
-        throw new Error(
-            `No se pudo registrar el check-in: ${error.message}`,
-        );
-    }
-
-    return data as Registration;
-}
-
-export async function undoCheckInRegistration(
-    registrationId: string,
+    checkedIn = true,
 ): Promise<Registration> {
     assertId(
         registrationId,
@@ -2042,10 +1741,7 @@ export async function undoCheckInRegistration(
     } = await supabase
         .from("registrations")
         .update({
-            checked_in:
-                false,
-            checked_in_at:
-                null,
+            checked_in: checkedIn,
         })
         .eq(
             "id",
@@ -2056,7 +1752,7 @@ export async function undoCheckInRegistration(
 
     if (error) {
         throw new Error(
-            `No se pudo revertir el check-in: ${error.message}`,
+            `No se pudo actualizar el check-in: ${error.message}`,
         );
     }
 
@@ -2474,4 +2170,60 @@ export function getRegistrationFlowState(
                 registration.estado,
             ),
     };
+}
+
+export async function verifyRegistrationPayment(
+    input: VerifyPaymentInput,
+): Promise<Registration> {
+    assertId(input.registrationId, "registrationId");
+
+    const registration = await getRegistrationById(
+        input.registrationId,
+    );
+
+    if (!registration) {
+        throw new Error("La inscripción no existe.");
+    }
+
+    if (registration.estado === CANCELLED_STATUS) {
+        throw new Error(
+            "No se puede verificar el pago de una inscripción cancelada.",
+        );
+    }
+
+    if (
+        input.amount !== undefined &&
+        input.amount !== null &&
+        (
+            !Number.isFinite(input.amount) ||
+            input.amount < 0
+        )
+    ) {
+        throw new Error("El importe del pago no es válido.");
+    }
+
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+        .from("registrations")
+        .update({
+            metodo_pago: input.method,
+            fecha_pago:
+                input.paymentDate ??
+                new Date().toISOString(),
+            importe: input.amount ?? null,
+            payment_status: "verificado",
+        })
+        .eq("id", input.registrationId)
+        .neq("estado", CANCELLED_STATUS)
+        .select("*")
+        .single();
+
+    if (error) {
+        throw new Error(
+            `No se pudo verificar el pago: ${error.message}`,
+        );
+    }
+
+    return data as Registration;
 }

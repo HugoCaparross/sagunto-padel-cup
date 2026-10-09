@@ -45,7 +45,7 @@ import {
     getRegistrations,
     getRegistrationSummary,
     verifyRegistrationPayment,
-    checkInRegistration,
+    markRegistrationCheckedIn as checkInRegistration,
     adminConfirmRegistration,
 } from "@/lib/services/registrations";
 
