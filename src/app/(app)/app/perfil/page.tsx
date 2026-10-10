@@ -11,6 +11,7 @@ import {
 
 import { getAuthenticatedContext } from "@/lib/auth/flow";
 import ProfileForm from "@/components/private/profile/ProfileForm";
+import LogoutButton from "@/components/auth/LogoutButton";
 
 import styles from "./page.module.css";
 
@@ -134,22 +135,26 @@ export default async function PerfilPage({
                         </p>
                     </div>
 
-                    <Link
-                        href="/app/seguridad"
-                        className={styles.securityLink}
-                    >
-                        <ShieldCheck
-                            size={17}
-                            aria-hidden="true"
-                        />
+                    <div className={styles.headerActions}>
+                        <Link
+                            href="/app/seguridad"
+                            className={styles.securityLink}
+                        >
+                            <ShieldCheck
+                                size={17}
+                                aria-hidden="true"
+                            />
 
-                        Seguridad
+                            Seguridad
 
-                        <ArrowRight
-                            size={15}
-                            aria-hidden="true"
-                        />
-                    </Link>
+                            <ArrowRight
+                                size={15}
+                                aria-hidden="true"
+                            />
+                        </Link>
+
+                        <LogoutButton variant="light" />
+                    </div>
                 </header>
 
                 <section

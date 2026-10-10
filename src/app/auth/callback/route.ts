@@ -107,9 +107,13 @@ export async function GET(
             );
         }
 
+        // Password recovery must reach the reset form even if the account
+        // has not completed its player profile. All other destinations are
+        // resolved against the authenticated role and onboarding state.
         const destination =
-            next ??
-            await getAuthenticatedDestination();
+            next === "/restablecer"
+                ? next
+                : await getAuthenticatedDestination(next);
 
         return NextResponse.redirect(
             new URL(

@@ -93,6 +93,17 @@
     line-height: 1.6;
 }
 
+/* Acciones de la cabecera */
+
+.headerActions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
 .securityLink {
     display: inline-flex;
     min-height: 40px;
@@ -111,7 +122,8 @@
     transition:
         border-color 160ms ease,
         background-color 160ms ease,
-        color 160ms ease;
+        color 160ms ease,
+        transform 160ms ease;
 }
 
 .securityLink:hover {
@@ -123,6 +135,10 @@
 .securityLink:focus-visible {
     outline: 3px solid color-mix(in srgb, var(--brand) 40%, transparent);
     outline-offset: 3px;
+}
+
+.securityLink:active {
+    transform: translateY(1px);
 }
 
 /* Identidad del jugador */
@@ -355,12 +371,6 @@
     line-height: 1.5;
 }
 
-/* Estados de interacción */
-
-.securityLink:active {
-    transform: translateY(1px);
-}
-
 /* Adaptación a tablet */
 
 @media (max-width: 900px) {
@@ -385,6 +395,12 @@
         flex-direction: column;
         gap: 15px;
         margin-bottom: 20px;
+    }
+
+    .headerActions {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 8px;
     }
 
     .securityLink {
@@ -450,6 +466,10 @@
 
     .sectionHeader h2 {
         font-size: 0.93rem;
+    }
+
+    .headerActions {
+        gap: 7px;
     }
 }
 

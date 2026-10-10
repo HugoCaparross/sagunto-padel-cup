@@ -90,7 +90,14 @@ export default async function Home() {
       const result = await getPublicRanking(category.id);
 
       if (result.error) {
-        throw new Error("No se pudo cargar el ranking de inicio.");
+        console.error(
+          "[SPC] Error real al cargar el ranking de inicio:",
+          result.error,
+        );
+
+        throw new Error(
+          `No se pudo cargar el ranking de inicio: ${result.error.message}`,
+        );
       }
 
       return {
@@ -228,7 +235,6 @@ function HeroSection({
 
       <div className={styles.heroContainer}>
         <div className={styles.heroContent}>
-
           <h1
             id="home-hero-title"
             className={styles.heroTitle}
@@ -366,10 +372,10 @@ function HeroTournamentCard({
 
         <span
           className={`${styles.heroStatus} ${statusVariant === "open"
-              ? styles.heroStatusOpen
-              : statusVariant === "live"
-                ? styles.heroStatusLive
-                : styles.heroStatusUpcoming
+            ? styles.heroStatusOpen
+            : statusVariant === "live"
+              ? styles.heroStatusLive
+              : styles.heroStatusUpcoming
             }`}
         >
           <span className={styles.heroStatusDot} aria-hidden="true" />
@@ -434,6 +440,7 @@ function HeroTournamentCard({
     </aside>
   );
 }
+
 function CircuitSection() {
   return (
     <section className={styles.circuitSection} aria-labelledby="circuito-home-title">

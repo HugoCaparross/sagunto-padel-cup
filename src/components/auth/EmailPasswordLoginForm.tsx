@@ -7,7 +7,13 @@ import { createClient } from "@/lib/supabase/client";
 import { loginSchema } from "@/lib/validators/auth";
 import styles from "./EmailPasswordLoginForm.module.css";
 
-export default function EmailPasswordLoginForm() {
+type EmailPasswordLoginFormProps = {
+    next?: string;
+};
+
+export default function EmailPasswordLoginForm({
+    next,
+}: EmailPasswordLoginFormProps) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
@@ -58,7 +64,16 @@ export default function EmailPasswordLoginForm() {
                 throw new Error("INVALID_CREDENTIALS");
             }
 
-            window.location.assign("/auth/continue");
+            const destination = new URL(
+                "/auth/continue",
+                window.location.origin,
+            );
+
+            if (next) {
+                destination.searchParams.set("next", next);
+            }
+
+            window.location.assign(destination.toString());
         } catch (error) {
             setLoading(false);
 

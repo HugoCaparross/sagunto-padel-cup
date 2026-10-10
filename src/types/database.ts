@@ -934,7 +934,6 @@ export type AuditLogUpdate =
     Partial<AuditLogInsert>;
 
 // -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
 // BADGES
 // -----------------------------------------------------------------------------
 
@@ -993,6 +992,22 @@ export type Database = {
         };
 
         Functions: {
+            complete_player_onboarding: {
+                Args: {
+                    p_nombre: string;
+                    p_apellidos: string;
+                    p_telefono: string | null;
+                    p_ciudad: string | null;
+                    p_instagram: string | null;
+                    p_pala: string | null;
+                    p_mano_dominante: string | null;
+                    p_categoria_actual_id: string | null;
+                    p_foto_url: string | null;
+                    p_accept_terms: boolean;
+                    p_accept_privacy: boolean;
+                };
+                Returns: string;
+            };
             admin_cancel_registration: {
                 Args: { p_registration_id: string };
                 Returns: { previous_status: string; pair_id: string }[];

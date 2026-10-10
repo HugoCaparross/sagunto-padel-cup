@@ -9,6 +9,7 @@ import PublicShell from "@/components/public/PublicShell";
 import {
     getUser,
 } from "@/lib/supabase/server";
+import { getSafeNextPath } from "@/lib/auth/safe-next-path";
 
 import styles from "./page.module.css";
 
@@ -31,6 +32,7 @@ export const metadata: Metadata = {
 type Props = {
     searchParams: Promise<{
         error?: string;
+        next?: string;
     }>;
 };
 
@@ -58,17 +60,18 @@ function getErrorMessage(
 export default async function LoginPage({
     searchParams,
 }: Props) {
-    const user =
-        await getUser();
+    const params = await searchParams;
+    const next = getSafeNextPath(params.next ?? null);
+
+    const user = await getUser();
 
     if (user) {
-        redirect(
-            "/auth/continue",
-        );
-    }
+        const continueUrl = next
+            ? `/auth/continue?next=${encodeURIComponent(next)}`
+            : "/auth/continue";
 
-    const params =
-        await searchParams;
+        redirect(continueUrl);
+    }
 
     const errorMessage =
         getErrorMessage(
@@ -163,7 +166,7 @@ export default async function LoginPage({
                                 </div>
                             )}
 
-                            <EmailPasswordLoginForm />
+                            <EmailPasswordLoginForm next={next ?? undefined} />
 
                             <div
                                 className={
@@ -178,7 +181,7 @@ export default async function LoginPage({
                                 <span />
                             </div>
 
-                            <GoogleSignInButton />
+                            <GoogleSignInButton next={next ?? undefined} />
 
                             <div
                                 className={

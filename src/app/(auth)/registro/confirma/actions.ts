@@ -7,12 +7,6 @@ import {
 } from "@/lib/validators/auth";
 
 import {
-    createPlayer,
-    getPlayerByAuthUserId,
-    updatePlayer,
-} from "@/lib/services/players";
-
-import {
     createClient,
 } from "@/lib/supabase/server";
 
@@ -153,81 +147,32 @@ export async function completeRegistration(
     }
 
     try {
-        const existingPlayer =
-            await getPlayerByAuthUserId(
-                user.id,
-            );
-
         const metadata =
             user.user_metadata ?? {};
 
         const avatarUrl =
-            typeof metadata.avatar_url ===
-                "string"
+            typeof metadata.avatar_url === "string"
                 ? metadata.avatar_url
                 : null;
 
-        const input = {
-            authUserId:
-                user.id,
+        const {
+            error: onboardingError,
+        } = await supabase.rpc("complete_player_onboarding", {
+            p_nombre: parsed.data.nombre,
+            p_apellidos: parsed.data.apellidos,
+            p_telefono: parsed.data.telefono || null,
+            p_ciudad: parsed.data.ciudad || null,
+            p_instagram: parsed.data.instagram || null,
+            p_pala: parsed.data.pala || null,
+            p_mano_dominante: parsed.data.mano_dominante || null,
+            p_categoria_actual_id: parsed.data.categoria_actual_id || null,
+            p_foto_url: avatarUrl,
+            p_accept_terms: parsed.data.acceptTerms,
+            p_accept_privacy: parsed.data.acceptPrivacy,
+        });
 
-            name:
-                parsed.data.nombre,
-
-            surname:
-                parsed.data.apellidos,
-
-            email:
-                user.email ?? "",
-
-            telefono:
-                parsed.data.telefono ||
-                null,
-
-            foto_url:
-                avatarUrl,
-
-            currentCategoryId:
-                parsed.data
-                    .categoria_actual_id ||
-                null,
-
-            dominantHand:
-                parsed.data
-                    .mano_dominante ===
-                    "diestro" ||
-                    parsed.data
-                        .mano_dominante ===
-                    "zurdo"
-                    ? parsed.data
-                        .mano_dominante
-                    : null,
-
-            pala:
-                parsed.data.pala ||
-                null,
-
-            city:
-                parsed.data.ciudad ||
-                null,
-
-            instagram:
-                parsed.data.instagram ||
-                null,
-
-            onboardingCompleted:
-                true,
-        } as const;
-
-        if (existingPlayer) {
-            await updatePlayer(
-                existingPlayer.id,
-                input,
-            );
-        } else {
-            await createPlayer(
-                input,
-            );
+        if (onboardingError) {
+            throw onboardingError;
         }
     } catch (error) {
         console.error(

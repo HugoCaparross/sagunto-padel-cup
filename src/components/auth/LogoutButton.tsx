@@ -17,20 +17,18 @@ type Props = {
     mobile?: boolean;
     compact?: boolean;
     onDone?: () => void;
+    variant?: "default" | "light";
 };
 
 export default function LogoutButton({
     mobile = false,
     compact = false,
     onDone,
+    variant = "default",
 }: Props) {
-    const router =
-        useRouter();
+    const router = useRouter();
 
-    const [
-        loading,
-        setLoading,
-    ] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
     async function handleLogout() {
@@ -49,52 +47,68 @@ export default function LogoutButton({
             router.replace("/");
             router.refresh();
         } catch (error) {
-            console.error(
-                "[SPC Logout]",
-                error,
+            console.error("[SPC Logout]", error);
+
+            setErrorMessage(
+                "No se ha podido cerrar la sesión. Inténtalo de nuevo.",
             );
 
-            setErrorMessage("No se ha podido cerrar la sesión. Inténtalo de nuevo.");
             setLoading(false);
         }
     }
 
+    const buttonClassName = [
+        mobile
+            ? styles.mobile
+            : compact
+                ? styles.compact
+                : styles.button,
+        variant === "light" ? styles.light : "",
+    ]
+        .filter(Boolean)
+        .join(" ");
+
     return (
         <div className={styles.logoutWrap}>
-        <button
-            type="button"
-            className={
-                mobile
-                    ? styles.mobile
-                    : compact
-                        ? styles.compact
-                        : styles.button
-            }
-            aria-label={loading ? "Cerrando sesión" : "Cerrar sesión"}
-            onClick={handleLogout}
-            disabled={loading}
-            aria-busy={loading}
-        >
-            {loading ? (
-                <LoaderCircle
-                    className={styles.loader}
-                    size={15}
-                />
-            ) : (
-                <LogOut
-                    size={15}
-                    aria-hidden="true"
-                />
-            )}
+            <button
+                type="button"
+                className={buttonClassName}
+                aria-label={
+                    loading
+                        ? "Cerrando sesión"
+                        : "Cerrar sesión"
+                }
+                onClick={handleLogout}
+                disabled={loading}
+                aria-busy={loading}
+            >
+                {loading ? (
+                    <LoaderCircle
+                        className={styles.loader}
+                        size={15}
+                        aria-hidden="true"
+                    />
+                ) : (
+                    <LogOut
+                        size={15}
+                        aria-hidden="true"
+                    />
+                )}
 
-            <span>
-                {loading
-                    ? "Saliendo..."
-                    : "Salir"}
-            </span>
-        </button>
+                <span>
+                    {loading
+                        ? "Cerrando sesión..."
+                        : "Cerrar sesión"}
+                </span>
+            </button>
+
             {errorMessage && (
-                <span className={styles.error} role="alert">{errorMessage}</span>
+                <span
+                    className={styles.error}
+                    role="alert"
+                >
+                    {errorMessage}
+                </span>
             )}
         </div>
     );
