@@ -1,0 +1,126 @@
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) minmax(112px, 0.9fr);
+    gap: 10px;
+}
+
+.event {
+    min-height: 138px;
+    border: 1px solid #e1e6e8;
+    border-radius: 6px;
+    background: #fff;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.eventTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    color: #9aa5ad;
+}
+
+.eventTop strong {
+    font-family: var(--font-oswald), sans-serif;
+    font-size: 29px;
+    line-height: 1;
+    color: #87939c;
+}
+
+.event.featured {
+    border-color: var(--coral);
+    box-shadow: 0 0 0 1px #f0443a10;
+}
+
+.featured .eventTop,
+.featured .eventTop strong {
+    color: var(--coral);
+}
+
+.date {
+    font-size: 9px;
+    font-weight: 700;
+    margin-top: 12px;
+    white-space: normal;
+}
+
+.event p {
+    font-size: 10px;
+    color: #66737c;
+    line-height: 1.4;
+    margin: 6px 0 12px;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 8px;
+    color: #7a858d;
+    margin-top: auto;
+}
+
+.featured .status {
+    color: var(--coral);
+}
+
+.master {
+    background: var(--navy);
+    color: #fff;
+    border-radius: 6px;
+    padding: 13px 11px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.master svg {
+    color: var(--coral);
+}
+
+.master strong {
+    font-family: var(--font-oswald), sans-serif;
+    font-size: 17px;
+    line-height: 1.05;
+}
+
+.master span {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--coral);
+}
+
+.master small {
+    font-size: 9px;
+    line-height: 1.4;
+    color: #bfc9cf;
+}
+
+@media (max-width: 1000px) {
+    .calendar {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .master {
+        min-height: 130px;
+    }
+}
+
+@media (max-width: 600px) {
+    .calendar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .event {
+        min-height: 130px;
+    }
+
+    .master {
+        min-height: 130px;
+    }
+}
