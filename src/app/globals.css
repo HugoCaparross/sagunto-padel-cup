@@ -14,24 +14,66 @@
     --radius-sm: 4px;
     --radius-md: 7px;
     --radius-lg: 12px;
+
+    /*
+     * SISTEMA GLOBAL DE PANTALLA COMPLETA
+     */
+
+    --header-height: 88px;
+    --section-padding-x: 48px;
+    --section-padding-y: 48px;
+    --viewport-height: 100vh;
 }
 
-* {
+/* =========================================
+   RESET Y COMPORTAMIENTO GENERAL
+   ========================================= */
+
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
 html {
+    min-height: 100%;
     scroll-behavior: smooth;
-    scroll-padding-top: 88px;
+    scroll-padding-top: 0;
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
+    min-width: 320px;
+    min-height: 100vh;
+    min-height: 100dvh;
     margin: 0;
     background: var(--background);
     color: var(--text);
     font-family: var(--font-poppins), Arial, sans-serif;
     font-size: 14px;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+body,
+button,
+input,
+textarea,
+select {
+    font-family: var(--font-poppins), Arial, sans-serif;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+    max-width: 100%;
+}
+
+img,
+video {
+    height: auto;
 }
 
 a {
@@ -44,22 +86,81 @@ a {
 }
 
 button:focus-visible,
-a:focus-visible {
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
     outline: 3px solid rgba(240, 68, 58, 0.5);
     outline-offset: 3px;
 }
 
+/* =========================================
+   CONTENEDORES GLOBALES
+   ========================================= */
+
 .container {
-    width: min(calc(100% - 48px), var(--container));
+    width: min(calc(100% - var(--section-padding-x) * 2), var(--container));
     margin-inline: auto;
 }
 
+main {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
+/*
+ * Cada sección directa de main tiene como mínimo
+ * la altura visible del viewport.
+ *
+ * Se utiliza min-height en lugar de height para
+ * permitir que el contenido crezca cuando lo necesite.
+ */
+
+main>section {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    min-height: var(--viewport-height);
+    min-height: 100vh;
+    min-height: 100dvh;
+    scroll-margin-top: 0;
+}
+
+/*
+ * Las secciones pueden superar la altura de pantalla
+ * cuando tienen tablas, calendarios u otro contenido extenso.
+ * No se oculta ni se recorta el contenido automáticamente.
+ */
+
+main>section>* {
+    min-width: 0;
+}
+
+/* =========================================
+   SECCIONES ESTÁNDAR
+   ========================================= */
+
 .section {
-    padding: 30px 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-block: var(--section-padding-y);
+}
+
+.section>.container {
+    flex: 0 0 auto;
+    width: min(calc(100% - var(--section-padding-x) * 2), var(--container));
+    margin-inline: auto;
 }
 
 .section-light {
     background: var(--background);
+    color: var(--text);
 }
 
 .section-dark {
@@ -68,8 +169,118 @@ a:focus-visible {
 }
 
 .section-calendar {
-    padding-top: 0;
+    padding-top: var(--section-padding-y);
 }
+
+/*
+ * Variante para secciones que necesitan crecer con
+ * su contenido, manteniendo una altura mínima de pantalla.
+ */
+
+.section-auto {
+    min-height: 100vh;
+    min-height: 100dvh;
+    height: auto;
+}
+
+/*
+ * Variante para secciones que deben ocupar exactamente
+ * el espacio visible disponible.
+ *
+ * Utilizar solamente cuando el contenido esté diseñado
+ * para caber dentro de ese espacio.
+ */
+
+.section-viewport {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: auto;
+}
+
+/* =========================================
+   PANTALLAS COMPLETAS REUTILIZABLES
+   ========================================= */
+
+/*
+ * Clase estándar para nuevas secciones.
+ *
+ * Uso:
+ * <section className="fullscreen-section">
+ *     ...
+ * </section>
+ */
+
+.fullscreen-section {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: var(--section-padding-y) var(--section-padding-x);
+}
+
+/*
+ * Contenedor de contenido para una pantalla completa.
+ */
+
+.fullscreen-section__content {
+    width: 100%;
+    max-width: var(--container);
+    margin-inline: auto;
+}
+
+/*
+ * Sección con contenido centrado horizontal y verticalmente.
+ */
+
+.fullscreen-section--center {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/*
+ * Sección con contenido alineado al inicio.
+ */
+
+.fullscreen-section--start {
+    justify-content: flex-start;
+}
+
+/*
+ * Sección con distribución vertical entre elementos.
+ */
+
+.fullscreen-section--between {
+    justify-content: space-between;
+}
+
+/* =========================================
+   NAVEGACIÓN Y ANCLAS
+   ========================================= */
+
+/*
+ * Evita que los enlaces internos queden ocultos
+ * bajo una cabecera fija, si se utiliza.
+ */
+
+[id] {
+    scroll-margin-top: 16px;
+}
+
+/*
+ * No se activa scroll-snap globalmente todavía.
+ * Así evitamos bloquear la navegación natural,
+ * el desplazamiento de calendarios y el uso móvil.
+ */
+
+/* =========================================
+   BOTONES
+   ========================================= */
 
 .button {
     display: inline-flex;
@@ -119,6 +330,10 @@ a:focus-visible {
     font-size: 11px;
 }
 
+/* =========================================
+   ENLACES DE TEXTO
+   ========================================= */
+
 .text-link {
     display: inline-flex;
     align-items: center;
@@ -134,19 +349,109 @@ a:focus-visible {
     color: var(--coral);
 }
 
+/* =========================================
+   CONTENIDO Y DESBORDAMIENTO
+   ========================================= */
+
+/*
+ * Permite que los elementos flexibles y de grid
+ * se reduzcan correctamente dentro de sus contenedores.
+ */
+
+main,
+section,
+article,
+aside,
+header,
+footer,
+.container {
+    min-width: 0;
+}
+
+/*
+ * Las tablas y listas extensas deben gestionar su propio
+ * desplazamiento cuando sea necesario. No se oculta
+ * globalmente el desbordamiento del documento.
+ */
+
+.table-scroll,
+.table-container,
+.horizontal-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+}
+
+/* =========================================
+   TABLET
+   ========================================= */
+
+@media (max-width: 1024px) {
+    :root {
+        --section-padding-x: 32px;
+        --section-padding-y: 36px;
+        --header-height: 76px;
+    }
+}
+
+/* =========================================
+   MÓVIL
+   ========================================= */
+
 @media (max-width: 680px) {
+    :root {
+        --section-padding-x: 16px;
+        --section-padding-y: 28px;
+        --header-height: 68px;
+    }
+
     .container {
-        width: min(calc(100% - 32px), var(--container));
+        width: calc(100% - 32px);
     }
 
     .section {
-        padding: 24px 0;
+        padding-block: var(--section-padding-y);
+    }
+
+    .section>.container {
+        width: 100%;
     }
 
     .section-calendar {
-        padding-top: 0;
+        padding-top: var(--section-padding-y);
+    }
+
+    .fullscreen-section {
+        padding: var(--section-padding-y) var(--section-padding-x);
+    }
+
+    .button {
+        min-height: 44px;
     }
 }
+
+/* =========================================
+   MÓVIL ESTRECHO
+   ========================================= */
+
+@media (max-width: 380px) {
+    :root {
+        --section-padding-x: 12px;
+        --section-padding-y: 24px;
+    }
+
+    .container {
+        width: calc(100% - 24px);
+    }
+
+    .fullscreen-section {
+        padding-inline: 12px;
+    }
+}
+
+/* =========================================
+   ACCESIBILIDAD Y MOVIMIENTO REDUCIDO
+   ========================================= */
 
 @media (prefers-reduced-motion: reduce) {
 

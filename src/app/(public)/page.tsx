@@ -17,7 +17,7 @@ import { HomeHeader } from "@/components/public/home-header";
 import { SectionHeading } from "@/components/public/section-heading";
 import { RankingPreview } from "@/components/public/ranking-preview";
 import { CircuitCalendar } from "@/components/public/circuit-calendar";
-import { SiteFooter } from "@/components/public/site-footer";
+import SiteFooter from "@/components/public/site-footer";
 
 import {
     upcomingEvent,
@@ -102,8 +102,9 @@ export default function HomePage() {
 
                 {/* PRÓXIMA PRUEBA */}
                 <section
-                    className="section section-light"
+                    className={`section section-light ${styles.eventsSection}`}
                     id="proxima-prueba"
+                    aria-labelledby="next-event-title"
                 >
                     <div className="container">
                         <SectionHeading
@@ -141,7 +142,9 @@ export default function HomePage() {
                                         PRUEBA {upcomingEvent.number}
                                     </p>
 
-                                    <h3>{upcomingEvent.club}</h3>
+                                    <h3 id="next-event-title">
+                                        {upcomingEvent.club}
+                                    </h3>
 
                                     <div className={styles.posterMeta}>
                                         <span>
@@ -174,9 +177,13 @@ export default function HomePage() {
                                             FECHA
                                         </span>
 
-                                        <strong>{upcomingEvent.dateLabel}</strong>
+                                        <strong>
+                                            {upcomingEvent.dateLabel}
+                                        </strong>
 
-                                        <small>{upcomingEvent.yearLabel}</small>
+                                        <small>
+                                            {upcomingEvent.yearLabel}
+                                        </small>
                                     </div>
                                 </div>
 
@@ -191,9 +198,13 @@ export default function HomePage() {
                                             SEDE
                                         </span>
 
-                                        <strong>{upcomingEvent.club}</strong>
+                                        <strong>
+                                            {upcomingEvent.club}
+                                        </strong>
 
-                                        <small>{upcomingEvent.location}</small>
+                                        <small>
+                                            {upcomingEvent.location}
+                                        </small>
                                     </div>
                                 </div>
 
@@ -283,8 +294,9 @@ export default function HomePage() {
 
                 {/* CALENDARIO */}
                 <section
-                    className="section section-light section-calendar"
+                    className={`section section-light section-calendar ${styles.calendarSection}`}
                     id="calendario"
+                    aria-labelledby="calendar-title"
                 >
                     <div className="container">
                         <SectionHeading
@@ -310,6 +322,7 @@ export default function HomePage() {
                 <section
                     className={`section section-dark ${styles.rankingSection}`}
                     id="ranking"
+                    aria-labelledby="ranking-title"
                 >
                     <div
                         className={styles.rankingBackdrop}
@@ -343,8 +356,9 @@ export default function HomePage() {
 
                 {/* RESULTADOS */}
                 <section
-                    className="section section-light"
+                    className={`section section-light ${styles.resultsSection}`}
                     id="resultados"
+                    aria-labelledby="results-title"
                 >
                     <div className="container">
                         <SectionHeading
@@ -397,6 +411,7 @@ export default function HomePage() {
                 <section
                     className={styles.saguntoBanner}
                     id="circuito"
+                    aria-labelledby="sagunto-title"
                 >
                     <div
                         className={styles.saguntoPhoto}
@@ -413,7 +428,7 @@ export default function HomePage() {
                             DEPORTE, COMUNIDAD Y TERRITORIO
                         </p>
 
-                        <h2>
+                        <h2 id="sagunto-title">
                             UN CIRCUITO
                             <br />
                             EN UNA CIUDAD
@@ -439,8 +454,9 @@ export default function HomePage() {
 
                 {/* ACTUALIDAD */}
                 <section
-                    className="section section-light"
+                    className={`section section-light ${styles.newsSection}`}
                     id="actualidad"
+                    aria-labelledby="news-title"
                 >
                     <div className="container">
                         <SectionHeading

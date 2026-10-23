@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -33,14 +34,14 @@ export function HomeHeader() {
                     className={styles.brand}
                     aria-label="Sagunto Padel Cup, inicio"
                 >
-                    <span className={styles.brandMark} aria-hidden="true">
-                        SPC
-                    </span>
-
-                    <span className={styles.brandText}>
-                        SAGUNTO
-                        <strong>PADEL CUP</strong>
-                    </span>
+                    <Image
+                        src="/images/logo-sagunto-padel-cup.png"
+                        alt="Sagunto Padel Cup"
+                        width={320}
+                        height={110}
+                        priority
+                        className={styles.logoImage}
+                    />
                 </Link>
 
                 <nav

@@ -1,24 +1,74 @@
-.hero {
+/* =========================================================
+   HOME — SAGUNTO PADEL CUP
+   Responsive · Secciones a pantalla completa · Fondo alterno
+   Colores principales: rojo, azul marino, blanco y neutros
+   ========================================================= */
+
+/* ---------- CONTENEDORES GENERALES ---------- */
+
+.page {
+    width: 100%;
+    overflow: clip;
+}
+
+.container {
+    width: min(1280px, calc(100% - 64px));
+    margin-inline: auto;
+}
+
+.hero,
+.eventsSection,
+.calendarSection,
+.rankingSection,
+.resultsSection,
+.saguntoBanner,
+.newsSection,
+.sponsorsSection {
     position: relative;
-    isolation: isolate;
-    min-height: 470px;
-    background: var(--navy);
-    color: #fff;
-    overflow: hidden;
+    width: 100%;
+    min-height: 100svh;
     display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: clamp(64px, 8vh, 110px);
+    scroll-margin-top: 0;
+}
+
+/* =========================================================
+   ALTERNANCIA DE FONDOS — ORDEN DEFINITIVO
+   Hero: imagen
+   Próxima prueba: claro
+   Calendario: oscuro
+   Ranking: claro
+   Resultados: oscuro
+   Sagunto: imagen
+   Actualidad: claro
+   Patrocinadores: oscuro
+   ========================================================= */
+
+/* ---------- HERO: IMAGEN ---------- */
+
+.hero {
+    isolation: isolate;
+    min-height: 100svh;
+    overflow: hidden;
     align-items: center;
+    justify-content: center;
+    padding-block: clamp(100px, 14vh, 150px) clamp(64px, 8vh, 100px);
+    background-color: var(--navy, #0d1b2a);
+    color: #fff;
 }
 
 .heroImage,
 .heroOverlay {
     position: absolute;
     inset: 0;
-    z-index: -2;
+    pointer-events: none;
 }
 
 .heroImage {
+    z-index: -2;
     background:
-        linear-gradient(90deg, rgba(4, 17, 27, 0.9), rgba(4, 17, 27, 0.25)),
         url("/images/hero-padel.jpg") center 45% / cover no-repeat,
         #102b3a;
 }
@@ -26,154 +76,244 @@
 .heroOverlay {
     z-index: -1;
     background:
-        linear-gradient(90deg, rgba(5, 18, 28, 0.38), transparent 72%),
-        linear-gradient(0deg, rgba(5, 18, 28, 0.26), transparent 40%);
+        linear-gradient(90deg,
+            rgba(4, 17, 27, 0.94) 0%,
+            rgba(4, 17, 27, 0.77) 45%,
+            rgba(4, 17, 27, 0.3) 100%),
+        linear-gradient(0deg,
+            rgba(4, 17, 27, 0.6),
+            transparent 45%);
 }
 
 .heroContent {
-    padding-top: 62px;
-    padding-bottom: 54px;
+    width: min(1280px, calc(100% - 64px));
+    margin-inline: auto;
+    padding-block: 32px;
 }
 
 .eyebrow {
-    margin: 0 0 12px;
-    color: var(--coral);
-    font-weight: 700;
+    margin: 0 0 16px;
+    color: var(--coral, #f0443a);
     font-size: 12px;
-    letter-spacing: 0.08em;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    line-height: 1.4;
+    text-transform: uppercase;
 }
 
 .hero h1,
 .saguntoContent h2 {
+    max-width: 800px;
+    margin: 0;
     font-family: var(--font-oswald), sans-serif;
-    font-size: clamp(42px, 5.2vw, 68px);
+    font-size: clamp(48px, 6.5vw, 88px);
     font-weight: 700;
     line-height: 0.98;
     letter-spacing: -0.025em;
-    margin: 0;
-    max-width: 720px;
+    text-wrap: balance;
 }
 
 .hero h1 span,
 .saguntoContent h2 span {
     display: block;
-    color: var(--coral);
+    color: var(--coral, #f0443a);
 }
 
 .heroLead {
-    font-size: 15px;
-    line-height: 1.65;
-    margin: 18px 0 22px;
-    color: #f0f2f4;
+    max-width: 540px;
+    margin: 24px 0 28px;
+    color: #e2e8ec;
+    font-size: clamp(14px, 1.3vw, 17px);
+    line-height: 1.7;
 }
 
 .heroActions {
     display: flex;
-    gap: 10px;
     flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.heroActions :global(.button-primary),
+.eventDetails .eventCta:global(.button-primary) {
+    border-color: var(--coral, #f0443a);
+    background: var(--coral, #f0443a);
+    color: #fff;
+}
+
+.heroActions :global(.button-primary:hover),
+.eventDetails .eventCta:global(.button-primary:hover) {
+    border-color: #d9362e;
+    background: #d9362e;
+    color: #fff;
+}
+
+.heroActions :global(.button-primary:focus-visible),
+.eventDetails .eventCta:global(.button-primary:focus-visible) {
+    outline: 3px solid rgba(240, 68, 58, 0.4);
+    outline-offset: 4px;
+}
+
+.heroActions :global(.button-secondary) {
+    border-color: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+}
+
+.heroActions :global(.button-secondary:hover) {
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.14);
 }
 
 .heroSlogan {
     position: absolute;
-    right: max(4vw, calc((100vw - 1280px) / 2));
-    top: 28%;
+    top: 26%;
+    right: max(5vw, calc((100vw - 1280px) / 2));
     font-family: var(--font-oswald), sans-serif;
     font-size: clamp(24px, 3vw, 42px);
     font-style: italic;
     font-weight: 700;
     line-height: 1.03;
-    transform: rotate(-7deg);
     text-shadow: 0 2px 10px #000;
+    transform: rotate(-7deg);
 }
 
 .heroSlogan::after {
-    content: "";
     display: block;
     height: 4px;
-    background: var(--coral);
-    transform: rotate(-4deg);
     margin-top: 9px;
+    background: var(--coral, #f0443a);
+    content: "";
+    transform: rotate(-4deg);
 }
 
-/* PRÓXIMA PRUEBA */
+/* ---------- TÍTULOS DE SECCIÓN ---------- */
+
+.sectionHeader {
+    width: min(1280px, calc(100% - 64px));
+    margin: 0 auto clamp(28px, 4vh, 48px);
+}
+
+.sectionHeader h2 {
+    max-width: 780px;
+    margin: 0;
+    font-family: var(--font-oswald), sans-serif;
+    font-size: clamp(34px, 4.5vw, 58px);
+    font-weight: 700;
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+}
+
+.sectionHeader p:not(.eyebrow) {
+    max-width: 650px;
+    margin: 16px 0 0;
+    color: var(--muted, #697680);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+/* ---------- PRÓXIMA PRUEBA: CLARO ---------- */
+
+.eventsSection {
+    justify-content: center;
+    background: var(--background, #fafaf9);
+    color: var(--text, #18232d);
+}
+
+.eventsSection .sectionHeader h2,
+.eventsSection .sectionHeader p:not(.eyebrow) {
+    color: var(--text, #18232d);
+}
+
+.eventsSection .sectionHeader .eyebrow {
+    color: var(--coral, #f0443a);
+}
 
 .eventGrid {
     display: grid;
     grid-template-columns:
-        minmax(280px, 1.15fr) minmax(300px, 1fr) minmax(190px, 0.62fr);
-    gap: 14px;
+        minmax(0, 1.15fr) minmax(0, 1fr) minmax(190px, 0.62fr);
+    gap: 16px;
     align-items: stretch;
+    width: min(1280px, calc(100% - 64px));
+    margin-inline: auto;
 }
 
 .eventPoster {
     position: relative;
-    min-height: 310px;
+    isolation: isolate;
+    min-width: 0;
+    min-height: 430px;
     overflow: hidden;
     border-radius: 7px;
-    background: var(--navy);
+    background: var(--navy, #0d1b2a);
     color: #fff;
-    isolation: isolate;
 }
 
 .posterImage,
 .posterShade {
     position: absolute;
     inset: 0;
-    z-index: -2;
+    pointer-events: none;
 }
 
 .posterImage {
+    z-index: -2;
     background:
         url("/images/event-padel.jpg") center / cover no-repeat,
-        #1c3c42;
+        #263640;
 }
 
 .posterShade {
     z-index: -1;
     background: linear-gradient(0deg,
-            rgba(2, 12, 20, 0.95),
-            rgba(2, 12, 20, 0.08) 76%);
+            rgba(2, 12, 20, 0.96),
+            rgba(2, 12, 20, 0.08) 78%);
 }
 
 .statusPill {
     position: absolute;
-    left: 14px;
-    top: 14px;
-    background: var(--coral);
-    color: white;
+    top: 16px;
+    left: 16px;
+    padding: 8px 11px;
     border-radius: 3px;
-    padding: 7px 10px;
+    background: var(--coral, #f0443a);
+    color: #fff;
     font-size: 10px;
     font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .posterContent {
     position: absolute;
-    left: 18px;
-    right: 18px;
-    bottom: 16px;
+    right: 20px;
+    bottom: 20px;
+    left: 20px;
 }
 
 .posterNumber {
+    margin: 0 0 4px;
     font-family: var(--font-oswald), sans-serif;
-    font-size: 25px;
+    font-size: 28px;
     font-weight: 700;
-    margin: 0 0 2px;
 }
 
 .posterContent h3 {
+    margin: 0 0 18px;
+    color: var(--coral, #f0443a);
     font-family: var(--font-oswald), sans-serif;
-    font-size: 23px;
+    font-size: clamp(22px, 2.4vw, 32px);
+    font-weight: 700;
     line-height: 1.08;
-    color: var(--coral);
-    margin: 0 0 14px;
     text-transform: uppercase;
 }
 
 .posterMeta {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 12px 18px;
     font-size: 11px;
     font-weight: 600;
 }
@@ -181,35 +321,36 @@
 .posterMeta span {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
 }
 
 .posterMeta svg {
-    color: var(--coral);
+    flex-shrink: 0;
+    color: var(--coral, #f0443a);
 }
 
 .organizerMarks {
     display: flex;
     justify-content: space-between;
     gap: 8px;
+    margin-top: 18px;
+    padding-top: 12px;
     border-top: 1px solid #ffffff40;
-    margin-top: 15px;
-    padding-top: 10px;
+    color: #dce3e7;
     font-size: 9px;
     letter-spacing: 0.04em;
-    color: #dce3e7;
 }
 
-/* DATOS DEL EVENTO */
-
 .eventDetails {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 22px;
+    gap: 24px;
+    min-width: 0;
+    padding: 24px;
+    border: 1px solid var(--border, #e6e9eb);
+    border-radius: 7px;
+    background: #fff;
+    color: var(--text, #18232d);
 }
 
 .detailRow {
@@ -222,56 +363,66 @@
     min-width: 0;
 }
 
-.detailIcon {
-    color: var(--coral);
+.detailIcon,
+.detailIconMuted {
     flex-shrink: 0;
+}
+
+.detailIcon {
+    color: var(--coral, #f0443a);
 }
 
 .detailIconMuted {
     color: #7e8b94;
-    flex-shrink: 0;
 }
 
 .detailLabel {
     display: block;
+    margin-bottom: 5px;
+    color: #65717b;
     font-size: 10px;
     font-weight: 700;
-    color: #65717b;
-    margin-bottom: 5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .detailRow strong {
     display: block;
+    color: var(--text, #18232d);
     font-size: 13px;
     font-weight: 700;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 .detailRow small {
     display: block;
+    margin-top: 4px;
     color: #7b858e;
     font-size: 11px;
-    margin-top: 3px;
+    line-height: 1.5;
 }
 
 .categoryTags {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 7px;
+    gap: 6px;
+    margin-top: 8px;
 }
 
 .categoryTags span {
+    padding: 6px 8px;
     border: 1px solid #d7dde0;
     border-radius: 4px;
-    padding: 5px 7px;
+    background: #fff;
+    color: var(--text, #18232d);
     font-size: 10px;
     font-weight: 600;
 }
 
 .categoryTags .tagSage {
-    background: #d9ead6;
-    border-color: #d9ead6;
+    border-color: #f5c5c1;
+    background: #fff0ef;
+    color: #b92d27;
 }
 
 .eventCta {
@@ -279,34 +430,27 @@
     margin-top: auto;
 }
 
-.demoNotice {
-    font-size: 10px;
-    color: #7b858e;
-    line-height: 1.5;
-    margin: 12px 0 0;
-}
-
-/* INFORMACIÓN COMPLEMENTARIA */
-
 .eventAside {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    background: #fff;
-    border: 1px solid var(--border);
+    gap: 22px;
+    min-width: 0;
+    padding: 20px;
+    border: 1px solid var(--border, #e6e9eb);
     border-radius: 7px;
-    padding: 17px;
+    background: #fff;
+    color: var(--text, #18232d);
 }
 
 .asideFact {
     display: flex;
-    gap: 10px;
     align-items: flex-start;
+    gap: 10px;
 }
 
 .asideFact svg {
-    color: var(--coral);
     flex-shrink: 0;
+    color: var(--coral, #f0443a);
 }
 
 .asideFact strong,
@@ -316,120 +460,218 @@
 
 .asideFact strong {
     font-size: 11px;
+    line-height: 1.5;
 }
 
 .asideFact span {
-    font-size: 10px;
+    margin-top: 4px;
     color: #78828a;
-    margin-top: 3px;
-    line-height: 1.45;
+    font-size: 10px;
+    line-height: 1.5;
 }
 
 .asidePhoto {
     flex: 1;
-    min-height: 90px;
+    min-height: 110px;
     border-radius: 5px;
     background:
         url("/images/event-padel.jpg") center / cover no-repeat,
-        #d4e0dc;
+        #e7e7e7;
 }
 
-/* RANKING */
-
-.rankingSection {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-}
-
-.rankingBackdrop {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background:
-        linear-gradient(90deg, rgba(7, 22, 32, 0.1), rgba(7, 22, 32, 0.6)),
-        url("/images/ranking-padel.jpg") right center / auto 100% no-repeat,
-        #0d1b2a;
-    opacity: 0.9;
+.demoNotice {
+    margin: 14px 0 0;
+    color: #7b858e;
+    font-size: 10px;
+    line-height: 1.5;
 }
 
 .demoNoticeDark {
-    font-size: 10px;
+    margin: 14px 0 0;
     color: #bdc7ce;
-    margin: 12px 0 0;
+    font-size: 10px;
+    line-height: 1.5;
 }
 
-/* RESULTADOS */
+/* ---------- CALENDARIO: OSCURO ---------- */
+
+.calendarSection {
+    min-height: 100svh;
+    justify-content: center;
+    padding-block: clamp(64px, 8vh, 110px);
+    background-color: var(--navy, #0d1b2a);
+    color: #fff;
+}
+
+.calendarSection .sectionHeader h2 {
+    color: #fff;
+}
+
+.calendarSection .sectionHeader p:not(.eyebrow) {
+    color: #c6d0d7;
+}
+
+.calendarSection .sectionHeader .eyebrow {
+    color: var(--coral, #f0443a);
+}
+
+.calendarSection a:not(.button) {
+    color: var(--coral, #f0443a);
+}
+
+.calendarSection .calendarCard,
+.calendarSection .calendarItem {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+}
+
+/* ---------- RANKING: CLARO ---------- */
+
+.rankingSection {
+    isolation: auto;
+    justify-content: center;
+    overflow: visible;
+    min-height: 100svh;
+    padding-block: clamp(64px, 8vh, 110px);
+    background: var(--background, #fafaf9);
+    color: var(--text, #18232d);
+}
+
+.rankingBackdrop {
+    display: none;
+}
+
+.rankingSection .sectionHeader h2 {
+    color: var(--text, #18232d);
+}
+
+.rankingSection .sectionHeader p:not(.eyebrow) {
+    color: var(--muted, #697680);
+}
+
+.rankingSection .sectionHeader .eyebrow {
+    color: var(--coral, #f0443a);
+}
+
+.rankingSection .demoNoticeDark {
+    color: var(--muted, #697680);
+}
+
+.rankingSection .rankingTable {
+    border-color: rgba(13, 27, 42, 0.12);
+    background: #fff;
+}
+
+.rankingSection .rankingHeader {
+    border-bottom-color: rgba(13, 27, 42, 0.12);
+    color: #65717b;
+}
+
+.rankingSection .rankingRow {
+    border-bottom-color: rgba(13, 27, 42, 0.1);
+    color: var(--text, #18232d);
+}
+
+.rankingSection .rankingRow:hover {
+    background: rgba(13, 27, 42, 0.035);
+}
+
+/* ---------- RESULTADOS: OSCURO ---------- */
+
+.resultsSection {
+    min-height: 100svh;
+    justify-content: center;
+    padding-block: clamp(64px, 8vh, 110px);
+    background-color: var(--navy, #0d1b2a);
+    color: #fff;
+}
+
+.resultsSection .sectionHeader h2 {
+    color: #fff;
+}
+
+.resultsSection .sectionHeader p:not(.eyebrow) {
+    color: #c6d0d7;
+}
+
+.resultsSection .sectionHeader .eyebrow {
+    color: var(--coral, #f0443a);
+}
 
 .resultsGrid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+    gap: 18px;
+    width: min(1280px, calc(100% - 64px));
+    margin-inline: auto;
 }
 
 .resultCard {
     display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 150px auto;
+    grid-template-rows: minmax(180px, 1fr) auto;
+    min-width: 0;
     overflow: hidden;
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 7px;
-    background: #fff;
-    color: inherit;
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
     text-decoration: none;
     transition:
-        transform 0.2s,
-        box-shadow 0.2s;
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
-.resultCard:hover,
-.newsCard:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-card);
+.resultCard:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px #0003;
 }
 
 .resultImage,
 .newsImage {
-    background-color: #dbe4e2;
+    background-color: #e5e5e5;
     background-position: center;
     background-size: cover;
 }
 
 .resultImage {
-    background-image: linear-gradient(135deg, #254b50, #8da69a);
+    background-image: linear-gradient(135deg, #343b43, #a9afb4);
 }
 
 .resultImageTwo {
-    background-image: linear-gradient(135deg, #173444, #a7c4a0);
+    background-image: linear-gradient(135deg, #202c38, #c1c4c8);
 }
 
 .resultImageThree {
-    background-image: linear-gradient(135deg, #244149, #e0b28b);
+    background-image: linear-gradient(135deg, #3a2929, #e2a29c);
 }
 
 .resultCopy {
-    padding: 12px 14px 14px;
     display: flex;
-    align-items: flex-start;
     flex-direction: column;
-    gap: 5px;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 18px;
 }
 
 .resultCategory {
+    color: var(--coral, #f0443a);
     font-size: 9px;
-    color: #6c7780;
     text-transform: uppercase;
 }
 
 .resultCopy strong {
+    color: #fff;
     font-family: var(--font-oswald), sans-serif;
-    color: var(--coral);
-    font-size: 18px;
+    font-size: 21px;
+    line-height: 1.2;
 }
 
 .resultCopy>span:not(.resultCategory) {
+    color: rgba(255, 255, 255, 0.78);
     font-size: 12px;
     font-weight: 600;
+    line-height: 1.5;
 }
 
 .resultCopy small,
@@ -437,32 +679,33 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    color: #7c858c;
+    margin-top: 5px;
+    color: #c6d0d7;
     font-size: 10px;
-    margin-top: 4px;
 }
 
-/* BANNER DE SAGUNTO */
+/* ---------- SAGUNTO: IMAGEN ---------- */
 
 .saguntoBanner {
-    position: relative;
     isolation: isolate;
-    min-height: 280px;
-    display: flex;
-    align-items: center;
-    color: #fff;
+    align-items: flex-start;
+    justify-content: center;
     overflow: hidden;
-    background: var(--navy);
+    min-height: 100svh;
+    background: var(--navy, #0d1b2a);
+    color: #fff;
 }
 
 .saguntoPhoto,
 .saguntoShade {
     position: absolute;
     inset: 0;
-    z-index: -2;
+    display: block;
+    pointer-events: none;
 }
 
 .saguntoPhoto {
+    z-index: -2;
     background:
         url("/images/sagunto-panorama.jpg") center 48% / cover no-repeat,
         #233847;
@@ -471,117 +714,185 @@
 .saguntoShade {
     z-index: -1;
     background: linear-gradient(90deg,
-            rgba(4, 18, 27, 0.95),
-            rgba(4, 18, 27, 0.62) 45%,
-            rgba(4, 18, 27, 0.02));
+            rgba(4, 18, 27, 0.94),
+            rgba(4, 18, 27, 0.72) 50%,
+            rgba(4, 18, 27, 0.24));
 }
 
 .saguntoContent {
-    padding-top: 36px;
-    padding-bottom: 36px;
+    position: relative;
+    z-index: 1;
+    width: min(1280px, calc(100% - 64px));
+    margin: auto;
+    padding-block: 40px;
+    color: #fff;
 }
 
 .saguntoContent h2 {
-    font-size: clamp(32px, 4vw, 48px);
+    max-width: 740px;
+    color: #fff;
+    font-size: clamp(38px, 5vw, 64px);
 }
 
 .saguntoContent>p:not(.eyebrow) {
-    font-size: 13px;
-    line-height: 1.6;
-    margin: 12px 0 18px;
+    max-width: 550px;
+    margin: 18px 0 24px;
+    color: #e3e8ec;
+    font-size: 14px;
+    line-height: 1.75;
 }
 
-/* ACTUALIDAD */
+.saguntoContent .eyebrow,
+.saguntoContent h2 span {
+    color: var(--coral, #f0443a);
+}
+
+.saguntoContent .button-outline-light {
+    border-color: #fff;
+    color: #fff;
+}
+
+.saguntoContent .button-outline-light:hover {
+    background: #fff;
+    color: var(--navy, #0d1b2a);
+}
+
+/* ---------- ACTUALIDAD: CLARO ---------- */
+
+.newsSection {
+    justify-content: center;
+    min-height: 100svh;
+    padding-block: clamp(64px, 8vh, 110px);
+    background: var(--background, #fafaf9);
+    color: var(--text, #18232d);
+}
+
+.newsSection .sectionHeader h2 {
+    color: var(--text, #18232d);
+}
+
+.newsSection .sectionHeader p:not(.eyebrow) {
+    color: var(--muted, #697680);
+}
+
+.newsSection .sectionHeader .eyebrow {
+    color: var(--coral, #f0443a);
+}
 
 .newsGrid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+    gap: 18px;
+    width: min(1280px, calc(100% - 64px));
+    margin-inline: auto;
 }
 
 .newsCard {
-    border: 1px solid var(--border);
-    border-radius: 7px;
+    min-width: 0;
     overflow: hidden;
+    border: 1px solid var(--border, #e6e9eb);
+    border-radius: 7px;
     background: #fff;
     transition:
-        transform 0.2s,
-        box-shadow 0.2s;
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.newsCard:hover {
+    transform: translateY(-3px);
+    border-color: var(--coral, #f0443a);
+    box-shadow: 0 12px 32px #15253314;
 }
 
 .newsImage {
-    height: 130px;
     position: relative;
-    background-image: linear-gradient(135deg, #204a51, #9bb9a7);
+    height: clamp(150px, 18vw, 230px);
+    background-image: linear-gradient(135deg, #343b43, #a9afb4);
 }
 
 .newsImageTwo {
-    background-image: linear-gradient(135deg, #132d3b, #74978e);
+    background-image: linear-gradient(135deg, #202c38, #c1c4c8);
 }
 
 .newsImageThree {
-    background-image: linear-gradient(135deg, #0d1b2a, #d7a16f);
+    background-image: linear-gradient(135deg, #302323, #d89b95);
 }
 
 .newsImage span {
     position: absolute;
-    bottom: 10px;
-    left: 10px;
-    background: var(--sage);
-    color: var(--navy);
-    padding: 5px 8px;
+    bottom: 12px;
+    left: 12px;
+    padding: 6px 9px;
     border-radius: 3px;
+    background: var(--coral, #f0443a);
+    color: #fff;
     font-size: 9px;
     font-weight: 700;
+    text-transform: uppercase;
 }
 
 .newsCopy {
-    padding: 12px 14px 14px;
+    padding: 18px;
 }
 
 .newsCopy h3 {
-    font-size: 13px;
-    line-height: 1.45;
-    margin: 0 0 5px;
+    margin: 0 0 9px;
+    color: var(--text, #18232d);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.5;
 }
 
 .newsCopy p {
-    font-size: 11px;
-    line-height: 1.5;
+    margin: 0 0 12px;
     color: #69757e;
-    margin: 0 0 8px;
+    font-size: 12px;
+    line-height: 1.65;
 }
 
-/* PATROCINADORES */
+.newsCopy small {
+    color: #7c858c;
+}
+
+/* ---------- PATROCINADORES: OSCURO ---------- */
 
 .sponsorsSection {
-    padding: 26px 0 32px;
-    background: #fff;
-    border-top: 1px solid var(--border);
+    justify-content: center;
+    min-height: 60svh;
+    background: var(--navy, #0d1b2a);
+    color: #fff;
+}
+
+.sponsorsInner {
+    width: min(1280px, calc(100% - 64px));
+    margin-inline: auto;
 }
 
 .sponsorsSection h2 {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: var(--coral);
-    font-size: 12px;
-    margin: 0 0 22px;
+    margin: 0 0 32px;
+    color: var(--coral, #f0443a);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
 .sponsorsList {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-around;
-    gap: 24px;
-    flex-wrap: wrap;
+    gap: 28px 36px;
 }
 
 .sponsorsList span {
+    color: #f0f2f4;
     font-family: var(--font-oswald), sans-serif;
+    font-size: clamp(18px, 2.4vw, 30px);
     font-weight: 700;
-    color: #152533;
-    font-size: clamp(17px, 2vw, 26px);
     letter-spacing: -0.03em;
 }
 
@@ -593,129 +904,565 @@
     font-weight: 400;
 }
 
-/* RESPONSIVE */
+/* ---------- ACCESIBILIDAD Y ESTADOS ---------- */
 
-.eventGrid,
-.resultsGrid,
-.newsGrid {
-    min-width: 0;
+.heroActions :global(a),
+.heroActions :global(button),
+.eventCta:global(a),
+.eventCta:global(button),
+.resultCard,
+.newsCard {
+    -webkit-tap-highlight-color: transparent;
 }
 
-@media (max-width: 1000px) {
+.resultCard:focus-visible,
+.newsCard:focus-visible {
+    outline: 3px solid var(--coral, #f0443a);
+    outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .resultCard,
+    .newsCard {
+        transition: none;
+    }
+
+    .resultCard:hover,
+    .newsCard:hover {
+        transform: none;
+    }
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .container,
+    .heroContent,
+    .sectionHeader,
+    .eventGrid,
+    .resultsGrid,
+    .newsGrid,
+    .saguntoContent,
+    .sponsorsInner {
+        width: calc(100% - 48px);
+    }
+
+    .hero h1 {
+        max-width: 680px;
+        font-size: clamp(48px, 6.5vw, 72px);
+    }
+
+    .heroSlogan {
+        right: 5%;
+        font-size: 27px;
+    }
+
     .eventGrid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .eventPoster {
+        min-height: 380px;
     }
 
     .eventAside {
         grid-column: 1 / -1;
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        align-items: start;
     }
 
     .asidePhoto {
-        display: none;
+        display: block;
+        min-height: 100px;
     }
 
-    .heroSlogan {
-        right: 5%;
-        font-size: 26px;
+    .resultsGrid,
+    .newsGrid {
+        gap: 14px;
     }
 
-    .hero h1 {
-        max-width: 620px;
-    }
-
-    .rankingBackdrop {
-        opacity: 0.35;
-        background-position: 75% center;
-    }
-
-    .eventPoster {
-        min-height: 330px;
+    .resultImage {
+        min-height: 160px;
     }
 }
 
-@media (max-width: 680px) {
+/* =========================================================
+   RESPONSIVE — MÓVIL
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .container,
+    .heroContent,
+    .sectionHeader,
+    .eventGrid,
+    .resultsGrid,
+    .newsGrid,
+    .saguntoContent,
+    .sponsorsInner {
+        width: calc(100% - 36px);
+    }
+
+    .hero,
+    .eventsSection,
+    .calendarSection,
+    .rankingSection,
+    .resultsSection,
+    .saguntoBanner,
+    .newsSection {
+        min-height: 100svh;
+        padding-block: 76px;
+    }
+
     .hero {
-        min-height: 500px;
+        min-height: 100svh;
+        padding-top: 100px;
+        padding-bottom: 64px;
+    }
+
+    .heroImage {
+        background-position: 58% center;
+    }
+
+    .heroOverlay {
+        background: linear-gradient(90deg,
+                rgba(4, 17, 27, 0.94),
+                rgba(4, 17, 27, 0.72));
     }
 
     .heroContent {
-        padding-top: 52px;
-        padding-bottom: 42px;
+        padding-block: 24px;
+    }
+
+    .eyebrow {
+        margin-bottom: 12px;
+        font-size: 10px;
     }
 
     .hero h1 {
-        font-size: clamp(38px, 11vw, 56px);
         max-width: 100%;
-    }
-
-    .heroSlogan {
-        display: none;
+        font-size: clamp(42px, 12vw, 60px);
+        line-height: 0.99;
     }
 
     .heroLead {
+        max-width: 440px;
+        margin: 18px 0 24px;
         font-size: 14px;
+        line-height: 1.65;
     }
 
     .heroActions {
         align-items: stretch;
         flex-direction: column;
-        max-width: 300px;
+        width: 100%;
+        max-width: 360px;
+    }
+
+    .heroActions :global(.button-primary),
+    .heroActions :global(.button-secondary) {
+        justify-content: center;
+        width: 100%;
+        min-height: 46px;
+    }
+
+    .heroSlogan {
+        display: none;
+    }
+
+    .sectionHeader {
+        margin-bottom: 28px;
+    }
+
+    .sectionHeader h2 {
+        font-size: clamp(34px, 9vw, 46px);
+        line-height: 1.04;
+    }
+
+    .sectionHeader p:not(.eyebrow) {
+        margin-top: 12px;
+        font-size: 13px;
+        line-height: 1.65;
+    }
+
+    /* Próxima prueba */
+
+    .eventsSection {
+        justify-content: flex-start;
     }
 
     .eventGrid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
     }
 
     .eventPoster {
-        min-height: 360px;
+        min-height: 390px;
+    }
+
+    .posterContent {
+        right: 16px;
+        bottom: 16px;
+        left: 16px;
+    }
+
+    .posterNumber {
+        font-size: 24px;
+    }
+
+    .posterContent h3 {
+        font-size: 27px;
+    }
+
+    .posterMeta {
+        gap: 10px 14px;
+        font-size: 10px;
+    }
+
+    .organizerMarks {
+        margin-top: 14px;
+        font-size: 8px;
     }
 
     .eventDetails {
-        padding: 18px;
+        gap: 20px;
+        padding: 20px;
     }
 
     .eventAside {
         grid-column: auto;
-        grid-template-columns: 1fr 1fr;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 18px 12px;
+        padding: 18px;
     }
 
-    .resultsGrid,
-    .newsGrid {
-        grid-template-columns: 1fr;
+    .asidePhoto {
+        min-height: 110px;
+    }
+
+    /* Ranking */
+
+    .rankingSection {
+        justify-content: flex-start;
+    }
+
+    .resultsGrid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
     }
 
     .resultCard {
-        grid-template-columns: 42% 1fr;
-        grid-template-rows: 1fr;
-        min-height: 150px;
+        grid-template-columns: minmax(110px, 36%) minmax(0, 1fr);
+        grid-template-rows: minmax(145px, auto);
     }
 
     .resultImage {
-        min-height: 150px;
+        min-height: 145px;
     }
 
-    .newsImage {
-        height: 175px;
+    .resultCopy {
+        justify-content: center;
+        gap: 5px;
+        padding: 14px;
     }
+
+    .resultCopy strong {
+        font-size: 19px;
+    }
+
+    /* Sagunto */
 
     .saguntoBanner {
-        min-height: 320px;
+        min-height: 100svh;
+    }
+
+    .saguntoPhoto {
+        background-position: 60% center;
     }
 
     .saguntoShade {
         background: linear-gradient(90deg,
-                rgba(4, 18, 27, 0.92),
-                rgba(4, 18, 27, 0.6));
+                rgba(4, 18, 27, 0.94),
+                rgba(4, 18, 27, 0.76));
+    }
+
+    .saguntoContent {
+        padding-block: 28px;
+    }
+
+    .saguntoContent h2 {
+        font-size: clamp(36px, 10vw, 50px);
+    }
+
+    .saguntoContent>p:not(.eyebrow) {
+        margin: 16px 0 22px;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    /* Actualidad */
+
+    .newsSection {
+        justify-content: flex-start;
+    }
+
+    .newsGrid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .newsImage {
+        height: 190px;
+    }
+
+    .newsCopy {
+        padding: 16px;
+    }
+
+    .newsCopy h3 {
+        font-size: 14px;
+    }
+
+    .newsCopy p {
+        font-size: 12px;
+    }
+
+    /* Patrocinadores */
+
+    .sponsorsSection {
+        min-height: 60svh;
+        padding-block: 64px;
+    }
+
+    .sponsorsSection h2 {
+        margin-bottom: 26px;
     }
 
     .sponsorsList {
         justify-content: flex-start;
-        gap: 18px 28px;
+        gap: 24px;
     }
 
     .sponsorsList span {
         font-size: 21px;
     }
+}
+
+/* =========================================================
+   RESPONSIVE — MÓVILES ESTRECHOS
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+    .container,
+    .heroContent,
+    .sectionHeader,
+    .eventGrid,
+    .resultsGrid,
+    .newsGrid,
+    .saguntoContent,
+    .sponsorsInner {
+        width: calc(100% - 28px);
+    }
+
+    .hero h1 {
+        font-size: 39px;
+    }
+
+    .sectionHeader h2 {
+        font-size: 32px;
+    }
+
+    .eventPoster {
+        min-height: 350px;
+    }
+
+    .eventDetails {
+        padding: 16px;
+    }
+
+    .eventAside {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .asidePhoto {
+        min-height: 130px;
+    }
+
+    .resultCard {
+        grid-template-columns: 34% minmax(0, 1fr);
+    }
+
+    .resultCopy {
+        padding: 12px;
+    }
+
+    .resultCopy strong {
+        font-size: 17px;
+    }
+
+    .sponsorsList {
+        gap: 18px;
+    }
+}
+
+/* =========================================================
+   RESPONSIVE — ESCRITORIOS GRANDES
+   ========================================================= */
+
+@media (min-width: 1600px) {
+
+    .container,
+    .heroContent,
+    .sectionHeader,
+    .eventGrid,
+    .resultsGrid,
+    .newsGrid,
+    .saguntoContent,
+    .sponsorsInner {
+        width: min(1400px, calc(100% - 100px));
+    }
+
+    .hero h1 {
+        font-size: clamp(76px, 5.5vw, 100px);
+    }
+
+    .heroLead {
+        font-size: 17px;
+    }
+
+    .eventPoster {
+        min-height: 480px;
+    }
+
+    .eventDetails,
+    .eventAside {
+        padding: 28px;
+    }
+}
+
+/* ---------- AJUSTES FINALES DE CONTRASTE ---------- */
+
+.eventsSection .sectionHeader h2,
+.eventsSection .sectionHeader p:not(.eyebrow),
+.rankingSection .sectionHeader h2 {
+    color: var(--text, #18232d);
+}
+
+.eventsSection .sectionHeader p:not(.eyebrow),
+.rankingSection .sectionHeader p:not(.eyebrow) {
+    color: var(--muted, #697680);
+}
+
+.eventsSection .sectionHeader .eyebrow,
+.rankingSection .sectionHeader .eyebrow,
+.calendarSection .sectionHeader .eyebrow,
+.resultsSection .sectionHeader .eyebrow,
+.newsSection .sectionHeader .eyebrow {
+    color: var(--coral, #f0443a);
+}
+
+.calendarSection .sectionHeader h2,
+.resultsSection .sectionHeader h2 {
+    color: #fff;
+}
+
+.calendarSection .sectionHeader p:not(.eyebrow),
+.resultsSection .sectionHeader p:not(.eyebrow) {
+    color: #c6d0d7;
+}
+
+.rankingSection .rankingBackdrop {
+    display: none;
+}
+
+.rankingSection .rankingTable {
+    border-color: rgba(13, 27, 42, 0.12);
+    background: #fff;
+}
+
+.rankingSection .rankingHeader {
+    border-bottom-color: rgba(13, 27, 42, 0.12);
+    color: #65717b;
+}
+
+.rankingSection .rankingRow {
+    border-bottom-color: rgba(13, 27, 42, 0.1);
+    color: var(--text, #18232d);
+}
+
+.rankingSection .rankingRow:hover {
+    background: rgba(13, 27, 42, 0.035);
+}
+
+.resultsSection .resultCard {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.resultsSection .resultCopy strong {
+    color: #fff;
+}
+
+.resultsSection .resultCopy>span:not(.resultCategory) {
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.resultsSection .resultCopy small {
+    color: #c6d0d7;
+}
+
+.saguntoBanner {
+    isolation: isolate;
+    background-color: var(--navy, #0d1b2a);
+    color: #fff;
+}
+
+.saguntoPhoto,
+.saguntoShade {
+    display: block;
+}
+
+.saguntoContent,
+.saguntoContent h2,
+.saguntoContent>p:not(.eyebrow) {
+    color: #fff;
+}
+
+.saguntoContent .eyebrow,
+.saguntoContent h2 span {
+    color: var(--coral, #f0443a);
+}
+
+.newsSection .newsCard {
+    border-color: var(--border, #e6e9eb);
+    background: #fff;
+}
+
+.newsSection .newsCopy h3 {
+    color: var(--text, #18232d);
+}
+
+.newsSection .newsCopy p,
+.newsSection .newsCopy small {
+    color: var(--muted, #697680);
+}
+
+.sponsorsSection {
+    background-color: var(--navy, #0d1b2a);
+    color: #fff;
+}
+
+.sponsorsSection h2 {
+    color: var(--coral, #f0443a);
+}
+
+.sponsorsList span {
+    color: #f0f2f4;
 }
