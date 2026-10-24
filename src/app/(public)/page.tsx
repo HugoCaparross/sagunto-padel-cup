@@ -19,17 +19,21 @@ import { RankingPreview } from "@/components/public/ranking-preview";
 import { CircuitCalendar } from "@/components/public/circuit-calendar";
 import SiteFooter from "@/components/public/site-footer";
 
-import {
-    upcomingEvent,
-    newsItems,
-    rankingPreview,
-    resultsPreview,
-    sponsors,
-} from "@/domains/content/home-content";
+import { getHomeData } from "@/domains/content/home-data";
 
 import styles from "./home.module.css";
 
-export default function HomePage() {
+export default async function HomePage() {
+    const {
+        upcomingEvent,
+        calendarEvents,
+        masterFinal,
+        rankingPreview,
+        resultsPreview,
+        newsItems,
+        sponsors,
+    } = await getHomeData();
+
     return (
         <>
             <HomeHeader />
@@ -134,7 +138,9 @@ export default function HomePage() {
                                 />
 
                                 <span className={styles.statusPill}>
-                                    INFORMACIÓN POR CONFIRMAR
+                                    {upcomingEvent.id
+                                        ? "DATOS DE LA PRUEBA"
+                                        : "INFORMACIÓN POR CONFIRMAR"}
                                 </span>
 
                                 <div className={styles.posterContent}>
@@ -220,12 +226,26 @@ export default function HomePage() {
                                         </span>
 
                                         <div className={styles.categoryTags}>
-                                            <span>1.ª Cat.</span>
-                                            <span>2.ª Cat.</span>
-                                            <span>3.ª Cat.</span>
-                                            <span className={styles.tagSage}>
-                                                Iniciación
-                                            </span>
+                                            {upcomingEvent.categories.length > 0 ? (
+                                                upcomingEvent.categories.map((category) => (
+                                                    <span
+                                                        key={category}
+                                                        className={
+                                                            category
+                                                                .toLowerCase()
+                                                                .includes("iniciación")
+                                                                ? styles.tagSage
+                                                                : undefined
+                                                        }
+                                                    >
+                                                        {category}
+                                                    </span>
+                                                ))
+                                            ) : (
+                                                <span>
+                                                    Categorías por confirmar
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -239,8 +259,9 @@ export default function HomePage() {
                                 </a>
 
                                 <p className={styles.demoNotice}>
-                                    Fecha, sede, precios y plazo de inscripción
-                                    pendientes de confirmación oficial.
+                                    Los precios y las condiciones de inscripción
+                                    se publicarán cuando estén confirmados por
+                                    la organización.
                                 </p>
                             </article>
 
@@ -249,9 +270,13 @@ export default function HomePage() {
                                     <UsersRound size={23} />
 
                                     <div>
-                                        <strong>Plazas limitadas</strong>
+                                        <strong>
+                                            {upcomingEvent.capacity
+                                                ? `${upcomingEvent.capacity} plazas disponibles como máximo`
+                                                : "Aforo por confirmar"}
+                                        </strong>
                                         <span>
-                                            Cupos pendientes de confirmación
+                                            Capacidad publicada para esta prueba
                                         </span>
                                     </div>
                                 </div>
@@ -260,8 +285,10 @@ export default function HomePage() {
                                     <Layers3 size={23} />
 
                                     <div>
-                                        <strong>Inscripción</strong>
-                                        <span>Precio por confirmar</span>
+                                        <strong>Inicio de inscripción</strong>
+                                        <span>
+                                            {upcomingEvent.registrationOpensLabel}
+                                        </span>
                                     </div>
                                 </div>
 
@@ -270,7 +297,9 @@ export default function HomePage() {
 
                                     <div>
                                         <strong>Cierre de inscripción</strong>
-                                        <span>Fecha por confirmar</span>
+                                        <span>
+                                            {upcomingEvent.registrationClosesLabel}
+                                        </span>
                                     </div>
                                 </div>
 
@@ -279,7 +308,9 @@ export default function HomePage() {
 
                                     <div>
                                         <strong>Organización</strong>
-                                        <span>Información oficial pendiente</span>
+                                        <span>
+                                            Información oficial pendiente
+                                        </span>
                                     </div>
                                 </div>
 
@@ -314,7 +345,10 @@ export default function HomePage() {
                             }
                         />
 
-                        <CircuitCalendar />
+                        <CircuitCalendar
+                            events={calendarEvents}
+                            masterFinal={masterFinal}
+                        />
                     </div>
                 </section>
 
@@ -347,10 +381,12 @@ export default function HomePage() {
 
                         <RankingPreview players={rankingPreview} />
 
-                        <p className={styles.demoNoticeDark}>
-                            La clasificación se conectará a los puntos oficiales
-                            validados por la organización.
-                        </p>
+                        {rankingPreview.length === 0 && (
+                            <p className={styles.demoNoticeDark}>
+                                El ranking oficial aparecerá cuando exista una
+                                clasificación publicada para la temporada activa.
+                            </p>
+                        )}
                     </div>
                 </section>
 
@@ -403,6 +439,12 @@ export default function HomePage() {
                                     </div>
                                 </a>
                             ))}
+
+                            {resultsPreview.length === 0 && (
+                                <p role="status">
+                                    Todavía no hay resultados validados publicados.
+                                </p>
+                            )}
                         </div>
                     </div>
                 </section>
@@ -497,6 +539,12 @@ export default function HomePage() {
                                     </div>
                                 </article>
                             ))}
+
+                            {newsItems.length === 0 && (
+                                <p role="status">
+                                    Todavía no hay noticias publicadas.
+                                </p>
+                            )}
                         </div>
                     </div>
                 </section>
@@ -514,14 +562,34 @@ export default function HomePage() {
 
                         <div className={styles.sponsorsList}>
                             {sponsors.map((sponsor) => (
-                                <span key={sponsor}>{sponsor}</span>
+                                <span key={sponsor.id}>
+                                    {sponsor.logo_url ? (
+                                        <img
+                                            src={sponsor.logo_url}
+                                            alt={sponsor.name}
+                                            loading="lazy"
+                                        />
+                                    ) : sponsor.website_url ? (
+                                        <a
+                                            href={sponsor.website_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            {sponsor.name}
+                                        </a>
+                                    ) : (
+                                        sponsor.name
+                                    )}
+                                </span>
                             ))}
-                        </div>
 
-                        <p className={styles.demoNotice}>
-                            Los patrocinadores definitivos se mostrarán cuando
-                            su colaboración y el uso de sus marcas estén confirmados.
-                        </p>
+                            {sponsors.length === 0 && (
+                                <p role="status">
+                                    Los patrocinadores se mostrarán cuando estén
+                                    publicados por la organización.
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </section>
             </main>

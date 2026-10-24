@@ -47,6 +47,13 @@ export function RankingPreview({
                     </thead>
 
                     <tbody>
+                        {players.length === 0 && (
+                            <tr>
+                                <td colSpan={5} className={styles.emptyState}>
+                                    No hay una clasificación oficial publicada para la temporada activa.
+                                </td>
+                            </tr>
+                        )}
                         {players.map((player) => (
                             <tr key={player.position}>
                                 <td>{player.position}</td>
