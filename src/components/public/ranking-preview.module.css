@@ -1,7 +1,9 @@
 .wrap {
+    width: 100%;
     max-width: 790px;
 }
 
+/* Filtros de categoría */
 .filters {
     display: flex;
     gap: 6px;
@@ -9,30 +11,55 @@
     margin-bottom: 10px;
 }
 
-.filters span {
+/* Botones interactivos */
+.filters button {
+    appearance: none;
+    flex-shrink: 0;
     padding: 8px 12px;
     background: #182b3a;
     border: 1px solid #ffffff12;
     border-radius: 20px;
     color: #dbe1e5;
+    font: inherit;
     font-size: 10px;
     font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        background-color 160ms ease,
+        border-color 160ms ease,
+        color 160ms ease;
 }
 
-.filters .selected {
-    background: var(--coral);
-    border-color: var(--coral);
+.filters button:hover {
+    background: #294052;
+    border-color: #ffffff30;
     color: #fff;
 }
 
+.filters button.selected {
+    background: var(--coral, #f0443a);
+    border-color: var(--coral, #f0443a);
+    color: #fff;
+}
+
+.filters button:focus-visible {
+    outline: 3px solid var(--coral, #f0443a);
+    outline-offset: 3px;
+}
+
+/* Tabla */
 .tableWrap {
+    width: 100%;
     overflow-x: auto;
     border-radius: 7px;
+    -webkit-overflow-scrolling: touch;
 }
 
 .table {
-    border-collapse: collapse;
     width: 100%;
+    border-collapse: collapse;
     background: #102433;
     color: #f4f6f7;
     font-size: 11px;
@@ -40,11 +67,12 @@
 }
 
 .table th {
-    font-size: 9px;
-    color: #b8c4cc;
-    font-weight: 600;
     padding: 11px 10px;
     border-bottom: 1px solid #ffffff18;
+    color: #b8c4cc;
+    font-size: 9px;
+    font-weight: 600;
+    white-space: nowrap;
 }
 
 .table td {
@@ -53,8 +81,16 @@
     white-space: nowrap;
 }
 
+.table tbody tr {
+    transition: background-color 140ms ease;
+}
+
 .table tbody tr:hover {
     background: #ffffff08;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: 0;
 }
 
 .table td:first-child,
@@ -75,6 +111,7 @@
     gap: 9px;
 }
 
+/* Iniciales del jugador */
 .avatar {
     display: inline-grid;
     place-items: center;
@@ -82,12 +119,13 @@
     height: 25px;
     flex-shrink: 0;
     border-radius: 50%;
-    background: var(--sage);
-    color: var(--navy);
+    background: var(--sage, #a8c3b0);
+    color: var(--navy, #0d1b2a);
     font-size: 9px;
     font-weight: 700;
 }
 
+/* Variación de posición */
 .up,
 .down,
 .same {
@@ -109,18 +147,48 @@
     color: #b4bec5;
 }
 
+/* Mensajes de tabla vacía */
+.emptyState {
+    padding: 16px 12px !important;
+    color: #f4f6f7;
+    font-size: 12px;
+    font-weight: 400;
+    white-space: normal !important;
+    line-height: 1.6;
+}
+
+/* Adaptación a pantallas pequeñas */
 @media (max-width: 680px) {
-    .table {
-        min-width: 500px;
+    .wrap {
+        max-width: 100%;
     }
 
     .filters {
         flex-wrap: nowrap;
         overflow-x: auto;
-        padding-bottom: 4px;
+        padding: 3px 3px 7px;
+        margin-bottom: 10px;
+        scrollbar-width: thin;
+        scrollbar-color: #526474 transparent;
     }
 
-    .filters span {
+    .filters button {
         white-space: nowrap;
+    }
+
+    .tableWrap {
+        border-radius: 7px;
+    }
+
+    .table {
+        min-width: 500px;
+    }
+}
+
+/* Respeta la preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    .filters button,
+    .table tbody tr {
+        transition: none;
     }
 }
