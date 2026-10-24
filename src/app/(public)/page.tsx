@@ -54,53 +54,76 @@ export default async function HomePage() {
                         aria-hidden="true"
                     />
 
-                    <div className={`container ${styles.heroContent}`}>
-                        <p className={styles.eyebrow}>
-                            SAGUNTO PADEL CUP
-                        </p>
+                    <div className={`container ${styles.heroLayout}`}>
+                        <div className={styles.heroContent}>
+                            <p className={styles.eyebrow}>
+                                SAGUNTO PADEL CUP
+                            </p>
 
-                        <h1 id="hero-title">
-                            COMPITE EN SAGUNTO.
-                            <span>SUMA PUNTOS.</span>
-                            VIVE EL PÁDEL.
-                        </h1>
+                            <h1 id="hero-title">
+                                COMPITE EN SAGUNTO.
+                                <span>SUMA PUNTOS.</span>
+                                VIVE EL PÁDEL.
+                            </h1>
 
-                        <p className={styles.heroLead}>
-                            Seis pruebas. Un ranking individual.
-                            <br />
-                            Un destino: el Máster Final.
-                        </p>
+                            <p className={styles.heroLead}>
+                                Seis pruebas. Un ranking individual.
+                                <br />
+                                Un destino: el Máster Final.
+                            </p>
 
-                        <div className={styles.heroActions}>
-                            <a
-                                className="button button-primary"
-                                href="#proxima-prueba"
-                            >
-                                <CalendarDays size={17} />
-                                Ver próxima prueba
-                            </a>
+                            <div className={styles.heroActions}>
+                                <a
+                                    className="button button-primary"
+                                    href="#proxima-prueba"
+                                >
+                                    <CalendarDays size={17} />
+                                    Ver próxima prueba
+                                </a>
 
-                            <a
-                                className="button button-outline-light"
-                                href="#circuito"
-                            >
-                                <Trophy size={17} />
-                                Descubrir el circuito
-                            </a>
+                                <a
+                                    className="button button-outline-light"
+                                    href="#circuito"
+                                >
+                                    <Trophy size={17} />
+                                    Descubrir el circuito
+                                </a>
+                            </div>
                         </div>
-                    </div>
 
-                    <div
-                        className={styles.heroSlogan}
-                        aria-hidden="true"
-                    >
-                        MÁS
-                        <br />
-                        PÁDEL
-                        <br />
-                        MÁS
-                        <br />
-                        SAGUNTO
+                        <a
+                            className={styles.heroNextEvent}
+                            href="#proxima-prueba"
+                            aria-label="Consultar la próxima prueba del circuito"
+                        >
+                            <span className={styles.heroNextEventEyebrow}>
+                                <CalendarDays size={15} />
+                                PRÓXIMA PRUEBA
+                            </span>
+
+                            <span className={styles.heroNextEventNumber}>
+                                PRUEBA {upcomingEvent.number}
+                            </span>
+
+                            <strong className={styles.heroNextEventTitle}>
+                                {upcomingEvent.club}
+                            </strong>
+
+                            <span className={styles.heroNextEventMeta}>
+                                <CalendarDays size={15} />
+                                {upcomingEvent.dateLabel}
+                            </span>
+
+                            <span className={styles.heroNextEventMeta}>
+                                <MapPin size={15} />
+                                {upcomingEvent.location}
+                            </span>
+
+                            <span className={styles.heroNextEventLink}>
+                                Consultar detalles
+                                <ArrowRight size={16} />
+                            </span>
+                        </a>
                     </div>
                 </section>
 
@@ -367,7 +390,6 @@ export default async function HomePage() {
                         <SectionHeading
                             eyebrow="RACE TO MASTER"
                             title="RANKING INDIVIDUAL"
-                            dark
                             action={
                                 <a
                                     className="button button-outline-light button-small"
