@@ -1,0 +1,130 @@
+.page {
+    display: grid;
+    min-height: 100vh;
+    min-height: 100dvh;
+    place-items: center;
+    padding: 24px;
+    background: #FAFAF9;
+    color: #18232D;
+}
+
+.panel {
+    width: min(100%, 480px);
+    border: 1px solid #E6E6E6;
+    border-radius: 8px;
+    padding: clamp(24px, 5vw, 44px);
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(13, 27, 42, 0.06);
+}
+
+.back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 34px;
+    color: #65717B;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.back:hover {
+    color: #F0443A;
+}
+
+.accent {
+    width: 48px;
+    height: 4px;
+    margin-bottom: 14px;
+    background: #F0443A;
+}
+
+.panel h1 {
+    margin: 0;
+    color: #0D1B2A;
+    font: 700 36px/1.1 var(--font-oswald), sans-serif;
+}
+
+.panel>p {
+    margin: 12px 0 26px;
+    color: #65717B;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.panel form {
+    display: flex;
+    flex-direction: column;
+}
+
+.panel label {
+    margin-bottom: 7px;
+    color: #0D1B2A;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.input {
+    display: flex;
+    min-height: 49px;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    border: 1px solid #D5D9DC;
+    border-radius: 5px;
+    padding: 0 12px;
+    color: #0D1B2A;
+}
+
+.input:focus-within {
+    outline: 3px solid rgba(240, 68, 58, 0.18);
+    border-color: #0D1B2A;
+}
+
+.input input {
+    width: 100%;
+    min-width: 0;
+    height: 46px;
+    border: 0;
+    outline: 0;
+    color: #18232D;
+    font: 400 12px var(--font-poppins), sans-serif;
+}
+
+.input input::placeholder {
+    color: #8A949D;
+}
+
+.panel button {
+    min-height: 48px;
+    border: 1px solid #F0443A;
+    border-radius: 5px;
+    background: #F0443A;
+    color: white;
+    font: 600 13px var(--font-poppins), sans-serif;
+    cursor: pointer;
+}
+
+.panel button:hover {
+    background: #D83B32;
+}
+
+.panel button:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.error {
+    margin: 0 0 14px;
+    color: #C73535;
+    font-size: 12px;
+}
+
+.success {
+    border: 1px solid #B9DCC8;
+    border-radius: 5px;
+    padding: 14px;
+    background: #EAF6EF;
+    color: #176C4D;
+    font-size: 13px;
+    line-height: 1.7;
+}
