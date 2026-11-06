@@ -1,0 +1,500 @@
+/* Sistema visual CRM — paleta oficial Sagunto Padel Cup */
+.shell {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100dvh;
+    background: #F4F5F4;
+    color: #18232D;
+    font-family: var(--font-poppins), Arial, sans-serif;
+    font-size: 14px;
+}
+
+.sidebar {
+    background: #0D1B2A;
+    color: #fff;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+}
+
+.brand {
+    font-family: var(--font-oswald), Impact, sans-serif;
+    font-size: 18px;
+    letter-spacing: .04em;
+}
+
+.brand span {
+    color: #F0443A;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav a {
+    color: rgba(255, 255, 255, .78);
+    text-decoration: none;
+    padding: 10px 12px;
+    border-radius: 7px;
+    font-weight: 500;
+}
+
+.nav a:hover,
+.nav a[aria-current="page"] {
+    background: rgba(240, 68, 58, .14);
+    color: #fff;
+}
+
+.nav a[aria-current="page"] {
+    box-shadow: inset 3px 0 0 #F0443A;
+}
+
+.sidebarFooter {
+    margin-top: auto;
+    font-size: 12px;
+    color: rgba(255, 255, 255, .6);
+}
+
+.main {
+    padding: 32px clamp(16px, 3vw, 40px);
+    min-width: 0;
+}
+
+.pageHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.pageTitle {
+    margin: 0;
+    font-family: var(--font-oswald), Impact, sans-serif;
+    font-size: clamp(26px, 3vw, 36px);
+    color: #0D1B2A;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.eyebrow {
+    margin: 0 0 4px;
+    color: #F0443A;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.headerActions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.muted {
+    color: #65717B;
+}
+
+.grid {
+    display: grid;
+    gap: 16px;
+}
+
+.kpis {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.kpi,
+.card {
+    background: #fff;
+    border: 1px solid #D5D9DC;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 24px rgba(13, 27, 42, .06);
+}
+
+.kpi {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.kpiLabel {
+    color: #65717B;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.kpiValue {
+    font-family: var(--font-oswald), Impact, sans-serif;
+    font-size: 34px;
+    color: #0D1B2A;
+    line-height: 1;
+}
+
+.kpiHint {
+    color: #65717B;
+    font-size: 12px;
+}
+
+.cardTitle {
+    margin: 0 0 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #0D1B2A;
+}
+
+.tableWrap {
+    overflow-x: auto;
+    background: #fff;
+    border: 1px solid #D5D9DC;
+    border-radius: 12px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 640px;
+}
+
+.table th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #65717B;
+    padding: 12px 14px;
+    background: #FAFAF9;
+    border-bottom: 1px solid #D5D9DC;
+}
+
+.table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #EEF0F1;
+    vertical-align: middle;
+}
+
+.table tr:hover td {
+    background: #FCFCFB;
+}
+
+.table a {
+    color: #0D1B2A;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.table a:hover {
+    color: #F0443A;
+}
+
+.toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.input,
+.select,
+.textarea {
+    font: inherit;
+    padding: 10px 12px;
+    border: 1px solid #D5D9DC;
+    border-radius: 7px;
+    background: #fff;
+    color: #18232D;
+    min-width: 0;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+    outline: 3px solid rgba(240, 68, 58, .35);
+    outline-offset: 1px;
+    border-color: #F0443A;
+}
+
+.search {
+    flex: 1;
+    min-width: 220px;
+}
+
+.btnPrimary,
+.btnSecondary,
+.btnGhost {
+    font: inherit;
+    font-weight: 600;
+    border-radius: 7px;
+    padding: 10px 16px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid transparent;
+    transition: background .2s, transform .15s;
+}
+
+.btnPrimary {
+    background: #F0443A;
+    color: #fff;
+}
+
+.btnPrimary:hover {
+    background: #D93229;
+    transform: translateY(-1px);
+}
+
+.btnSecondary {
+    background: #fff;
+    color: #0D1B2A;
+    border-color: #0D1B2A;
+}
+
+.btnSecondary:hover {
+    background: #0D1B2A;
+    color: #fff;
+}
+
+.btnGhost {
+    background: transparent;
+    color: #65717B;
+}
+
+.btnGhost:hover {
+    color: #0D1B2A;
+}
+
+.badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.success {
+    background: #EAF6EF;
+    color: #16845B;
+}
+
+.warning {
+    background: #FFF4DE;
+    color: #B77912;
+}
+
+.info {
+    background: #EAF2FC;
+    color: #2767B1;
+}
+
+.error {
+    background: #FDECEC;
+    color: #C73535;
+}
+
+.neutral {
+    background: #F4F5F4;
+    color: #65717B;
+}
+
+.pipeline {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    align-items: start;
+}
+
+.column {
+    background: #EEF0F1;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 200px;
+}
+
+.columnHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    padding: 4px 6px;
+}
+
+.regCard {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px;
+    border: 1px solid #D5D9DC;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.regCard p {
+    margin: 0;
+}
+
+.regCard form {
+    display: flex;
+    gap: 6px;
+}
+
+.empty {
+    background: #fff;
+    border: 1px dashed #D5D9DC;
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    color: #65717B;
+}
+
+.empty strong {
+    color: #0D1B2A;
+}
+
+.alertError {
+    background: #FDECEC;
+    color: #C73535;
+    padding: 10px 12px;
+    border-radius: 7px;
+    margin: 0 0 12px;
+}
+
+.alertSuccess {
+    background: #EAF6EF;
+    color: #16845B;
+    padding: 10px 12px;
+    border-radius: 7px;
+    margin: 0 0 12px;
+}
+
+.alertWarning {
+    background: #FFF4DE;
+    color: #B77912;
+    padding: 12px 14px;
+    border-radius: 7px;
+}
+
+.detailGrid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 16px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .detailGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 16px;
+    margin: 0;
+}
+
+.dl dt {
+    color: #65717B;
+}
+
+.dl dd {
+    margin: 0;
+    font-weight: 500;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-weight: 500;
+}
+
+.field input,
+.field textarea {
+    font: inherit;
+    padding: 12px 14px;
+    border: 1px solid #D5D9DC;
+    border-radius: 7px;
+}
+
+.check {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.authWrap {
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    background: #FAFAF9;
+    padding: 24px;
+    font-family: var(--font-poppins), Arial, sans-serif;
+}
+
+.authCard {
+    width: min(440px, 100%);
+    background: #fff;
+    border-radius: 12px;
+    padding: 36px;
+    box-shadow: 0 8px 24px rgba(13, 27, 42, .08);
+    border-top: 4px solid #F0443A;
+}
+
+.authTitle {
+    margin: 0 0 8px;
+    font-family: var(--font-oswald), Impact, sans-serif;
+    font-size: 36px;
+    color: #0D1B2A;
+}
+
+.safeNote {
+    margin-top: 18px;
+    font-size: 12px;
+    color: #65717B;
+    background: #EAF2FC;
+    padding: 12px;
+    border-radius: 7px;
+}
+
+.btnPrimary.wide {
+    width: 100%;
+    justify-content: center;
+}
+
+@media (max-width: 860px) {
+    .shell {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: static;
+        height: auto;
+    }
+
+    .nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}
