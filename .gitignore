@@ -26,3 +26,7 @@ Thumbs.db
 # Archivos temporales de Supabase CLI
 /supabase/.temp/
 /dist/
+
+# Copias de seguridad y pruebas locales
+backup_*.sql
+prueba_*.sql
