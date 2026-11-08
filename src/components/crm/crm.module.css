@@ -1,4 +1,6 @@
 /* Sistema visual CRM — paleta oficial Sagunto Padel Cup */
+
+/* ===== Estructura general ===== */
 .shell {
     display: grid;
     grid-template-columns: 240px 1fr;
@@ -19,9 +21,13 @@
     position: sticky;
     top: 0;
     height: 100dvh;
+    overflow-y: auto;
 }
 
 .brand {
+    display: block;
+    color: #fff;
+    text-decoration: none;
     font-family: var(--font-oswald), Impact, sans-serif;
     font-size: 18px;
     letter-spacing: .04em;
@@ -29,30 +35,6 @@
 
 .brand span {
     color: #F0443A;
-}
-
-.nav {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.nav a {
-    color: rgba(255, 255, 255, .78);
-    text-decoration: none;
-    padding: 10px 12px;
-    border-radius: 7px;
-    font-weight: 500;
-}
-
-.nav a:hover,
-.nav a[aria-current="page"] {
-    background: rgba(240, 68, 58, .14);
-    color: #fff;
-}
-
-.nav a[aria-current="page"] {
-    box-shadow: inset 3px 0 0 #F0443A;
 }
 
 .sidebarFooter {
@@ -66,6 +48,50 @@
     min-width: 0;
 }
 
+/* ===== Navegación del panel ===== */
+.adminNav {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.adminNavList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.adminNavList a {
+    display: block;
+    color: rgba(255, 255, 255, .78);
+    text-decoration: none;
+    padding: 11px 12px;
+    border-radius: 7px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.adminNavList a:hover,
+.adminNavList a[aria-current="page"] {
+    background: rgba(240, 68, 58, .14);
+    color: #fff;
+}
+
+.adminNavList a[aria-current="page"] {
+    box-shadow: inset 3px 0 0 #F0443A;
+}
+
+.adminNavFooter {
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, .12);
+    padding-top: 12px;
+}
+
+/* ===== Cabeceras y textos ===== */
 .pageHeader {
     display: flex;
     justify-content: space-between;
@@ -103,6 +129,208 @@
     color: #65717B;
 }
 
+.statusLine {
+    background: #0D1B2A;
+    color: #fff;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.statusLine strong {
+    color: #fff;
+}
+
+.simBanner {
+    background: #EAF2FC;
+    color: #2767B1;
+    border-radius: 7px;
+    padding: 10px 12px;
+    font-size: 13px;
+    margin: 0 0 16px;
+}
+
+.sectionTitle {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #65717B;
+}
+
+/* ===== Pestañas ===== */
+.tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #D5D9DC;
+    padding-bottom: 8px;
+}
+
+.tab {
+    padding: 8px 14px;
+    border-radius: 7px;
+    color: #65717B;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.tab:hover {
+    color: #0D1B2A;
+}
+
+.tab[aria-current="page"] {
+    background: #0D1B2A;
+    color: #fff;
+}
+
+/* ===== Panel lateral ===== */
+.drawerLayer {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+}
+
+.drawerBackdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(13, 27, 42, .45);
+}
+
+.drawer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(560px, 100%);
+    background: #fff;
+    box-shadow: -12px 0 32px rgba(13, 27, 42, .18);
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.drawerHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 20px;
+    border-bottom: 1px solid #D5D9DC;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 1;
+}
+
+.drawerHead h2 {
+    margin: 0;
+    font-family: var(--font-oswald), Impact, sans-serif;
+    font-size: 24px;
+    color: #0D1B2A;
+}
+
+.drawerBody {
+    padding: 20px;
+    display: grid;
+    gap: 18px;
+}
+
+/* ===== Listas y filas ===== */
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1px solid #D5D9DC;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.row:hover {
+    border-color: #F0443A;
+}
+
+.rowMain {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.rowMain strong {
+    color: #0D1B2A;
+}
+
+.rowMeta {
+    color: #65717B;
+    font-size: 13px;
+}
+
+.groupBlock {
+    margin-bottom: 24px;
+}
+
+.groupBlock>summary {
+    cursor: pointer;
+    font-family: var(--font-oswald), Impact, sans-serif;
+    font-size: 20px;
+    color: #0D1B2A;
+    padding: 8px 0;
+    list-style: none;
+}
+
+.checkList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+}
+
+.checkRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: #fff;
+    border: 1px solid #D5D9DC;
+    border-radius: 10px;
+    flex-wrap: wrap;
+}
+
+.pendingItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+    background: #fff;
+    border: 1px solid #D5D9DC;
+    border-left: 4px solid #F0443A;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.pendingCount {
+    font-family: var(--font-oswald), Impact, sans-serif;
+    font-size: 30px;
+    color: #0D1B2A;
+    min-width: 48px;
+}
+
+/* ===== Tarjetas, tablas y formularios ===== */
 .grid {
     display: grid;
     gap: 16px;
@@ -254,6 +482,18 @@
     transform: translateY(-1px);
 }
 
+.btnPrimary:disabled,
+.btnSecondary:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btnPrimary.wide {
+    width: 100%;
+    justify-content: center;
+}
+
 .btnSecondary {
     background: #fff;
     color: #0D1B2A;
@@ -395,12 +635,6 @@
     align-items: start;
 }
 
-@media (max-width: 900px) {
-    .detailGrid {
-        grid-template-columns: 1fr;
-    }
-}
-
 .dl {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -478,9 +712,11 @@
     border-radius: 7px;
 }
 
-.btnPrimary.wide {
-    width: 100%;
-    justify-content: center;
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+    .detailGrid {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 860px) {
@@ -491,10 +727,56 @@
     .sidebar {
         position: static;
         height: auto;
+        padding: 16px;
+        gap: 12px;
+        overflow: visible;
     }
 
-    .nav {
+    .adminNav {
         flex-direction: row;
-        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        overflow-x: auto;
+    }
+
+    .adminNavList {
+        flex-direction: row;
+        overflow-x: auto;
+    }
+
+    .adminNavFooter {
+        margin-top: 0;
+        border-top: 0;
+        padding-top: 0;
+        padding-left: 12px;
+        border-left: 1px solid rgba(255, 255, 255, .12);
+    }
+}
+
+@media (max-width: 640px) {
+
+    .row,
+    .checkRow,
+    .pendingItem {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .drawer {
+        width: 100%;
+    }
+
+    .tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+
+    .tab {
+        white-space: nowrap;
+    }
+
+    .statusLine {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
