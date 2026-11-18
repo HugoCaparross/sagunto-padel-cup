@@ -1,0 +1,1 @@
+alter table public.auditoria add column motivo text;
