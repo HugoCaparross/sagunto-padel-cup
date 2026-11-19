@@ -1,9 +1,9 @@
 // Documentos legales de la web.
-// Adaptado a: web informativa, sin pagos ni cobros online, inscripción registrada y confirmada
-// por el organizador, pago en persona el día de la prueba, datos alojados en Supabase (Frankfurt, UE),
-// titular persona física sin actividad económica.
+// Adaptado a: web informativa, inscripciones registradas y confirmadas por el organizador,
+// pago en efectivo el primer día de la prueba, datos alojados en Supabase (Frankfurt, UE),
+// responsable: Hugo Caparrós, bajo el nombre comercial Sagunto Padel Cup.
 //
-// Si la web genera ingresos (patrocinios remunerados, cobros), revisar aviso legal y condiciones.
+// Pendiente (LSSI-CE art. 10): sin NIF ni domicilio publicados, mientras haya cobros.
 
 export const TIPOS_DOCUMENTO = [
     "aviso_legal",
@@ -29,12 +29,12 @@ export const REQUISITOS: Requisito[] = [
     {
         tipo: "aviso_legal",
         nombre: "Aviso legal",
-        baseLegal: "Ley 34/2002 (LSSI-CE), art. 10, aplicable si hay contraprestación económica",
+        baseLegal: "Ley 34/2002 (LSSI-CE), art. 10",
         contenidoMinimo: [
-            "Nombre del responsable del circuito",
-            "Email de contacto dedicado",
-            "Objeto de la web: información del circuito, ranking, calendario y noticias",
-            "Aclaración de que la web no gestiona pagos ni cobros",
+            "Titular: Hugo Caparrós, bajo el nombre comercial Sagunto Padel Cup",
+            "Email de contacto",
+            "Objeto de la web",
+            "Aclaración de que la web no procesa pagos",
             "Propiedad intelectual de contenidos y logotipo",
             "Legislación aplicable y jurisdicción",
         ],
@@ -46,15 +46,13 @@ export const REQUISITOS: Requisito[] = [
         nombre: "Política de privacidad",
         baseLegal: "RGPD arts. 13-14; LOPDGDD",
         contenidoMinimo: [
-            "Responsable del tratamiento: nombre y email de contacto para ejercer derechos",
-            "Datos tratados: nombre, email, talla de camiseta, datos deportivos (opcionales), inscripciones, resultados y mensajes de contacto",
-            "Finalidades y base legal: contrato o solicitud del interesado (inscripciones, resultados, ranking), consentimiento (imagen, visibilidad pública, datos deportivos, mayoría de edad o autorización del tutor), interés legítimo (seguridad y auditoría)",
-            "Encargado del tratamiento: Supabase, con alojamiento en Frankfurt (Unión Europea), sin transferencias fuera de la UE",
-            "Los pagos se realizan en persona el día de la prueba; la web no recibe ni guarda datos de pago",
-            "Publicación: nombre y resultados solo si el jugador activa la visibilidad pública; el resto aparece como 'Jugador privado'",
-            "Plazos de conservación, incluido el de los mensajes de contacto",
-            "Derechos de acceso, rectificación, supresión, limitación, oposición y portabilidad",
-            "Derecho a reclamar ante la Agencia Española de Protección de Datos (AEPD)",
+            "Responsable: Hugo Caparrós, con email para ejercer derechos",
+            "Datos tratados y finalidades con base jurídica de cada uno",
+            "Encargado: Supabase, región Frankfurt (Unión Europea)",
+            "Pagos en efectivo: la web no guarda datos de pago",
+            "Publicación: nombre y resultados solo con visibilidad pública activada",
+            "Plazos de conservación",
+            "Derechos y reclamación ante la AEPD",
         ],
         palabrasClave: ["Supabase", "AEPD", "Unión Europea"],
         ruta: "/privacidad",
@@ -64,9 +62,9 @@ export const REQUISITOS: Requisito[] = [
         nombre: "Política de cookies",
         baseLegal: "LSSI-CE art. 22.2; guía de cookies de la AEPD",
         contenidoMinimo: [
-            "Listado de cookies técnicas: nombre, finalidad y duración",
-            "Cookies de sesión de Supabase: técnicas, no requieren consentimiento",
-            "Si se añade analítica o publicidad: banner de consentimiento previo a su carga",
+            "Cookies técnicas de sesión (Supabase), sin consentimiento necesario",
+            "Declaración de que no hay analítica ni publicidad",
+            "Compromiso de pedir consentimiento antes de añadir cookies no técnicas",
             "Cómo borrarlas desde el navegador",
         ],
         palabrasClave: ["cookies"],
@@ -77,15 +75,15 @@ export const REQUISITOS: Requisito[] = [
         nombre: "Condiciones de participación",
         baseLegal: "Condiciones de uso del servicio de inscripción",
         contenidoMinimo: [
-            "La inscripción en la web es una solicitud de plaza: queda pendiente hasta que el organizador la confirma",
-            "La inscripción en la web es gratuita y no implica ningún pago",
-            "El precio por pareja se indica en cada prueba y se abona en persona el primer día, en el lugar que se indique",
-            "Plazas limitadas por prueba: si se llena, la inscripción pasa a lista de espera",
-            "Categoría que no alcanza 3 parejas: no se disputa y no se cobra",
-            "Retirada desde la web: gratuita hasta que la prueba esté en curso",
-            "Causas de fuerza mayor, aplazamientos y cancelaciones del organizador",
+            "La inscripción en la web es una solicitud pendiente hasta que el organizador la confirma",
+            "Precio por pareja indicado en cada prueba, pagado en efectivo el primer día",
+            "Categoría con menos de 3 parejas: no se disputa y no se cobra",
+            "Retirada sin coste mientras la prueba no esté en curso",
+            "Pareja que no se presenta sin avisar: no paga la inscripción",
+            "Desistimiento no aplicable a servicios de ocio con fecha determinada (art. 103 TRLGDCU)",
+            "Cancelación o cambios por el organizador, fuerza mayor y responsabilidad",
         ],
-        palabrasClave: ["pendiente", "3 parejas"],
+        palabrasClave: ["efectivo", "3 parejas"],
         ruta: "/condiciones",
     },
     {
@@ -93,12 +91,13 @@ export const REQUISITOS: Requisito[] = [
         nombre: "Reglamento del circuito",
         baseLegal: "Normas de participación",
         contenidoMinimo: [
-            "Formato de grupos y fases finales",
-            "Criterios de desempate",
-            "Sistema de puntos y ventana de 12 meses",
-            "Normas de conducta y sanciones",
-            "Uso de imagen durante las pruebas",
-            "Menores de edad: autorización del tutor legal",
+            "Categorías y formato de grupos y fases finales",
+            "Formato de partido por fase",
+            "Desempates en grupos",
+            "Puntos por jugador y ventana de 12 meses",
+            "Puntualidad e incomparecencia",
+            "Conducta y sanciones",
+            "Imagen y menores de edad",
         ],
         palabrasClave: ["desempate", "puntos"],
         ruta: "/reglamento",
