@@ -2,16 +2,13 @@
 import type { Cuadro } from "@/lib/constantes";
 import {
     estadisticasJugador,
+    type EstadisticasJugador as EstadisticasCompletas,
     type PartidoHistorial,
     type PuntoHistorial,
     type SetJuego,
 } from "@/lib/estadisticas/calcular";
 import { crearClienteAdmin } from "@/lib/supabase/server";
-import {
-    progresoDeJugador,
-    type EstadisticasJugador,
-    type ProgresoNivel,
-} from "@/lib/xp/niveles";
+import { progresoDeJugador, type ProgresoNivel } from "@/lib/xp/niveles";
 
 type InscripcionFila = {
     id: string;
@@ -36,10 +33,10 @@ type PuntoFila = {
     puntos: number;
 };
 
-// Estadísticas de todo el historial del jugador, sin ventana temporal.
+// Estadísticas completas del historial del jugador, sin ventana temporal.
 export async function estadisticasHistoricas(
     jugadorId: string
-): Promise<EstadisticasJugador> {
+): Promise<EstadisticasCompletas & { puntosHistoricos: number }> {
     const admin = crearClienteAdmin();
 
     const { data: insc, error: errorInsc } = await admin
@@ -91,16 +88,16 @@ export async function estadisticasHistoricas(
     const puntosHistoricos = filasPuntos.reduce((total, p) => total + p.puntos, 0);
     const base = estadisticasJugador(jugadorId, partidos, puntos);
 
-    return {
-        puntosHistoricos,
-        pruebasJugadas: base.pruebasJugadas,
-        partidos: base.partidos,
-        porcentajeVictorias: base.porcentajeVictorias,
-    };
+    return { ...base, puntosHistoricos };
 }
 
 // Nivel, tier y progreso de la barra a partir de todo el historial.
 export async function progresoHistorico(jugadorId: string): Promise<ProgresoNivel> {
-    const estadisticas = await estadisticasHistoricas(jugadorId);
-    return progresoDeJugador(estadisticas);
+    const e = await estadisticasHistoricas(jugadorId);
+    return progresoDeJugador({
+        puntosHistoricos: e.puntosHistoricos,
+        pruebasJugadas: e.pruebasJugadas,
+        partidos: e.partidos,
+        porcentajeVictorias: e.porcentajeVictorias,
+    });
 }
