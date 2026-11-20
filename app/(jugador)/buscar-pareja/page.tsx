@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { listarBuscaPareja } from "@/actions/inscripciones";
-import BotonUnirse from "@/components/inscripcion/BotonUnirse";
+import BotonUnirse from "@/components/inscripciones/BotonUnirse";
 import { usuarioActual } from "@/lib/auth/organizador";
 import { ETIQUETAS_CATEGORIA, type Categoria } from "@/lib/constantes";
 import { crearClienteServidor } from "@/lib/supabase/server";

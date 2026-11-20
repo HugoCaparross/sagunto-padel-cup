@@ -1,6 +1,5 @@
 type Props = { className?: string };
 
-// Líneas de nivel decorativas. Son fijas, sin aleatoriedad, para que el render sea estable.
 export default function FondoTopografico({ className = "" }: Props) {
     return (
         <svg

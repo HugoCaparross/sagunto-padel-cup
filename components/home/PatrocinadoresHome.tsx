@@ -1,45 +1,95 @@
-import Link from "next/link";
-import LogoPatrocinador from "@/components/patrocinio/LogoPatrocinador";
 import type { PatrocinadorPublico } from "@/lib/patrocinio/publico";
+import GoogleIcon from "@/components/ui/GoogleIcon";
+import Image from "next/image";
+import s from "./home.module.css";
 
 type Props = {
-  patrocinadores: PatrocinadorPublico[];
-  nombrePrueba: string;
+    patrocinadores: PatrocinadorPublico[];
+    nombrePrueba: string | null;
 };
 
+function LogoPatro({ p, grande = false }: { p: PatrocinadorPublico; grande?: boolean }) {
+    const img = (
+        <Image
+            src={p.logoUrl}
+            alt={p.nombre}
+            width={208}
+            height={68}
+            unoptimized
+            loading="lazy"
+            className={`${s.patroLogo} ${grande ? s.patroLogoGrande : ""}`}
+        />
+    );
+
+    if (!p.webUrl) {
+        return <div className={s.patroEnlace}>{img}</div>;
+    }
+
+    return (
+        <a
+            href={p.webUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${p.nombre} (se abre en otra pestaña)`}
+            className={s.patroEnlace}
+        >
+            {img}
+        </a>
+    );
+}
+
 export default function PatrocinadoresHome({ patrocinadores, nombrePrueba }: Props) {
-  if (patrocinadores.length === 0) return null;
+    const institucionales = patrocinadores.filter((p) => p.tipo === "institucional");
+    const comerciales = patrocinadores.filter((p) => p.tipo === "comercial");
 
-  const institucionales = patrocinadores.filter((p) => p.tipo === "institucional");
-  const comerciales = patrocinadores.filter((p) => p.tipo === "comercial");
+    return (
+        <section className={`${s.section} ${s.sectionLight}`}>
+            <div className={`container ${s.patroGrid}`}>
+                <header className="space-y-4">
+                    <p className={s.proximaEyebrow}>Juntos hacemos crecer el circuito</p>
+                    <h2 className={s.sectionTitle}>Patrocinadores y colaboradores</h2>
+                    <p className={s.sectionText}>
+                        {nombrePrueba
+                            ? `Gracias a quienes apoyan cada prueba, como ${nombrePrueba}.`
+                            : "Gracias a las entidades y negocios que apoyan el pádel local."}
+                    </p>
+                </header>
 
-  return (
-    <section className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h2 className="heading-font text-4xl">Patrocinadores</h2>
-          <p className="text-sm text-muted">De {nombrePrueba}</p>
-        </div>
-        <Link href="/patrocinadores" className="text-sm underline">
-          Ver todos
-        </Link>
-      </div>
+                <div className="space-y-6">
+                    {institucionales.length > 0 && (
+                        <ul className={s.patroInst}>
+                            {institucionales.map((p) => (
+                                <li key={p.id}>
+                                    <LogoPatro p={p} grande />
+                                </li>
+                            ))}
+                        </ul>
+                    )}
 
-      {institucionales.length > 0 && (
-        <div className="grid gap-4 rounded-2xl border-2 border-coral p-4 sm:grid-cols-2 lg:grid-cols-3">
-          {institucionales.map((p) => (
-            <LogoPatrocinador key={p.id} patrocinador={p} grande />
-          ))}
-        </div>
-      )}
-
-      {comerciales.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
-          {comerciales.map((p) => (
-            <LogoPatrocinador key={p.id} patrocinador={p} />
-          ))}
-        </div>
-      )}
-    </section>
-  );
+                    {comerciales.length > 0 && (
+                        <ul className={s.patroCom}>
+                            {comerciales.map((p) => (
+                                <li key={p.id}>
+                                    <LogoPatro p={p} />
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                    {patrocinadores.length === 0 && (
+                        <div className={s.patroVacio}>
+                            <GoogleIcon name="group" />
+                            <div>
+                                <h3>¿Quieres apoyar el circuito?</h3>
+                                <p>Escríbenos y te contamos cómo colaborar con Sagunto Padel Cup.</p>
+                            </div>
+                            <a href="mailto:saguntopadelcup@gmail.com">
+                                Contactar
+                                <GoogleIcon name="arrow_forward" />
+                            </a>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </section>
+    );
 }

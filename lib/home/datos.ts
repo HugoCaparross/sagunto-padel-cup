@@ -25,11 +25,19 @@ export type FilaTop = {
     pruebasJugadas: number;
 };
 
+export type Cifras = {
+    jugadores: number;
+    parejas: number;
+    pruebas: number;
+    categorias: number;
+};
+
 export type DatosHome = {
     temporada: string | null;
     proxima: PruebaHome | null;
     calendario: PruebaHome[];
     ranking: Record<Categoria, FilaTop[]>;
+    cifras: Cifras;
 };
 
 type PruebaFila = {
@@ -117,10 +125,21 @@ export async function cargarDatosHome(): Promise<DatosHome> {
             });
     }
 
+    const jugadoresActivos = new Set([
+        ...datos.puntos.map((p) => p.clave),
+        ...datos.partidos.map((p) => p.clave),
+    ]).size;
+
     return {
         temporada: (temp as { anio: string } | null)?.anio ?? null,
         proxima,
         calendario,
         ranking,
+        cifras: {
+            jugadores: jugadoresActivos,
+            parejas: [...ocupadasDe.values()].reduce((total, ocupadas) => total + ocupadas, 0),
+            pruebas: calendario.length,
+            categorias: CATEGORIAS.length,
+        },
     };
 }
