@@ -54,7 +54,7 @@ export default async function PaginaInicio() {
     .slice(0, 4);
 
   return (
-    <main className="pb-24 lg:pb-0">
+    <main className="pb-24 lg:pb-0" data-homepage="true">
       <Hero temporada={datos.temporada} proxima={prueba} pruebas={pruebasDeCircuito} />
       <ProximaPrueba prueba={prueba} />
       <ElCircuito />

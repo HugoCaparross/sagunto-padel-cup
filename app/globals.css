@@ -521,6 +521,13 @@
     display: block;
 }
 
+body:has(.site-content [data-homepage="true"]) .site-header {
+    position: absolute;
+    inset: 0 0 auto;
+    border-color: transparent;
+    background: transparent;
+}
+
 .site-header .btn-primario {
     white-space: nowrap;
 }
