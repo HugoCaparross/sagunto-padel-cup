@@ -11,6 +11,7 @@ import {
 } from "@/lib/constantes";
 import { exigirOrganizador } from "@/lib/auth/organizador";
 import { registrarAuditoria } from "@/lib/auditoria";
+import { notificarInscripcion } from "@/lib/email/notificaciones";
 import { ESTADOS_CON_INSCRITOS_PUBLICOS } from "@/lib/pruebas/transiciones";
 import { crearClienteAdmin } from "@/lib/supabase/server";
 
@@ -55,7 +56,7 @@ async function cambiarEstadoInscripcion(p: {
 }): Promise<AccionInscrito> {
     const usuarioId = await exigirOrganizador();
     if (!usuarioId) return { ok: false, error: "No autorizado" };
-    const admin = crearClienteAdmin();
+    const admin: Admin = crearClienteAdmin();
 
     const { data: insc, error } = await admin
         .from("inscripciones")
@@ -89,20 +90,24 @@ async function cambiarEstadoInscripcion(p: {
 }
 
 // ---------------------------------------------------------
-// 1. Confirmar una inscripción pendiente
+// 1. Confirmar una inscripción pendiente (avisa por email)
 // ---------------------------------------------------------
 export async function confirmarInscripcion(entrada: unknown): Promise<AccionInscrito> {
     try {
         const parseo = esquemaId.safeParse(entrada);
         if (!parseo.success) return { ok: false, error: parseo.error.issues[0].message };
+        const { inscripcionId } = parseo.data;
 
-        return await cambiarEstadoInscripcion({
-            inscripcionId: parseo.data.inscripcionId,
+        const res = await cambiarEstadoInscripcion({
+            inscripcionId,
             desde: ["pendiente"],
             hasta: "confirmada",
             accion: "confirmar_inscripcion",
             mensajeError: "Solo se confirman inscripciones pendientes",
         });
+
+        if (res.ok) await notificarInscripcion(inscripcionId, "confirmada");
+        return res;
     } catch (e) {
         return { ok: false, error: e instanceof Error ? e.message : "Error inesperado" };
     }
@@ -110,6 +115,7 @@ export async function confirmarInscripcion(entrada: unknown): Promise<AccionInsc
 
 // ---------------------------------------------------------
 // 2. Marcar como pagada en la prueba (pago en efectivo, sin importe guardado)
+// No envía email: el pago se da en persona el día de la prueba.
 // ---------------------------------------------------------
 export async function marcarPagadaEnPrueba(entrada: unknown): Promise<AccionInscrito> {
     try {

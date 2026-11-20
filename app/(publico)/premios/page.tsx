@@ -10,9 +10,7 @@ import {
 
 export const metadata: Metadata = { title: "Premios" };
 
-type Props = {
-  searchParams: Promise<{ prueba?: string }>;
-};
+type Props = { searchParams: Promise<{ prueba?: string }> };
 
 export default async function PaginaPremios({ searchParams }: Props) {
   const { prueba: slug } = await searchParams;
@@ -23,7 +21,7 @@ export default async function PaginaPremios({ searchParams }: Props) {
   if (!elegida) {
     return (
       <main className="container py-12">
-        <p className="text-sm text-[#68737D]">Todavía no hay pruebas en el circuito.</p>
+        <p className="text-sm text-muted">Todavía no hay pruebas en el circuito.</p>
       </main>
     );
   }
@@ -34,14 +32,14 @@ export default async function PaginaPremios({ searchParams }: Props) {
     <main className="container space-y-10 py-12">
       <header className="space-y-4">
         <h1 className="heading-font text-6xl">Premios</h1>
-        <p className="text-lg text-[#68737D]">
+        <p className="text-lg text-muted">
           Premios de cada cuadro. Algunos se revelan el día de la prueba.
         </p>
         <SelectorPrueba pruebas={pruebas} activaId={elegida.id} ruta="/premios" />
       </header>
 
       {premios.length === 0 ? (
-        <p className="rounded-xl bg-white p-6 text-sm text-[#68737D] ring-1 ring-[#D5D9DC]">
+        <p className="card p-6 text-sm text-muted">
           Los premios de esta prueba se publicarán próximamente.
         </p>
       ) : (

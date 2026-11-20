@@ -1,0 +1,8 @@
+/* Estilos propios de esta página.
+   Tailwind sigue siendo lo principal: aquí va solo lo que no sale con utilidades.
+   Usa los tokens de globals.css: var(--color-navy), var(--color-coral)...
+   Importar en page.tsx:  import estilos from "./page.module.css";  */
+
+.pagina {
+  color: var(--color-ink);
+}

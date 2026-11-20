@@ -8,6 +8,7 @@ import {
     ETIQUETAS_CATEGORIA,
     type Categoria,
 } from "@/lib/constantes";
+import { notificarInscripcion } from "@/lib/email/notificaciones";
 import { crearClienteAdmin, crearClienteServidor } from "@/lib/supabase/server";
 import {
     esquemaCrearInscripcion,
@@ -106,9 +107,12 @@ export async function crearInscripcion(
                 jugador_2: null,
                 estado: "pendiente",
             })
-            .select("estado")
-            .single();
+            .select("id, estado")
+            .single<{ id: string; estado: string }>();
         if (error) return { ok: false, error: error.message };
+
+        // El trigger puede haberla dejado en lista de espera: el email refleja el estado real
+        await notificarInscripcion(data.id, "registrada");
 
         revalidatePath("/cuenta/inscripciones");
         revalidatePath("/buscar-pareja");
@@ -121,6 +125,7 @@ export async function crearInscripcion(
 // ---------------------------------------------------------
 // 2. Unirse a una inscripción que busca pareja
 // Usa la clave de servicio porque RLS no deja ver ni editar inscripciones ajenas.
+// No envía email: el jugador que se une ya lo sabe en el momento.
 // ---------------------------------------------------------
 export async function unirseAInscripcion(
     entrada: unknown
@@ -140,7 +145,7 @@ export async function unirseAInscripcion(
             .from("inscripciones")
             .select("id, prueba_id, categoria, jugador_1, jugador_2, estado")
             .eq("id", inscripcionId)
-            .single<FilaInscripcion>();
+            .single<FilaInscripcion & { estado: string }>();
         if (!insc) return { ok: false, error: "Inscripción no encontrada" };
         if (insc.jugador_2) return { ok: false, error: "Esta inscripción ya tiene pareja" };
         if (insc.estado === "retirada") {
@@ -201,7 +206,7 @@ export async function unirseAInscripcion(
 
 // ---------------------------------------------------------
 // 3. Retirar la inscripción (de la pareja completa)
-// Libera la plaza y promociona a la primera de la lista de espera.
+// Libera la plaza, promociona a la primera de la lista de espera y avisa por email.
 // ---------------------------------------------------------
 export async function retirarInscripcion(
     entrada: unknown
@@ -243,6 +248,8 @@ export async function retirarInscripcion(
         if (error) return { ok: false, error: error.message };
         if (!retirada) return { ok: false, error: "No se pudo completar la retirada" };
 
+        let promovidaId: string | null = null;
+
         // Si la inscripción ocupaba plaza, entra el siguiente de la lista de espera
         const ocupabaPlaza = (ESTADOS_QUE_OCUPAN_PLAZA as readonly string[]).includes(insc.estado);
         if (ocupabaPlaza) {
@@ -251,18 +258,23 @@ export async function retirarInscripcion(
                 .from("inscripciones")
                 .select("id")
                 .eq("prueba_id", insc.prueba_id)
+                .eq("categoria", insc.categoria)
                 .eq("estado", "lista_espera")
                 .order("created_at", { ascending: true })
                 .limit(1)
-                .maybeSingle();
+                .maybeSingle<{ id: string }>();
 
             if (siguiente) {
-                await admin
+                const { error: errorPromo } = await admin
                     .from("inscripciones")
                     .update({ estado: "pendiente" })
                     .eq("id", siguiente.id);
+                if (!errorPromo) promovidaId = siguiente.id;
             }
         }
+
+        await notificarInscripcion(insc.id, "baja");
+        if (promovidaId) await notificarInscripcion(promovidaId, "promocion");
 
         revalidatePath("/cuenta/inscripciones");
         revalidatePath("/buscar-pareja");

@@ -5,7 +5,7 @@ const RUTAS_JUGADOR = ["/cuenta", "/inscribirse", "/buscar-pareja"];
 const RUTAS_ADMIN = ["/admin"];
 const RUTAS_SOLO_INVITADO = ["/login", "/registro", "/recuperar"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const { respuesta, user, supabase } = await actualizarSesion(request);
     const ruta = request.nextUrl.pathname;
 
