@@ -1,6 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
-import { ETIQUETAS_CATEGORIA } from "@/lib/constantes";
+import { ETIQUETAS_CATEGORIA, ETIQUETAS_CUADRO } from "@/lib/constantes";
 import { fechaCorta } from "@/lib/formato";
 import type { PartidoPublico } from "@/lib/pruebas/publico";
 import GoogleIcon from "@/components/ui/GoogleIcon";
@@ -9,17 +8,43 @@ import s from "./home.module.css";
 type ResultadoHome = {
     pruebaNombre: string;
     pruebaSlug: string;
-    partido: PartidoPublico;
+    partido: PartidoPublico & { resultado: string };
     href?: string;
 };
 
 type Props = { resultados: ResultadoHome[] };
 
-const FOTOS_RESULTADOS = [
-    "/images/padel-woman.jpg",
-    "/images/padel-player.jpg",
-    "/images/padel-court.jpg",
-];
+const ETIQUETAS_RONDA_PARTIDO: Record<string, string> = {
+    round_robin: "Fase de grupos",
+    dieciseisavos: "Dieciseisavos de final",
+    octavos: "Octavos de final",
+    cuartos: "Cuartos de final",
+    semifinal: "Semifinal",
+    final: "Final",
+};
+
+function etiquetaRonda(partido: PartidoPublico): string {
+    if (partido.fase === "grupo") {
+        return partido.grupo ? `Grupo ${partido.grupo}` : "Fase de grupos";
+    }
+
+    if (!partido.ronda || partido.ronda === "automatico") return "Eliminatoria";
+
+    return (
+        ETIQUETAS_RONDA_PARTIDO[partido.ronda] ??
+        partido.ronda.replace(/_/g, " ").replace(/^./, (letra) => letra.toUpperCase())
+    );
+}
+
+function NombresPareja({ nombre, className }: { nombre: string; className: string }) {
+    return (
+        <span className={className}>
+            {nombre.split(" / ").map((jugador, index) => (
+                <span key={`${jugador}-${index}`}>{jugador}</span>
+            ))}
+        </span>
+    );
+}
 
 export default function ResultadosRecientes({ resultados }: Props) {
     return (
@@ -55,31 +80,46 @@ export default function ResultadosRecientes({ resultados }: Props) {
                     </div>
                 ) : (
                     <ul className={s.resultadosGrid}>
-                        {resultados.map(({ pruebaNombre, pruebaSlug, partido, href }, index) => (
+                        {resultados.map(({ pruebaNombre, pruebaSlug, partido, href }) => (
                             <li key={partido.id}>
                                 <Link href={href ?? `/pruebas/${pruebaSlug}`} className={s.resultadoCard}>
-                                    <span className={s.resultadoImagen}>
-                                        <Image
-                                            src={FOTOS_RESULTADOS[index % FOTOS_RESULTADOS.length]}
-                                            alt=""
-                                            fill
-                                            sizes="(max-width: 760px) 100vw, 25vw"
-                                        />
+                                    <span className={s.resultadoCabeceraCard}>
+                                        <span className={s.resultadoPrueba}>
+                                            <GoogleIcon name="event" />
+                                            <span>{pruebaNombre}</span>
+                                        </span>
+                                        <span className={s.resultadoCategoria}>
+                                            {ETIQUETAS_CATEGORIA[partido.categoria]}
+                                        </span>
                                     </span>
-                                    <span className={s.resultadoMeta}>
-                                        <span>{pruebaNombre}</span>
-                                        <span>{ETIQUETAS_CATEGORIA[partido.categoria]}</span>
+                                    <span className={s.resultadoContexto}>
+                                        <span className={s.resultadoRonda}>
+                                            <GoogleIcon name={partido.fase === "grupo" ? "groups" : "emoji_events"} />
+                                            {etiquetaRonda(partido)}
+                                        </span>
+                                        {partido.cuadro && (
+                                            <span className={s.resultadoCuadro}>
+                                                Cuadro {ETIQUETAS_CUADRO[partido.cuadro]}
+                                            </span>
+                                        )}
                                     </span>
                                     <span className={s.resultadoParejas}>
-                                        <span>{partido.ladoA}</span>
-                                        <span className={s.resultadoVs}>vs</span>
-                                        <span>{partido.ladoB}</span>
+                                        <NombresPareja nombre={partido.ladoA} className={s.resultadoLadoA} />
+                                        <strong className={s.resultadoMarcador}>
+                                            {partido.resultado}
+                                        </strong>
+                                        <NombresPareja nombre={partido.ladoB} className={s.resultadoLadoB} />
                                     </span>
                                     <span className={s.resultadoPie}>
                                         <span>
-                                            {partido.fecha ? fechaCorta(partido.fecha) : "Marcador final"}
+                                            {partido.fecha
+                                                ? `${fechaCorta(partido.fecha)}${partido.hora ? ` · ${partido.hora}` : ""}`
+                                                : "Marcador final"}
                                         </span>
-                                        <strong>{partido.resultado}</strong>
+                                        <span className={s.resultadoVer}>
+                                            Ver prueba
+                                            <GoogleIcon name="arrow_outward" />
+                                        </span>
                                     </span>
                                 </Link>
                             </li>

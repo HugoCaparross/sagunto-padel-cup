@@ -32,6 +32,11 @@ export type PruebaSelector = {
     fechaInicio: string;
 };
 
+export type HistoricoPatrocinador = {
+    prueba: PruebaSelector;
+    patrocinadores: PatrocinadorPublico[];
+};
+
 type PatrocinadorFila = {
     id: string;
     nombre: string;
@@ -101,19 +106,17 @@ export async function patrocinadoresDePrueba(pruebaId: string): Promise<Patrocin
 }
 
 // Histórico: cada prueba con sus patrocinadores, de la más reciente a la más antigua.
-export async function historicoPatrocinadores(): Promise<
-    { prueba: PruebaSelector; patrocinadores: PatrocinadorPublico[] }[]
-> {
+export async function historicoPatrocinadores(): Promise<HistoricoPatrocinador[]> {
     const supabase = await crearClienteServidor();
+    const admin = crearClienteAdmin();
     const pruebas = await listarPruebasSelector();
 
     const [{ data: enlaces, error: errorEnlaces }, { data: patros, error: errorPatros }] =
         await Promise.all([
             supabase.from("prueba_patrocinadores").select("prueba_id, patrocinador_id"),
-            supabase
+            admin
                 .from("patrocinadores")
-                .select("id, nombre, logo_url, web_url, tipo")
-                .eq("activo", true),
+                .select("id, nombre, logo_url, web_url, tipo"),
         ]);
     if (errorEnlaces) throw new Error(errorEnlaces.message);
     if (errorPatros) throw new Error(errorPatros.message);

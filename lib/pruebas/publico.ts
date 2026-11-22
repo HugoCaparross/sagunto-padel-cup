@@ -173,7 +173,7 @@ async function textosDeParejas(ids: string[]): Promise<Map<string, string>> {
 
 function formatearResultado(sets: [number, number][] | null): string | null {
     if (!sets || sets.length === 0) return null;
-    return sets.map(([a, b]) => `${a}-${b}`).join("  ");
+    return sets.map(([a, b]) => `${a}-${b}`).join(" × ");
 }
 
 export async function cargarPartidosPublicos(pruebaId: string): Promise<PartidoPublico[]> {

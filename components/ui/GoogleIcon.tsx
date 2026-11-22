@@ -22,11 +22,13 @@ export type GoogleIconName =
     | "payments"
     | "person_add"
     | "person"
+    | "photo_camera"
     | "schedule"
     | "sports_tennis"
     | "sports_score"
     | "trending_up"
-    | "upload";
+    | "upload"
+    | "music_note";
 
 type Props = {
     name: GoogleIconName;

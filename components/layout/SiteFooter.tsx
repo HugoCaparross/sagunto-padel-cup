@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Logo from "@/components/brand/Logo";
+import GoogleIcon from "@/components/ui/GoogleIcon";
 
 const GRUPOS = [
     {
@@ -47,6 +48,28 @@ export default function SiteFooter() {
                     >
                         saguntopadelcup@gmail.com
                     </a>
+                    <nav className="flex flex-wrap gap-3 pt-1" aria-label="Redes sociales">
+                        <a
+                            href="https://www.instagram.com/saguntopadelcup/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Instagram de Sagunto Padel Cup (se abre en otra pestaña)"
+                            className="inline-flex items-center gap-2 rounded-full border border-white/15 px-3 py-2 text-sm text-white/80 transition-colors hover:border-white/40 hover:text-white"
+                        >
+                            <GoogleIcon name="photo_camera" />
+                            Instagram
+                        </a>
+                        <a
+                            href="https://www.tiktok.com/@saguntopadelcup"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="TikTok de Sagunto Padel Cup (se abre en otra pestaña)"
+                            className="inline-flex items-center gap-2 rounded-full border border-white/15 px-3 py-2 text-sm text-white/80 transition-colors hover:border-white/40 hover:text-white"
+                        >
+                            <GoogleIcon name="music_note" />
+                            TikTok
+                        </a>
+                    </nav>
                 </div>
 
                 {GRUPOS.map((grupo) => (

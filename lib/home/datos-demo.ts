@@ -1,7 +1,7 @@
 import type { NoticiaPublica } from "@/actions/noticias";
 import { CATEGORIAS, type Categoria, type EstadoPrueba } from "@/lib/constantes";
 import type { FilaTop, PruebaHome } from "@/lib/home/datos";
-import type { PatrocinadorPublico, PremioPublico } from "@/lib/patrocinio/publico";
+import type { PremioPublico } from "@/lib/patrocinio/publico";
 import type { PartidoPublico } from "@/lib/pruebas/publico";
 
 export const PRUEBA_DEMO: PruebaHome = {
@@ -81,43 +81,12 @@ export const PREMIOS_DEMO: PremioPublico[] = CATEGORIAS.map((categoria, index) =
     revelado: true,
     revelaEl: null,
     descripcion: [
-        "Pala de competición",
-        "Paletero oficial",
-        "Pack de accesorios",
-        "Experiencia deportiva",
+        "Pala de competición para la pareja campeona",
+        "Paletero oficial y accesorios",
+        "Pack de material deportivo",
+        "Vale para equipamiento de pádel",
     ][index],
 }));
-
-export const PATROCINADORES_DEMO: PatrocinadorPublico[] = [
-    {
-        id: "demo-patrocinador-institucional",
-        nombre: "Turismo Sagunto",
-        logoUrl: "",
-        webUrl: null,
-        tipo: "institucional",
-    },
-    {
-        id: "demo-patrocinador-club",
-        nombre: "Club Padel Sagunto",
-        logoUrl: "",
-        webUrl: null,
-        tipo: "comercial",
-    },
-    {
-        id: "demo-patrocinador-deporte",
-        nombre: "Deporte Mediterráneo",
-        logoUrl: "",
-        webUrl: null,
-        tipo: "comercial",
-    },
-    {
-        id: "demo-patrocinador-local",
-        nombre: "Comercio Local",
-        logoUrl: "",
-        webUrl: null,
-        tipo: "comercial",
-    },
-];
 
 export const NOTICIAS_DEMO: (NoticiaPublica & { href: string })[] = [
     {
@@ -155,7 +124,7 @@ export const NOTICIAS_DEMO: (NoticiaPublica & { href: string })[] = [
     },
 ];
 
-const partidosDemo: PartidoPublico[] = [
+const partidosDemo: (PartidoPublico & { resultado: string })[] = [
     {
         id: "demo-partido-uno",
         categoria: "primera",
@@ -165,7 +134,7 @@ const partidosDemo: PartidoPublico[] = [
         ronda: "final",
         ladoA: "Marina Beltrán / Pablo Ferrer",
         ladoB: "Nora Vidal / Leo Pons",
-        resultado: "6-4, 6-3",
+        resultado: "6-4 × 6-3",
         pista: 1,
         fecha: "2026-10-12",
         hora: "18:30",
@@ -179,7 +148,7 @@ const partidosDemo: PartidoPublico[] = [
         ronda: "semifinal",
         ladoA: "Lucía Mar / Hugo Costa",
         ladoB: "Marta Ríos / Álex Navarro",
-        resultado: "6-2, 4-6, 6-4",
+        resultado: "6-2 × 4-6 × 6-4",
         pista: 2,
         fecha: "2026-10-11",
         hora: "17:00",
@@ -193,7 +162,7 @@ const partidosDemo: PartidoPublico[] = [
         ronda: "final",
         ladoA: "Carla Gil / Dani Serra",
         ladoB: "Noa Martí / Pol Torres",
-        resultado: "7-5, 6-4",
+        resultado: "7-5 × 6-4",
         pista: 3,
         fecha: "2026-09-21",
         hora: "12:00",
@@ -207,7 +176,7 @@ const partidosDemo: PartidoPublico[] = [
         ronda: "final",
         ladoA: "Aina López / Marc Sanz",
         ladoB: "Lola Pérez / Eric Vidal",
-        resultado: "6-3, 6-1",
+        resultado: "6-3 × 6-1",
         pista: 1,
         fecha: "2026-09-20",
         hora: "11:00",

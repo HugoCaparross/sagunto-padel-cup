@@ -15,7 +15,6 @@ import { CATEGORIAS, type Categoria } from "@/lib/constantes";
 import { cargarDatosHome, type FilaTop } from "@/lib/home/datos";
 import {
   NOTICIAS_DEMO,
-  PATROCINADORES_DEMO,
   PREMIOS_DEMO,
   PRUEBA_DEMO,
   PRUEBAS_DEMO,
@@ -23,8 +22,12 @@ import {
   RESULTADOS_DEMO,
   RANKING_GENERAL_DEMO,
 } from "@/lib/home/datos-demo";
-import { patrocinadoresDePrueba, premiosDePrueba } from "@/lib/patrocinio/publico";
-import { cargarPartidosPublicos } from "@/lib/pruebas/publico";
+import {
+  historicoPatrocinadores,
+  premiosDePrueba,
+  type PremioPublico,
+} from "@/lib/patrocinio/publico";
+import { cargarPartidosPublicos, type PartidoPublico } from "@/lib/pruebas/publico";
 
 export const metadata: Metadata = { title: "Inicio" };
 
@@ -44,9 +47,12 @@ export default async function PaginaInicio() {
   const usarDatosDemo = process.env.NODE_ENV === "development";
   const pruebaReal = datos.proxima;
   const prueba = usarDatosDemo ? PRUEBA_DEMO : pruebaReal;
-  const [patrocinadores, premios] = pruebaReal
-    ? await Promise.all([patrocinadoresDePrueba(pruebaReal.id), premiosDePrueba(pruebaReal.id)])
-    : [[], []];
+  const [historialPatrocinadoresVista, premios] = await Promise.all([
+    historicoPatrocinadores(),
+    !usarDatosDemo && pruebaReal
+      ? premiosDePrueba(pruebaReal.id)
+      : Promise.resolve<PremioPublico[]>([]),
+  ]);
 
   const calendario = usarDatosDemo
     ? [
@@ -73,22 +79,7 @@ export default async function PaginaInicio() {
   const rankingGeneral = usarDatosDemo
       ? combinarRankingGeneral(datos.rankingGeneral, RANKING_GENERAL_DEMO)
       : datos.rankingGeneral;
-  const premiosVista = usarDatosDemo
-    ? [
-        ...premios,
-        ...PREMIOS_DEMO.filter(
-          (demo) => !premios.some((real) => real.categoria === demo.categoria)
-        ),
-      ]
-    : premios;
-  const patrocinadoresVista = usarDatosDemo
-    ? [
-        ...patrocinadores,
-        ...PATROCINADORES_DEMO.filter(
-          (demo) => !patrocinadores.some((real) => real.nombre === demo.nombre)
-        ).slice(0, Math.max(0, 4 - patrocinadores.length)),
-      ]
-    : patrocinadores;
+  const premiosVista = usarDatosDemo ? PREMIOS_DEMO : premios;
   const noticiasVista = usarDatosDemo
     ? [...noticias, ...NOTICIAS_DEMO].slice(0, 3)
     : noticias;
@@ -107,7 +98,9 @@ export default async function PaginaInicio() {
   )
     .flatMap(({ prueba: pruebaFinalizada, partidos }) =>
       partidos
-        .filter((partido) => partido.resultado)
+        .filter(
+          (partido): partido is PartidoPublico & { resultado: string } => partido.resultado !== null
+        )
         .map((partido) => ({
           pruebaNombre: pruebaFinalizada.nombre,
           pruebaSlug: pruebaFinalizada.slug,
@@ -136,12 +129,14 @@ export default async function PaginaInicio() {
       />
       <ComoFunciona />
       <RankingTop5 ranking={ranking} rankingGeneral={rankingGeneral} />
-      <PremiosDestacados premios={premiosVista} />
-      <ResultadosRecientes resultados={resultadosVista} />
-      <PatrocinadoresHome
-        patrocinadores={patrocinadoresVista}
+      <PremiosDestacados
+        premios={premiosVista}
+        categorias={prueba?.categorias ?? []}
         nombrePrueba={prueba?.nombre ?? null}
+        pruebaSlug={!usarDatosDemo ? prueba?.slug ?? null : null}
       />
+      <ResultadosRecientes resultados={resultadosVista} />
+      <PatrocinadoresHome historial={historialPatrocinadoresVista} />
       <UltimasNoticias noticias={noticiasVista} />
       <LlamadaFinal />
 
