@@ -127,12 +127,12 @@ export default async function PaginaInicio() {
       <RankingTop5 ranking={ranking} />
       <PremiosDestacados premios={premiosVista} />
       <ResultadosRecientes resultados={resultadosVista} />
-      <LlamadaFinal />
-      <UltimasNoticias noticias={noticiasVista} />
       <PatrocinadoresHome
         patrocinadores={patrocinadoresVista}
         nombrePrueba={prueba?.nombre ?? null}
       />
+      <UltimasNoticias noticias={noticiasVista} />
+      <LlamadaFinal />
 
       {pruebaReal && (
         <BarraInscripcionMovil

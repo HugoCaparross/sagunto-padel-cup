@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useRef, useState, type KeyboardEvent } from "react";
 import { CATEGORIAS, ETIQUETAS_CATEGORIA, type Categoria } from "@/lib/constantes";
 import type { FilaTop } from "@/lib/home/datos";
@@ -14,6 +13,10 @@ export default function RankingTop5({ ranking }: Props) {
     const [activa, setActiva] = useState<Categoria>("segunda");
     const botones = useRef<Array<HTMLButtonElement | null>>([]);
     const filas = ranking[activa] ?? [];
+    const podio = [2, 1, 3]
+        .map((posicion) => filas.find((fila) => fila.posicion === posicion))
+        .filter((fila): fila is FilaTop => Boolean(fila));
+    const resto = filas.filter((fila) => fila.posicion > 3);
 
     // Pestañas con teclado: flechas, inicio y fin
     function teclado(e: KeyboardEvent<HTMLDivElement>) {
@@ -73,7 +76,12 @@ export default function RankingTop5({ ranking }: Props) {
                         ))}
                     </div>
 
-                    <div role="tabpanel" id="panel-ranking" aria-labelledby={`tab-${activa}`}>
+                    <div
+                        role="tabpanel"
+                        id="panel-ranking"
+                        aria-labelledby={`tab-${activa}`}
+                        className={s.rankTabPanel}
+                    >
                         {filas.length === 0 ? (
                             <div className={s.rankVacio}>
                                 <p className={s.rankVacioTitulo}>
@@ -87,38 +95,51 @@ export default function RankingTop5({ ranking }: Props) {
                                 </Link>
                             </div>
                         ) : (
-                            <ol>
-                                {filas.map((f) => (
-                                    <li key={`${f.posicion}-${f.nombre}`} className={s.rankFila}>
-                                        <span className={`${s.rankPos} ${f.posicion === 1 ? s.rankPos1 : ""}`}>
-                                            {f.posicion}
-                                        </span>
-                                        <span className="truncate">{f.nombre}</span>
-                                        <span className={s.rankPts}>{f.puntos.toLocaleString("es-ES")}</span>
-                                    </li>
-                                ))}
-                            </ol>
+                            <>
+                                <ol className={s.rankPodio} aria-label="Podio de la categoría">
+                                    {podio.map((fila) => (
+                                        <li
+                                            key={`${fila.posicion}-${fila.nombre}`}
+                                            className={`${s.rankPodioItem} ${
+                                                fila.posicion === 1
+                                                    ? s.rankPodioPrimero
+                                                    : fila.posicion === 2
+                                                      ? s.rankPodioSegundo
+                                                      : s.rankPodioTercero
+                                            }`}
+                                        >
+                                            <span className={s.rankPodioMedalla} aria-hidden="true">
+                                                <GoogleIcon name="emoji_events" />
+                                            </span>
+                                            <span className={s.rankPodioPosicion}>{fila.posicion}º</span>
+                                            <strong className={s.rankPodioNombre}>{fila.nombre}</strong>
+                                            <span className={s.rankPodioPuntos}>
+                                                {fila.puntos.toLocaleString("es-ES")}
+                                                <small>puntos</small>
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ol>
+                                {resto.length > 0 && (
+                                    <ol className={s.rankResto} aria-label="Siguientes posiciones">
+                                        {resto.map((fila) => (
+                                            <li
+                                                key={`${fila.posicion}-${fila.nombre}`}
+                                                className={s.rankFila}
+                                            >
+                                                <span className={s.rankPos}>{fila.posicion}</span>
+                                                <span className="truncate">{fila.nombre}</span>
+                                                <span className={s.rankPts}>
+                                                    {fila.puntos.toLocaleString("es-ES")}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ol>
+                                )}
+                            </>
                         )}
                     </div>
                 </div>
-
-                <aside className={s.rankLateral}>
-                    <Image
-                        src="/images/padel-player.jpg"
-                        alt=""
-                        fill
-                        sizes="(max-width: 1000px) 100vw, 22vw"
-                    />
-                    <div className={s.rankLateralContenido}>
-                        <GoogleIcon name="leaderboard" className={s.rankLateralIcono} />
-                        <p className={s.rankLateralTitulo}>
-                            El esfuerzo
-                            <br />
-                            también puntúa
-                        </p>
-                        <p className="text-sm">Cada partido cuenta en tu camino al Máster Final.</p>
-                    </div>
-                </aside>
             </div>
         </section>
     );
