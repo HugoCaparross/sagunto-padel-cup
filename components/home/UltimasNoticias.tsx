@@ -6,7 +6,9 @@ import { ETIQUETAS_NOTICIA } from "@/lib/validadores/noticias";
 import GoogleIcon from "@/components/ui/GoogleIcon";
 import s from "./home.module.css";
 
-type Props = { noticias: NoticiaPublica[] };
+type NoticiaHome = NoticiaPublica & { href?: string };
+
+type Props = { noticias: NoticiaHome[] };
 
 export default function UltimasNoticias({ noticias }: Props) {
     return (
@@ -58,7 +60,7 @@ export default function UltimasNoticias({ noticias }: Props) {
                     <ul className={s.newsGrid}>
                         {noticias.map((n) => (
                             <li key={n.id}>
-                                <Link href={`/noticias/${n.slug}`} className={s.newsCard}>
+                                <Link href={n.href ?? `/noticias/${n.slug}`} className={s.newsCard}>
                                     <div className={s.newsMedia}>
                                         {n.imagenUrl && (
                                             // eslint-disable-next-line @next/next/no-img-element

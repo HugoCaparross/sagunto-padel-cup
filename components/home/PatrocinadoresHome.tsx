@@ -9,7 +9,7 @@ type Props = {
 };
 
 function LogoPatro({ p, grande = false }: { p: PatrocinadorPublico; grande?: boolean }) {
-    const img = (
+    const logo = p.logoUrl ? (
         <Image
             src={p.logoUrl}
             alt={p.nombre}
@@ -19,10 +19,15 @@ function LogoPatro({ p, grande = false }: { p: PatrocinadorPublico; grande?: boo
             loading="lazy"
             className={`${s.patroLogo} ${grande ? s.patroLogoGrande : ""}`}
         />
+    ) : (
+        <span className={s.patroLogoTexto}>
+            <GoogleIcon name={p.tipo === "institucional" ? "account_balance" : "sports_tennis"} />
+            {p.nombre}
+        </span>
     );
 
     if (!p.webUrl) {
-        return <div className={s.patroEnlace}>{img}</div>;
+        return <div className={s.patroEnlace}>{logo}</div>;
     }
 
     return (
@@ -33,7 +38,7 @@ function LogoPatro({ p, grande = false }: { p: PatrocinadorPublico; grande?: boo
             aria-label={`${p.nombre} (se abre en otra pestaña)`}
             className={s.patroEnlace}
         >
-            {img}
+            {logo}
         </a>
     );
 }

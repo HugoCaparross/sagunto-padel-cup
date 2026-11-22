@@ -90,7 +90,8 @@
 
 @media (min-width: 900px) {
     .heroGrid {
-        grid-template-columns: minmax(0, 1fr);
+        grid-template-columns: minmax(0, 1.08fr) minmax(20rem, 0.92fr);
+        gap: clamp(2rem, 5vw, 5rem);
     }
 }
 
@@ -131,34 +132,181 @@
 .heroCopy {
     position: relative;
     z-index: 1;
-    max-width: 60rem;
+    max-width: 44rem;
 }
 
-.heroSello {
+.heroProxima {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 31rem);
+    justify-self: end;
+    overflow: hidden;
+    border: 1px solid rgb(255 255 255 / 0.76);
+    border-radius: 1.1rem;
+    background: rgb(255 255 255 / 0.97);
+    color: var(--color-ink);
+    box-shadow: 0 1.5rem 3.5rem rgb(0 0 0 / 0.32);
+}
+
+.heroProximaImagen {
+    position: relative;
+    height: 9.5rem;
+    overflow: hidden;
+    background: var(--color-navy);
+}
+
+.heroProximaImagen::after {
     position: absolute;
-    top: 50%;
-    right: 1.5rem;
-    transform: translateY(-50%) rotate(-7deg);
-    color: #fff;
-    font-family: var(--font-poppins), sans-serif;
-    font-size: clamp(1.7rem, 3.5vw, 3.2rem);
-    font-style: italic;
-    font-weight: 800;
-    letter-spacing: -0.06em;
-    line-height: 0.92;
-    text-align: left;
-    text-shadow: 0 0.3rem 1rem rgb(0 0 0 / 0.65);
+    inset: 0;
+    background: linear-gradient(0deg, rgb(9 15 18 / 0.55), transparent 75%);
+    content: "";
+}
+
+.heroProximaImagen > img {
+    object-fit: cover;
+    object-position: center 45%;
+}
+
+.heroProximaEstado {
+    position: absolute;
+    z-index: 1;
+    top: 1rem;
+    left: 1rem;
+    border-radius: 999px;
+    background: var(--color-sage);
+    padding: 0.4rem 0.7rem;
+    color: var(--color-navy);
+    font-size: 0.7rem;
+    font-weight: 700;
     text-transform: uppercase;
 }
 
-.heroSello::after {
-    display: block;
-    width: 100%;
-    height: 0.3rem;
-    margin-top: 0.45rem;
+.heroProximaContenido {
+    display: grid;
+    gap: 1rem;
+    padding: 1.25rem 1.4rem 1.4rem;
+}
+
+.heroProximaEyebrow {
+    margin-bottom: 0.25rem;
+    color: var(--color-coral);
+    font-family: var(--font-inter), sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.heroProximaTitulo {
+    font-family: var(--font-poppins), sans-serif;
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+}
+
+.heroProximaDatos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+    margin: 0;
+}
+
+.heroProximaDatos > div {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.heroProximaDatos > div > .google-icon {
+    color: var(--color-coral);
+    font-size: 1.3rem;
+}
+
+.heroProximaDatos span {
+    display: grid;
+    gap: 0.15rem;
+}
+
+.heroProximaDatos small,
+.heroProximaResumen span {
+    color: var(--color-muted);
+    font-size: 0.7rem;
+}
+
+.heroProximaDatos strong {
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.heroProximaResumen {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    padding-block: 0.75rem;
+}
+
+.heroProximaResumen > div {
+    display: grid;
+    gap: 0.15rem;
+}
+
+.heroProximaResumen > div + div {
+    border-left: 1px solid var(--color-border);
+    padding-left: 1rem;
+}
+
+.heroProximaResumen strong {
+    color: var(--color-navy);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.heroProximaCategorias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.heroProximaCategorias li {
+    border-radius: 999px;
+    background: var(--color-surface);
+    padding: 0.3rem 0.55rem;
+    color: var(--color-ink);
+    font-size: 0.68rem;
+    font-weight: 600;
+}
+
+.heroProximaSinPrueba {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+}
+
+.heroProximaBoton {
+    display: flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    border-radius: 0.65rem;
     background: var(--color-coral);
-    content: "";
-    transform: rotate(-8deg);
+    padding: 0.75rem 1rem;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.heroProximaBoton:hover {
+    transform: translateY(-2px);
+    background: #a91923;
 }
 
 .heroSub {
@@ -808,29 +956,22 @@
     font-size: 0.85rem;
 }
 
-.pasosCabecera {
+.comoFuncionaCabecera {
     display: grid;
-    gap: 0.3rem;
-    margin-top: clamp(2.5rem, 5vw, 4rem);
+    justify-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    text-align: center;
 }
 
-.pasosCabecera > span {
-    color: var(--color-coral);
-    font-family: var(--font-inter), sans-serif;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-}
-
-.pasosCabecera h3 {
-    font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+.comoFuncionaCabecera .proximaEyebrow {
+    color: #ff7778;
 }
 
 .pasos {
     display: grid;
     gap: 1rem;
-    margin-top: 2rem;
+    margin-top: 0;
     padding: 0;
     list-style: none;
 }
@@ -880,6 +1021,7 @@
 
 .pasosCta {
     margin-top: 1.5rem;
+    justify-self: center;
 }
 
 .calGrid {
@@ -1348,6 +1490,23 @@
     height: 4.25rem;
 }
 
+.patroLogoTexto {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    color: var(--color-navy);
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: left;
+}
+
+.patroLogoTexto :global(.google-icon) {
+    color: #527d34;
+    font-size: 1.35rem;
+}
+
 .patroLogo:hover {
     filter: grayscale(0);
     opacity: 1;
@@ -1772,116 +1931,55 @@
 
 .ctaFinal {
     display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    overflow: hidden;
-    border: 1px solid var(--color-border);
-    border-radius: 1.25rem;
-    background: #fff;
-    box-shadow: var(--shadow-card);
+    justify-items: center;
+    gap: 1.25rem;
+    max-width: 58rem;
+    text-align: center;
 }
 
-.ctaFinalContenido {
-    display: grid;
-    align-content: center;
-    gap: 1.5rem;
-    padding: clamp(1.5rem, 5vw, 3.5rem);
-}
-
-.ctaFinalTexto {
-    display: flex;
-    align-items: flex-start;
-    gap: 1.2rem;
-}
-
-.ctaFinalIcono {
-    display: grid;
-    width: 4rem;
-    height: 4rem;
-    flex: 0 0 auto;
-    place-items: center;
-    border: 1px solid #e1ead9;
-    border-radius: 1rem;
-    background: #edf4e7;
-    color: #416d2d;
-}
-
-.ctaFinalIcono :global(.google-icon) {
-    font-size: 2rem;
+.ctaFinalSection {
+    background: var(--color-sage);
+    color: var(--color-navy);
 }
 
 .ctaFinalEyebrow {
-    margin-bottom: 0.25rem;
-    color: var(--color-coral);
+    color: #243719;
     font-family: var(--font-inter), sans-serif;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.13em;
     text-transform: uppercase;
 }
 
-.ctaFinalTexto h2 {
+.ctaFinalTitulo {
+    max-width: 16ch;
     color: var(--color-navy);
-    font-size: clamp(1.7rem, 3vw, 2.55rem);
-    line-height: 1.15;
+    font-family: var(--font-poppins), sans-serif;
+    font-size: clamp(2.5rem, 5.2vw, 4.75rem);
+    font-weight: 800;
+    letter-spacing: -0.06em;
+    line-height: 0.98;
 }
 
-.ctaFinalTexto p:last-child {
-    margin-top: 0.5rem;
-    color: var(--color-muted);
-    font-size: 0.9rem;
-}
-
-.ctaFinalMedia {
-    position: relative;
-    min-height: 24rem;
-    overflow: hidden;
-    margin: 0;
-    background: var(--color-surface);
-}
-
-.ctaFinalMedia > img {
-    object-fit: cover;
-    object-position: center 54%;
-    transition: transform 450ms ease;
-}
-
-.ctaFinal:hover .ctaFinalMedia > img {
-    transform: scale(1.025);
-}
-
-.ctaFinalCredito {
-    position: absolute;
-    z-index: 1;
-    right: 0.75rem;
-    bottom: 0.75rem;
-    max-width: calc(100% - 1.5rem);
-    border-radius: 0.4rem;
-    background: rgb(16 21 21 / 0.82);
-    padding: 0.35rem 0.5rem;
-    color: #fff;
-    font-family: var(--font-inter), sans-serif;
-    font-size: 0.62rem;
-    text-align: right;
-}
-
-.ctaFinalCredito a {
-    color: #fff;
-    text-decoration: underline;
-    text-underline-offset: 0.15rem;
+.ctaFinalTexto {
+    max-width: 44rem;
+    color: #25361a;
+    font-size: clamp(1rem, 1.8vw, 1.2rem);
+    line-height: 1.6;
 }
 
 .ctaFinalBoton {
     display: inline-flex;
-    min-height: 3.25rem;
+    min-height: 3.5rem;
     width: fit-content;
     align-items: center;
     justify-content: center;
-    gap: 0.6rem;
+    gap: 0.7rem;
     border-radius: 0.7rem;
-    background: var(--color-coral);
-    padding: 0.8rem 1.1rem;
+    background: var(--color-navy);
+    padding: 0.9rem 1.4rem;
     color: #fff;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     font-weight: 700;
     text-decoration: none;
     transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
@@ -1889,8 +1987,8 @@
 
 .ctaFinalBoton:hover {
     transform: translateY(-2px);
-    background: #a91923;
-    box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 0.18);
+    background: #292e32;
+    box-shadow: 0 0.5rem 1rem rgb(23 25 28 / 0.2);
 }
 
 .ctaFinalBoton :global(.google-icon) {
@@ -1955,7 +2053,6 @@
     .resultadoImagen img,
     .proximaFoto > img,
     .proximaBoton,
-    .ctaFinalMedia > img,
     .featureLink :global(.google-icon),
     .calFlecha :global(.google-icon),
     .calImagen img,
@@ -1976,22 +2073,31 @@
 
     .heroArt::after {
         background:
+            linear-gradient(180deg, rgb(8 14 17 / 0.72) 0%, transparent 28%),
             linear-gradient(90deg, rgb(12 17 17 / 0.83), rgb(12 17 17 / 0.3)),
             linear-gradient(0deg, rgb(12 17 17 / 0.94), rgb(12 17 17 / 0.2) 85%);
     }
 
     .heroGrid {
+        grid-template-columns: minmax(0, 1fr);
+        align-content: center;
+        gap: 1.75rem;
         min-height: 100vh;
         min-height: 100svh;
-        padding-block: 3rem 3.5rem;
+        padding-block: 6rem 3.5rem;
+    }
+
+    .heroProxima {
+        width: 100%;
+        justify-self: stretch;
+    }
+
+    .heroProximaImagen {
+        height: 8rem;
     }
 
     .heroTitle {
         font-size: clamp(3rem, 11vw, 5rem);
-    }
-
-    .heroSello {
-        display: none;
     }
 
     .proximaCabecera {
@@ -2052,25 +2158,11 @@
     }
 
     .ctaFinal {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .ctaFinalContenido {
-        padding: 1.5rem 1.25rem;
+        gap: 1rem;
     }
 
     .ctaFinalBoton {
         width: fit-content;
-    }
-
-    .ctaFinalMedia {
-        min-height: 17rem;
-        grid-row: 1;
-    }
-
-    .ctaFinalIcono {
-        width: 3rem;
-        height: 3rem;
     }
 
     .resultadosCabecera {
@@ -2098,6 +2190,11 @@
 @media (max-width: 400px) {
     .heroTitle {
         font-size: clamp(2.4rem, 11vw, 3.2rem);
+    }
+
+    .heroProximaContenido {
+        gap: 0.85rem;
+        padding: 1rem;
     }
 
     .heroLead {

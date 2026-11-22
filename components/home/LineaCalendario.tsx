@@ -91,7 +91,7 @@ export default function LineaCalendario({ pruebas, proximaId, temporada }: Props
                         return (
                             <li key={p.id}>
                                 <Link
-                                    href={`/pruebas/${p.slug}`}
+                                    href={p.href ?? `/pruebas/${p.slug}`}
                                     className={clases}
                                     aria-label={`${p.esMaster ? "Master Final" : `${numero}.ª Prueba`}, ${rangoCorto(p)}, ${ESTADO_TEXTO[p.estado]}`}
                                 >

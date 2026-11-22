@@ -37,7 +37,7 @@
 }
 
 :root {
-    --header-height: 4.5rem;
+    --header-height: 5.25rem;
     color-scheme: light;
 }
 
@@ -67,7 +67,7 @@
 
 @media (max-width: 768px) {
     :root {
-        --header-height: 4rem;
+        --header-height: 4.75rem;
     }
 }
 
@@ -603,7 +603,7 @@ body:has(.site-content [data-homepage="true"]) .site-header {
     }
 
     .site-header .site-logo img {
-        width: 112px;
+        width: 104px;
     }
 
     .site-header .container > div:last-child {

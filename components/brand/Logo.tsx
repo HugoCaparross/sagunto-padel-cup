@@ -10,7 +10,7 @@ export default function Logo({ className = "", compact = false }: Props) {
             width={2030}
             height={768}
             loading="eager"
-            className={`h-auto ${compact ? "w-[140px]" : "w-[150px] sm:w-[190px]"} ${className}`}
+            className={`h-auto ${compact ? "w-[132px]" : "w-[132px] sm:w-[170px]"} ${className}`}
         />
     );
 }

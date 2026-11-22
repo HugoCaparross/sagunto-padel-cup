@@ -16,6 +16,7 @@ export type PruebaHome = {
     categorias: Categoria[];
     plazasLibres: number;
     plazasMaximas: number;
+    href?: string;
 };
 
 export type FilaTop = {

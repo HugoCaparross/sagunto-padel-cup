@@ -1,22 +1,32 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { PruebaHome } from "@/lib/home/datos";
 import GoogleIcon from "@/components/ui/GoogleIcon";
+import { ETIQUETAS_CATEGORIA, ETIQUETAS_ESTADO_PRUEBA } from "@/lib/constantes";
+import { euros, fechaLarga } from "@/lib/formato";
+import type { PruebaHome } from "@/lib/home/datos";
 import s from "./home.module.css";
 
 type Props = {
     temporada: string | null;
     proxima: PruebaHome | null;
     pruebas: number;
+    proximaHref?: string;
 };
 
-export default function Hero({ temporada, proxima, pruebas }: Props) {
+function fechasDePrueba(prueba: PruebaHome): string {
+    const inicio = fechaLarga(prueba.fechaInicio);
+    return prueba.fechaFin !== prueba.fechaInicio
+        ? `${inicio} – ${fechaLarga(prueba.fechaFin)}`
+        : inicio;
+}
+
+export default function Hero({ temporada, proxima, pruebas, proximaHref }: Props) {
     const inscripcionesAbiertas = proxima?.estado === "abierta";
-    const href = proxima
+    const href = proximaHref ?? proxima?.href ?? (proxima
         ? inscripcionesAbiertas
             ? `/inscribirse/${proxima.slug}`
             : `/pruebas/${proxima.slug}`
-        : "/calendario";
+        : "/calendario");
 
     return (
         <section className={s.hero}>
@@ -51,15 +61,75 @@ export default function Hero({ temporada, proxima, pruebas }: Props) {
                         </Link>
                     </div>
                 </div>
-                <p className={s.heroSello} aria-hidden="true">
-                    Más
-                    <br />
-                    pádel
-                    <br />
-                    más
-                    <br />
-                    Sagunto
-                </p>
+                <article className={s.heroProxima} aria-labelledby="hero-proxima-titulo">
+                    <div className={s.heroProximaImagen}>
+                        <Image
+                            src="/images/padel-court.jpg"
+                            alt=""
+                            fill
+                            loading="eager"
+                            sizes="(max-width: 760px) 100vw, 34vw"
+                        />
+                        <span className={s.heroProximaEstado}>
+                            {proxima ? ETIQUETAS_ESTADO_PRUEBA[proxima.estado] : "Próximamente"}
+                        </span>
+                    </div>
+                    <div className={s.heroProximaContenido}>
+                        <div>
+                            <p className={s.heroProximaEyebrow}>Próxima prueba</p>
+                            <h2 id="hero-proxima-titulo" className={s.heroProximaTitulo}>
+                                {proxima?.nombre ?? "Nuevas fechas en camino"}
+                            </h2>
+                        </div>
+                        {proxima ? (
+                            <>
+                                <div className={s.heroProximaDatos}>
+                                    <div>
+                                        <GoogleIcon name="calendar_month" />
+                                        <span>
+                                            <small>Fecha</small>
+                                            <strong>{fechasDePrueba(proxima)}</strong>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <GoogleIcon name="location_on" />
+                                        <span>
+                                            <small>Sede</small>
+                                            <strong>{proxima.sede}</strong>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className={s.heroProximaResumen}>
+                                    <div>
+                                        <span>Plazas disponibles</span>
+                                        <strong>{proxima.plazasLibres} / {proxima.plazasMaximas}</strong>
+                                    </div>
+                                    <div>
+                                        <span>Precio por pareja</span>
+                                        <strong>{euros(proxima.precioCentimos)}</strong>
+                                    </div>
+                                </div>
+                                <ul className={s.heroProximaCategorias} aria-label="Categorías">
+                                    {proxima.categorias.map((categoria) => (
+                                        <li key={categoria}>{ETIQUETAS_CATEGORIA[categoria]}</li>
+                                    ))}
+                                </ul>
+                            </>
+                        ) : (
+                            <p className={s.heroProximaSinPrueba}>
+                                Estamos preparando el calendario. Consulta las fechas en cuanto se publiquen.
+                            </p>
+                        )}
+                        <Link href={href} className={s.heroProximaBoton}>
+                            {!proxima || href === "/calendario"
+                                ? "Ver calendario"
+                                : inscripcionesAbiertas
+                                  ? "Inscribirme"
+                                  : "Ver detalles"}
+                            <GoogleIcon name="arrow_forward" />
+                        </Link>
+                    </div>
+                </article>
             </div>
         </section>
     );

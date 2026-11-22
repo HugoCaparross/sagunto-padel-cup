@@ -10,6 +10,7 @@ type ResultadoHome = {
     pruebaNombre: string;
     pruebaSlug: string;
     partido: PartidoPublico;
+    href?: string;
 };
 
 type Props = { resultados: ResultadoHome[] };
@@ -54,9 +55,9 @@ export default function ResultadosRecientes({ resultados }: Props) {
                     </div>
                 ) : (
                     <ul className={s.resultadosGrid}>
-                        {resultados.map(({ pruebaNombre, pruebaSlug, partido }, index) => (
+                        {resultados.map(({ pruebaNombre, pruebaSlug, partido, href }, index) => (
                             <li key={partido.id}>
-                                <Link href={`/pruebas/${pruebaSlug}`} className={s.resultadoCard}>
+                                <Link href={href ?? `/pruebas/${pruebaSlug}`} className={s.resultadoCard}>
                                     <span className={s.resultadoImagen}>
                                         <Image
                                             src={FOTOS_RESULTADOS[index % FOTOS_RESULTADOS.length]}

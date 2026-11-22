@@ -1,4 +1,5 @@
 export type GoogleIconName =
+    | "account_balance"
     | "account_circle"
     | "arrow_downward"
     | "arrow_forward"
