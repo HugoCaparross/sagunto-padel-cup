@@ -118,12 +118,12 @@ export default async function PaginaInicio() {
         proximaHref={usarDatosDemo ? "/calendario" : undefined}
       />
       <ElCircuito />
-      <ComoFunciona />
       <LineaCalendario
         pruebas={calendario}
         proximaId={prueba?.id ?? null}
         temporada={datos.temporada}
       />
+      <ComoFunciona />
       <RankingTop5 ranking={ranking} />
       <PremiosDestacados premios={premiosVista} />
       <ResultadosRecientes resultados={resultadosVista} />

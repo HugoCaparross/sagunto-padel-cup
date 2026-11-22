@@ -27,14 +27,6 @@ const ESTADO_ICONO: Record<EstadoPrueba, GoogleIconName> = {
     finalizada: "check_circle",
 };
 
-const ESTADO_CLASE: Record<EstadoPrueba, string> = {
-    proxima: s.calEstadoProxima,
-    abierta: s.calEstadoAbierta,
-    cerrada: s.calEstadoCerrada,
-    en_curso: s.calEstadoEnCurso,
-    finalizada: s.calEstadoFinalizada,
-};
-
 function rangoCorto(p: PruebaHome): string {
     const ini = new Date(`${p.fechaInicio}T12:00:00Z`);
     const fin = new Date(`${p.fechaFin}T12:00:00Z`);
@@ -53,80 +45,122 @@ const FOTOS_PRUEBA = [
     "/images/padel-court.jpg",
 ];
 
+function fotoDePrueba(prueba: PruebaHome, indice: number): string {
+    return prueba.esMaster ? "/images/sagunto-castle.jpg" : FOTOS_PRUEBA[indice % FOTOS_PRUEBA.length];
+}
+
 export default function LineaCalendario({ pruebas, proximaId, temporada }: Props) {
-    let numero = 0;
+    const destacada =
+        pruebas.find((prueba) => prueba.id === proximaId) ??
+        pruebas.find((prueba) => prueba.estado === "abierta" || prueba.estado === "proxima") ??
+        pruebas[0];
+    const secundarias = pruebas.filter((prueba) => prueba.id !== destacada?.id).slice(0, 2);
 
     return (
-        <section className={`${s.section} ${s.sectionLight}`}>
-            <div className="container grid gap-10 lg:grid-cols-[1fr_2.4fr] lg:items-center">
-                <header className="space-y-5">
+        <section className={`${s.section} ${s.sectionDark}`}>
+            <div
+                className={`container ${s.calFeatured} ${
+                    secundarias.length === 0 ? s.calFeaturedSimple : ""
+                }`}
+            >
+                <header className={s.calIntro}>
+                    <p className={s.calIntroEyebrow}>
+                        Próximas pruebas{temporada ? ` · Temporada ${temporada}` : ""}
+                    </p>
                     <h2 className={s.sectionTitle}>
-                        Calendario
-                        {temporada && (
-                            <>
-                                <br />
-                                Temporada {temporada}
-                            </>
-                        )}
+                        Encuentra tu próxima pista.
                     </h2>
                     <p className={s.sectionText}>
-                        Cada fecha es una nueva oportunidad para competir y sumar puntos.
+                        Elige una fecha, prepara tu pareja y suma puntos durante toda la temporada.
                     </p>
-                    <Link href="/calendario" className="btn btn-secundario">
+                    <Link href="/calendario" className="btn btn-claro">
                         Ver todas las pruebas
                         <GoogleIcon name="arrow_forward" />
                     </Link>
                 </header>
 
-                <ol className={s.calGrid}>
-                    {pruebas.map((p, index) => {
-                        if (!p.esMaster) numero++;
+                {destacada ? (
+                    <Link
+                        href={destacada.href ?? `/pruebas/${destacada.slug}`}
+                        className={s.calFeatureCard}
+                        aria-label={`${destacada.nombre}, ${rangoCorto(destacada)}, ${ESTADO_TEXTO[destacada.estado]}`}
+                    >
+                        <span className={s.calFeatureImagen}>
+                            <Image
+                                src={fotoDePrueba(destacada, 0)}
+                                alt=""
+                                fill
+                                sizes="(max-width: 700px) 100vw, (max-width: 1000px) 50vw, 38vw"
+                            />
+                            <span className={s.calFeatureEstado} data-estado={destacada.estado}>
+                                <GoogleIcon name={ESTADO_ICONO[destacada.estado]} />
+                                {ESTADO_TEXTO[destacada.estado]}
+                            </span>
+                        </span>
+                        <span className={s.calFeatureContenido}>
+                            <span className={s.calFeatureEyebrow}>
+                                {destacada.esMaster ? "Gran final del circuito" : "Prueba destacada"}
+                            </span>
+                            <strong className={s.calFeatureTitulo}>{destacada.nombre}</strong>
+                            <span className={s.calFeatureMeta}>
+                                <span>
+                                    <GoogleIcon name="calendar_month" />
+                                    {rangoCorto(destacada)}
+                                </span>
+                                <span>
+                                    <GoogleIcon name="location_on" />
+                                    {destacada.sede}
+                                </span>
+                            </span>
+                            <span className={s.calFeatureLink}>
+                                Descubrir prueba
+                                <GoogleIcon name="arrow_forward" />
+                            </span>
+                        </span>
+                    </Link>
+                ) : (
+                    <div className={s.calSinPruebas}>
+                        <GoogleIcon name="event" />
+                        <p>Estamos preparando las próximas fechas del circuito.</p>
+                    </div>
+                )}
 
-                        const clases = [
-                            s.calCard,
-                            p.esMaster ? s.calCardMaster : "",
-                            p.id === proximaId || p.estado === "abierta" ? s.calCardActiva : "",
-                        ].join(" ");
-
-                        return (
-                            <li key={p.id}>
+                {secundarias.length > 0 && (
+                    <ul className={s.calSideList} aria-label="Otras próximas pruebas">
+                        {secundarias.map((prueba, index) => (
+                            <li key={prueba.id}>
                                 <Link
-                                    href={p.href ?? `/pruebas/${p.slug}`}
-                                    className={clases}
-                                    aria-label={`${p.esMaster ? "Master Final" : `${numero}.ª Prueba`}, ${rangoCorto(p)}, ${ESTADO_TEXTO[p.estado]}`}
+                                    href={prueba.href ?? `/pruebas/${prueba.slug}`}
+                                    className={s.calSideCard}
+                                    aria-label={`${prueba.nombre}, ${rangoCorto(prueba)}, ${ESTADO_TEXTO[prueba.estado]}`}
                                 >
-                                    <span className={s.calImagen}>
+                                    <span className={s.calSideImagen}>
                                         <Image
-                                            src={p.esMaster ? "/images/padel-court.jpg" : FOTOS_PRUEBA[index % FOTOS_PRUEBA.length]}
+                                            src={fotoDePrueba(prueba, index + 1)}
                                             alt=""
                                             fill
-                                            sizes="(max-width: 680px) 82vw, (max-width: 1100px) 40vw, 28vw"
+                                            sizes="(max-width: 700px) 28vw, 16vw"
                                         />
-                                        <span className={`${s.calEstado} ${ESTADO_CLASE[p.estado]}`}>
-                                            <GoogleIcon name={ESTADO_ICONO[p.estado]} />
-                                            {ESTADO_TEXTO[p.estado]}
-                                        </span>
                                     </span>
-                                    <span className={s.calContenido}>
-                                        <span className={s.calDate}>
+                                    <span className={s.calSideContenido}>
+                                        <span className={s.calSideFecha}>
                                             <GoogleIcon name="calendar_month" />
-                                            {rangoCorto(p)}
+                                            {rangoCorto(prueba)}
                                         </span>
-                                        <span className={s.calName}>{p.nombre}</span>
-                                        <span className={s.calSede}>
+                                        <strong className={s.calSideTitulo}>{prueba.nombre}</strong>
+                                        <span className={s.calSideSede}>
                                             <GoogleIcon name="location_on" />
-                                            {p.sede}
+                                            {prueba.sede}
                                         </span>
-                                        <span className={s.calFlecha}>
-                                            Ver prueba
-                                            <GoogleIcon name="arrow_forward" />
+                                        <span className={s.calSideEstado} data-estado={prueba.estado}>
+                                            {ESTADO_TEXTO[prueba.estado]}
                                         </span>
                                     </span>
                                 </Link>
                             </li>
-                        );
-                    })}
-                </ol>
+                        ))}
+                    </ul>
+                )}
             </div>
         </section>
     );
