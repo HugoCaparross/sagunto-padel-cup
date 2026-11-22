@@ -1,13 +1,31 @@
 import type { MetadataRoute } from "next";
+import { url, urlBase } from "@/lib/seo/url";
 
 export default function robots(): MetadataRoute.Robots {
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   return {
-    rules: {
-      userAgent: "*",
-      allow: "/",
-      disallow: ["/admin", "/cuenta", "/inscribirse", "/buscar-pareja"],
-    },
-    sitemap: `${base}/sitemap.xml`,
+    rules: [
+      {
+        userAgent: "*",
+        allow: "/",
+        disallow: [
+          "/admin",
+          "/admin/",
+          "/cuenta",
+          "/cuenta/",
+          "/onboarding",
+          "/login",
+          "/registro",
+          "/recuperar",
+          "/nueva-contrasena",
+          "/verificar",
+          "/auth/",
+          "/inscribirse/",
+          "/buscar-pareja",
+          "/api/",
+        ],
+      },
+    ],
+    sitemap: url("/sitemap.xml"),
+    host: urlBase(),
   };
 }

@@ -5,7 +5,9 @@ import { historialConsentimientos } from "@/actions/legal";
 import FormularioPerfil from "@/components/cuenta/FormularioPerfil";
 import { usuarioActual } from "@/lib/auth/organizador";
 import { fechaCorta } from "@/lib/formato";
+import { urlFirmadaFoto } from "@/lib/jugadores/fotos";
 import { crearClienteServidor } from "@/lib/supabase/server";
+import FotoPerfil from "@/components/cuenta/FotoPerfil";
 import type { TALLAS } from "@/lib/validadores/auth";
 
 export const metadata: Metadata = { title: "Mi perfil" };
@@ -30,17 +32,18 @@ export default async function PaginaPerfil() {
   if (!userId) redirect("/login");
 
   const supabase = await crearClienteServidor();
-  const { data: perfil } = await supabase
+  const { data: perfil, error: errorPerfil } = await supabase
     .from("perfiles")
     .select("nombre, talla_camiseta, visibilidad_publica, consentimiento_imagen, datos_deportivos")
     .eq("id", userId)
-    .single<{
+    .maybeSingle<{
       nombre: string;
       talla_camiseta: (typeof TALLAS)[number] | null;
       visibilidad_publica: boolean;
       consentimiento_imagen: boolean;
       datos_deportivos: DatosDeportivosGuardados | null;
     }>();
+  if (errorPerfil) throw new Error(`No se pudo cargar el perfil: ${errorPerfil.message}`);
 
   if (!perfil) redirect("/cuenta");
 
@@ -51,6 +54,26 @@ export default async function PaginaPerfil() {
 
   const historial = await historialConsentimientos();
   const filas = historial.ok ? historial.filas.slice(0, 10) : [];
+  let fotoPath: string | null = null;
+  if (perfil.visibilidad_publica) {
+    const { data: foto, error: errorFoto } = await supabase
+      .from("perfiles")
+      .select("foto_perfil_path")
+      .eq("id", userId)
+      .maybeSingle<{ foto_perfil_path: string | null }>();
+    if (errorFoto?.code === "42703") {
+      console.warn(
+        "[perfil] Falta la columna perfiles.foto_perfil_path; aplica la migración de fotos de perfil."
+      );
+    } else if (errorFoto) {
+      throw new Error(`No se pudo cargar la foto del perfil: ${errorFoto.message}`);
+    } else {
+      fotoPath = foto?.foto_perfil_path ?? null;
+    }
+  }
+  const fotoUrl = perfil.visibilidad_publica
+    ? await urlFirmadaFoto(fotoPath)
+    : null;
 
   return (
     <main className="container grid gap-10 py-10 lg:grid-cols-[1fr_320px]">
@@ -68,6 +91,9 @@ export default async function PaginaPerfil() {
             otros,
           }}
         />
+        <div className="mt-6">
+          <FotoPerfil inicialUrl={fotoUrl} perfilPublico={perfil.visibilidad_publica} />
+        </div>
       </section>
 
       <aside className="space-y-6">

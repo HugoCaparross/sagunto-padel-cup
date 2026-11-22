@@ -1,8 +1,234 @@
-/* Estilos propios de esta página.
-   Tailwind sigue siendo lo principal: aquí va solo lo que no sale con utilidades.
-   Usa los tokens de globals.css: var(--color-navy), var(--color-coral)...
-   Importar en page.tsx:  import estilos from "./page.module.css";  */
-
 .pagina {
+  padding-block: clamp(2rem, 5vw, 4.5rem) clamp(4rem, 8vw, 7rem);
   color: var(--color-ink);
+}
+
+.hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: clamp(1.5rem, 5vw, 3.5rem);
+  border-radius: 1.5rem;
+  background: #17191c;
+  color: #fff;
+  box-shadow: 0 1.25rem 3rem rgb(23 25 28 / 0.12);
+}
+
+.heroTexto {
+  max-width: 46rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.55rem;
+  color: var(--color-coral);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+:global(.site-content main > header:first-child) .eyebrow {
+  margin: 0 0 0.55rem;
+  color: #d7edbd;
+}
+
+.titulo {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(2.35rem, 5vw, 4rem);
+  line-height: 1.08;
+}
+
+:global(.site-content main > header:first-child) .titulo {
+  color: #fff;
+  font-size: clamp(2.35rem, 5vw, 4rem);
+  line-height: 1.08;
+}
+
+.descripcion {
+  max-width: 48ch;
+  margin: 1rem 0 0;
+  color: #e0e3e1;
+  font-size: clamp(1rem, 1.7vw, 1.125rem);
+}
+
+:global(.site-content main > header:first-child) .descripcion {
+  margin: 1rem 0 0;
+  color: #e0e3e1;
+  font-size: clamp(1rem, 1.7vw, 1.125rem);
+}
+
+.resumen {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 1.75rem;
+  padding: 1.1rem 1.35rem;
+  border: 1px solid rgb(255 255 255 / 0.2);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.08);
+}
+
+.resumenDato {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  color: #e0e3e1;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.resumenNumero {
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.accesos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.acceso {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--color-ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    border-color 150ms ease,
+    color 150ms ease,
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+
+.acceso:hover {
+  transform: translateY(-1px);
+  border-color: var(--color-coral);
+  color: var(--color-coral);
+}
+
+.seccion {
+  scroll-margin-top: calc(var(--header-height) + 1.5rem);
+  margin-top: clamp(3rem, 7vw, 5rem);
+}
+
+.cabeceraSeccion {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tituloSeccion {
+  margin: 0;
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  line-height: 1.15;
+}
+
+.contador {
+  flex: 0 0 auto;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.rejilla {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.15rem;
+}
+
+.vacio {
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.vacio h3 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.vacio p {
+  max-width: 56ch;
+  margin: 0.6rem 0 1.2rem;
+  color: var(--color-muted);
+}
+
+.enlace {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-coral);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.enlace:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+@media (max-width: 900px) {
+  .rejilla {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1.5rem;
+    border-radius: 1.1rem;
+  }
+
+  .resumen {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .rejilla {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 380px) {
+  .cabeceraSeccion {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .acceso {
+    padding-inline: 0.8rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acceso {
+    transition: none;
+  }
 }

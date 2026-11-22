@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cerrarSesion } from "@/actions/auth";
+import Logo from "@/components/brand/Logo";
 
 type Seccion = { href: string; texto: string };
 
@@ -30,8 +31,8 @@ export default function AdminSidebar() {
         <aside className="border-b border-white/10 bg-navy text-white lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-r">
             <div className="flex h-full flex-col gap-6 p-4 lg:p-6">
                 <div className="flex items-center justify-between gap-4">
-                    <Link href="/admin" className="heading-font text-lg tracking-wide">
-                        ADMIN <span className="text-coral">PADEL CUP</span>
+                    <Link href="/admin" aria-label="Administración Sagunto Padel Cup">
+                        <Logo compact />
                     </Link>
                     <Link href="/" className="text-xs text-white/60 hover:text-white">
                         Ver web

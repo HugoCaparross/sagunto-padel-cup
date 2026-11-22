@@ -17,6 +17,7 @@ export type FilaRankingPublico = FilaRanking & {
 type FilaPrueba = { id: string; fecha_fin: string; es_master: boolean };
 type FilaInscripcion = { id: string; jugador_1: string; jugador_2: string | null };
 type FilaPerfil = { id: string; nombre: string; visibilidad_publica: boolean };
+type FilaFotoPerfil = { id: string; foto_perfil_path: string | null };
 type FilaPuntos = {
     jugador_id: string;
     prueba_id: string;
@@ -36,7 +37,7 @@ type FilaPartido = {
 export type DatosRanking = {
     puntos: RegistroPuntos[];
     partidos: RegistroPartido[];
-    perfiles: Map<string, { nombre: string; visible: boolean }>;
+    perfiles: Map<string, { nombre: string; visible: boolean; fotoPath: string | null }>;
 };
 
 function leer<T>(
@@ -75,12 +76,31 @@ export async function cargarDatosRanking(
         jugadoresDeInscripcion.set(i.id, jugadores);
     }
 
-    const perfiles = new Map<string, { nombre: string; visible: boolean }>();
-    for (const p of leer<FilaPerfil>(
+    const filasPerfiles = leer<FilaPerfil>(
         "perfiles",
         await supabase.from("perfiles").select("id, nombre, visibilidad_publica")
-    )) {
-        perfiles.set(p.id, { nombre: p.nombre, visible: p.visibilidad_publica });
+    );
+    const { data: fotosData, error: errorFotos } = await supabase
+        .from("perfiles")
+        .select("id, foto_perfil_path");
+    if (errorFotos?.code === "42703") {
+        console.warn(
+            "[ranking] Falta la columna perfiles.foto_perfil_path; aplica la migración de fotos de perfil."
+        );
+    } else if (errorFotos) {
+        throw new Error(`Error leyendo fotos de perfil: ${errorFotos.message}`);
+    }
+
+    const rutasFotos = new Map(
+        ((fotosData ?? []) as FilaFotoPerfil[]).map((fila) => [fila.id, fila.foto_perfil_path])
+    );
+    const perfiles = new Map<string, { nombre: string; visible: boolean; fotoPath: string | null }>();
+    for (const p of filasPerfiles) {
+        perfiles.set(p.id, {
+            nombre: p.nombre,
+            visible: p.visibilidad_publica,
+            fotoPath: rutasFotos.get(p.id) ?? null,
+        });
     }
 
     // Puntos: ya vienen por jugador desde puntos_prueba

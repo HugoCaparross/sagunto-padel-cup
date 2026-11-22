@@ -82,7 +82,7 @@ export default function FormularioPerfil({ inicial }: Props) {
                 <legend className="mb-3 text-lg font-semibold">Datos personales</legend>
 
                 <label className="flex flex-col gap-1 text-sm sm:col-span-2">
-                    <span className="text-[#68737D]">Nombre visible</span>
+                    <span className="text-[#68737D]">Nombre y apellidos visibles</span>
                     <input name="nombre" defaultValue={inicial.nombre} required minLength={2} maxLength={80} className={CAMPO} />
                 </label>
 
@@ -105,8 +105,8 @@ export default function FormularioPerfil({ inicial }: Props) {
                 <label className="flex items-start gap-2 text-sm">
                     <input name="visibilidad" type="checkbox" defaultChecked={inicial.visibilidadPublica} className="mt-1" />
                     <span>
-                        Mostrar mi nombre y resultados en el ranking y en mi perfil público. Si no lo marcas,
-                        aparecerás como "Jugador privado".
+                        Mostrar mi nombre, foto y resultados en el ranking y en mi perfil público. Si no lo
+                        marcas, aparecerás como &quot;Jugador privado&quot;.
                     </span>
                 </label>
 
@@ -147,7 +147,7 @@ export default function FormularioPerfil({ inicial }: Props) {
                 </label>
 
                 <label className="flex flex-col gap-1 text-sm sm:col-span-2">
-                    <span className="text-[#68737D]">Otros datos (una línea por campo, formato "Campo: valor", máximo 10)</span>
+                    <span className="text-[#68737D]">Otros datos (una línea por campo, formato &quot;Campo: valor&quot;, máximo 10)</span>
                     <textarea name="otros" defaultValue={inicial.otros} rows={4} className={CAMPO} />
                 </label>
             </fieldset>

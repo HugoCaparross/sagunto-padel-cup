@@ -262,7 +262,7 @@ export function OnboardingForm({ nombreInicial }: { nombreInicial: string }) {
                     <input name="visibilidad" type="checkbox" className="mt-1" />
                     <span>
                         Mostrar mi nombre y mis resultados en el ranking y en mi perfil público. Si no lo
-                        marcas, aparecerás como "Jugador privado". (opcional)
+                        marcas, aparecerás como &quot;Jugador privado&quot;. (opcional)
                     </span>
                 </label>
             </fieldset>

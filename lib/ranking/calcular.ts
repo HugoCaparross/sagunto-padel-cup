@@ -68,14 +68,26 @@ type Acumulado = EstadisticasPareja & {
     partidos: number;
 };
 
-// Ranking de una categoría en la fecha de referencia.
-// El llamador debe excluir del array de puntos el Máster Final si no computa para el ranking de temporada.
-export function calcularRanking(params: {
-    categoria: Categoria;
+type ParametrosCalculo = {
+    categoria?: Categoria;
     referencia: string;
     puntos: RegistroPuntos[];
     partidos: RegistroPartido[];
-}): FilaRanking[] {
+};
+
+// Ranking de una categoría en la fecha de referencia. El ranking general suma todas.
+// El llamador debe excluir del array de puntos el Máster Final si no computa para el ranking de temporada.
+export function calcularRanking(params: ParametrosCalculo & { categoria: Categoria }): FilaRanking[] {
+    return calcularRankingFiltrado(params);
+}
+
+export function calcularRankingGeneral(
+    params: Omit<ParametrosCalculo, "categoria">
+): FilaRanking[] {
+    return calcularRankingFiltrado(params);
+}
+
+function calcularRankingFiltrado(params: ParametrosCalculo): FilaRanking[] {
     const { categoria, referencia, puntos, partidos } = params;
     const inicio = inicioVentana(referencia);
     const enVentana = (fecha: string) => fecha > inicio && fecha <= referencia;
@@ -102,7 +114,7 @@ export function calcularRanking(params: {
     };
 
     for (const r of puntos) {
-        if (r.categoria !== categoria || !enVentana(r.fecha)) continue;
+        if ((categoria !== undefined && r.categoria !== categoria) || !enVentana(r.fecha)) continue;
 
         const fila = obtener(r.clave);
         fila.puntos += r.puntos;
@@ -118,7 +130,7 @@ export function calcularRanking(params: {
     }
 
     for (const p of partidos) {
-        if (p.categoria !== categoria || !enVentana(p.fecha)) continue;
+        if ((categoria !== undefined && p.categoria !== categoria) || !enVentana(p.fecha)) continue;
 
         const fila = obtener(p.clave);
         fila.partidos++;

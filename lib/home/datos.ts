@@ -1,6 +1,7 @@
 import { CATEGORIAS, type Categoria, type EstadoPrueba } from "@/lib/constantes";
-import { calcularRanking } from "@/lib/ranking/calcular";
+import { calcularRanking, calcularRankingGeneral } from "@/lib/ranking/calcular";
 import { cargarDatosRanking, hoyEnMadrid } from "@/lib/ranking/cargar";
+import { urlsFirmadasFotos } from "@/lib/jugadores/fotos";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
 export type PruebaHome = {
@@ -16,13 +17,26 @@ export type PruebaHome = {
     categorias: Categoria[];
     plazasLibres: number;
     plazasMaximas: number;
+    href?: string;
 };
 
 export type FilaTop = {
+    jugadorId: string | null;
     posicion: number;
     nombre: string;
     puntos: number;
     pruebasJugadas: number;
+    partidos: number;
+    victorias: number;
+    porcentajeVictorias: number;
+    fotoUrl: string | null;
+};
+
+export type Cifras = {
+    jugadores: number;
+    parejas: number;
+    pruebas: number;
+    categorias: number;
 };
 
 export type DatosHome = {
@@ -30,6 +44,8 @@ export type DatosHome = {
     proxima: PruebaHome | null;
     calendario: PruebaHome[];
     ranking: Record<Categoria, FilaTop[]>;
+    rankingGeneral: FilaTop[];
+    cifras: Cifras;
 };
 
 type PruebaFila = {
@@ -97,6 +113,20 @@ export async function cargarDatosHome(): Promise<DatosHome> {
 
     const datos = await cargarDatosRanking();
     const ranking = {} as Record<Categoria, FilaTop[]>;
+    const aFilaTop = (fila: ReturnType<typeof calcularRanking>[number]): FilaTop => {
+        const perfil = datos.perfiles.get(fila.clave);
+        return {
+            jugadorId: perfil?.visible ? fila.clave : null,
+            posicion: fila.posicion,
+            nombre: perfil?.visible ? perfil.nombre || "Jugador" : "Jugador privado",
+            puntos: fila.puntos,
+            pruebasJugadas: fila.pruebasJugadas,
+            partidos: fila.partidos,
+            victorias: fila.victorias,
+            porcentajeVictorias: fila.porcentajeVictorias,
+            fotoUrl: null,
+        };
+    };
 
     for (const categoria of CATEGORIAS) {
         ranking[categoria] = calcularRanking({
@@ -106,21 +136,49 @@ export async function cargarDatosHome(): Promise<DatosHome> {
             partidos: datos.partidos,
         })
             .slice(0, 5)
-            .map((f) => {
-                const perfil = datos.perfiles.get(f.clave);
-                return {
-                    posicion: f.posicion,
-                    nombre: perfil?.visible ? perfil.nombre || "Jugador" : "Jugador privado",
-                    puntos: f.puntos,
-                    pruebasJugadas: f.pruebasJugadas,
-                };
-            });
+            .map(aFilaTop);
     }
+    const rankingGeneral = calcularRankingGeneral({
+        referencia: hoy,
+        puntos: datos.puntos,
+        partidos: datos.partidos,
+    })
+        .slice(0, 5)
+        .map(aFilaTop);
+
+    const filasVisibles = [...Object.values(ranking).flat(), ...rankingGeneral];
+    const rutasPorJugador = new Map(
+        filasVisibles.flatMap((fila) => {
+            const ruta = fila.jugadorId ? datos.perfiles.get(fila.jugadorId)?.fotoPath : null;
+            return ruta && fila.jugadorId ? [[fila.jugadorId, ruta] as const] : [];
+        })
+    );
+    const urlsPorRuta = await urlsFirmadasFotos([...rutasPorJugador.values()]);
+    const añadirFotos = (filas: FilaTop[]) =>
+        filas.map((fila) => {
+            const ruta = fila.jugadorId ? rutasPorJugador.get(fila.jugadorId) : null;
+            return { ...fila, fotoUrl: fila.fotoUrl ?? (ruta ? urlsPorRuta.get(ruta) ?? null : null) };
+        });
+
+    for (const categoria of CATEGORIAS) ranking[categoria] = añadirFotos(ranking[categoria]);
+    const rankingGeneralConFotos = añadirFotos(rankingGeneral);
+
+    const jugadoresActivos = new Set([
+        ...datos.puntos.map((p) => p.clave),
+        ...datos.partidos.map((p) => p.clave),
+    ]).size;
 
     return {
         temporada: (temp as { anio: string } | null)?.anio ?? null,
         proxima,
         calendario,
         ranking,
+        rankingGeneral: rankingGeneralConFotos,
+        cifras: {
+            jugadores: jugadoresActivos,
+            parejas: [...ocupadasDe.values()].reduce((total, ocupadas) => total + ocupadas, 0),
+            pruebas: calendario.length,
+            categorias: CATEGORIAS.length,
+        },
     };
 }

@@ -25,6 +25,8 @@ const esquemaRol = z.object({
     motivo: z.string().trim().min(10, "El motivo debe tener al menos 10 caracteres").max(500),
 });
 
+type InscripcionExport = { jugador_1: string; jugador_2: string | null };
+
 function hoy(): string {
     return new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Madrid" });
 }
@@ -61,8 +63,8 @@ export async function exportarDatos(entrada: unknown): Promise<Exportacion> {
 
             const nombres = await nombresDe(admin, data ?? []);
             cabecera = ["Prueba", "Categoría", "Estado", "Llegada", "Jugador 1", "Jugador 2", "Alta"];
-            filas = (data ?? []).map((i: any) => [
-                i.prueba?.nombre ?? "", i.categoria, i.estado, i.checkin_at,
+            filas = (data ?? []).map((i) => [
+                i.prueba?.[0]?.nombre ?? "", i.categoria, i.estado, i.checkin_at,
                 nombres.get(i.jugador_1) ?? "", i.jugador_2 ? (nombres.get(i.jugador_2) ?? "") : "", i.created_at,
             ]);
         } else if (recurso === "puntos") {
@@ -72,10 +74,10 @@ export async function exportarDatos(entrada: unknown): Promise<Exportacion> {
                 .order("fecha", { ascending: true });
             if (error) return { ok: false, error: error.message };
 
-            const nombres = await nombresDePerfiles(admin, [...new Set((data ?? []).map((p: any) => p.jugador_id))]);
+            const nombres = await nombresDePerfiles(admin, [...new Set((data ?? []).map((p) => p.jugador_id))]);
             cabecera = ["Fecha", "Prueba", "Jugador", "Categoría", "Cuadro", "Ronda", "Puntos"];
-            filas = (data ?? []).map((p: any) => [
-                p.fecha, p.prueba?.nombre ?? "", nombres.get(p.jugador_id) ?? "",
+            filas = (data ?? []).map((p) => [
+                p.fecha, p.prueba?.[0]?.nombre ?? "", nombres.get(p.jugador_id) ?? "",
                 p.categoria, p.cuadro, p.ronda, p.puntos,
             ]);
         } else {
@@ -86,9 +88,10 @@ export async function exportarDatos(entrada: unknown): Promise<Exportacion> {
                 .limit(5000);
             if (error) return { ok: false, error: error.message };
 
-            const nombres = await nombresDePerfiles(admin, [...new Set((data ?? []).map((a: any) => a.usuario_id).filter(Boolean))]);
+            const usuarioIds = [...new Set((data ?? []).flatMap((a) => a.usuario_id ? [a.usuario_id] : []))];
+            const nombres = await nombresDePerfiles(admin, usuarioIds);
             cabecera = ["Fecha", "Usuario", "Acción", "Tabla", "Registro", "Motivo"];
-            filas = (data ?? []).map((a: any) => [
+            filas = (data ?? []).map((a) => [
                 a.created_at, a.usuario_id ? (nombres.get(a.usuario_id) ?? "") : "Sistema",
                 a.accion, a.tabla, a.registro_id, a.motivo,
             ]);
@@ -129,9 +132,9 @@ async function nombresDePerfiles(
 
 async function nombresDe(
     admin: ReturnType<typeof crearClienteAdmin>,
-    inscripciones: any[]
+    inscripciones: InscripcionExport[]
 ): Promise<Map<string, string>> {
-    const ids = inscripciones.flatMap((i) => [i.jugador_1, i.jugador_2]).filter(Boolean);
+    const ids = inscripciones.flatMap((i) => i.jugador_2 ? [i.jugador_1, i.jugador_2] : [i.jugador_1]);
     return nombresDePerfiles(admin, [...new Set(ids)]);
 }
 

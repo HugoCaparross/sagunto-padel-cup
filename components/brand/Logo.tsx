@@ -1,10 +1,16 @@
-type Props = { className?: string };
+import Image from "next/image";
 
-// Logo en texto mientras no exista el archivo gráfico definitivo.
-export default function Logo({ className = "" }: Props) {
+type Props = { className?: string; compact?: boolean };
+
+export default function Logo({ className = "", compact = false }: Props) {
     return (
-        <span className={`heading-font tracking-wide ${className}`}>
-            SAGUNTO <span className="text-[#F0443A]">PADEL CUP</span>
-        </span>
+        <Image
+            src="/sagunto-padel-cup-logo.png"
+            alt="Sagunto Padel Cup"
+            width={2030}
+            height={768}
+            loading="eager"
+            className={`h-auto ${compact ? "w-[132px]" : "w-[132px] sm:w-[170px]"} ${className}`}
+        />
     );
 }

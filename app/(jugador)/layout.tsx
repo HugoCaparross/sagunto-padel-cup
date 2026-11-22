@@ -24,7 +24,7 @@ export default async function LayoutJugador({
     <>
       <SiteHeader />
       <PlayerNav />
-      <div className="min-h-[70vh]">{children}</div>
+      <div className="player-content min-h-[70vh]">{children}</div>
       <SiteFooter />
     </>
   );
