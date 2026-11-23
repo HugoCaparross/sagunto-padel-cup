@@ -33,7 +33,8 @@ export default async function PaginaPremios({ searchParams }: Props) {
       <header className="space-y-4">
         <h1 className="heading-font text-6xl">Premios</h1>
         <p className="text-lg text-muted">
-          Premios de cada cuadro. Algunos se revelan el día de la prueba.
+          En cada categoría, solo los campeones y subcampeones del cuadro Oro reciben premio.
+          Algunos premios se revelan el día de la prueba.
         </p>
         <SelectorPrueba pruebas={pruebas} activaId={elegida.id} ruta="/premios" />
       </header>

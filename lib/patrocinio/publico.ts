@@ -1,6 +1,5 @@
 import {
     CATEGORIAS,
-    CUADROS,
     type Categoria,
     type Cuadro,
     type EstadoPrueba,
@@ -138,40 +137,54 @@ export async function historicoPatrocinadores(): Promise<HistoricoPatrocinador[]
         .map((p) => ({ prueba: p, patrocinadores: porPrueba.get(p.id) ?? [] }));
 }
 
-// Premios de una prueba. Se leen con la clave de servicio para poder ocultar la descripción
-// de los premios que todavía no se han revelado.
-export async function premiosDePrueba(pruebaId: string): Promise<PremioPublico[]> {
+// Premios públicos: solo el cuadro Oro entrega premios a campeones y subcampeones.
+export async function premiosDePruebas(
+    pruebaIds: string[]
+): Promise<Record<string, PremioPublico[]>> {
+    if (pruebaIds.length === 0) return {};
+
     const admin = crearClienteAdmin();
 
     const { data, error } = await admin
         .from("premios")
-        .select("id, categoria, cuadro, descripcion, revelar_at")
-        .eq("prueba_id", pruebaId);
+        .select("id, prueba_id, categoria, cuadro, descripcion, revelar_at")
+        .in("prueba_id", pruebaIds)
+        .eq("cuadro", "oro");
     if (error) throw new Error(error.message);
 
     const ahora = Date.now();
+    const porPrueba: Record<string, PremioPublico[]> = {};
+    for (const id of pruebaIds) porPrueba[id] = [];
 
-    return ((data ?? []) as {
+    for (const p of (data ?? []) as {
         id: string;
+        prueba_id: string;
         categoria: Categoria;
         cuadro: Cuadro;
         descripcion: string;
         revelar_at: string | null;
-    }[])
-        .map((p): PremioPublico => {
-            const revelado = !p.revelar_at || Date.parse(p.revelar_at) <= ahora;
-            return {
-                id: p.id,
-                categoria: p.categoria,
-                cuadro: p.cuadro,
-                revelado,
-                revelaEl: p.revelar_at,
-                descripcion: revelado ? p.descripcion : null,
-            };
-        })
-        .sort(
-            (a, b) =>
-                CATEGORIAS.indexOf(a.categoria) - CATEGORIAS.indexOf(b.categoria) ||
-                CUADROS.indexOf(a.cuadro) - CUADROS.indexOf(b.cuadro)
-        );
+    }[]) {
+        const revelado = !p.revelar_at || Date.parse(p.revelar_at) <= ahora;
+        const premios = porPrueba[p.prueba_id];
+        if (!premios) throw new Error(`Premio asociado a una prueba no solicitada: ${p.prueba_id}`);
+        premios.push({
+            id: p.id,
+            categoria: p.categoria,
+            cuadro: p.cuadro,
+            revelado,
+            revelaEl: p.revelar_at,
+            descripcion: revelado ? p.descripcion : null,
+        });
+    }
+
+    for (const premios of Object.values(porPrueba)) {
+        premios.sort((a, b) => CATEGORIAS.indexOf(a.categoria) - CATEGORIAS.indexOf(b.categoria));
+    }
+
+    return porPrueba;
+}
+
+export async function premiosDePrueba(pruebaId: string): Promise<PremioPublico[]> {
+    const premiosPorPrueba = await premiosDePruebas([pruebaId]);
+    return premiosPorPrueba[pruebaId] ?? [];
 }

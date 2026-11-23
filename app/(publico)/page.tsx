@@ -24,8 +24,7 @@ import {
 } from "@/lib/home/datos-demo";
 import {
   historicoPatrocinadores,
-  premiosDePrueba,
-  type PremioPublico,
+  premiosDePruebas,
 } from "@/lib/patrocinio/publico";
 import { cargarPartidosPublicos, type PartidoPublico } from "@/lib/pruebas/publico";
 
@@ -47,11 +46,9 @@ export default async function PaginaInicio() {
   const usarDatosDemo = process.env.NODE_ENV === "development";
   const pruebaReal = datos.proxima;
   const prueba = usarDatosDemo ? PRUEBA_DEMO : pruebaReal;
-  const [historialPatrocinadoresVista, premios] = await Promise.all([
+  const [historialPatrocinadoresVista, premiosPorPrueba] = await Promise.all([
     historicoPatrocinadores(),
-    !usarDatosDemo && pruebaReal
-      ? premiosDePrueba(pruebaReal.id)
-      : Promise.resolve<PremioPublico[]>([]),
+    premiosDePruebas(datos.calendario.map((item) => item.id)),
   ]);
 
   const calendario = usarDatosDemo
@@ -79,7 +76,24 @@ export default async function PaginaInicio() {
   const rankingGeneral = usarDatosDemo
       ? combinarRankingGeneral(datos.rankingGeneral, RANKING_GENERAL_DEMO)
       : datos.rankingGeneral;
-  const premiosVista = usarDatosDemo ? PREMIOS_DEMO : premios;
+  const pruebasParaPremios =
+    datos.calendario.length > 0
+      ? datos.calendario
+      : usarDatosDemo
+        ? [PRUEBA_DEMO]
+        : [];
+  const primeraPruebaRegularId = pruebasParaPremios.find((item) => !item.esMaster)?.id ?? null;
+  const pruebasPremiosVista = pruebasParaPremios.map((item) => {
+    const premiosReales = premiosPorPrueba[item.id] ?? [];
+    const premios =
+      premiosReales.length > 0 || !usarDatosDemo || item.id !== primeraPruebaRegularId
+        ? premiosReales
+        : PREMIOS_DEMO;
+    return { ...item, premios };
+  });
+  const pruebaInicialPremiosId = usarDatosDemo
+    ? primeraPruebaRegularId
+    : pruebasPremiosVista.find((item) => item.premios.length)?.id ?? pruebaReal?.id ?? null;
   const noticiasVista = usarDatosDemo
     ? [...noticias, ...NOTICIAS_DEMO].slice(0, 3)
     : noticias;
@@ -130,10 +144,8 @@ export default async function PaginaInicio() {
       <ComoFunciona />
       <RankingTop5 ranking={ranking} rankingGeneral={rankingGeneral} />
       <PremiosDestacados
-        premios={premiosVista}
-        categorias={prueba?.categorias ?? []}
-        nombrePrueba={prueba?.nombre ?? null}
-        pruebaSlug={!usarDatosDemo ? prueba?.slug ?? null : null}
+        pruebas={pruebasPremiosVista}
+        pruebaInicialId={pruebaInicialPremiosId}
       />
       <ResultadosRecientes resultados={resultadosVista} />
       <PatrocinadoresHome historial={historialPatrocinadoresVista} />

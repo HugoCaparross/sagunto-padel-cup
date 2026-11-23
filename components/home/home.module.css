@@ -1956,6 +1956,36 @@
     text-align: center;
 }
 
+.premiosSelector {
+    display: grid;
+    width: min(100%, 24rem);
+    gap: 0.45rem;
+    color: var(--color-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-align: left;
+}
+
+.premiosSelector select {
+    width: 100%;
+    min-height: 3rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    background: #fff;
+    padding: 0.65rem 2.5rem 0.65rem 0.85rem;
+    color: var(--color-navy);
+    font: inherit;
+    cursor: pointer;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.premiosSelector select:hover,
+.premiosSelector select:focus-visible {
+    border-color: var(--color-coral);
+    box-shadow: 0 0 0 3px rgb(240 68 58 / 0.12);
+    outline: none;
+}
+
 .premiosGrid {
     display: grid;
     width: 100%;
@@ -2038,7 +2068,7 @@
     background: rgb(255 255 255 / 0.14);
     padding: 0.25rem 0.6rem;
     color: #fff;
-    font-size: 0.68rem;
+    font-size: 0.63rem;
     font-weight: 700;
 }
 
@@ -2076,6 +2106,16 @@
 .premioEnlace :global(.google-icon) {
     font-size: 0.95rem;
     transition: transform 160ms ease;
+}
+
+.premioSinDatos {
+    width: min(100%, 42rem);
+    border: 1px dashed var(--color-border);
+    border-radius: 1rem;
+    background: #fff;
+    padding: 1.5rem;
+    color: var(--color-muted);
+    text-align: center;
 }
 
 .premioCard:hover .premioEnlace :global(.google-icon) {
@@ -2634,13 +2674,13 @@
 
 .resultadoParejas {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    align-items: center;
-    gap: 0.65rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
 }
 
 .resultadoLadoA,
 .resultadoLadoB {
+    grid-row: 2;
     display: grid;
     gap: 0.1rem;
     min-width: 0;
@@ -2652,15 +2692,38 @@
 }
 
 .resultadoMarcador {
-    border-radius: 0.7rem;
-    background: #fff0f1;
-    padding: 0.55rem 0.65rem;
+    grid-column: 1 / -1;
+    grid-row: 1;
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    gap: 0.5rem;
+    border-radius: 0.75rem;
+    background: #fff7f7;
+    padding: 0.7rem;
+}
+
+.resultadoSet {
+    display: grid;
+    min-width: 0;
+    justify-items: center;
+    gap: 0.25rem;
+}
+
+.resultadoSetEtiqueta {
+    color: var(--color-muted);
+    font-size: 0.64rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.resultadoSetPuntuacion {
     color: var(--color-coral);
     font-family: var(--font-inter), sans-serif;
-    font-size: clamp(0.85rem, 1.2vw, 1.1rem);
+    font-size: clamp(0.9rem, 1.2vw, 1.1rem);
     font-variant-numeric: tabular-nums;
     font-weight: 800;
-    text-align: center;
+    line-height: 1.2;
     white-space: nowrap;
 }
 
@@ -3054,20 +3117,8 @@
         grid-template-columns: minmax(0, 1fr);
     }
 
-    .resultadoParejas {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.5rem;
-    }
-
-    .resultadoMarcador {
-        grid-column: 1 / -1;
-        grid-row: 1;
-        justify-self: center;
-    }
-
     .resultadoLadoA,
     .resultadoLadoB {
-        grid-row: 2;
         font-size: 0.76rem;
     }
 

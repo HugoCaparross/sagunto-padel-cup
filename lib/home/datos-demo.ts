@@ -74,19 +74,43 @@ export const RANKING_GENERAL_DEMO: FilaTop[] = Object.values(RANKING_DEMO)
     .slice(0, 5)
     .map((fila, index) => ({ ...fila, posicion: index + 1 }));
 
-export const PREMIOS_DEMO: PremioPublico[] = CATEGORIAS.map((categoria, index) => ({
-    id: `demo-premio-${categoria}`,
-    categoria,
-    cuadro: "oro",
-    revelado: true,
-    revelaEl: null,
-    descripcion: [
-        "Pala de competición para la pareja campeona",
-        "Paletero oficial y accesorios",
-        "Pack de material deportivo",
-        "Vale para equipamiento de pádel",
-    ][index],
-}));
+export const PREMIOS_DEMO: PremioPublico[] = [
+    {
+        id: "demo-premio-primera",
+        categoria: "primera",
+        cuadro: "oro",
+        revelado: true,
+        revelaEl: null,
+        descripcion:
+            "Campeón: trofeo y comida en Restaurante Torres Torres. Subcampeón: inscripción gratis.",
+    },
+    {
+        id: "demo-premio-segunda",
+        categoria: "segunda",
+        cuadro: "oro",
+        revelado: true,
+        revelaEl: null,
+        descripcion:
+            "Campeón: trofeo y cena en Paréntesis. Subcampeón: trofeo y desayuno para dos en La Pícara.",
+    },
+    {
+        id: "demo-premio-tercera",
+        categoria: "tercera",
+        cuadro: "oro",
+        revelado: true,
+        revelaEl: null,
+        descripcion:
+            "Campeón: trofeo y tres sesiones de prueba por persona en Bodymax. Subcampeón: trofeo, paleteros y tarta de queso.",
+    },
+    {
+        id: "demo-premio-cuarta",
+        categoria: "cuarta",
+        cuadro: "oro",
+        revelado: true,
+        revelaEl: null,
+        descripcion: "Premio por confirmar.",
+    },
+];
 
 export const NOTICIAS_DEMO: (NoticiaPublica & { href: string })[] = [
     {
@@ -135,6 +159,7 @@ const partidosDemo: (PartidoPublico & { resultado: string })[] = [
         ladoA: "Marina Beltrán / Pablo Ferrer",
         ladoB: "Nora Vidal / Leo Pons",
         resultado: "6-4 × 6-3",
+        sets: [[6, 4], [6, 3]],
         pista: 1,
         fecha: "2026-10-12",
         hora: "18:30",
@@ -149,6 +174,7 @@ const partidosDemo: (PartidoPublico & { resultado: string })[] = [
         ladoA: "Lucía Mar / Hugo Costa",
         ladoB: "Marta Ríos / Álex Navarro",
         resultado: "6-2 × 4-6 × 6-4",
+        sets: [[6, 2], [4, 6], [6, 4]],
         pista: 2,
         fecha: "2026-10-11",
         hora: "17:00",
@@ -163,6 +189,7 @@ const partidosDemo: (PartidoPublico & { resultado: string })[] = [
         ladoA: "Carla Gil / Dani Serra",
         ladoB: "Noa Martí / Pol Torres",
         resultado: "7-5 × 6-4",
+        sets: [[7, 5], [6, 4]],
         pista: 3,
         fecha: "2026-09-21",
         hora: "12:00",
@@ -177,6 +204,7 @@ const partidosDemo: (PartidoPublico & { resultado: string })[] = [
         ladoA: "Aina López / Marc Sanz",
         ladoB: "Lola Pérez / Eric Vidal",
         resultado: "6-3 × 6-1",
+        sets: [[6, 3], [6, 1]],
         pista: 1,
         fecha: "2026-09-20",
         hora: "11:00",

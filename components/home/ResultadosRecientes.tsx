@@ -105,9 +105,24 @@ export default function ResultadosRecientes({ resultados }: Props) {
                                     </span>
                                     <span className={s.resultadoParejas}>
                                         <NombresPareja nombre={partido.ladoA} className={s.resultadoLadoA} />
-                                        <strong className={s.resultadoMarcador}>
-                                            {partido.resultado}
-                                        </strong>
+                                        <span
+                                            className={s.resultadoMarcador}
+                                            role="group"
+                                            aria-label={`Marcador por sets: ${partido.resultado}`}
+                                        >
+                                            {partido.sets?.length
+                                                ? partido.sets.map(([a, b], index) => (
+                                                      <span className={s.resultadoSet} key={index}>
+                                                          <span className={s.resultadoSetEtiqueta}>
+                                                              {index + 1} set
+                                                          </span>
+                                                          <strong className={s.resultadoSetPuntuacion}>
+                                                              {a}-{b}
+                                                          </strong>
+                                                      </span>
+                                                  ))
+                                                : partido.resultado}
+                                        </span>
                                         <NombresPareja nombre={partido.ladoB} className={s.resultadoLadoB} />
                                     </span>
                                     <span className={s.resultadoPie}>

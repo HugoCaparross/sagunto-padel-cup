@@ -33,20 +33,77 @@ from (values
    'Por confirmar', 0, true, 'proxima')
 ) as v(slug, nombre, fecha_inicio, fecha_fin, sede, precio, es_master, estado);
 
+-- 2.1 Patrocinadores de las pruebas 1 y 2.
+with asociaciones (slug, nombre) as (
+  values
+    ('prueba-1-2026', 'Restaurante Torres Torres'),
+    ('prueba-1-2026', 'Talleres Juan Sánchez'),
+    ('prueba-1-2026', 'El Bravero'),
+    ('prueba-1-2026', 'Bodymax'),
+    ('prueba-1-2026', 'Taller Soledad'),
+    ('prueba-1-2026', 'Charter'),
+    ('prueba-1-2026', 'La Pícara'),
+    ('prueba-1-2026', 'Aseport'),
+    ('prueba-1-2026', 'Quattre'),
+    ('prueba-1-2026', 'Peluquería Toni Rodrigo'),
+    ('prueba-1-2026', 'VN Tartes'),
+    ('prueba-1-2026', 'Samos'),
+    ('prueba-1-2026', 'Hamburguesería Paréntesis'),
+    ('prueba-1-2026', 'Bonrasa Reformas'),
+    ('prueba-1-2026', 'Ayuntamiento de Sagunto'),
+    ('prueba-1-2026', 'Concejalía de Deportes Sagunto'),
+    ('prueba-1-2026', 'Sport Padel Sagunt'),
+    ('prueba-1-2026', 'TTM'),
+    ('prueba-2-2026', 'Sport Padel Sagunt'),
+    ('prueba-2-2026', 'TTM'),
+    ('prueba-2-2026', 'Restaurante Torres Torres'),
+    ('prueba-2-2026', 'La Pícara'),
+    ('prueba-2-2026', 'Quattre'),
+    ('prueba-2-2026', 'VN Tartes'),
+    ('prueba-2-2026', 'El Bravero'),
+    ('prueba-2-2026', 'Gasolinera Sendra Solbes'),
+    ('prueba-2-2026', 'Ayuntamiento de Sagunto'),
+    ('prueba-2-2026', 'Concejalía de Deportes Sagunto')
+)
+insert into public.prueba_patrocinadores (prueba_id, patrocinador_id)
+select prueba.id, patrocinador.id
+from asociaciones a
+join public.pruebas prueba on prueba.slug = a.slug
+join public.patrocinadores patrocinador
+  on lower(patrocinador.nombre) = lower(a.nombre)
+on conflict (prueba_id, patrocinador_id) do nothing;
+
+-- 2.2 Premios Oro de la primera prueba, con categorías normalizadas.
+insert into public.premios (prueba_id, categoria, cuadro, descripcion, revelar_at)
+select prueba.id, premio.categoria, 'oro', premio.descripcion, null
+from public.pruebas prueba
+cross join (
+  values
+    ('primera', 'Campeón: trofeo y comida en Restaurante Torres Torres. Subcampeón: inscripción gratis.'),
+    ('segunda', 'Campeón: trofeo y cena en Paréntesis. Subcampeón: trofeo y desayuno para dos en La Pícara.'),
+    ('tercera', 'Campeón: trofeo y tres sesiones de prueba por persona en Bodymax. Subcampeón: trofeo, paleteros y tarta de queso.'),
+    ('cuarta', 'Premio por confirmar.')
+) as premio(categoria, descripcion)
+where prueba.slug = 'prueba-1-2026'
+on conflict (prueba_id, categoria, cuadro)
+do update set descripcion = excluded.descripcion, revelar_at = null;
+
 -- 3. Categorías
--- Prueba 1: 2.ª, 3.ª y 4.ª (según lo jugado).
+-- Prueba 1: las categorías originales se normalizan como 1.ª, 2.ª, 3.ª y 4.ª.
 insert into public.prueba_categorias (prueba_id, categoria)
 select p.id, c.categoria
 from public.pruebas p
-cross join (values ('segunda'), ('tercera'), ('cuarta')) as c(categoria)
-where p.slug = 'prueba-1-2026';
+cross join (values ('primera'), ('segunda'), ('tercera'), ('cuarta')) as c(categoria)
+where p.slug = 'prueba-1-2026'
+on conflict (prueba_id, categoria) do nothing;
 
 -- Resto de pruebas: 1.ª, 2.ª, 3.ª y 4.ª
 insert into public.prueba_categorias (prueba_id, categoria)
 select p.id, c.categoria
 from public.pruebas p
 cross join (values ('primera'), ('segunda'), ('tercera'), ('cuarta')) as c(categoria)
-where p.slug <> 'prueba-1-2026';
+where p.slug <> 'prueba-1-2026'
+on conflict (prueba_id, categoria) do nothing;
 
 -- 4. Escala de puntos (posición por categoría y cuadro)
 insert into public.points_scale (categoria, cuadro, ronda, puntos)

@@ -35,6 +35,7 @@ export type PartidoPublico = {
     ladoA: string;
     ladoB: string;
     resultado: string | null;
+    sets: [number, number][] | null;
     pista: number | null;
     fecha: string | null;
     hora: string | null;
@@ -216,6 +217,7 @@ export async function cargarPartidosPublicos(pruebaId: string): Promise<PartidoP
             ladoA: ladoDe(f.inscripcion_a, f.origen_a),
             ladoB: ladoDe(f.inscripcion_b, f.origen_b),
             resultado: f.ganador_id ? formatearResultado(f.resultado) : null,
+            sets: f.ganador_id ? f.resultado : null,
             pista: f.pista?.numero ?? null,
             fecha: cita?.fecha ?? null,
             hora: cita ? aHora(cita.minutos) : null,
