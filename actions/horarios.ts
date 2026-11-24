@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { CATEGORIAS, type Categoria, type Cuadro } from "@/lib/constantes";
+import { type Categoria, type Cuadro } from "@/lib/constantes";
 import {
     detectarConflictos,
     planificar,

@@ -14,7 +14,6 @@ import {
     type SetJuego,
 } from "@/lib/estadisticas/calcular";
 import {
-    DATOS_DEPORTIVOS_VACIOS,
     esquemaDatosDeportivos,
     type DatosDeportivos,
 } from "@/lib/validadores/datos-deportivos";

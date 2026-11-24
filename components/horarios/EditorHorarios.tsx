@@ -173,11 +173,6 @@ export default function EditorHorarios({
     const horaIni = aMinutos(datos.prueba.horaInicio);
     const horaFin = aMinutos(datos.prueba.horaFin);
 
-    const ventanas: Ventana[] = useMemo(
-        () => dias.map((fecha) => ({ fecha, inicioMin: horaIni, finMin: horaFin })),
-        [dias, horaIni, horaFin]
-    );
-
     const ventanaDia: Ventana = { fecha: dia, inicioMin: horaIni, finMin: horaFin };
 
     const filasPorId = useMemo(

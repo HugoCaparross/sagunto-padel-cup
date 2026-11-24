@@ -5,7 +5,6 @@ import {
     CATEGORIAS,
     CUADROS,
     ESTADOS_QUE_OCUPAN_PLAZA,
-    type Categoria,
     type Cuadro,
     type Ronda as RondaPuntos,
 } from "@/lib/constantes";

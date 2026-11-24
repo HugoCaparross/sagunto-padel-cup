@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { exigirOrganizador, usuarioActual } from "@/lib/auth/organizador";
 import { registrarAuditoria } from "@/lib/auditoria";
 import {

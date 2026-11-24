@@ -1,5 +1,5 @@
 import type { Categoria, Cuadro, Ronda } from "@/lib/constantes";
-import { estadisticasJugador, type EstadisticasJugador } from "@/lib/estadisticas/calcular";
+import { type EstadisticasJugador } from "@/lib/estadisticas/calcular";
 import { cargarDatosRanking } from "@/lib/ranking/cargar";
 import { crearClienteAdmin } from "@/lib/supabase/server";
 import { progresoDeJugador, type ProgresoNivel } from "@/lib/xp/niveles";

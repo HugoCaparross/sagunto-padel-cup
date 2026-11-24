@@ -2,7 +2,6 @@
 
 import { z } from "zod";
 import {
-    ESTADOS_QUE_OCUPAN_PLAZA,
     type Categoria,
     type EstadoInscripcion,
     type EstadoPrueba,

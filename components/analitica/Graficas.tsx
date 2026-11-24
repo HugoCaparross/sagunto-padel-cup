@@ -27,7 +27,6 @@ function Bloque({ titulo, vacio, children }: { titulo: string; vacio: boolean; c
             ) : (
                 <div className="h-64 w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                        {/* eslint-disable-next-line react/jsx-no-useless-fragment */}
                         <>{children}</>
                     </ResponsiveContainer>
                 </div>
