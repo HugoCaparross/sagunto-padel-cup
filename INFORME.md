@@ -59,6 +59,7 @@ T01 queda bloqueada por dos causas reproducibles: binarios nativos abiertos en e
 - `e991dd6` — `test: escala de puntos coincide con seed.sql`
 - `082f9a4` — `fix(seguridad): filtros públicos explícitos en lecturas con cliente admin`
 - `6a62ac5` — `feat(jugadores): slug público en fichas de jugador (migración sin aplicar)`
+- `b190097` — `test: smoke test de rutas públicas`
 
 ### Detalle de auditoría T07
 
