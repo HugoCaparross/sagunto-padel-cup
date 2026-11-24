@@ -21,5 +21,5 @@ T01 queda bloqueada por dos causas reproducibles: binarios nativos abiertos en e
 
 | Tarea | Estado | Archivos tocados | Comandos y resultado |
 |---|---|---|---|
-| T02 | EN CURSO | `lib/legal/contenido.ts`, `lib/legal/requisitos.ts`, `tests/legal.test.ts` | Búsqueda de `Caparr` en `lib app components actions`: sin resultados. `typecheck` bloqueado por `tsc` ausente tras T01; `npm install` no pudo reparar `node_modules` (`ENOTEMPTY`/`EPERM`, archivos en uso). Revisión jurídica pendiente (LSSI-CE art. 10: identificación del prestador). |
-| T03 | EN CURSO | `docs/reglamento-tecnico.md` | Tabla de `TAMANOS` transcrita; sin cambios de código. Pendiente de confirmación por la organización: si el tope es por prueba, por categoría o ambos. |
+| T02 | BLOQUEADA | `lib/legal/contenido.ts`, `lib/legal/requisitos.ts`, `tests/legal.test.ts` | Búsqueda de `Caparr` en `lib app components actions`: sin resultados. `typecheck` bloqueado por `tsc` ausente tras T01; `npm install` no pudo reparar `node_modules` (`ENOTEMPTY`/`EPERM`, archivos en uso). Revisión jurídica pendiente (LSSI-CE art. 10: identificación del prestador). |
+| T03 | OK | `docs/reglamento-tecnico.md`, `INFORME.md` | Tabla de `TAMANOS` transcrita; sin cambios de código. Pendiente de confirmación por la organización: si el tope es por prueba, por categoría o ambos. |
