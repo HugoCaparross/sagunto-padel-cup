@@ -12,7 +12,7 @@ export const DOCUMENTOS_INICIALES: Record<
         titulo: "Aviso legal",
         contenido: `## 1. Titular del sitio web
 
-Esta web es titularidad de Hugo Caparrós, que organiza el circuito amateur de pádel Sagunto Padel Cup en la comarca del Camp de Morvedre (Valencia).
+Esta web es titularidad de Sagunto Padel Cup, circuito amateur de pádel que se organiza en la comarca del Camp de Morvedre (Valencia). Por decisión de la organización, no se publican datos personales del titular.
 
 Contacto: saguntopadelcup@gmail.com
 
@@ -49,7 +49,7 @@ Esta web se rige por la legislación española. Para los consumidores, serán co
         titulo: "Política de privacidad",
         contenido: `## 1. Responsable del tratamiento
 
-El responsable del tratamiento es Hugo Caparrós, bajo el nombre comercial Sagunto Padel Cup. Para ejercer derechos o hacer consultas: saguntopadelcup@gmail.com.
+El responsable del tratamiento es Sagunto Padel Cup, a través de su organización. Para ejercer derechos o hacer consultas: saguntopadelcup@gmail.com.
 
 ## 2. Datos que se tratan y finalidades
 

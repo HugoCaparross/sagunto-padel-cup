@@ -1,7 +1,7 @@
 // Documentos legales de la web.
 // Adaptado a: web informativa, inscripciones registradas y confirmadas por el organizador,
 // pago en efectivo el primer día de la prueba, datos alojados en Supabase (Frankfurt, UE),
-// responsable: Hugo Caparrós, bajo el nombre comercial Sagunto Padel Cup.
+// responsable: Sagunto Padel Cup (sin datos personales publicados).
 //
 // Pendiente (LSSI-CE art. 10): sin NIF ni domicilio publicados, mientras haya cobros.
 
@@ -31,7 +31,7 @@ export const REQUISITOS: Requisito[] = [
         nombre: "Aviso legal",
         baseLegal: "Ley 34/2002 (LSSI-CE), art. 10",
         contenidoMinimo: [
-            "Titular: Hugo Caparrós, bajo el nombre comercial Sagunto Padel Cup",
+            "Titular: Sagunto Padel Cup",
             "Email de contacto",
             "Objeto de la web",
             "Aclaración de que la web no procesa pagos",
@@ -46,7 +46,7 @@ export const REQUISITOS: Requisito[] = [
         nombre: "Política de privacidad",
         baseLegal: "RGPD arts. 13-14; LOPDGDD",
         contenidoMinimo: [
-            "Responsable: Hugo Caparrós, con email para ejercer derechos",
+            "Responsable: Sagunto Padel Cup, con email para ejercer derechos",
             "Datos tratados y finalidades con base jurídica de cada uno",
             "Encargado: Supabase, región Frankfurt (Unión Europea)",
             "Pagos en efectivo: la web no guarda datos de pago",
