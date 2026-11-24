@@ -20,7 +20,7 @@ import {
 import {
     MAX_PAREJAS_POR_CATEGORIA,
     MIN_PAREJAS_CATEGORIA,
-    RONDAS,
+    FASES_CUADRO,
     enfrentamientos,
     plantillaPorDefecto,
     tamanosGrupos,
@@ -31,7 +31,7 @@ import {
     type Incidencia,
     type LadoEntrada,
     type PartidoEntrada,
-    type Ronda,
+    type FaseCuadro,
 } from "@/lib/cuadros/formatos";
 import {
     sortearGrupos,
@@ -143,7 +143,7 @@ const esquemaLado = z.discriminatedUnion("tipo", [
 const esquemaPartido = z.object({
     id: z.string().min(1).max(64),
     cuadro: z.enum(CUADROS),
-    ronda: z.enum(RONDAS),
+    ronda: z.enum(FASES_CUADRO),
     formato: z.enum(["fase_final", "final"]),
     orden: z.number().int().min(0),
     a: esquemaLado.nullable(),
@@ -851,7 +851,7 @@ export async function obtenerEditorLlaves(
             : elimRows.map((r) => ({
                 id: r.id,
                 cuadro: r.cuadro as Cuadro,
-                ronda: r.ronda as Ronda,
+                ronda: r.ronda as FaseCuadro,
                 formato: r.formato as "fase_final" | "final",
                 orden: r.orden,
                 a: ladoDesdeBD(r.inscripcion_a, r.origen_a),

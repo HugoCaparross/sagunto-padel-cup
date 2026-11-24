@@ -4,7 +4,7 @@ import {
     type PartidoGrupo,
     type SetJuego,
 } from "@/lib/cuadros/clasificacion";
-import type { Ronda } from "@/lib/cuadros/formatos";
+import type { FaseCuadro } from "@/lib/cuadros/formatos";
 
 export type RondaPuntos =
     | "campeon"
@@ -18,7 +18,7 @@ export type RondaPuntos =
 export type EliminatoriaFinal = {
     id: string;
     cuadro: Cuadro;
-    ronda: Exclude<Ronda, "round_robin">;
+    ronda: Exclude<FaseCuadro, "round_robin">;
     a: string | null;
     b: string | null;
     ganadorId: string | null;

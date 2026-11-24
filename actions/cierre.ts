@@ -10,7 +10,7 @@ import {
     type Cuadro,
 } from "@/lib/constantes";
 import type { SetJuego } from "@/lib/cuadros/clasificacion";
-import { RONDAS, type Ronda } from "@/lib/cuadros/formatos";
+import { FASES_CUADRO, type FaseCuadro } from "@/lib/cuadros/formatos";
 import {
     calcularPosiciones,
     type AutomaticoFinal,
@@ -166,12 +166,12 @@ async function calcularBD(
             continue;
         }
 
-        if (!(RONDAS as readonly string[]).includes(f.ronda)) continue;
+        if (!(FASES_CUADRO as readonly string[]).includes(f.ronda)) continue;
 
         eliminatorias.push({
             id: f.id,
             cuadro: f.cuadro,
-            ronda: f.ronda as Exclude<Ronda, "round_robin">,
+            ronda: f.ronda as Exclude<FaseCuadro, "round_robin">,
             a: f.inscripcion_a,
             b: f.inscripcion_b,
             ganadorId: f.ganador_id,

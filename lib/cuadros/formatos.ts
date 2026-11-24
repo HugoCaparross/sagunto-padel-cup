@@ -12,11 +12,11 @@ export const MIN_PARTIDOS_POR_PAREJA = 3;
 // ---------------------------------------------------------
 export type FasePartido = "grupo" | "fase_final" | "final";
 
-export const RONDAS = ["round_robin", "cuartos", "semifinal", "final"] as const;
-export type Ronda = (typeof RONDAS)[number];
+export const FASES_CUADRO = ["round_robin", "cuartos", "semifinal", "final"] as const;
+export type FaseCuadro = (typeof FASES_CUADRO)[number];
 
 // Una plaza solo puede depender de un partido de una ronda anterior.
-export const ORDEN_RONDA: Record<Ronda, number> = {
+export const ORDEN_RONDA: Record<FaseCuadro, number> = {
     round_robin: 0,
     cuartos: 1,
     semifinal: 2,
@@ -41,7 +41,7 @@ export type LadoEntrada =
 export type PartidoEntrada = {
     id: string;
     cuadro: Cuadro;
-    ronda: Ronda;
+    ronda: FaseCuadro;
     formato: "fase_final" | "final";
     orden: number;
     a: LadoEntrada | null;
@@ -112,7 +112,7 @@ export function enfrentamientos(
 // Es solo el punto de partida del editor. El organizador la modifica libremente.
 // Final de oro: 2 sets. Resto de finales: 1 set de 9 juegos.
 // ---------------------------------------------------------
-type Bloque = { cuadro: Cuadro; ronda: Ronda; veces: number };
+type Bloque = { cuadro: Cuadro; ronda: FaseCuadro; veces: number };
 
 const PLANTILLAS: Record<
     number,
@@ -205,7 +205,7 @@ const PLANTILLAS: Record<
     },
 };
 
-function formatoDe(cuadro: Cuadro, ronda: Ronda): "fase_final" | "final" {
+function formatoDe(cuadro: Cuadro, ronda: FaseCuadro): "fase_final" | "final" {
     return cuadro === "oro" && ronda === "final" ? "final" : "fase_final";
 }
 
