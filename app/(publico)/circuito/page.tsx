@@ -1,78 +1,77 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
+import GoogleIcon from "@/components/ui/GoogleIcon";
+import s from "./page.module.css";
 
 export const metadata: Metadata = { title: "El circuito" };
 
 const FORMATO = [
-    { titulo: "Grupos", texto: "Hasta 5 parejas juegan en un grupo. Desde 6, se forman dos grupos." },
-    { titulo: "Fase final", texto: "Según el número de parejas, se organizan los cuadros de oro, plata y bronce." },
-    { titulo: "Máster Final", texto: "Las mejores parejas de cada categoría se clasifican para la gran final de temporada." },
+    { numero: "01", titulo: "Fase de grupos", texto: "Las parejas compiten en grupos. Con hasta cinco parejas se juega un grupo; desde seis, se organizan dos." },
+    { numero: "02", titulo: "Cuadros finales", texto: "Al acabar los grupos, cada pareja pasa al cuadro que le corresponde y sigue compitiendo por el título." },
+    { numero: "03", titulo: "Race al Máster", texto: "Los resultados suman para el ranking. Las parejas mejor clasificadas pelean por un puesto en el Máster Final." },
+];
+
+const CUADROS = [
+    { nombre: "Oro", clase: s.oro, texto: "El cuadro principal. Las parejas compiten por el título y por los premios de la prueba." },
+    { nombre: "Plata", clase: s.plata, texto: "Una nueva oportunidad para luchar por la victoria y sumar experiencia." },
+    { nombre: "Bronce", clase: s.bronce, texto: "Más partidos y emoción hasta el final de la prueba para todas las parejas." },
 ];
 
 export default function PaginaCircuito() {
     return (
-        <main className="container space-y-16 py-12">
-            <header className="max-w-2xl space-y-4">
-                <h1 className="heading-font text-6xl">El circuito</h1>
-                <p className="text-lg text-[#68737D]">
-                    Sagunto Padel Cup es un circuito amateur de pádel en la comarca del Camp de Morvedre.
-                    Seis pruebas a lo largo de la temporada y un Máster Final que reúne a las mejores parejas.
-                </p>
-            </header>
-
-            <section className="space-y-6">
-                <h2 className="heading-font text-4xl">Cómo funciona</h2>
-                <ol className="grid gap-4 md:grid-cols-3">
-                    {FORMATO.map((f, i) => (
-                        <li key={f.titulo} className="space-y-3 rounded-xl bg-white p-6 ring-1 ring-[#D5D9DC]">
-                            <span className="heading-font text-4xl text-[#F0443A]">{i + 1}</span>
-                            <h3 className="font-semibold">{f.titulo}</h3>
-                            <p className="text-sm text-[#68737D]">{f.texto}</p>
-                        </li>
-                    ))}
-                </ol>
-            </section>
-
-            <section className="max-w-2xl space-y-4">
-                <h2 className="heading-font text-4xl">Cuadros</h2>
-                <p>
-                    Al terminar la fase de grupos, las parejas se reparten en tres cuadros. El{" "}
-                    <strong>oro</strong> reúne a las parejas con más opciones de título, el{" "}
-                    <strong>plata</strong> a las que llegan a la fase final desde posiciones intermedias y el{" "}
-                    <strong>bronce</strong> al resto de parejas, que siguen jugando hasta el final.
-                </p>
-                <p>
-                    Cada cuadro tiene su propio campeón, así que cualquier pareja tiene algo que jugarse en su
-                    categoría.
-                </p>
-            </section>
-
-            <section className="max-w-2xl space-y-4">
-                <h2 className="heading-font text-4xl">Race al Máster</h2>
-                <p>
-                    Los puntos se acumulan durante los últimos 12 meses. Las parejas mejor clasificadas en cada
-                    categoría, con un mínimo de dos pruebas disputadas, se clasifican directamente para el Máster
-                    Final.
-                </p>
-                <Link href="/puntos" className="inline-block text-sm underline">
-                    Ver el sistema de puntos
-                </Link>
-            </section>
-
-            <section className="rounded-2xl bg-[#0D1B2A] p-8 text-white">
-                <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
-                    <div className="space-y-2">
-                        <h2 className="heading-font text-3xl">¿Listo para jugar?</h2>
-                        <p className="text-white/70">Consulta el calendario y elige tu próxima prueba.</p>
+        <main className={s.pagina}>
+            <section className={s.hero}>
+                <Image src="/images/padel-hero.jpg" alt="Pista de pádel preparada para jugar" fill priority sizes="100vw" className={s.heroImagen} />
+                <div className={s.heroOverlay} />
+                <div className={`container ${s.heroContenido}`}>
+                    <p className={s.eyebrow}>Sagunto · Camp de Morvedre</p>
+                    <h1>El pádel de aquí.<br /><span>Un circuito para vivirlo.</span></h1>
+                    <p className={s.heroTexto}>Seis pruebas a lo largo de la temporada. Nuevos retos, grandes partidos y una comunidad que se encuentra en la pista.</p>
+                    <div className={s.acciones}>
+                        <Link href="/calendario" className={s.botonPrincipal}>Ver calendario <GoogleIcon name="arrow_forward" /></Link>
+                        <Link href="/registro" className={s.botonClaro}>Únete al circuito</Link>
                     </div>
-                    <Link
-                        href="/calendario"
-                        className="rounded-lg bg-[#F0443A] px-5 py-3 text-sm font-medium text-white"
-                    >
-                        Ver calendario
-                    </Link>
+                    <a href="#formato" className={s.bajar}>Descubre cómo funciona <span aria-hidden="true">↓</span></a>
                 </div>
             </section>
+
+            <section id="formato" className={s.formato}>
+                <div className="container">
+                    <header className={s.cabeceraSeccion}>
+                        <p className={s.eyebrowOscuro}>Tu temporada, punto a punto</p>
+                        <h2>Compite a tu ritmo.<br /><span>Juega por algo más.</span></h2>
+                        <p>Un formato pensado para disfrutar cada prueba y mantener la emoción durante toda la temporada.</p>
+                    </header>
+                    <ol className={s.pasos}>
+                        {FORMATO.map((paso) => <li key={paso.numero}><span className={s.numero}>{paso.numero}</span><h3>{paso.titulo}</h3><p>{paso.texto}</p></li>)}
+                    </ol>
+                </div>
+            </section>
+
+            <section className={s.cuadros}>
+                <div className={`container ${s.cuadrosGrid}`}>
+                    <div className={s.cuadrosIntro}>
+                        <p className={s.eyebrow}>Cada partido cuenta</p>
+                        <h2>Tres cuadros.<br />Una gran final.</h2>
+                        <p>Después de la fase de grupos, la competición continúa en cuadros adaptados a la clasificación. Cada pareja tiene un nuevo objetivo por el que jugar.</p>
+                        <Link href="/reglamento" className={s.enlaceClaro}>Consulta el reglamento <GoogleIcon name="arrow_forward" /></Link>
+                    </div>
+                    <div className={s.cuadrosLista}>
+                        {CUADROS.map((cuadro) => <article className={`${s.cuadro} ${cuadro.clase}`} key={cuadro.nombre}><span className={s.cuadroLinea} aria-hidden="true" /><div><h3>{cuadro.nombre}</h3><p>{cuadro.texto}</p></div><GoogleIcon name="arrow_outward" /></article>)}
+                    </div>
+                </div>
+            </section>
+
+            <section className={s.race}>
+                <div className={`container ${s.raceGrid}`}>
+                    <div><p className={s.eyebrowOscuro}>El camino al Máster</p><h2>Una temporada<br />que deja huella.</h2></div>
+                    <div className={s.raceCopy}><p>Los puntos del ranking reflejan el rendimiento de los últimos 12 meses. Cada prueba es una oportunidad para escalar posiciones y acercarse al Máster Final.</p><p>Las parejas mejor clasificadas de cada categoría, con al menos dos pruebas disputadas, consiguen su plaza para la gran final.</p><Link href="/ranking" className={s.botonOscuro}>Explorar el ranking <GoogleIcon name="arrow_forward" /></Link></div>
+                    <div className={s.raceDato}><strong>12</strong><span>meses de competición en el ranking</span></div><div className={s.raceDato}><strong>6</strong><span>pruebas para construir tu temporada</span></div>
+                </div>
+            </section>
+
+            <section className={s.cierre}><div className="container"><p className={s.eyebrow}>Nos vemos en la pista</p><h2>Tu próxima prueba<br />empieza aquí.</h2><Link href="/calendario" className={s.botonClaro}>Encuentra tu próxima prueba <GoogleIcon name="arrow_forward" /></Link></div></section>
         </main>
     );
 }

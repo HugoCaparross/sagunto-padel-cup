@@ -12,10 +12,7 @@ import s from "./home.module.css";
 type Props = { prueba: PruebaHome | null };
 
 function fechasDePrueba(prueba: PruebaHome): string {
-    const inicio = fechaLarga(prueba.fechaInicio);
-    return prueba.fechaFin !== prueba.fechaInicio
-        ? `${inicio} – ${fechaLarga(prueba.fechaFin)}`
-        : inicio;
+    return fechaLarga(prueba.fechaInicio);
 }
 
 export default function ProximaPrueba({ prueba }: Props) {

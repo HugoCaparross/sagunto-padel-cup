@@ -3,12 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { listarInscritos } from "@/actions/inscritos";
 import AgendaPartidos from "@/components/pruebas/AgendaPartidos";
+import GoogleIcon from "@/components/ui/GoogleIcon";
 import {
   CATEGORIAS,
   ETIQUETAS_CATEGORIA,
   ETIQUETAS_ESTADO_PRUEBA,
 } from "@/lib/constantes";
 import { euros, fechaLarga } from "@/lib/formato";
+import { fechaAperturaInscripciones, fechaCierreInscripciones, fechaDiaPrueba, formatoFechaClave } from "@/lib/pruebas/fechas-clave";
 import {
   cargarPartidosPublicos,
   listarPruebasPublicas,
@@ -58,10 +60,9 @@ export default async function PaginaPrueba({ params }: Props) {
 
         <dl className="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <dt className="text-[#68737D]">Fechas</dt>
+            <dt className="text-[#68737D]">Día del torneo</dt>
             <dd className="font-medium">
               {fechaLarga(prueba.fechaInicio)}
-              {prueba.fechaFin !== prueba.fechaInicio && ` – ${fechaLarga(prueba.fechaFin)}`}
             </dd>
           </div>
           <div>
@@ -89,6 +90,27 @@ export default async function PaginaPrueba({ params }: Props) {
             </dd>
           </div>
         </dl>
+
+        <section aria-labelledby="fechas-clave-titulo" className="rounded-xl border border-border bg-[#F7F8F6] p-5 sm:p-6">
+          <h2 id="fechas-clave-titulo" className="mb-4 font-semibold">Fechas clave</h2>
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="rounded-lg border border-border bg-white p-4 shadow-card">
+              <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#456C30]"><GoogleIcon name="event_available" />Apertura de inscripciones</p>
+              <time dateTime={fechaAperturaInscripciones(prueba.fechaInicio)} className="block font-semibold text-ink">{formatoFechaClave(fechaAperturaInscripciones(prueba.fechaInicio))}</time>
+              <p className="mt-1 text-xs text-muted">El viernes de tres semanas antes</p>
+            </div>
+            <div className="rounded-lg border border-border bg-white p-4 shadow-card">
+              <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-coral"><GoogleIcon name="event" />Cierre de inscripciones</p>
+              <time dateTime={fechaCierreInscripciones(prueba.fechaInicio)} className="block font-semibold text-ink">{formatoFechaClave(fechaCierreInscripciones(prueba.fechaInicio))}</time>
+              <p className="mt-1 text-xs text-muted">Dos días antes del torneo</p>
+            </div>
+            <div className="rounded-lg border border-border bg-white p-4 shadow-card">
+              <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-navy"><GoogleIcon name="sports_tennis" />Día del torneo</p>
+              <time dateTime={fechaDiaPrueba(prueba.fechaInicio)} className="block font-semibold text-ink">{formatoFechaClave(fechaDiaPrueba(prueba.fechaInicio))}</time>
+              <p className="mt-1 text-xs text-muted">Una sola jornada</p>
+            </div>
+          </div>
+        </section>
 
         {inscribible ? (
           <Link

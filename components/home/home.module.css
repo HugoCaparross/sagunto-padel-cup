@@ -1666,6 +1666,13 @@
     background: #faf8f7;
 }
 
+.rankFila.rankOro { background: linear-gradient(90deg, rgb(233 195 83 / 0.18), rgb(255 255 255 / 0.96) 72%); }
+.rankFila.rankPlata { background: linear-gradient(90deg, rgb(157 169 177 / 0.2), rgb(255 255 255 / 0.96) 72%); }
+.rankFila.rankBronce { background: linear-gradient(90deg, rgb(187 125 82 / 0.18), rgb(255 255 255 / 0.96) 72%); }
+.rankFila.rankOro .rankPos { color: #94700e; }
+.rankFila.rankPlata .rankPos { color: #66737d; }
+.rankFila.rankBronce .rankPos { color: #95603d; }
+
 .rankVacio {
     display: grid;
     justify-items: center;
@@ -2046,19 +2053,6 @@
     transform: scale(1.04);
 }
 
-.premioIcono {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    width: 2.5rem;
-    height: 2.5rem;
-    place-items: center;
-    border: 1px solid rgb(255 255 255 / 0.34);
-    border-radius: 50%;
-    background: rgb(255 255 255 / 0.16);
-    color: #ffe193;
-    font-size: 1.25rem;
-}
 
 .premioCuadro {
     position: relative;

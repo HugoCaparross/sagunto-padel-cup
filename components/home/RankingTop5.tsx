@@ -124,7 +124,7 @@ export default function RankingTop5({ ranking, rankingGeneral }: Props) {
                             ) : (
                                 <ol className={s.rankLista} aria-label={`Ranking ${etiquetaCategoria(activa)}`}>
                                     {filas.map((fila) => (
-                                        <li key={`${fila.jugadorId ?? fila.nombre}-${fila.posicion}`} className={s.rankFila}>
+                                        <li key={`${fila.jugadorId ?? fila.nombre}-${fila.posicion}`} className={`${s.rankFila} ${fila.posicion === 1 ? s.rankOro : fila.posicion === 2 ? s.rankPlata : fila.posicion === 3 ? s.rankBronce : ""}`}>
                                             <span className={s.rankPos}>{fila.posicion}</span>
                                             <span className={s.rankAvatar}>
                                                 <Image

@@ -17,10 +17,7 @@ const ESTILO_ESTADO: Record<EstadoPrueba, string> = {
 };
 
 export default function TarjetaPrueba({ prueba }: { prueba: PruebaPublica }) {
-    const fechas =
-        prueba.fechaFin !== prueba.fechaInicio
-            ? `${fechaCorta(prueba.fechaInicio)} – ${fechaCorta(prueba.fechaFin)}`
-            : fechaCorta(prueba.fechaInicio);
+    const fecha = fechaCorta(prueba.fechaInicio);
 
     return (
         <Link
@@ -28,7 +25,7 @@ export default function TarjetaPrueba({ prueba }: { prueba: PruebaPublica }) {
             className={estilos.tarjeta}
         >
             <div className={estilos.cabecera}>
-                <p className={estilos.fechas}>{fechas}</p>
+                <p className={estilos.fechas}>{fecha}</p>
                 <span className={`${estilos.estado} ${ESTILO_ESTADO[prueba.estado]}`}>
                     {ETIQUETAS_ESTADO_PRUEBA[prueba.estado]}
                 </span>

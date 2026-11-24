@@ -14,10 +14,7 @@ type Props = {
 };
 
 function fechasDePrueba(prueba: PruebaHome): string {
-    const inicio = fechaLarga(prueba.fechaInicio);
-    return prueba.fechaFin !== prueba.fechaInicio
-        ? `${inicio} – ${fechaLarga(prueba.fechaFin)}`
-        : inicio;
+    return fechaLarga(prueba.fechaInicio);
 }
 
 export default function Hero({ temporada, proxima, pruebas, proximaHref }: Props) {

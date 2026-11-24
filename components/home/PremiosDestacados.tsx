@@ -105,10 +105,6 @@ export default function PremiosDestacados({ pruebas, pruebaInicialId }: Props) {
                                             sizes="(max-width: 760px) 90vw, 25vw"
                                             className={s.premioImagen}
                                         />
-                                        <GoogleIcon
-                                            name={premio && !premio.revelado ? "lock" : "emoji_events"}
-                                            className={s.premioIcono}
-                                        />
                                         <span className={s.premioCuadro}>
                                             Campeón y subcampeón · Oro
                                         </span>

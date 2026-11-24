@@ -29,14 +29,9 @@ const ESTADO_ICONO: Record<EstadoPrueba, GoogleIconName> = {
 
 function rangoCorto(p: PruebaHome): string {
     const ini = new Date(`${p.fechaInicio}T12:00:00Z`);
-    const fin = new Date(`${p.fechaFin}T12:00:00Z`);
     const mes = ini.toLocaleDateString("es-ES", { month: "short", timeZone: "UTC" }).replace(".", "");
     const mesCap = mes.charAt(0).toUpperCase() + mes.slice(1);
-    const dias =
-        p.fechaFin !== p.fechaInicio
-            ? `${ini.getUTCDate()} – ${fin.getUTCDate()}`
-            : `${ini.getUTCDate()}`;
-    return `${dias} ${mesCap}`;
+    return `${ini.getUTCDate()} ${mesCap}`;
 }
 
 const FOTOS_PRUEBA = [

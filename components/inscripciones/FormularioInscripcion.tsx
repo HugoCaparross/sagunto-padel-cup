@@ -93,8 +93,7 @@ export default function FormularioInscripcion({ datos }: { datos: DatosInscripci
             <header className="space-y-2">
                 <h1 className="text-2xl font-semibold">Inscribirse en {prueba.nombre}</h1>
                 <p className="text-sm text-muted">
-                    {fechaLarga(prueba.fechaInicio)}
-                    {prueba.fechaFin !== prueba.fechaInicio && ` – ${fechaLarga(prueba.fechaFin)}`} ·{" "}
+                    {fechaLarga(prueba.fechaInicio)} ·{" "}
                     {prueba.sede}
                 </p>
             </header>
