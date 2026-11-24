@@ -13,3 +13,6 @@
 | Tarea | Estado | Archivos tocados | Comandos y resultado |
 |---|---|---|---|
 | T00 | OK | `INFORME.md` | `npm install`, `npm run typecheck`, `npm test` (45 OK), `npm run lint` (0 errores, 11 warnings). |
+| T01 | BLOQUEADA | `INFORME.md` | `npm ci` en el repo falla con `EPERM` al quitar `node_modules/lightningcss-win32-x64-msvc/lightningcss.win32-x64-msvc.node` (archivo en uso). Tras regenerar el lock, una instalación limpia temporal falla con `EUSAGE`: falta `@emnapi/runtime@` en el lock. Revertí el lockfile para no dejar una instalación inconsistente. |
+
+T01 queda bloqueada por dos causas reproducibles: binarios nativos abiertos en el workspace y una dependencia `@emnapi` que npm 11 no resuelve correctamente en el lockfile. No cerré procesos externos porque pueden pertenecer al servidor de desarrollo del usuario.
