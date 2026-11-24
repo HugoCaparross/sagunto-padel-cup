@@ -26,3 +26,18 @@ T01 queda bloqueada por dos causas reproducibles: binarios nativos abiertos en e
 | T04 | BLOQUEADA | `actions/checkin.ts`, `actions/contacto.ts`, `actions/estadisticas.ts`, `actions/horarios.ts`, `actions/legal.ts`, `actions/noticias.ts`, `actions/patrocinio.ts`, `actions/simulador.ts`, `components/analitica/Graficas.tsx`, `components/horarios/EditorHorarios.tsx`, `lib/jugadores/publico.ts` | Quitados imports/declaración/comentario comprobados sin uso. No se pudo confirmar `lint` sin warnings: `npm install` terminó con `ENOTEMPTY`/`EPERM` al limpiar archivos de `node_modules` abiertos; `tsc` tampoco está disponible. |
 | T05 | BLOQUEADA | `lib/cuadros/formatos.ts`, `actions/cuadros.ts`, `actions/cierre.ts`, `lib/cuadros/posiciones.ts` | Renombrado `RONDAS`/`Ronda` propios de formatos a `FASES_CUADRO`/`FaseCuadro`; `rg` en `lib/cuadros` y usos afectados no encuentra nombres antiguos. `typecheck` pendiente porque falta `tsc` en `node_modules` tras T01. |
 | T06 | BLOQUEADA | `tests/escala-espejo.test.ts` | Test añadido para extraer las filas del `insert into public.points_scale` y comparar 28 valores; inspección estática de las 28 filas no detecta diferencias. No se puede ejecutar `vitest` porque `node_modules` quedó incompleto tras T01. |
+| T07 | BLOQUEADA | `lib/patrocinio/publico.ts`, `INFORME.md` | Auditoría: `sitemap` filtra noticias publicadas, pruebas con estado distinto de `proxima` y perfiles visibles; perfiles públicos filtran visibilidad y ocultan datos deportivos si son privados; pruebas usan cliente de servidor sujeto a RLS (el enum no tiene estado borrador); ranking solo expone nombres/fotos al comprobar visibilidad; cuenta filtra inscripciones por `jugador_1/jugador_2` y puntos por `jugador_id`. Corregido histórico de patrocinadores para limitar a `activo = true`. Premios: cuadro oro, descripción oculta hasta `revelar_at`; `NULL` se interpreta como publicación inmediata en la regla existente. Tipos/tests bloqueados por `node_modules` incompleto. |
+
+### Detalle de auditoría T07
+
+| Consulta | Filtro / privacidad | Resultado |
+|---|---|---|
+| `app/sitemap.ts` noticias | `publicada = true` | OK |
+| `app/sitemap.ts` pruebas | `estado <> proxima` | OK |
+| `app/sitemap.ts` perfiles | `visibilidad_publica = true` | OK |
+| `lib/jugadores/publico.ts` ficha/listado | La ficha privada retorna `null` salvo propietario; listado filtra visibilidad; datos deportivos solo visibles para perfil público | OK |
+| `lib/pruebas/publico.ts` | Cliente de servidor con RLS pública; enum sin estado borrador | OK |
+| `lib/patrocinio/publico.ts` patrocinadores | Activos en ficha e histórico | CORREGIDO (histórico admin añadía activos) |
+| `lib/patrocinio/publico.ts` premios | Solo cuadro Oro; `revelar_at` futuro oculta descripción y `NULL` publica de inmediato | OK; regla observada, no se cambia |
+| `lib/ranking/cargar.ts` | Nombre anonimizado al mapear ranking; fotos firmadas solo para IDs visibles en home | OK |
+| `lib/cuenta/cargar.ts` | Inscripciones limitadas por `jugador_1/jugador_2`; puntos por `jugador_id` | OK |

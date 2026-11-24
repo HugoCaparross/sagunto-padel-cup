@@ -115,7 +115,8 @@ export async function historicoPatrocinadores(): Promise<HistoricoPatrocinador[]
             supabase.from("prueba_patrocinadores").select("prueba_id, patrocinador_id"),
             admin
                 .from("patrocinadores")
-                .select("id, nombre, logo_url, web_url, tipo"),
+                .select("id, nombre, logo_url, web_url, tipo")
+                .eq("activo", true),
         ]);
     if (errorEnlaces) throw new Error(errorEnlaces.message);
     if (errorPatros) throw new Error(errorPatros.message);
