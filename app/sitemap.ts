@@ -36,7 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .neq("estado", "proxima"),
     admin
       .from("perfiles")
-      .select("id, created_at")
+      .select("slug, created_at")
       .eq("visibilidad_publica", true),
   ]);
 
@@ -60,13 +60,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  // Solo jugadores con perfil público. Se enlazan por id, que es la ruta que usa la web.
-  const entradasJugadores: MetadataRoute.Sitemap = (jugadores ?? []).map((j) => ({
-    url: url(`/jugadores/${j.id}`),
-    lastModified: new Date(j.created_at),
-    changeFrequency: "weekly",
-    priority: 0.5,
-  }));
+  // Solo jugadores con perfil público; la ficha usa slug legible.
+  const entradasJugadores: MetadataRoute.Sitemap = (jugadores ?? []).flatMap((j) =>
+    j.slug
+      ? [{
+          url: url(`/jugadores/${j.slug}`),
+          lastModified: new Date(j.created_at),
+          changeFrequency: "weekly",
+          priority: 0.5,
+        }]
+      : []
+  );
 
   return [...fijas, ...entradasNoticias, ...entradasPruebas, ...entradasJugadores];
 }

@@ -497,6 +497,7 @@ export type Database = {
           nombre: string
           onboarding_completado_at: string | null
           rol: string
+          slug: string | null
           talla_camiseta: string | null
           visibilidad_publica: boolean
         }
@@ -508,6 +509,7 @@ export type Database = {
           nombre?: string
           onboarding_completado_at?: string | null
           rol?: string
+          slug?: string | null
           talla_camiseta?: string | null
           visibilidad_publica?: boolean
         }
@@ -519,6 +521,7 @@ export type Database = {
           nombre?: string
           onboarding_completado_at?: string | null
           rol?: string
+          slug?: string | null
           talla_camiseta?: string | null
           visibilidad_publica?: boolean
         }

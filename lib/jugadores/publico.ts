@@ -36,7 +36,7 @@ type PerfilFila = {
 // Devuelve null si el perfil no existe o es privado y no es el del propio usuario.
 // Así no se confirma que un jugador privado está registrado.
 export async function cargarFichaPublica(
-    id: string,
+    slug: string,
     usuarioActual: string | null
 ): Promise<FichaPublica | null> {
     const admin = crearClienteAdmin();
@@ -44,20 +44,20 @@ export async function cargarFichaPublica(
     const { data, error } = await admin
         .from("perfiles")
         .select("id, nombre, visibilidad_publica, datos_deportivos")
-        .eq("id", id)
+        .eq("slug", slug)
         .maybeSingle<PerfilFila>();
     if (error) throw new Error(error.message);
     if (!data) return null;
 
-    const esPropio = usuarioActual === id;
+    const esPropio = usuarioActual === data.id;
     if (!data.visibilidad_publica && !esPropio) return null;
 
-    const estadisticas = await estadisticasHistoricas(id);
+    const estadisticas = await estadisticasHistoricas(data.id);
 
     const { data: puntosData, error: errorPuntos } = await admin
         .from("puntos_prueba")
         .select("categoria, cuadro, ronda, puntos, fecha, prueba:pruebas(nombre)")
-        .eq("jugador_id", id)
+        .eq("jugador_id", data.id)
         .order("fecha", { ascending: false });
     if (errorPuntos) throw new Error(errorPuntos.message);
 
@@ -91,7 +91,7 @@ export async function cargarFichaPublica(
             referencia: hoy,
             puntos: datos.puntos,
             partidos: datos.partidos,
-        }).find((f) => f.clave === id);
+        }).find((f) => f.clave === data.id);
         return fila ? [{ categoria, posicion: fila.posicion, puntos: fila.puntos }] : [];
     });
 
