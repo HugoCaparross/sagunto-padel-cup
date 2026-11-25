@@ -1,5 +1,6 @@
 import { esCategoria, esRonda, type Categoria } from "@/lib/constantes";
 import { crearClienteAdmin } from "@/lib/supabase/server";
+import { fotoPublicable } from "@/lib/jugadores/fotos-publicas";
 import {
     calcularRanking,
     type FilaRanking,
@@ -17,7 +18,12 @@ export type FilaRankingPublico = FilaRanking & {
 type FilaPrueba = { id: string; fecha_fin: string; es_master: boolean };
 type FilaInscripcion = { id: string; jugador_1: string; jugador_2: string | null };
 type FilaPerfil = { id: string; nombre: string; visibilidad_publica: boolean };
-type FilaFotoPerfil = { id: string; foto_perfil_path: string | null };
+type FilaFotoPerfil = {
+    id: string;
+    foto_perfil_path: string | null;
+    visibilidad_publica: boolean;
+    consentimiento_imagen: boolean;
+};
 type FilaPuntos = {
     jugador_id: string;
     prueba_id: string;
@@ -82,7 +88,7 @@ export async function cargarDatosRanking(
     );
     const { data: fotosData, error: errorFotos } = await supabase
         .from("perfiles")
-        .select("id, foto_perfil_path");
+        .select("id, foto_perfil_path, visibilidad_publica, consentimiento_imagen");
     if (errorFotos?.code === "42703") {
         console.warn(
             "[ranking] Falta la columna perfiles.foto_perfil_path; aplica la migración de fotos de perfil."
@@ -92,14 +98,20 @@ export async function cargarDatosRanking(
     }
 
     const rutasFotos = new Map(
-        ((fotosData ?? []) as FilaFotoPerfil[]).map((fila) => [fila.id, fila.foto_perfil_path])
+        ((fotosData ?? []) as FilaFotoPerfil[]).map((fila) => [fila.id, fila])
     );
     const perfiles = new Map<string, { nombre: string; visible: boolean; fotoPath: string | null }>();
     for (const p of filasPerfiles) {
         perfiles.set(p.id, {
             nombre: p.nombre,
             visible: p.visibilidad_publica,
-            fotoPath: rutasFotos.get(p.id) ?? null,
+            fotoPath: fotoPublicable({
+                ...(rutasFotos.get(p.id) ?? {
+                    foto_perfil_path: null,
+                    visibilidad_publica: false,
+                    consentimiento_imagen: false,
+                }),
+            }),
         });
     }
 
