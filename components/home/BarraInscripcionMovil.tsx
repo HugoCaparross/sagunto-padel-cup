@@ -33,7 +33,7 @@ export default function BarraInscripcionMovil({
             </p>
             <Link href={`/inscribirse/${slug}`} className="btn btn-primario shrink-0">
                 <GoogleIcon name="sports_tennis" />
-                Inscribirme
+                {plazasLibres > 0 ? "Inscribirme" : "Apuntarme a lista de espera"}
             </Link>
         </div>
     );
