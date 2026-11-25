@@ -165,6 +165,8 @@ export async function crearPrueba(entrada: unknown): Promise<AccionCrearPrueba> 
                 nombre: d.nombre,
                 fecha_inicio: d.fechaInicio,
                 fecha_fin: d.fechaFin,
+                inscripciones_abren_at: d.inscripcionesAbrenAt ?? null,
+                inscripciones_cierran_at: d.inscripcionesCierranAt ?? null,
                 hora_inicio: d.horaInicio,
                 hora_fin: d.horaFin,
                 sede: d.sede,

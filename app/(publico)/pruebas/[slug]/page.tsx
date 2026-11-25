@@ -10,7 +10,7 @@ import {
   ETIQUETAS_ESTADO_PRUEBA,
 } from "@/lib/constantes";
 import { euros, fechaLarga } from "@/lib/formato";
-import { fechaAperturaInscripciones, fechaCierreInscripciones, fechaDiaPrueba, formatoFechaClave } from "@/lib/pruebas/fechas-clave";
+import { formatoFechaInscripcion } from "@/lib/pruebas/fechas-clave";
 import {
   cargarPartidosPublicos,
   listarPruebasPublicas,
@@ -63,6 +63,7 @@ export default async function PaginaPrueba({ params }: Props) {
             <dt className="text-[#68737D]">Día del torneo</dt>
             <dd className="font-medium">
               {fechaLarga(prueba.fechaInicio)}
+              {prueba.fechaFin !== prueba.fechaInicio && ` – ${fechaLarga(prueba.fechaFin)}`}
             </dd>
           </div>
           <div>
@@ -96,18 +97,18 @@ export default async function PaginaPrueba({ params }: Props) {
           <div className="grid gap-3 md:grid-cols-3">
             <div className="rounded-lg border border-border bg-white p-4 shadow-card">
               <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#456C30]"><GoogleIcon name="event_available" />Apertura de inscripciones</p>
-              <time dateTime={fechaAperturaInscripciones(prueba.fechaInicio)} className="block font-semibold text-ink">{formatoFechaClave(fechaAperturaInscripciones(prueba.fechaInicio))}</time>
-              <p className="mt-1 text-xs text-muted">El viernes de tres semanas antes</p>
+              {prueba.inscripcionesAbrenAt ? <time dateTime={prueba.inscripcionesAbrenAt} className="block font-semibold text-ink">{formatoFechaInscripcion(prueba.inscripcionesAbrenAt)}</time> : <p className="font-semibold text-ink">{formatoFechaInscripcion(null)}</p>}
+              <p className="mt-1 text-xs text-muted">{prueba.inscripcionesAbrenAt ? "Fecha indicada por la organización" : "La organización la anunciará"}</p>
             </div>
             <div className="rounded-lg border border-border bg-white p-4 shadow-card">
               <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-coral"><GoogleIcon name="event" />Cierre de inscripciones</p>
-              <time dateTime={fechaCierreInscripciones(prueba.fechaInicio)} className="block font-semibold text-ink">{formatoFechaClave(fechaCierreInscripciones(prueba.fechaInicio))}</time>
-              <p className="mt-1 text-xs text-muted">Dos días antes del torneo</p>
+              {prueba.inscripcionesCierranAt ? <time dateTime={prueba.inscripcionesCierranAt} className="block font-semibold text-ink">{formatoFechaInscripcion(prueba.inscripcionesCierranAt)}</time> : <p className="font-semibold text-ink">{formatoFechaInscripcion(null)}</p>}
+              <p className="mt-1 text-xs text-muted">{prueba.inscripcionesCierranAt ? "Fecha indicada por la organización" : "La organización la anunciará"}</p>
             </div>
             <div className="rounded-lg border border-border bg-white p-4 shadow-card">
               <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-navy"><GoogleIcon name="sports_tennis" />Día del torneo</p>
-              <time dateTime={fechaDiaPrueba(prueba.fechaInicio)} className="block font-semibold text-ink">{formatoFechaClave(fechaDiaPrueba(prueba.fechaInicio))}</time>
-              <p className="mt-1 text-xs text-muted">Una sola jornada</p>
+              <p className="font-semibold text-ink">{fechaLarga(prueba.fechaInicio)}{prueba.fechaFin !== prueba.fechaInicio && ` – ${fechaLarga(prueba.fechaFin)}`}</p>
+              <p className="mt-1 text-xs text-muted">Fechas del torneo</p>
             </div>
           </div>
         </section>

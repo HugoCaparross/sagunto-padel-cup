@@ -14,6 +14,8 @@ export type PruebaPublica = {
     estado: EstadoPrueba;
     fechaInicio: string;
     fechaFin: string;
+    inscripcionesAbrenAt: string | null;
+    inscripcionesCierranAt: string | null;
     horaInicio: string;
     horaFin: string;
     sede: string;
@@ -48,6 +50,8 @@ type PruebaRow = {
     estado: EstadoPrueba;
     fecha_inicio: string;
     fecha_fin: string;
+    inscripciones_abren_at: string | null;
+    inscripciones_cierran_at: string | null;
     hora_inicio: string;
     hora_fin: string;
     sede: string;
@@ -83,7 +87,7 @@ export async function listarPruebasPublicas(): Promise<PruebaPublica[]> {
         supabase
             .from("pruebas")
             .select(
-                "id, slug, nombre, estado, fecha_inicio, fecha_fin, hora_inicio, hora_fin, sede, sede_url, precio_pareja_centimos, es_master, plazas_maximas"
+                "id, slug, nombre, estado, fecha_inicio, fecha_fin, inscripciones_abren_at, inscripciones_cierran_at, hora_inicio, hora_fin, sede, sede_url, precio_pareja_centimos, es_master, plazas_maximas"
             )
             .order("fecha_inicio", { ascending: true }),
         supabase.from("prueba_categorias").select("prueba_id, categoria"),
@@ -113,6 +117,8 @@ export async function listarPruebasPublicas(): Promise<PruebaPublica[]> {
         estado: p.estado,
         fechaInicio: p.fecha_inicio,
         fechaFin: p.fecha_fin,
+        inscripcionesAbrenAt: p.inscripciones_abren_at,
+        inscripcionesCierranAt: p.inscripciones_cierran_at,
         horaInicio: p.hora_inicio.slice(0, 5),
         horaFin: p.hora_fin.slice(0, 5),
         sede: p.sede,

@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { CATEGORIAS, ETIQUETAS_CATEGORIA, ETIQUETAS_ESTADO_PRUEBA } from "@/lib/constantes";
 import type { PruebaPublica } from "@/lib/pruebas/publico";
-import { fechaAperturaInscripciones, fechaCierreInscripciones, fechaDiaPrueba, formatoFechaClave } from "@/lib/pruebas/fechas-clave";
+import { fechaLarga } from "@/lib/formato";
+import { formatoFechaInscripcion } from "@/lib/pruebas/fechas-clave";
 import GoogleIcon from "@/components/ui/GoogleIcon";
 import s from "./page.module.css";
 
@@ -66,25 +67,27 @@ export default function CalendarBrowser({ pruebas }: { pruebas: PruebaPublica[] 
 
   return <div className={s.browser}>
     <header className={s.browserCabecera}>
-      <div><p className={s.eyebrowOscuro}>Fechas importantes de cada prueba</p><h2>Tres momentos para tener en cuenta</h2><p>Consulta cuándo se abren las inscripciones, cuándo se cierran y qué día se juega cada torneo.</p></div>
+      <div><p className={s.eyebrowOscuro}>Fechas importantes de cada prueba</p><h2>Tres momentos para tener en cuenta</h2><p>Consulta cuándo se abren las inscripciones, cuándo se cierran y qué días se juega cada torneo.</p></div>
       <div className={s.filtros}><Selector etiqueta="Categoría" valor={categoria} opciones={OPCIONES_CATEGORIA} alCambiar={setCategoria} /><Selector etiqueta="Estado" valor={estado} opciones={OPCIONES_ESTADO} alCambiar={setEstado} /></div>
     </header>
 
     <p className={s.cuentaPruebas}><strong>{visibles.length}</strong> {visibles.length === 1 ? "prueba" : "pruebas"}</p>
     {visibles.length > 0 ? <ol className={s.listaPruebas}>
       {visibles.map((prueba) => {
-        const apertura = fechaAperturaInscripciones(prueba.fechaInicio);
-        const cierre = fechaCierreInscripciones(prueba.fechaInicio);
-        const torneo = fechaDiaPrueba(prueba.fechaInicio);
+        const apertura = prueba.inscripcionesAbrenAt;
+        const cierre = prueba.inscripcionesCierranAt;
+        const torneo = prueba.fechaInicio === prueba.fechaFin
+          ? fechaLarga(prueba.fechaInicio)
+          : `${fechaLarga(prueba.fechaInicio)} – ${fechaLarga(prueba.fechaFin)}`;
         return <li key={prueba.id}>
           <Link href={`/pruebas/${prueba.slug}`} className={s.tarjetaPrueba}>
             <header className={s.tarjetaCabecera}><div><p className={s.tarjetaEyebrow}>{prueba.esMaster ? "Máster Final" : "Prueba del circuito"}</p><h3>{prueba.nombre}</h3></div><span className={s.estadoPrueba} data-estado={prueba.estado}>{ETIQUETAS_ESTADO_PRUEBA[prueba.estado]}</span></header>
             <div className={s.hitos}>
-              <div className={`${s.hito} ${s.hitoApertura}`}><span className={s.hitoIcono}><GoogleIcon name="event_available" /></span><span className={s.hitoTexto}><span className={s.hitoEtiqueta}>Apertura de inscripciones</span><time dateTime={apertura}>{formatoFechaClave(apertura)}</time><small>Viernes, tres semanas antes</small></span></div>
+              <div className={`${s.hito} ${s.hitoApertura}`}><span className={s.hitoIcono}><GoogleIcon name="event_available" /></span><span className={s.hitoTexto}><span className={s.hitoEtiqueta}>Apertura de inscripciones</span>{apertura ? <time dateTime={apertura}>{formatoFechaInscripcion(apertura)}</time> : <span>{formatoFechaInscripcion(apertura)}</span>}<small>{apertura ? "Fecha indicada por la organización" : "La organización la anunciará"}</small></span></div>
               <div className={s.hito}>
-                <span className={s.hitoIcono}><GoogleIcon name="event" /></span><span className={s.hitoTexto}><span className={s.hitoEtiqueta}>Cierre de inscripciones</span><time dateTime={cierre}>{formatoFechaClave(cierre)}</time><small>Dos días antes del torneo</small></span>
+                <span className={s.hitoIcono}><GoogleIcon name="event" /></span><span className={s.hitoTexto}><span className={s.hitoEtiqueta}>Cierre de inscripciones</span>{cierre ? <time dateTime={cierre}>{formatoFechaInscripcion(cierre)}</time> : <span>{formatoFechaInscripcion(cierre)}</span>}<small>{cierre ? "Fecha indicada por la organización" : "La organización la anunciará"}</small></span>
               </div>
-              <div className={`${s.hito} ${s.hitoTorneo}`}><span className={s.hitoIcono}><GoogleIcon name="sports_tennis" /></span><span className={s.hitoTexto}><span className={s.hitoEtiqueta}>Día del torneo</span><time dateTime={torneo}>{formatoFechaClave(torneo)}</time><small>Una sola jornada</small></span></div>
+              <div className={`${s.hito} ${s.hitoTorneo}`}><span className={s.hitoIcono}><GoogleIcon name="sports_tennis" /></span><span className={s.hitoTexto}><span className={s.hitoEtiqueta}>{prueba.fechaInicio === prueba.fechaFin ? "Día del torneo" : "Fechas del torneo"}</span><span>{torneo}</span><small>Calendario del torneo</small></span></div>
             </div>
             <footer className={s.tarjetaPie}><span><GoogleIcon name="location_on" />{prueba.sede}</span><span>{prueba.categorias.map((categoriaPrueba) => ETIQUETAS_CATEGORIA[categoriaPrueba]).join(" · ")}</span><span className={s.verPrueba}>Ver detalles <GoogleIcon name="arrow_forward" /></span></footer>
           </Link>

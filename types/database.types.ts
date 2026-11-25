@@ -683,6 +683,8 @@ export type Database = {
       pruebas: {
         Row: {
           created_at: string
+          inscripciones_abren_at: string | null
+          inscripciones_cierran_at: string | null
           descanso_min: number
           duracion_fase_final_min: number
           duracion_final_min: number
@@ -704,6 +706,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          inscripciones_abren_at?: string | null
+          inscripciones_cierran_at?: string | null
           descanso_min?: number
           duracion_fase_final_min?: number
           duracion_final_min?: number
@@ -725,6 +729,8 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          inscripciones_abren_at?: string | null
+          inscripciones_cierran_at?: string | null
           descanso_min?: number
           duracion_fase_final_min?: number
           duracion_final_min?: number

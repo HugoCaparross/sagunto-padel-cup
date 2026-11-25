@@ -16,6 +16,8 @@ export const esquemaCrearPrueba = z
             .optional(),
         fechaInicio: FECHA,
         fechaFin: FECHA,
+        inscripcionesAbrenAt: z.iso.datetime({ offset: true }).nullable().optional(),
+        inscripcionesCierranAt: z.iso.datetime({ offset: true }).nullable().optional(),
         horaInicio: HORA,
         horaFin: HORA,
         sede: z.string().trim().min(2, "Indica la sede").max(120),
@@ -32,4 +34,27 @@ export const esquemaCrearPrueba = z
     .refine((d) => d.horaFin > d.horaInicio, {
         message: "La hora de fin debe ser posterior a la de inicio",
         path: ["horaFin"],
+    })
+    .refine((d) => {
+        if (!d.inscripcionesAbrenAt || !d.inscripcionesCierranAt) return true;
+        return Date.parse(d.inscripcionesCierranAt) > Date.parse(d.inscripcionesAbrenAt);
+    }, {
+        message: "El cierre debe ser posterior a la apertura",
+        path: ["inscripcionesCierranAt"],
+    })
+    .refine((d) => {
+        if (!d.inscripcionesAbrenAt || !d.inscripcionesCierranAt) return true;
+        const localInicio = new Intl.DateTimeFormat("sv-SE", {
+            timeZone: "Europe/Madrid",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hourCycle: "h23",
+        }).format(new Date(d.inscripcionesCierranAt)).replace(" ", "T");
+        return localInicio < `${d.fechaInicio}T${d.horaInicio}`;
+    }, {
+        message: "El cierre debe ser anterior al inicio de la prueba",
+        path: ["inscripcionesCierranAt"],
     });

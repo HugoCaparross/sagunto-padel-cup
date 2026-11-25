@@ -24,6 +24,10 @@ export default function FormularioPrueba() {
         const euros = Number(String(f.get("precio") ?? "").replace(",", "."));
         const slug = String(f.get("slug") ?? "").trim();
         const sedeUrl = String(f.get("sedeUrl") ?? "").trim();
+        const aIso = (value: FormDataEntryValue | null) => {
+            const fechaLocal = String(value ?? "");
+            return fechaLocal ? new Date(fechaLocal).toISOString() : null;
+        };
 
         setEnviando(true);
         setError(null);
@@ -33,6 +37,8 @@ export default function FormularioPrueba() {
             slug: slug || undefined,
             fechaInicio: String(f.get("fechaInicio") ?? ""),
             fechaFin: String(f.get("fechaFin") ?? ""),
+            inscripcionesAbrenAt: aIso(f.get("inscripcionesAbrenAt")),
+            inscripcionesCierranAt: aIso(f.get("inscripcionesCierranAt")),
             horaInicio: String(f.get("horaInicio") ?? ""),
             horaFin: String(f.get("horaFin") ?? ""),
             sede: String(f.get("sede") ?? ""),
@@ -75,6 +81,16 @@ export default function FormularioPrueba() {
                 <label className="flex flex-col gap-1 text-sm">
                     <span className="text-[#68737D]">Fecha de fin</span>
                     <input name="fechaFin" type="date" required className={campo} />
+                </label>
+
+                <label className="flex flex-col gap-1 text-sm">
+                    <span className="text-[#68737D]">Abren inscripciones</span>
+                    <input name="inscripcionesAbrenAt" type="datetime-local" className={campo} />
+                </label>
+
+                <label className="flex flex-col gap-1 text-sm">
+                    <span className="text-[#68737D]">Cierran inscripciones</span>
+                    <input name="inscripcionesCierranAt" type="datetime-local" className={campo} />
                 </label>
 
                 <label className="flex flex-col gap-1 text-sm">
