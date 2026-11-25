@@ -27,14 +27,14 @@ export default async function PaginaNoticias({ searchParams }: Props) {
     <main className="container space-y-10 py-12">
       <header className="space-y-2">
         <h1 className="heading-font text-6xl">Noticias</h1>
-        <p className="text-lg text-[#68737D]">Novedades del circuito, resultados y avisos.</p>
+        <p className="text-lg text-[var(--color-muted)]">Novedades del circuito, resultados y avisos.</p>
       </header>
 
       <nav aria-label="Categorías de noticias" className="flex flex-wrap gap-2">
         <Link
           href="/noticias"
           aria-current={activa === undefined ? "page" : undefined}
-          className={`rounded-md px-3 py-1.5 text-sm ${activa === undefined ? "bg-[#0D1B2A] text-white" : "bg-white ring-1 ring-[#D5D9DC]"
+          className={`rounded-md px-3 py-1.5 text-sm ${activa === undefined ? "bg-[var(--color-navy)] text-white" : "bg-white ring-1 ring-[var(--color-border)]"
             }`}
         >
           Todas
@@ -44,7 +44,7 @@ export default async function PaginaNoticias({ searchParams }: Props) {
             key={c}
             href={`/noticias?categoria=${c}`}
             aria-current={activa === c ? "page" : undefined}
-            className={`rounded-md px-3 py-1.5 text-sm ${activa === c ? "bg-[#0D1B2A] text-white" : "bg-white ring-1 ring-[#D5D9DC]"
+            className={`rounded-md px-3 py-1.5 text-sm ${activa === c ? "bg-[var(--color-navy)] text-white" : "bg-white ring-1 ring-[var(--color-border)]"
               }`}
           >
             {ETIQUETAS_NOTICIA[c]}
@@ -53,7 +53,7 @@ export default async function PaginaNoticias({ searchParams }: Props) {
       </nav>
 
       {noticias.length === 0 ? (
-        <p className="rounded-xl bg-white p-6 text-sm text-[#68737D] ring-1 ring-[#D5D9DC]">
+        <p className="rounded-xl bg-white p-6 text-sm text-[var(--color-muted)] ring-1 ring-[var(--color-border)]">
           Todavía no hay noticias en esta categoría.
         </p>
       ) : (

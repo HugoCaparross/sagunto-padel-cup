@@ -16,7 +16,7 @@ import type { DatosAnalitica } from "@/lib/analitica/datos";
 
 type Props = Pick<DatosAnalitica, "semanal" | "participacion" | "retencion" | "categorias">;
 
-const COLORES = ["#F0443A", "#0D1B2A", "#A7C4A0", "#B77912"];
+const COLORES = ["var(--color-coral)", "var(--color-navy)", "var(--color-sage)", "var(--color-warning)"];
 
 function Bloque({ titulo, vacio, children }: { titulo: string; vacio: boolean; children: React.ReactNode }) {
     return (
@@ -42,31 +42,31 @@ export default function Graficas({ semanal, participacion, retencion, categorias
         <div className="grid gap-6 xl:grid-cols-2">
             <Bloque titulo="Inscripciones por semana" vacio={semanaVacia}>
                 <BarChart data={semanal}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#D5D9DC" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                     <XAxis dataKey="semana" fontSize={12} />
                     <YAxis allowDecimals={false} fontSize={12} />
                     <Tooltip />
-                    <Bar dataKey="inscripciones" fill="#F0443A" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="inscripciones" fill="var(--color-coral)" radius={[4, 4, 0, 0]} />
                 </BarChart>
             </Bloque>
 
             <Bloque titulo="Parejas por prueba" vacio={participacion.every((p) => p.parejas === 0)}>
                 <BarChart data={participacion}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#D5D9DC" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                     <XAxis dataKey="prueba" fontSize={12} />
                     <YAxis allowDecimals={false} fontSize={12} />
                     <Tooltip />
-                    <Bar dataKey="parejas" fill="#0D1B2A" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="parejas" fill="var(--color-navy)" radius={[4, 4, 0, 0]} />
                 </BarChart>
             </Bloque>
 
             <Bloque titulo="Retención entre pruebas (%)" vacio={retencion.length === 0}>
                 <BarChart data={retencion}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#D5D9DC" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                     <XAxis dataKey="a" fontSize={12} />
                     <YAxis domain={[0, 100]} fontSize={12} />
                     <Tooltip formatter={(valor) => `${valor}%`} />
-                    <Bar dataKey="porcentaje" fill="#A7C4A0" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="porcentaje" fill="var(--color-sage)" radius={[4, 4, 0, 0]} />
                 </BarChart>
             </Bloque>
 

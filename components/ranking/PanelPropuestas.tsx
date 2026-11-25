@@ -1,5 +1,7 @@
 "use client";
 
+import Boton from "@/components/ui/Boton";
+
 import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -110,18 +112,18 @@ export default function PanelPropuestas({
         });
     }
 
-    const campo = "rounded-md border border-[#D5D9DC] bg-white px-2 py-1.5 text-sm";
+    const campo = "rounded-md border border-[var(--color-border)] bg-white px-2 py-1.5 text-sm";
 
     return (
         <div className="space-y-4">
             <form
                 onSubmit={generar}
-                className="flex flex-wrap items-end gap-3 rounded-xl bg-white p-4 text-sm ring-1 ring-[#D5D9DC]"
+                className="flex flex-wrap items-end gap-3 rounded-xl bg-white p-4 text-sm ring-1 ring-[var(--color-border)]"
             >
                 {destino ? (
                     <>
-                        <p className="w-full text-[#68737D]">
-                            Se generan para la temporada <span className="font-medium text-[#18232D]">{destino.anio}</span>.
+                        <p className="w-full text-[var(--color-muted)]">
+                            Se generan para la temporada <span className="font-medium text-[var(--color-ink)]">{destino.anio}</span>.
                             Usa el ranking con fecha de corte:
                         </p>
                         <input
@@ -131,16 +133,16 @@ export default function PanelPropuestas({
                             required
                             className={campo}
                         />
-                        <button
+                        <Boton variante="primario" tamano="md"
                             type="submit"
                             disabled={pendiente}
-                            className="rounded-lg bg-[#F0443A] px-4 py-2 font-medium text-white disabled:opacity-50"
+                            className="font-medium disabled:opacity-50"
                         >
                             {pendiente ? "Generando…" : "Generar propuestas"}
-                        </button>
+                        </Boton>
                     </>
                 ) : (
-                    <p className="text-[#B77912]">
+                    <p className="text-[var(--color-warning)]">
                         No hay una temporada posterior. Créala antes de generar propuestas.
                     </p>
                 )}
@@ -148,7 +150,7 @@ export default function PanelPropuestas({
 
             {mensaje && (
                 <p
-                    className={`rounded-lg p-3 text-sm ${mensaje.tipo === "ok" ? "bg-[#EAF6EF] text-[#16845B]" : "bg-[#FDECEC] text-[#C73535]"
+                    className={`rounded-lg p-3 text-sm ${mensaje.tipo === "ok" ? "bg-[var(--color-success-bg)] text-[var(--color-success)]" : "bg-[var(--color-danger-bg)] text-[var(--color-danger)]"
                         }`}
                 >
                     {mensaje.texto}
@@ -156,11 +158,11 @@ export default function PanelPropuestas({
             )}
 
             {propuestas.length === 0 ? (
-                <p className="text-sm text-[#68737D]">Todavía no hay propuestas para esta temporada.</p>
+                <p className="text-sm text-[var(--color-muted)]">Todavía no hay propuestas para esta temporada.</p>
             ) : (
-                <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[#D5D9DC]">
+                <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[var(--color-border)]">
                     <table className="w-full text-sm">
-                        <thead className="bg-[#F4F5F4] text-left text-xs uppercase text-[#68737D]">
+                        <thead className="bg-[var(--color-surface)] text-left text-xs uppercase text-[var(--color-muted)]">
                             <tr>
                                 <th className="px-3 py-2">Jugador</th>
                                 <th className="px-3 py-2">Movimiento</th>
@@ -172,10 +174,10 @@ export default function PanelPropuestas({
                         <tbody>
                             {propuestas.map((p) => (
                                 <>
-                                    <tr key={p.id} className="border-t border-[#D5D9DC]">
+                                    <tr key={p.id} className="border-t border-[var(--color-border)]">
                                         <td className="px-3 py-2">{p.nombre}</td>
                                         <td className="px-3 py-2">
-                                            <span className="text-xs text-[#68737D]">
+                                            <span className="text-xs text-[var(--color-muted)]">
                                                 {p.tipo === "ascenso" ? "Ascenso" : "Descenso"}:
                                             </span>{" "}
                                             {ETIQUETAS_CATEGORIA[p.categoriaOrigen]} →{" "}
@@ -184,7 +186,7 @@ export default function PanelPropuestas({
                                         <td className="px-3 py-2">
                                             {p.posicion}
                                             {p.empate && (
-                                                <span className="ml-2 rounded bg-[#FFF4DE] px-1.5 py-0.5 text-xs text-[#B77912]">
+                                                <span className="ml-2 rounded bg-[var(--color-warning-bg)] px-1.5 py-0.5 text-xs text-[var(--color-warning)]">
                                                     Empate
                                                 </span>
                                             )}
@@ -192,7 +194,7 @@ export default function PanelPropuestas({
                                         <td className="px-3 py-2">
                                             {ETIQUETA_ESTADO[p.estado]}
                                             {p.estado === "modificada" && p.motivo && (
-                                                <span className="block text-xs text-[#68737D]">{p.motivo}</span>
+                                                <span className="block text-xs text-[var(--color-muted)]">{p.motivo}</span>
                                             )}
                                         </td>
                                         <td className="px-3 py-2">
@@ -220,11 +222,11 @@ export default function PanelPropuestas({
                                     </tr>
 
                                     {editando === p.id && (
-                                        <tr key={`${p.id}-editar`} className="bg-[#F4F5F4]">
+                                        <tr key={`${p.id}-editar`} className="bg-[var(--color-surface)]">
                                             <td colSpan={5} className="px-3 py-3">
                                                 <div className="flex flex-wrap items-end gap-3">
                                                     <label className="flex flex-col gap-1 text-sm">
-                                                        <span className="text-[#68737D]">Categoría final</span>
+                                                        <span className="text-[var(--color-muted)]">Categoría final</span>
                                                         <select
                                                             value={categoriaFinal}
                                                             onChange={(e) => setCategoriaFinal(e.target.value as Categoria)}
@@ -239,7 +241,7 @@ export default function PanelPropuestas({
                                                     </label>
 
                                                     <label className="flex min-w-[240px] flex-1 flex-col gap-1 text-sm">
-                                                        <span className="text-[#68737D]">Motivo (mínimo 10 caracteres)</span>
+                                                        <span className="text-[var(--color-muted)]">Motivo (mínimo 10 caracteres)</span>
                                                         <input
                                                             value={motivo}
                                                             onChange={(e) => setMotivo(e.target.value)}
@@ -248,19 +250,19 @@ export default function PanelPropuestas({
                                                         />
                                                     </label>
 
-                                                    <button
+                                                    <Boton variante="secundario" tamano="md"
                                                         type="button"
                                                         onClick={() => guardarModificacion(p.id)}
                                                         disabled={pendiente}
-                                                        className="rounded-lg bg-[#0D1B2A] px-3 py-2 text-sm text-white disabled:opacity-50"
+                                                        className="disabled:opacity-50"
                                                     >
                                                         Guardar
-                                                    </button>
+                                                    </Boton>
                                                     <button
                                                         type="button"
                                                         onClick={() => setEditando(null)}
                                                         disabled={pendiente}
-                                                        className="text-sm text-[#68737D] underline"
+                                                        className="text-sm text-[var(--color-muted)] underline"
                                                     >
                                                         Cancelar
                                                     </button>

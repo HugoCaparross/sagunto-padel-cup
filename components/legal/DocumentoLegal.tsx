@@ -25,7 +25,7 @@ function BloqueLegal({ bloque }: { bloque: Bloque }) {
             return (
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-[#F4F5F4] text-left">
+                        <thead className="bg-[var(--color-surface)] text-left">
                             <tr>
                                 {bloque.cabecera.map((c, i) => (
                                     <th key={i} className="px-3 py-2 font-medium">
@@ -36,7 +36,7 @@ function BloqueLegal({ bloque }: { bloque: Bloque }) {
                         </thead>
                         <tbody>
                             {bloque.filas.map((fila, i) => (
-                                <tr key={i} className="border-t border-[#D5D9DC]">
+                                <tr key={i} className="border-t border-[var(--color-border)]">
                                     {fila.map((celda, j) => (
                                         <td key={j} className="px-3 py-2 align-top">
                                             {celda}
@@ -56,10 +56,10 @@ export default async function DocumentoLegal({ tipo }: { tipo: TipoDocumento }) 
     if (!doc) notFound();
 
     return (
-        <article className="mx-auto max-w-[720px] space-y-5 px-4 py-12 text-[#18232D]">
-            <header className="space-y-1 border-b border-[#D5D9DC] pb-6">
+        <article className="mx-auto max-w-[720px] space-y-5 px-4 py-12 text-[var(--color-ink)]">
+            <header className="space-y-1 border-b border-[var(--color-border)] pb-6">
                 <h1 className="text-3xl font-semibold">{doc.titulo}</h1>
-                <p className="text-sm text-[#68737D]">
+                <p className="text-sm text-[var(--color-muted)]">
                     Versión {doc.version} · publicada el {fechaLarga(doc.publicadoAt)}
                 </p>
             </header>

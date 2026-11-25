@@ -1,5 +1,6 @@
 "use client";
 
+import Boton from "@/components/ui/Boton";
 import { useMemo, useState, type ReactNode } from "react";
 import {
     DndContext,
@@ -33,7 +34,7 @@ function ChipPareja({ id, children }: { id: string; children: ReactNode }) {
             ref={setNodeRef}
             {...listeners}
             {...attributes}
-            className={`cursor-grab select-none rounded-md bg-white px-2 py-1 text-sm shadow-sm ring-1 ring-[#D5D9DC] ${isDragging ? "opacity-50" : ""
+            className={`cursor-grab select-none rounded-md bg-white px-2 py-1 text-sm shadow-sm ring-1 ring-[var(--color-border)] ${isDragging ? "opacity-50" : ""
                 }`}
         >
             {children}
@@ -49,7 +50,7 @@ function ZonaGrupo({ letra, children }: { letra: string; children: ReactNode }) 
     return (
         <div
             ref={setNodeRef}
-            className={`rounded-xl bg-white p-4 ring-1 ring-[#D5D9DC] ${isOver ? "ring-2 ring-[#F0443A]" : ""
+            className={`rounded-xl bg-white p-4 ring-1 ring-[var(--color-border)] ${isOver ? "ring-2 ring-[var(--color-coral)]" : ""
                 }`}
         >
             {children}
@@ -148,8 +149,8 @@ export default function EditorGrupos({ pruebaId, categoria, datos }: Props) {
 
     if (letras.length === 0) {
         return (
-            <section className="rounded-xl bg-white p-4 ring-1 ring-[#D5D9DC]">
-                <p className="text-sm text-[#68737D]">
+            <section className="rounded-xl bg-white p-4 ring-1 ring-[var(--color-border)]">
+                <p className="text-sm text-[var(--color-muted)]">
                     Genera primero la fase de grupos para poder editarlos.
                 </p>
             </section>
@@ -165,18 +166,18 @@ export default function EditorGrupos({ pruebaId, categoria, datos }: Props) {
                         type="button"
                         onClick={repetirSorteo}
                         disabled={enviando}
-                        className="rounded-lg bg-white px-3 py-2 text-sm ring-1 ring-[#D5D9DC] disabled:opacity-50"
+                        className="rounded-lg bg-white px-3 py-2 text-sm ring-1 ring-[var(--color-border)] disabled:opacity-50"
                     >
                         Repetir sorteo de grupos
                     </button>
-                    <button
+                    <Boton variante="primario" tamano="md"
                         type="button"
                         onClick={guardar}
                         disabled={enviando || problemas.length > 0}
-                        className="rounded-lg bg-[#F0443A] px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+                        className="disabled:opacity-50"
                     >
                         {enviando ? "Guardando…" : "Guardar grupos"}
-                    </button>
+                    </Boton>
                 </div>
             </header>
 
@@ -186,7 +187,7 @@ export default function EditorGrupos({ pruebaId, categoria, datos }: Props) {
                         <ZonaGrupo key={letra} letra={letra}>
                             <h3 className="mb-2 font-medium">
                                 Grupo {letra}{" "}
-                                <span className="text-xs text-[#68737D]">
+                                <span className="text-xs text-[var(--color-muted)]">
                                     ({miembros(letra).length}/{esperados[letra]})
                                 </span>
                             </h3>
@@ -203,7 +204,7 @@ export default function EditorGrupos({ pruebaId, categoria, datos }: Props) {
             </DndContext>
 
             {problemas.length > 0 && (
-                <div className="rounded-lg bg-[#FFF4DE] p-3 text-sm text-[#B77912]">
+                <div className="rounded-lg bg-[var(--color-warning-bg)] p-3 text-sm text-[var(--color-warning)]">
                     {problemas.map((p) => (
                         <p key={p}>{p}</p>
                     ))}
@@ -213,8 +214,8 @@ export default function EditorGrupos({ pruebaId, categoria, datos }: Props) {
             {mensaje && (
                 <div
                     className={`rounded-lg p-3 text-sm ${mensaje.tipo === "ok"
-                            ? "bg-[#EAF6EF] text-[#16845B]"
-                            : "bg-[#FDECEC] text-[#C73535]"
+                            ? "bg-[var(--color-success-bg)] text-[var(--color-success)]"
+                            : "bg-[var(--color-danger-bg)] text-[var(--color-danger)]"
                         }`}
                 >
                     {mensaje.texto}

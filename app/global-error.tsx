@@ -13,22 +13,22 @@ export default function ErrorGlobal({
                 style={{
                     margin: 0,
                     fontFamily: "Arial, Helvetica, sans-serif",
-                    background: "#F4F5F4",
-                    color: "#18232D",
+                    background: "var(--color-surface)",
+                    color: "var(--color-ink)",
                 }}
             >
                 <main style={{ maxWidth: 560, margin: "0 auto", padding: "64px 24px" }}>
                     <h1 style={{ fontSize: 28, margin: "0 0 12px" }}>Algo ha fallado</h1>
                     <p style={{ margin: "0 0 16px" }}>Vuelve a intentarlo en unos segundos.</p>
                     {error.digest && (
-                        <p style={{ fontSize: 12, color: "#68737D" }}>Código: {error.digest}</p>
+                        <p style={{ fontSize: 12, color: "var(--color-muted)" }}>Código: {error.digest}</p>
                     )}
                     <button
                         type="button"
                         onClick={reset}
                         style={{
-                            background: "#F0443A",
-                            color: "#FFFFFF",
+                            background: "var(--color-coral)",
+                            color: "var(--color-reference-ffffff)",
                             border: 0,
                             padding: "10px 16px",
                             borderRadius: 8,

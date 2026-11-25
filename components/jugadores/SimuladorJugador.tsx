@@ -1,5 +1,7 @@
 "use client";
 
+import Boton from "@/components/ui/Boton";
+
 import { useState, useTransition } from "react";
 import { simularTorneo, type DatosSimulador } from "@/actions/simulador";
 import { CATEGORIAS, ETIQUETAS_CATEGORIA, type Categoria } from "@/lib/constantes";
@@ -30,15 +32,15 @@ export default function SimuladorJugador({ pruebas = [] }: Props) {
     return (
         <div className="space-y-4 text-sm">
             {pruebas.length === 0 ? (
-                <p className="text-[#68737D]">No tienes inscripciones para simular.</p>
+                <p className="text-[var(--color-muted)]">No tienes inscripciones para simular.</p>
             ) : (
                 <>
                     <label className="flex flex-col gap-1">
-                        <span className="text-[#68737D]">Prueba</span>
+                        <span className="text-[var(--color-muted)]">Prueba</span>
                         <select
                             value={pruebaId}
                             onChange={(e) => setPruebaId(e.target.value)}
-                            className="rounded-md border border-[#D5D9DC] bg-white px-2 py-1.5"
+                            className="rounded-md border border-[var(--color-border)] bg-white px-2 py-1.5"
                         >
                             {pruebas.map((p) => (
                                 <option key={p.id} value={p.id}>
@@ -49,11 +51,11 @@ export default function SimuladorJugador({ pruebas = [] }: Props) {
                     </label>
 
                     <label className="flex flex-col gap-1">
-                        <span className="text-[#68737D]">Categoría</span>
+                        <span className="text-[var(--color-muted)]">Categoría</span>
                         <select
                             value={categoria}
                             onChange={(e) => setCategoria(e.target.value as Categoria)}
-                            className="rounded-md border border-[#D5D9DC] bg-white px-2 py-1.5"
+                            className="rounded-md border border-[var(--color-border)] bg-white px-2 py-1.5"
                         >
                             {CATEGORIAS.map((c) => (
                                 <option key={c} value={c}>
@@ -63,27 +65,27 @@ export default function SimuladorJugador({ pruebas = [] }: Props) {
                         </select>
                     </label>
 
-                    <button
+                    <Boton variante="secundario" tamano="md"
                         type="button"
                         onClick={simular}
                         disabled={pendiente || !pruebaId}
-                        className="w-full rounded-lg bg-[#0D1B2A] px-3 py-2 text-white disabled:opacity-50"
+                        className="w-full disabled:opacity-50"
                     >
                         {pendiente ? "Calculando…" : "Simular"}
-                    </button>
+                    </Boton>
 
-                    {error && <p className="text-[#C73535]">{error}</p>}
+                    {error && <p className="text-[var(--color-danger)]">{error}</p>}
 
                     {datos && (
                         <div className="space-y-4">
                             {datos.avisos.map((a) => (
-                                <p key={a} className="rounded-lg bg-[#FFF4DE] p-2 text-xs text-[#B77912]">
+                                <p key={a} className="rounded-lg bg-[var(--color-warning-bg)] p-2 text-xs text-[var(--color-warning)]">
                                     {a}
                                 </p>
                             ))}
 
                             {datos.proximoPartido && (
-                                <div className="rounded-lg bg-[#F4F5F4] p-3 text-xs">
+                                <div className="rounded-lg bg-[var(--color-surface)] p-3 text-xs">
                                     <p className="font-medium">Próximo partido</p>
                                     <p>Si ganas: {datos.proximoPartido.siGana}</p>
                                     <p>Si pierdes: {datos.proximoPartido.siPierde.texto}</p>
@@ -93,7 +95,7 @@ export default function SimuladorJugador({ pruebas = [] }: Props) {
                             {datos.cuadros.map((c) => (
                                 <div key={c.cuadro} className="space-y-2">
                                     <p className="font-medium capitalize">{c.cuadro}</p>
-                                    <ul className="divide-y divide-[#D5D9DC]">
+                                    <ul className="divide-y divide-[var(--color-border)]">
                                         {c.filas
                                             .filter((f) => f.alcanzable)
                                             .map((f) => (
@@ -102,7 +104,7 @@ export default function SimuladorJugador({ pruebas = [] }: Props) {
                                                     <span>
                                                         {f.puntos} pts
                                                         {f.posicionProyectada !== null && (
-                                                            <span className="text-[#68737D]"> · {f.posicionProyectada}.º</span>
+                                                            <span className="text-[var(--color-muted)]"> · {f.posicionProyectada}.º</span>
                                                         )}
                                                     </span>
                                                 </li>

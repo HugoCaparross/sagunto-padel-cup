@@ -49,14 +49,14 @@ export default async function PaginaInscripciones() {
       </header>
 
       {conQr.length === 0 ? (
-        <p className="text-sm text-[#68737D]">Todavía no estás inscrito en ninguna prueba.</p>
+        <p className="text-sm text-[var(--color-muted)]">Todavía no estás inscrito en ninguna prueba.</p>
       ) : (
         <ul className="space-y-4">
           {conQr.map(({ i, qr }) => (
-            <li key={i.id} className="grid gap-4 rounded-xl bg-white p-5 ring-1 ring-[#D5D9DC] md:grid-cols-[1fr_auto]">
+            <li key={i.id} className="grid gap-4 rounded-xl bg-white p-5 ring-1 ring-[var(--color-border)] md:grid-cols-[1fr_auto]">
               <div className="space-y-2">
                 <p className="text-lg font-medium">{i.prueba.nombre}</p>
-                <p className="text-sm text-[#68737D]">
+                <p className="text-sm text-[var(--color-muted)]">
                   {fechaLarga(i.prueba.fechaInicio)} · {i.prueba.sede}
                 </p>
                 <p className="text-sm">

@@ -13,7 +13,7 @@ export default async function PaginaVerificar({ searchParams }: Props) {
   return (
     <main className="mx-auto max-w-sm space-y-4 px-4 py-16 text-center">
       <h1 className="text-2xl font-semibold">Revisa tu email</h1>
-      <p className="text-sm text-[#68737D]">
+      <p className="text-sm text-[var(--color-muted)]">
         {recuperar
           ? "Si existe una cuenta con ese email, te hemos enviado un enlace para cambiar la contraseña."
           : "Te hemos enviado un enlace para confirmar tu cuenta. Ábrelo desde este mismo dispositivo."}

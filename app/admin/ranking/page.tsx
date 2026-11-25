@@ -1,3 +1,4 @@
+import Boton from "@/components/ui/Boton";
 import type { Metadata } from "next";
 import PanelPropuestas from "@/components/ranking/PanelPropuestas";
 import FormPlazas from "@/components/ranking/FormPlazas";
@@ -65,7 +66,7 @@ export default async function PaginaRankingAdmin({ searchParams }: Props) {
 
   if (!seleccionada) {
     return (
-      <p className="text-[#C73535]">
+      <p className="text-[var(--color-danger)]">
         No hay temporadas creadas. Crea la primera antes de usar el ranking.
       </p>
     );
@@ -85,21 +86,21 @@ export default async function PaginaRankingAdmin({ searchParams }: Props) {
     <main className="space-y-8">
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold">Ranking</h1>
-        <p className="text-sm text-[#68737D]">
+        <p className="text-sm text-[var(--color-muted)]">
           Clasificación por categoría, plazas y propuestas de ascenso y descenso.
         </p>
       </header>
 
       <form
         method="get"
-        className="flex flex-wrap items-end gap-3 rounded-xl bg-white p-4 text-sm ring-1 ring-[#D5D9DC]"
+        className="flex flex-wrap items-end gap-3 rounded-xl bg-white p-4 text-sm ring-1 ring-[var(--color-border)]"
       >
         <label className="flex flex-col gap-1">
-          <span className="text-[#68737D]">Temporada</span>
+          <span className="text-[var(--color-muted)]">Temporada</span>
           <select
             name="temporada"
             defaultValue={String(seleccionada.id)}
-            className="rounded-md border border-[#D5D9DC] px-2 py-1.5"
+            className="rounded-md border border-[var(--color-border)] px-2 py-1.5"
           >
             {temporadas.map((t) => (
               <option key={t.id} value={t.id}>
@@ -111,11 +112,11 @@ export default async function PaginaRankingAdmin({ searchParams }: Props) {
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-[#68737D]">Categoría</span>
+          <span className="text-[var(--color-muted)]">Categoría</span>
           <select
             name="categoria"
             defaultValue={categoria}
-            className="rounded-md border border-[#D5D9DC] px-2 py-1.5"
+            className="rounded-md border border-[var(--color-border)] px-2 py-1.5"
           >
             {CATEGORIAS.map((c) => (
               <option key={c} value={c}>
@@ -126,21 +127,21 @@ export default async function PaginaRankingAdmin({ searchParams }: Props) {
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-[#68737D]">Fecha de corte</span>
+          <span className="text-[var(--color-muted)]">Fecha de corte</span>
           <input
             type="date"
             name="referencia"
             defaultValue={referencia}
-            className="rounded-md border border-[#D5D9DC] px-2 py-1.5"
+            className="rounded-md border border-[var(--color-border)] px-2 py-1.5"
           />
         </label>
 
-        <button
+        <Boton variante="secundario" tamano="md"
           type="submit"
-          className="rounded-lg bg-[#0D1B2A] px-4 py-2 text-white"
+          className=""
         >
           Ver
-        </button>
+        </Boton>
       </form>
 
       <section className="space-y-3">
@@ -172,16 +173,16 @@ export default async function PaginaRankingAdmin({ searchParams }: Props) {
       <section className="space-y-3">
         <h2 className="font-semibold">Últimos cambios</h2>
         {historial.length === 0 ? (
-          <p className="text-sm text-[#68737D]">Todavía no hay cambios registrados.</p>
+          <p className="text-sm text-[var(--color-muted)]">Todavía no hay cambios registrados.</p>
         ) : (
-          <ul className="divide-y divide-[#D5D9DC] rounded-xl bg-white text-sm ring-1 ring-[#D5D9DC]">
+          <ul className="divide-y divide-[var(--color-border)] rounded-xl bg-white text-sm ring-1 ring-[var(--color-border)]">
             {historial.map((h) => (
               <li key={h.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2">
                 <span>
                   {ETIQUETA_ACCION[h.accion] ?? h.accion}
-                  {h.motivo && <span className="text-[#68737D]"> · {h.motivo}</span>}
+                  {h.motivo && <span className="text-[var(--color-muted)]"> · {h.motivo}</span>}
                 </span>
-                <span className="text-xs text-[#68737D]">{fechaCorta(h.creadoAt)}</span>
+                <span className="text-xs text-[var(--color-muted)]">{fechaCorta(h.creadoAt)}</span>
               </li>
             ))}
           </ul>

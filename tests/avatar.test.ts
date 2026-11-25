@@ -17,6 +17,6 @@ describe("avatar de jugador", () => {
     it("elige de forma estable un color de marca", () => {
         const color = colorAvatarJugador("Lucía Mar Pérez");
         expect(colorAvatarJugador("Lucía Mar Pérez")).toBe(color);
-        expect(["#F0443A", "#0D1B2A", "#A7C4A0"]).toContain(color);
+        expect(["coral", "navy", "sage"]).toContain(color);
     });
 });

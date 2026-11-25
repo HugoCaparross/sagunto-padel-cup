@@ -1,15 +1,15 @@
 .page {
-  --rank-ink: #0d1b2a;
-  --rank-muted: #626970;
-  --rank-border: #d5d9dc;
+  --rank-ink: var(--color-navy);
+  --rank-muted: var(--color-muted-strong);
+  --rank-border: var(--color-border);
   color: var(--rank-ink);
-  background: #fafaf9;
+  background: var(--color-reference-fafaf9);
 }
 
 .hero {
   position: relative;
   overflow: hidden;
-  background: #0d1b2a;
+  background: var(--color-navy);
   color: #fff;
 }
 
@@ -60,28 +60,28 @@
   text-transform: uppercase;
 }
 
-.eyebrow { color: #a7c4a0; }
-.eyebrow > span { width: 1.5rem; height: 2px; background: #f0443a; }
+.eyebrow { color: var(--color-sage); }
+.eyebrow > span { width: 1.5rem; height: 2px; background: var(--color-coral); }
 .hero h1 { margin: 0; font-size: clamp(3.6rem, 8vw, 6.6rem); font-weight: 700; letter-spacing: -0.075em; line-height: 0.92; }
-.hero h1 em { color: #a7c4a0; font-style: normal; }
-.heroText { max-width: 32rem; margin: 1.5rem 0 0; color: #e6e6e6; font-size: 1.05rem; line-height: 1.65; }
+.hero h1 em { color: var(--color-sage); font-style: normal; }
+.heroText { max-width: 32rem; margin: 1.5rem 0 0; color: var(--color-reference-e6e6e6); font-size: 1.05rem; line-height: 1.65; }
 .heroActions { display: flex; flex-wrap: wrap; align-items: center; gap: 1.4rem; margin-top: 2rem; }
 .primaryLink, .secondaryLink, .footerCta > a { display: inline-flex; min-height: 3rem; align-items: center; justify-content: center; gap: 0.8rem; text-decoration: none; transition: transform 180ms ease, color 180ms ease, background-color 180ms ease; }
-.primaryLink { background: #f0443a; padding: 0.75rem 1.1rem; color: #0d1b2a; font-size: 0.88rem; font-weight: 700; }
-.primaryLink:hover { transform: translateY(-2px); background: #e6e6e6; }
+.primaryLink { background: var(--color-coral); padding: 0.75rem 1.1rem; color: var(--color-navy); font-size: 0.88rem; font-weight: 700; }
+.primaryLink:hover { transform: translateY(-2px); background: var(--color-reference-e6e6e6); }
 .secondaryLink { color: #fff; font-size: 0.9rem; font-weight: 600; }
-.secondaryLink:hover { color: #a7c4a0; }
+.secondaryLink:hover { color: var(--color-sage); }
 .heroMark { display: grid; width: 11rem; flex: 0 0 11rem; grid-template-columns: 1fr auto; align-items: end; gap: 1rem; border-left: 1px solid rgb(255 255 255 / 0.22); padding: 1rem 0 0 1.4rem; }
-.markIndex { grid-column: 1 / -1; align-self: start; color: #a7c4a0; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; }
+.markIndex { grid-column: 1 / -1; align-self: start; color: var(--color-sage); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; }
 .markLetters { color: rgb(255 255 255 / 0.15); font-size: 4.8rem; font-weight: 700; letter-spacing: -0.1em; line-height: 0.76; }
 .markCaption { padding-bottom: 0.2rem; color: #fff; font-size: 0.78rem; font-weight: 600; line-height: 1.35; }
 
 .intro { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 4rem; padding-block: 5rem; }
-.kicker { margin-bottom: 0.8rem; color: #0d1b2a; }
+.kicker { margin-bottom: 0.8rem; color: var(--color-navy); }
 .intro h2, .sectionHeader h2, .footerCta h2 { margin: 0; font-size: clamp(2.1rem, 4vw, 3.5rem); font-weight: 700; letter-spacing: -0.06em; line-height: 1.02; }
 .introDetails { max-width: 34rem; align-self: end; }
 .introDetails p { margin: 0 0 0.85rem; color: var(--rank-muted); font-size: 0.98rem; }
-.introDetails a { display: inline-flex; gap: 0.5rem; margin-top: 0.6rem; color: #0d1b2a; font-size: 0.88rem; font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.introDetails a { display: inline-flex; gap: 0.5rem; margin-top: 0.6rem; color: var(--color-navy); font-size: 0.88rem; font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 4px; }
 
 .competition { padding-block: 1rem 5.5rem; }
 .sectionHeader { display: flex; align-items: end; justify-content: space-between; gap: 2rem; border-bottom: 1px solid var(--rank-border); padding-bottom: 1.4rem; }
@@ -92,18 +92,18 @@
 .dateForm { display: flex; flex-wrap: wrap; align-items: center; justify-content: end; gap: 0.6rem; color: var(--rank-muted); font-size: 0.78rem; }
 .dateForm input { min-height: 2.75rem; border: 1px solid var(--rank-border); border-radius: 0.35rem; background: #fff; padding: 0.5rem 0.65rem; color: var(--rank-ink); font: inherit; }
 .dateForm input:focus-visible { outline: 3px solid rgb(240 68 58 / 0.35); outline-offset: 2px; }
-.dateForm button { min-height: 2.75rem; border: 0; border-radius: 0.35rem; background: #0d1b2a; padding: 0.5rem 0.9rem; color: #fff; font: inherit; font-weight: 700; cursor: pointer; transition: background-color 160ms ease, transform 160ms ease; }
-.dateForm button:hover { transform: translateY(-1px); background: #f0443a; color: #0d1b2a; }
+.dateForm button { min-height: 2.75rem; border: 0; border-radius: 0.35rem; background: var(--color-navy); padding: 0.5rem 0.9rem; color: #fff; font: inherit; font-weight: 700; cursor: pointer; transition: background-color 160ms ease, transform 160ms ease; }
+.dateForm button:hover { transform: translateY(-1px); background: var(--color-coral); color: var(--color-navy); }
 .categoryHeading { display: flex; align-items: center; justify-content: space-between; margin-block: 1rem 1.1rem; }
 .categoryHeading > div { display: flex; align-items: center; gap: 0.65rem; }
 .categoryHeading h3 { margin: 0; font-size: 1.25rem; letter-spacing: -0.025em; }
 .categoryHeading > span { color: var(--rank-muted); font-size: 0.78rem; }
-.categoryDot { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: #f0443a; }
+.categoryDot { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--color-coral); }
 
 .footerCta { display: flex; align-items: end; justify-content: space-between; gap: 2rem; border-top: 1px solid var(--rank-border); padding-block: 2.5rem 4rem; }
 .footerCta h2 { font-size: clamp(2rem, 4vw, 3rem); }
-.footerCta > a { background: #a7c4a0; padding: 0.8rem 1rem; color: #0d1b2a; font-size: 0.88rem; font-weight: 700; }
-.footerCta > a:hover { transform: translateY(-2px); background: #e6e6e6; }
+.footerCta > a { background: var(--color-sage); padding: 0.8rem 1rem; color: var(--color-navy); font-size: 0.88rem; font-weight: 700; }
+.footerCta > a:hover { transform: translateY(-2px); background: var(--color-reference-e6e6e6); }
 
 @media (max-width: 900px) {
   .heroInner, .intro, .competition, .footerCta { width: min(calc(100% - 2rem), 1200px); }

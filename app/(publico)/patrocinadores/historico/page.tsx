@@ -12,21 +12,21 @@ export default async function PaginaHistorico() {
   return (
     <main className="container space-y-12 py-12">
       <header className="space-y-2">
-        <Link href="/patrocinadores" className="text-sm text-[#68737D] hover:underline">
+        <Link href="/patrocinadores" className="text-sm text-[var(--color-muted)] hover:underline">
           ← Patrocinadores
         </Link>
         <h1 className="heading-font text-5xl">Histórico</h1>
-        <p className="text-lg text-[#68737D]">Patrocinadores de cada prueba del circuito.</p>
+        <p className="text-lg text-[var(--color-muted)]">Patrocinadores de cada prueba del circuito.</p>
       </header>
 
       {historico.length === 0 ? (
-        <p className="text-sm text-[#68737D]">Todavía no hay histórico.</p>
+        <p className="text-sm text-[var(--color-muted)]">Todavía no hay histórico.</p>
       ) : (
         historico.map(({ prueba, patrocinadores }) => (
           <section key={prueba.id} className="space-y-4">
             <div>
               <h2 className="font-semibold">{prueba.nombre}</h2>
-              <p className="text-xs text-[#68737D]">{fechaLarga(prueba.fechaInicio)}</p>
+              <p className="text-xs text-[var(--color-muted)]">{fechaLarga(prueba.fechaInicio)}</p>
             </div>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               {patrocinadores.map((p) => (

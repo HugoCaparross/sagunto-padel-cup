@@ -1,5 +1,7 @@
 "use client";
 
+import Boton from "@/components/ui/Boton";
+
 import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { crearNoticia, editarNoticia, type NoticiaAdmin } from "@/actions/noticias";
@@ -12,7 +14,7 @@ import {
 
 type Props = { inicial?: NoticiaAdmin };
 
-const CAMPO = "rounded-md border border-[#D5D9DC] bg-white px-3 py-2 text-sm";
+const CAMPO = "rounded-md border border-[var(--color-border)] bg-white px-3 py-2 text-sm";
 
 export default function FormularioNoticia({ inicial }: Props) {
     const router = useRouter();
@@ -63,9 +65,9 @@ export default function FormularioNoticia({ inicial }: Props) {
     }
 
     return (
-        <form onSubmit={enviar} className="space-y-5 rounded-xl bg-white p-6 ring-1 ring-[#D5D9DC]">
+        <form onSubmit={enviar} className="space-y-5 rounded-xl bg-white p-6 ring-1 ring-[var(--color-border)]">
             <label className="flex flex-col gap-1 text-sm">
-                <span className="text-[#68737D]">Título</span>
+                <span className="text-[var(--color-muted)]">Título</span>
                 <input
                     name="titulo"
                     value={titulo}
@@ -78,7 +80,7 @@ export default function FormularioNoticia({ inicial }: Props) {
             </label>
 
             <label className="flex flex-col gap-1 text-sm">
-                <span className="text-[#68737D]">
+                <span className="text-[var(--color-muted)]">
                     Slug (parte final de la URL)
                     {!inicial && " · se genera del título si lo dejas vacío"}
                 </span>
@@ -94,14 +96,14 @@ export default function FormularioNoticia({ inicial }: Props) {
                     className={CAMPO}
                 />
                 {slugCambiado && (
-                    <span className="text-xs text-[#B77912]">
+                    <span className="text-xs text-[var(--color-warning)]">
                         Si cambias el slug, la dirección anterior dejará de funcionar.
                     </span>
                 )}
             </label>
 
             <label className="flex flex-col gap-1 text-sm">
-                <span className="text-[#68737D]">Resumen (aparece en el listado)</span>
+                <span className="text-[var(--color-muted)]">Resumen (aparece en el listado)</span>
                 <textarea
                     name="resumen"
                     defaultValue={inicial?.resumen ?? ""}
@@ -115,7 +117,7 @@ export default function FormularioNoticia({ inicial }: Props) {
 
             <div className="grid gap-4 sm:grid-cols-2">
                 <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-[#68737D]">Categoría</span>
+                    <span className="text-[var(--color-muted)]">Categoría</span>
                     <select name="categoria" defaultValue={inicial?.categoria ?? "general"} className={CAMPO}>
                         {CATEGORIAS_NOTICIA.map((c) => (
                             <option key={c} value={c}>
@@ -126,7 +128,7 @@ export default function FormularioNoticia({ inicial }: Props) {
                 </label>
 
                 <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-[#68737D]">Imagen (URL, opcional)</span>
+                    <span className="text-[var(--color-muted)]">Imagen (URL, opcional)</span>
                     <input
                         name="imagenUrl"
                         type="url"
@@ -138,7 +140,7 @@ export default function FormularioNoticia({ inicial }: Props) {
             </div>
 
             <label className="flex flex-col gap-1 text-sm">
-                <span className="text-[#68737D]">
+                <span className="text-[var(--color-muted)]">
                     Contenido · usa ## para títulos, - para listas y una línea en blanco entre párrafos
                 </span>
                 <textarea
@@ -160,20 +162,20 @@ export default function FormularioNoticia({ inicial }: Props) {
             )}
 
             {inicial && (
-                <p className="text-xs text-[#68737D]">
+                <p className="text-xs text-[var(--color-muted)]">
                     Para publicar o pasar a borrador, usa el listado de noticias.
                 </p>
             )}
 
-            {error && <p className="rounded-lg bg-[#FDECEC] p-3 text-sm text-[#C73535]">{error}</p>}
+            {error && <p className="rounded-lg bg-[var(--color-danger-bg)] p-3 text-sm text-[var(--color-danger)]">{error}</p>}
 
-            <button
+            <Boton variante="primario" tamano="md"
                 type="submit"
                 disabled={pendiente}
-                className="rounded-lg bg-[#F0443A] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                className="font-medium disabled:opacity-50"
             >
                 {pendiente ? "Guardando…" : inicial ? "Guardar cambios" : "Crear noticia"}
-            </button>
+            </Boton>
         </form>
     );
 }

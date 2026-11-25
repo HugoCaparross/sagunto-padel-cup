@@ -39,7 +39,7 @@ export default async function PaginaPrueba({ params }: Props) {
 
   return (
     <main className="container space-y-12 py-12">
-      <nav className="text-sm text-[#68737D]">
+      <nav className="text-sm text-[var(--color-muted)]">
         <Link href="/calendario" className="hover:underline">
           Calendario
         </Link>
@@ -48,11 +48,11 @@ export default async function PaginaPrueba({ params }: Props) {
 
       <header className="space-y-4">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded bg-[#0D1B2A] px-2 py-1 text-xs text-white">
+          <span className="rounded bg-[var(--color-navy)] px-2 py-1 text-xs text-white">
             {ETIQUETAS_ESTADO_PRUEBA[prueba.estado]}
           </span>
           {prueba.esMaster && (
-            <span className="rounded bg-[#FFF4DE] px-2 py-1 text-xs text-[#B77912]">Máster</span>
+            <span className="rounded bg-[var(--color-warning-bg)] px-2 py-1 text-xs text-[var(--color-warning)]">Máster</span>
           )}
         </div>
 
@@ -60,20 +60,20 @@ export default async function PaginaPrueba({ params }: Props) {
 
         <dl className="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <dt className="text-[#68737D]">Día del torneo</dt>
+            <dt className="text-[var(--color-muted)]">Día del torneo</dt>
             <dd className="font-medium">
               {fechaLarga(prueba.fechaInicio)}
               {prueba.fechaFin !== prueba.fechaInicio && ` – ${fechaLarga(prueba.fechaFin)}`}
             </dd>
           </div>
           <div>
-            <dt className="text-[#68737D]">Horario</dt>
+            <dt className="text-[var(--color-muted)]">Horario</dt>
             <dd className="font-medium">
               {prueba.horaInicio} – {prueba.horaFin}
             </dd>
           </div>
           <div>
-            <dt className="text-[#68737D]">Sede</dt>
+            <dt className="text-[var(--color-muted)]">Sede</dt>
             <dd className="font-medium">
               {prueba.sedeUrl ? (
                 <a href={prueba.sedeUrl} target="_blank" rel="noopener noreferrer" className="underline">
@@ -85,18 +85,18 @@ export default async function PaginaPrueba({ params }: Props) {
             </dd>
           </div>
           <div>
-            <dt className="text-[#68737D]">Precio por pareja</dt>
+            <dt className="text-[var(--color-muted)]">Precio por pareja</dt>
             <dd className="font-medium">
               {euros(prueba.precioCentimos)} <span className="font-normal">en efectivo el primer día</span>
             </dd>
           </div>
         </dl>
 
-        <section aria-labelledby="fechas-clave-titulo" className="rounded-xl border border-border bg-[#F7F8F6] p-5 sm:p-6">
+        <section aria-labelledby="fechas-clave-titulo" className="rounded-xl border border-border bg-[var(--color-fondo)] p-5 sm:p-6">
           <h2 id="fechas-clave-titulo" className="mb-4 font-semibold">Fechas clave</h2>
           <div className="grid gap-3 md:grid-cols-3">
             <div className="rounded-lg border border-border bg-white p-4 shadow-card">
-              <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#456C30]"><GoogleIcon name="event_available" />Apertura de inscripciones</p>
+              <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--color-reference-456c30)]"><GoogleIcon name="event_available" />Apertura de inscripciones</p>
               {prueba.inscripcionesAbrenAt ? <time dateTime={prueba.inscripcionesAbrenAt} className="block font-semibold text-ink">{formatoFechaInscripcion(prueba.inscripcionesAbrenAt)}</time> : <p className="font-semibold text-ink">{formatoFechaInscripcion(null)}</p>}
               <p className="mt-1 text-xs text-muted">{prueba.inscripcionesAbrenAt ? "Fecha indicada por la organización" : "La organización la anunciará"}</p>
             </div>
@@ -116,12 +116,12 @@ export default async function PaginaPrueba({ params }: Props) {
         {inscribible ? (
           <Link
             href={`/inscribirse/${prueba.slug}`}
-            className="inline-block rounded-lg bg-[#F0443A] px-5 py-3 text-sm font-medium text-white"
+            className="btn btn-primario btn-lg"
           >
             Inscribirme
           </Link>
         ) : (
-          <p className="text-sm text-[#68737D]">
+          <p className="text-sm text-[var(--color-muted)]">
             {prueba.estado === "proxima"
               ? "Las inscripciones se abrirán próximamente."
               : "Las inscripciones de esta prueba ya están cerradas."}
@@ -132,18 +132,18 @@ export default async function PaginaPrueba({ params }: Props) {
       <section className="space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <h2 className="heading-font text-3xl">Categorías</h2>
-          <p className="text-sm text-[#68737D]">
+          <p className="text-sm text-[var(--color-muted)]">
             {prueba.plazasMaximas} parejas máximo · {prueba.plazasLibres} plazas libres
           </p>
         </div>
         <ul className="flex flex-wrap gap-2 text-sm">
           {CATEGORIAS.filter((c) => prueba.categorias.includes(c)).map((c) => (
-            <li key={c} className="rounded-full bg-white px-4 py-1.5 ring-1 ring-[#D5D9DC]">
+            <li key={c} className="rounded-full bg-white px-4 py-1.5 ring-1 ring-[var(--color-border)]">
               {ETIQUETAS_CATEGORIA[c]}
             </li>
           ))}
         </ul>
-        <p className="text-xs text-[#68737D]">
+        <p className="text-xs text-[var(--color-muted)]">
           Una categoría se disputa si tiene al menos 3 parejas inscritas.
         </p>
       </section>
@@ -152,26 +152,26 @@ export default async function PaginaPrueba({ params }: Props) {
         <h2 className="heading-font text-3xl">Inscritos</h2>
         {inscritos.ok ? (
           inscritos.filas.length === 0 ? (
-            <p className="text-sm text-[#68737D]">Todavía no hay parejas inscritas.</p>
+            <p className="text-sm text-[var(--color-muted)]">Todavía no hay parejas inscritas.</p>
           ) : (
             <div className="grid gap-6 md:grid-cols-2">
               {CATEGORIAS.filter((c) => prueba.categorias.includes(c)).map((c) => {
                 const lista = inscritos.filas.filter((f) => f.categoria === c);
                 return (
-                  <div key={c} className="rounded-xl bg-white p-5 ring-1 ring-[#D5D9DC]">
+                  <div key={c} className="rounded-xl bg-white p-5 ring-1 ring-[var(--color-border)]">
                     <h3 className="mb-3 font-semibold">
                       {ETIQUETAS_CATEGORIA[c]}{" "}
-                      <span className="text-sm font-normal text-[#68737D]">({lista.length})</span>
+                      <span className="text-sm font-normal text-[var(--color-muted)]">({lista.length})</span>
                     </h3>
                     {lista.length === 0 ? (
-                      <p className="text-sm text-[#68737D]">Sin parejas todavía.</p>
+                      <p className="text-sm text-[var(--color-muted)]">Sin parejas todavía.</p>
                     ) : (
-                      <ul className="divide-y divide-[#D5D9DC] text-sm">
+                      <ul className="divide-y divide-[var(--color-border)] text-sm">
                         {lista.map((f) => (
                           <li key={f.inscripcionId} className="flex justify-between py-2">
                             <span>{f.texto}</span>
                             {!f.ocupaPlaza && (
-                              <span className="text-xs text-[#B77912]">Lista de espera</span>
+                              <span className="text-xs text-[var(--color-warning)]">Lista de espera</span>
                             )}
                           </li>
                         ))}
@@ -183,7 +183,7 @@ export default async function PaginaPrueba({ params }: Props) {
             </div>
           )
         ) : (
-          <p className="text-sm text-[#68737D]">{inscritos.error}</p>
+          <p className="text-sm text-[var(--color-muted)]">{inscritos.error}</p>
         )}
       </section>
 

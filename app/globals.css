@@ -7,25 +7,128 @@
    Estados: éxito, advertencia, error, información
    ========================================================= */
 @theme {
-    --color-coral: #C6202B;
-    --color-navy: #17191C;
-    --color-sage: #79B83A;
+    --color-coral: #F0443A;
+    --color-navy: #0D1B2A;
+    --color-sage: #A7C4A0;
     --color-gris-claro: #E8E9E7;
 
     --color-fondo: #F7F8F6;
-    --color-surface: #F0F2EF;
-    --color-border: #E0E3DF;
-    --color-muted: #68716A;
-    --color-ink: #1B201C;
+    --color-surface: #F4F5F4;
+    --color-border: #D5D9DC;
+    --color-muted: #68737D;
+    --color-ink: #18232D;
 
-    --color-success: #267A45;
-    --color-success-bg: #EAF4EC;
-    --color-warning: #9A6814;
-    --color-warning-bg: #FBF3DF;
-    --color-danger: #B92D37;
-    --color-danger-bg: #FBEAEC;
+    --color-success: #16845B;
+    --color-success-bg: #EAF6EF;
+    --color-warning: #B77912;
+    --color-warning-bg: #FFF4DE;
+    --color-danger: #C73535;
+    --color-danger-bg: #FDECEC;
     --color-info: #2767A8;
     --color-info-bg: #EAF1F8;
+    --color-surface-hover: #EDEEED;
+    --color-muted-strong: #626970;
+    --color-reference-111719: #111719;
+    --color-reference-15518a: #15518A;
+    --color-reference-17191c: #17191C;
+    --color-reference-17623f: #17623F;
+    --color-reference-20251f: #20251F;
+    --color-reference-202721: #202721;
+    --color-reference-23613a: #23613A;
+    --color-reference-242b25: #242B25;
+    --color-reference-243719: #243719;
+    --color-reference-245c91: #245C91;
+    --color-reference-252b26: #252B26;
+    --color-reference-263328: #263328;
+    --color-reference-273029: #273029;
+    --color-reference-292929: #292929;
+    --color-reference-29451e: #29451E;
+    --color-reference-2d4823: #2D4823;
+    --color-reference-2f4826: #2F4826;
+    --color-reference-333b34: #333B34;
+    --color-reference-343b35: #343B35;
+    --color-reference-35502b: #35502B;
+    --color-reference-3f4a40: #3F4A40;
+    --color-reference-42494f: #42494F;
+    --color-reference-424c43: #424C43;
+    --color-reference-45652a: #45652A;
+    --color-reference-456c30: #456C30;
+    --color-reference-4a534b: #4A534B;
+    --color-reference-4c554d: #4C554D;
+    --color-reference-4c554f: #4C554F;
+    --color-reference-4e574f: #4E574F;
+    --color-reference-4e5a4c: #4E5A4C;
+    --color-reference-4f5850: #4F5850;
+    --color-reference-50604e: #50604E;
+    --color-reference-515a52: #515A52;
+    --color-reference-547b37: #547B37;
+    --color-reference-567b36: #567B36;
+    --color-reference-59615b: #59615B;
+    --color-reference-5c8537: #5C8537;
+    --color-reference-674d11: #674D11;
+    --color-reference-68716a: #68716A;
+    --color-reference-6b4400: #6B4400;
+    --color-reference-718c5a: #718C5A;
+    --color-reference-7c837d: #7C837D;
+    --color-reference-8f1720: #8F1720;
+    --color-reference-98ad86: #98AD86;
+    --color-reference-9bb18a: #9BB18A;
+    --color-reference-9f1620: #9F1620;
+    --color-reference-a61d26: #A61D26;
+    --color-reference-a91923: #A91923;
+    --color-reference-a91d26: #A91D26;
+    --color-reference-b28b25: #B28B25;
+    --color-reference-b9c0ba: #B9C0BA;
+    --color-reference-bac3c8: #BAC3C8;
+    --color-reference-c0845c: #C0845C;
+    --color-reference-c6202b: #C6202B;
+    --color-reference-c9d0c6: #C9D0C6;
+    --color-reference-cbd2ca: #CBD2CA;
+    --color-reference-cbd3c8: #CBD3C8;
+    --color-reference-d0d5d1: #D0D5D1;
+    --color-reference-d5e5cb: #D5E5CB;
+    --color-reference-d8b74c: #D8B74C;
+    --color-reference-d8ded6: #D8DED6;
+    --color-reference-d8edbd: #D8EDBD;
+    --color-reference-d9dfd6: #D9DFD6;
+    --color-reference-dce1db: #DCE1DB;
+    --color-reference-dceacc: #DCEACC;
+    --color-reference-dfe3de: #DFE3DE;
+    --color-reference-dfe5dc: #DFE5DC;
+    --color-reference-e0e4df: #E0E4DF;
+    --color-reference-e1e5df: #E1E5DF;
+    --color-reference-e2e5e2: #E2E5E2;
+    --color-reference-e2e6e1: #E2E6E1;
+    --color-reference-e3e8e1: #E3E8E1;
+    --color-reference-e4e7e2: #E4E7E2;
+    --color-reference-e4edd9: #E4EDD9;
+    --color-reference-e5e8e4: #E5E8E4;
+    --color-reference-e6e6e6: #E6E6E6;
+    --color-reference-eaf1f8: #EAF1F8;
+    --color-reference-eaf2e3: #EAF2E3;
+    --color-reference-eaf4ec: #EAF4EC;
+    --color-reference-eceeeb: #ECEEEB;
+    --color-reference-edf3e7: #EDF3E7;
+    --color-reference-edf3e8: #EDF3E8;
+    --color-reference-edf4e7: #EDF4E7;
+    --color-reference-eef3e9: #EEF3E9;
+    --color-reference-efc9cc: #EFC9CC;
+    --color-reference-f0f2ef: #F0F2EF;
+    --color-reference-f0f3ee: #F0F3EE;
+    --color-reference-f1e1b5: #F1E1B5;
+    --color-reference-f1f4ef: #F1F4EF;
+    --color-reference-f1f6eb: #F1F6EB;
+    --color-reference-f3f6f0: #F3F6F0;
+    --color-reference-f4f6f3: #F4F6F3;
+    --color-reference-f7faf4: #F7FAF4;
+    --color-reference-f8edcf: #F8EDCF;
+    --color-reference-fafaf9: #FAFAF9;
+    --color-reference-fafbf9: #FAFBF9;
+    --color-reference-fafbfa: #FAFBFA;
+    --color-reference-fafcf8: #FAFCF8;
+    --color-reference-fbeaec: #FBEAEC;
+    --color-reference-fff1f1: #FFF1F1;
+    --color-reference-ffffff: #FFFFFF;
 
     --font-heading: var(--font-poppins), system-ui, sans-serif;
     --font-body: var(--font-poppins), system-ui, sans-serif;
@@ -210,20 +313,23 @@
         transform: translateY(0);
     }
 
-    /* Acción principal: texto navy sobre coral (contraste 4,6:1) */
+    .btn-md { min-height: 2.75rem; }
+    .btn-lg { min-height: 3.25rem; padding: 0.9rem 1.5rem; font-size: 1rem; }
+
+    /* Acción principal: texto navy sobre coral (contraste AA) */
     .btn-primario {
         background: var(--color-coral);
-        color: #fff;
+        color: var(--color-navy);
     }
 
     .btn-primario:hover {
         filter: brightness(0.95);
     }
 
-    /* CTA de portada: texto blanco grande y en negrita (contraste válido para texto grande) */
+    /* CTA de portada sigue la combinación coral y navy de la marca. */
     .btn-cta {
         background: var(--color-coral);
-        color: #fff;
+        color: var(--color-navy);
         font-size: 1.2rem;
         font-weight: 700;
         padding: 0.9rem 1.5rem;
@@ -337,17 +443,6 @@
     }
 }
 
-[class~="bg-[#F0443A]"] {
-    background-color: var(--color-coral);
-}
-
-[class~="text-[#F0443A]"] {
-    color: var(--color-coral);
-}
-
-[class~="border-[#F0443A]"] {
-    border-color: var(--color-coral);
-}
 
 .container {
     width: min(calc(100% - 2.5rem), 1200px);

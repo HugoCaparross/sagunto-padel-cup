@@ -19,7 +19,7 @@
 
 .tarjeta:hover {
   transform: translateY(-3px);
-  border-color: #b9c0ba;
+  border-color: var(--color-reference-b9c0ba);
   box-shadow: 0 0.75rem 1.75rem rgb(23 25 28 / 0.1);
 }
 
@@ -55,28 +55,28 @@
 }
 
 .estadoProxima {
-  background: #e8f0fb;
-  color: #15518a;
+  background: var(--color-info-bg);
+  color: var(--color-reference-15518a);
 }
 
 .estadoAbierta {
-  background: #eaf6ef;
-  color: #17623f;
+  background: var(--color-success-bg);
+  color: var(--color-reference-17623f);
 }
 
 .estadoCerrada {
-  background: #fff4de;
-  color: #6b4400;
+  background: var(--color-warning-bg);
+  color: var(--color-reference-6b4400);
 }
 
 .estadoEnCurso {
-  background: #17191c;
+  background: var(--color-reference-17191c);
   color: #fff;
 }
 
 .estadoFinalizada {
-  background: #f0f2ef;
-  color: #4c554f;
+  background: var(--color-reference-f0f2ef);
+  color: var(--color-reference-4c554f);
 }
 
 .nombre {
@@ -127,11 +127,11 @@
 }
 
 .plazas {
-  color: #17623f;
+  color: var(--color-reference-17623f);
 }
 
 .listaEspera {
-  color: #6b4400;
+  color: var(--color-reference-6b4400);
 }
 
 .detalle {
@@ -148,7 +148,7 @@
 }
 
 .tarjeta:hover .detalle {
-  color: #9f1620;
+  color: var(--color-reference-9f1620);
 }
 
 @media (prefers-reduced-motion: reduce) {

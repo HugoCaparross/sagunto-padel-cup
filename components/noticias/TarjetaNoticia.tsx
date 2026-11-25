@@ -7,7 +7,7 @@ export default function TarjetaNoticia({ noticia }: { noticia: NoticiaPublica })
     return (
         <Link
             href={`/noticias/${noticia.slug}`}
-            className="group flex h-full flex-col overflow-hidden rounded-xl bg-white ring-1 ring-[#D5D9DC] hover:ring-[#0D1B2A]"
+            className="group flex h-full flex-col overflow-hidden rounded-xl bg-white ring-1 ring-[var(--color-border)] hover:ring-[var(--color-navy)]"
         >
             {noticia.imagenUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -20,14 +20,14 @@ export default function TarjetaNoticia({ noticia }: { noticia: NoticiaPublica })
             )}
 
             <div className="flex flex-1 flex-col gap-3 p-5">
-                <p className="text-xs text-[#68737D]">
+                <p className="text-xs text-[var(--color-muted)]">
                     {ETIQUETAS_NOTICIA[noticia.categoria]}
                     {noticia.publicadaAt && ` · ${fechaLarga(noticia.publicadaAt)}`}
                 </p>
                 <h2 className="heading-font text-2xl leading-tight group-hover:underline">
                     {noticia.titulo}
                 </h2>
-                <p className="text-sm text-[#68737D]">{noticia.resumen}</p>
+                <p className="text-sm text-[var(--color-muted)]">{noticia.resumen}</p>
             </div>
         </Link>
     );

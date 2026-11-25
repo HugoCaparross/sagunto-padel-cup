@@ -18,7 +18,7 @@ export default async function PaginaContactos({ searchParams }: Props) {
         : undefined;
 
     const res = await listarContactos(filtro ? { estado: filtro } : {});
-    if (!res.ok) return <p className="p-6 text-[#C73535]">{res.error}</p>;
+    if (!res.ok) return <p className="p-6 text-[var(--color-danger)]">{res.error}</p>;
 
     const opciones: { valor: EstadoContacto | null; texto: string }[] = [
         { valor: null, texto: "Todas" },
@@ -36,7 +36,7 @@ export default async function PaginaContactos({ searchParams }: Props) {
                             <Link
                                 key={o.texto}
                                 href={o.valor ? `?estado=${o.valor}` : "?"}
-                                className={`rounded-md px-3 py-1 text-sm ${activo ? "bg-[#0D1B2A] text-white" : "bg-white ring-1 ring-[#D5D9DC]"
+                                className={`rounded-md px-3 py-1 text-sm ${activo ? "bg-[var(--color-navy)] text-white" : "bg-white ring-1 ring-[var(--color-border)]"
                                     }`}
                             >
                                 {o.texto}

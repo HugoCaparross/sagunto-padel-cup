@@ -27,7 +27,7 @@ export default async function PaginaCuadros({ params, searchParams }: Props) {
                     <Link
                         key={c}
                         href={`?categoria=${c}`}
-                        className={`rounded-md px-3 py-1 text-sm ${c === cat ? "bg-[#0D1B2A] text-white" : "bg-white ring-1 ring-[#D5D9DC]"
+                        className={`rounded-md px-3 py-1 text-sm ${c === cat ? "bg-[var(--color-navy)] text-white" : "bg-white ring-1 ring-[var(--color-border)]"
                             }`}
                     >
                         {c}
@@ -42,7 +42,7 @@ export default async function PaginaCuadros({ params, searchParams }: Props) {
                     <CierreCategoria pruebaId={id} categoria={cat} />
                 </>
             ) : (
-                <p className="text-[#C73535]">{res.error}</p>
+                <p className="text-[var(--color-danger)]">{res.error}</p>
             )}
         </main>
     );

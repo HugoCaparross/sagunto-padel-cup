@@ -23,7 +23,7 @@ export default async function PaginaOnboarding() {
     <main className="mx-auto max-w-md space-y-6 px-4 py-12">
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold">Completa tu perfil</h1>
-        <p className="text-sm text-[#68737D]">Solo tendrás que hacerlo una vez.</p>
+        <p className="text-sm text-[var(--color-muted)]">Solo tendrás que hacerlo una vez.</p>
       </header>
       <OnboardingForm nombreInicial={perfil?.nombre ?? ""} />
     </main>

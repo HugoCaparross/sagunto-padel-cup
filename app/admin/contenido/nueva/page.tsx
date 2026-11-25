@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Nueva noticia · Admin" };
 export default function PaginaNuevaNoticia() {
     return (
         <main className="max-w-3xl space-y-6">
-            <nav className="text-sm text-[#68737D]">
+            <nav className="text-sm text-[var(--color-muted)]">
                 <Link href="/admin/contenido" className="hover:underline">
                     Noticias
                 </Link>

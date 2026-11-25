@@ -15,7 +15,7 @@ export default function SelectorPrueba({ pruebas, activaId, ruta }: Props) {
                     key={p.id}
                     href={`${ruta}?prueba=${p.slug}`}
                     aria-current={p.id === activaId ? "page" : undefined}
-                    className={`rounded-md px-3 py-1.5 text-sm ${p.id === activaId ? "bg-[#0D1B2A] text-white" : "bg-white ring-1 ring-[#D5D9DC]"
+                    className={`rounded-md px-3 py-1.5 text-sm ${p.id === activaId ? "bg-[var(--color-navy)] text-white" : "bg-white ring-1 ring-[var(--color-border)]"
                         }`}
                 >
                     {p.nombre}

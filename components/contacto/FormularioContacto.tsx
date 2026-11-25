@@ -5,6 +5,7 @@ import { useState, useTransition, type FormEvent } from "react";
 import { enviarContacto } from "@/actions/contacto";
 import type { TipoContacto } from "@/lib/validadores/contacto";
 import Aviso from "@/components/ui/Aviso";
+import Boton from "@/components/ui/Boton";
 
 type Props = { logueado: boolean; tipoInicial?: TipoContacto };
 
@@ -39,12 +40,12 @@ export default function FormularioContacto({ logueado, tipoInicial = "consulta" 
         });
     }
 
-    const campo = "rounded-md border border-[#D5D9DC] bg-white px-3 py-2 text-sm";
+    const campo = "rounded-md border border-[var(--color-border)] bg-white px-3 py-2 text-sm";
 
     return (
-        <form onSubmit={enviar} className="space-y-5 rounded-xl bg-white p-6 ring-1 ring-[#D5D9DC]">
+        <form onSubmit={enviar} className="space-y-5 rounded-xl bg-white p-6 ring-1 ring-[var(--color-border)]">
             <fieldset className="space-y-2">
-                <legend className="text-sm text-[#68737D]">Tipo de mensaje</legend>
+                <legend className="text-sm text-[var(--color-muted)]">Tipo de mensaje</legend>
                 <label className="flex items-center gap-2 text-sm">
                     <input type="radio" name="tipo" value="consulta" defaultChecked={tipoInicial === "consulta"} />
                     Consulta
@@ -62,17 +63,17 @@ export default function FormularioContacto({ logueado, tipoInicial = "consulta" 
             </fieldset>
 
             <label className="flex flex-col gap-1 text-sm">
-                <span className="text-[#68737D]">Nombre</span>
+                <span className="text-[var(--color-muted)]">Nombre</span>
                 <input name="nombre" autoComplete="name" required minLength={2} maxLength={80} className={campo} />
             </label>
 
             <label className="flex flex-col gap-1 text-sm">
-                <span className="text-[#68737D]">Email</span>
+                <span className="text-[var(--color-muted)]">Email</span>
                 <input name="email" type="email" autoComplete="email" required maxLength={254} className={campo} />
             </label>
 
             <label className="flex flex-col gap-1 text-sm">
-                <span className="text-[#68737D]">Mensaje</span>
+                <span className="text-[var(--color-muted)]">Mensaje</span>
                 <textarea name="mensaje" required minLength={10} maxLength={2000} rows={6} className={campo} />
             </label>
 
@@ -108,13 +109,12 @@ export default function FormularioContacto({ logueado, tipoInicial = "consulta" 
                 </Aviso>
             )}
 
-            <button
+            <Boton
                 type="submit"
                 disabled={pendiente}
-                className="rounded-lg bg-[#F0443A] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
             >
                 {pendiente ? "Enviando…" : "Enviar"}
-            </button>
+            </Boton>
         </form>
     );
 }

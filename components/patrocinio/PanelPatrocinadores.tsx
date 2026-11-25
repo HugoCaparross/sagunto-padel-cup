@@ -1,5 +1,7 @@
 "use client";
 
+import Boton from "@/components/ui/Boton";
+
 import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -17,7 +19,7 @@ type Props = {
 
 type Resultado = { ok: true } | { ok: false; error: string };
 
-const CAMPO = "rounded-md border border-[#D5D9DC] bg-white px-2 py-1.5 text-sm";
+const CAMPO = "rounded-md border border-[var(--color-border)] bg-white px-2 py-1.5 text-sm";
 
 export default function PanelPatrocinadores({ pruebaId, patrocinadores, asignadas }: Props) {
     const router = useRouter();
@@ -66,49 +68,48 @@ export default function PanelPatrocinadores({ pruebaId, patrocinadores, asignada
             <header className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h2 className="font-semibold">Patrocinadores</h2>
-                    <p className="text-xs text-[#68737D]">
+                    <p className="text-xs text-[var(--color-muted)]">
                         Los inactivos no se muestran en la web. Asígnalos a la prueba con la casilla.
                     </p>
                 </div>
-                <button
+                <Boton variante="primario" tamano="md"
                     type="button"
                     onClick={() => setEditando("nuevo")}
-                    className="rounded-lg bg-[#F0443A] px-3 py-2 text-sm font-medium text-white"
                 >
                     Nuevo patrocinador
-                </button>
+                </Boton>
             </header>
 
             {editando !== null && (
                 <form
                     key={valor?.id ?? "nuevo"}
                     onSubmit={guardar}
-                    className="grid gap-3 rounded-xl bg-white p-4 text-sm ring-1 ring-[#D5D9DC] md:grid-cols-2"
+                    className="grid gap-3 rounded-xl bg-white p-4 text-sm ring-1 ring-[var(--color-border)] md:grid-cols-2"
                 >
                     <label className="flex flex-col gap-1">
-                        <span className="text-[#68737D]">Nombre</span>
+                        <span className="text-[var(--color-muted)]">Nombre</span>
                         <input name="nombre" defaultValue={valor?.nombre ?? ""} required minLength={2} maxLength={120} className={CAMPO} />
                     </label>
                     <label className="flex flex-col gap-1">
-                        <span className="text-[#68737D]">Tipo</span>
+                        <span className="text-[var(--color-muted)]">Tipo</span>
                         <select name="tipo" defaultValue={valor?.tipo ?? "comercial"} className={CAMPO}>
                             <option value="institucional">Institucional</option>
                             <option value="comercial">Comercial</option>
                         </select>
                     </label>
                     <label className="flex flex-col gap-1 md:col-span-2">
-                        <span className="text-[#68737D]">URL del logo</span>
+                        <span className="text-[var(--color-muted)]">URL del logo</span>
                         <input name="logoUrl" type="url" defaultValue={valor?.logoUrl ?? ""} required maxLength={500} className={CAMPO} />
                     </label>
                     <label className="flex flex-col gap-1 md:col-span-2">
-                        <span className="text-[#68737D]">Web (opcional)</span>
+                        <span className="text-[var(--color-muted)]">Web (opcional)</span>
                         <input name="webUrl" type="url" defaultValue={valor?.webUrl ?? ""} maxLength={500} className={CAMPO} />
                     </label>
                     <div className="flex gap-2 md:col-span-2">
-                        <button type="submit" disabled={pendiente} className="rounded-lg bg-[#0D1B2A] px-3 py-2 text-white disabled:opacity-50">
+                        <Boton variante="secundario" tamano="md" type="submit" disabled={pendiente} className="disabled:opacity-50">
                             Guardar
-                        </button>
-                        <button type="button" onClick={() => setEditando(null)} className="text-[#68737D] underline">
+                        </Boton>
+                        <button type="button" onClick={() => setEditando(null)} className="text-[var(--color-muted)] underline">
                             Cancelar
                         </button>
                     </div>
@@ -116,17 +117,17 @@ export default function PanelPatrocinadores({ pruebaId, patrocinadores, asignada
             )}
 
             {mensaje && (
-                <p className={`rounded-lg p-3 text-sm ${mensaje.tipo === "ok" ? "bg-[#EAF6EF] text-[#16845B]" : "bg-[#FDECEC] text-[#C73535]"}`}>
+                <p className={`rounded-lg p-3 text-sm ${mensaje.tipo === "ok" ? "bg-[var(--color-success-bg)] text-[var(--color-success)]" : "bg-[var(--color-danger-bg)] text-[var(--color-danger)]"}`}>
                     {mensaje.texto}
                 </p>
             )}
 
             {patrocinadores.length === 0 ? (
-                <p className="text-sm text-[#68737D]">Todavía no hay patrocinadores.</p>
+                <p className="text-sm text-[var(--color-muted)]">Todavía no hay patrocinadores.</p>
             ) : (
-                <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[#D5D9DC]">
+                <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[var(--color-border)]">
                     <table className="w-full text-sm">
-                        <thead className="bg-[#F4F5F4] text-left text-xs uppercase text-[#68737D]">
+                        <thead className="bg-[var(--color-surface)] text-left text-xs uppercase text-[var(--color-muted)]">
                             <tr>
                                 <th className="px-4 py-2">Nombre</th>
                                 <th className="px-4 py-2">Tipo</th>
@@ -137,10 +138,10 @@ export default function PanelPatrocinadores({ pruebaId, patrocinadores, asignada
                         </thead>
                         <tbody>
                             {patrocinadores.map((p) => (
-                                <tr key={p.id} className="border-t border-[#D5D9DC]">
+                                <tr key={p.id} className="border-t border-[var(--color-border)]">
                                     <td className="px-4 py-2 font-medium">{p.nombre}</td>
                                     <td className="px-4 py-2">{p.tipo === "institucional" ? "Institucional" : "Comercial"}</td>
-                                    <td className="px-4 py-2 text-[#68737D]">{p.webUrl ?? "—"}</td>
+                                    <td className="px-4 py-2 text-[var(--color-muted)]">{p.webUrl ?? "—"}</td>
                                     <td className="px-4 py-2 text-center">
                                         <input
                                             type="checkbox"
@@ -173,7 +174,7 @@ export default function PanelPatrocinadores({ pruebaId, patrocinadores, asignada
                                                         p.activo ? "Patrocinador desactivado" : "Patrocinador activado"
                                                     )
                                                 }
-                                                className={`underline disabled:opacity-50 ${p.activo ? "" : "text-[#68737D]"}`}
+                                                className={`underline disabled:opacity-50 ${p.activo ? "" : "text-[var(--color-muted)]"}`}
                                             >
                                                 {p.activo ? "Desactivar" : "Activar"}
                                             </button>

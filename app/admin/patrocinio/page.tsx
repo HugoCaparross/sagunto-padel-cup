@@ -19,7 +19,7 @@ export default async function PaginaPatrocinioAdmin({ searchParams }: Props) {
 
     if (!elegida) {
         return (
-            <p className="text-sm text-[#68737D]">
+            <p className="text-sm text-[var(--color-muted)]">
                 Crea una prueba antes de asignar patrocinadores o premios.
             </p>
         );
@@ -32,7 +32,7 @@ export default async function PaginaPatrocinioAdmin({ searchParams }: Props) {
             <header className="space-y-4">
                 <div>
                     <h1 className="text-2xl font-semibold">Patrocinio y premios</h1>
-                    <p className="text-sm text-[#68737D]">Gestiona los patrocinadores y los premios de cada prueba.</p>
+                    <p className="text-sm text-[var(--color-muted)]">Gestiona los patrocinadores y los premios de cada prueba.</p>
                 </div>
                 <SelectorPrueba pruebas={pruebas} activaId={elegida.id} ruta="/admin/patrocinio" />
             </header>

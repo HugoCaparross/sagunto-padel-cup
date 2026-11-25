@@ -13,11 +13,9 @@ import {
 } from "@/actions/auth";
 import { TALLAS } from "@/lib/validadores/auth";
 import Aviso from "@/components/ui/Aviso";
+import Boton from "@/components/ui/Boton";
 
-const CAMPO = "rounded-md border border-[#D5D9DC] bg-white px-3 py-2 text-sm";
-const BOTON =
-    "w-full rounded-lg bg-[#F0443A] px-4 py-2 text-sm font-medium text-white disabled:opacity-50";
-
+const CAMPO = "rounded-md border border-[var(--color-border)] bg-white px-3 py-2 text-sm";
 function useEnvio() {
     const router = useRouter();
     const [pendiente, start] = useTransition();
@@ -43,7 +41,7 @@ function MensajeError({ texto }: { texto: string | null }) {
 function Campo({ etiqueta, children }: { etiqueta: string; children: ReactNode }) {
     return (
         <label className="flex flex-col gap-1 text-sm">
-            <span className="text-[#68737D]">{etiqueta}</span>
+            <span className="text-[var(--color-muted)]">{etiqueta}</span>
             {children}
         </label>
     );
@@ -74,9 +72,9 @@ export function LoginForm({ siguiente }: { siguiente?: string }) {
                 <input name="password" type="password" autoComplete="current-password" required className={CAMPO} />
             </Campo>
             <MensajeError texto={error} />
-            <button type="submit" disabled={pendiente} className={BOTON}>
+            <Boton type="submit" disabled={pendiente} className="w-full">
                 {pendiente ? "Entrando…" : "Entrar"}
-            </button>
+            </Boton>
             <div className="flex justify-between text-sm">
                 <Link href="/recuperar" className="underline">
                     He olvidado la contraseña
@@ -132,9 +130,9 @@ export function RegistroForm() {
                 </span>
             </label>
             <MensajeError texto={error} />
-            <button type="submit" disabled={pendiente} className={BOTON}>
+            <Boton type="submit" disabled={pendiente} className="w-full">
                 {pendiente ? "Creando cuenta…" : "Crear cuenta"}
-            </button>
+            </Boton>
         </form>
     );
 }
@@ -155,9 +153,9 @@ export function RecuperarForm() {
                 <input name="email" type="email" autoComplete="email" required className={CAMPO} />
             </Campo>
             <MensajeError texto={error} />
-            <button type="submit" disabled={pendiente} className={BOTON}>
+            <Boton type="submit" disabled={pendiente} className="w-full">
                 Enviar enlace
-            </button>
+            </Boton>
         </form>
     );
 }
@@ -186,9 +184,9 @@ export function NuevaContrasenaForm() {
                 <input name="confirmacion" type="password" autoComplete="new-password" required minLength={10} className={CAMPO} />
             </Campo>
             <MensajeError texto={error} />
-            <button type="submit" disabled={pendiente} className={BOTON}>
+            <Boton type="submit" disabled={pendiente} className="w-full">
                 Guardar contraseña
-            </button>
+            </Boton>
         </form>
     );
 }
@@ -269,9 +267,9 @@ export function OnboardingForm({ nombreInicial }: { nombreInicial: string }) {
             </fieldset>
 
             <MensajeError texto={error} />
-            <button type="submit" disabled={pendiente} className={BOTON}>
+            <Boton type="submit" disabled={pendiente} className="w-full">
                 {pendiente ? "Guardando…" : "Continuar"}
-            </button>
+            </Boton>
         </form>
     );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Boton from "@/components/ui/Boton";
 import { useMemo, useState, type ReactNode } from "react";
 import {
     DndContext,
@@ -79,7 +80,7 @@ function Chip({
             ref={setNodeRef}
             {...listeners}
             {...attributes}
-            className={`cursor-grab select-none rounded-md bg-white px-2 py-1 text-sm shadow-sm ring-1 ring-[#D5D9DC] ${isDragging ? "opacity-50" : ""
+            className={`cursor-grab select-none rounded-md bg-white px-2 py-1 text-sm shadow-sm ring-1 ring-[var(--color-border)] ${isDragging ? "opacity-50" : ""
                 }`}
         >
             {children}
@@ -102,7 +103,7 @@ function Zona({
     return (
         <div
             ref={setNodeRef}
-            className={`${className ?? ""} ${isOver ? "ring-2 ring-[#F0443A]" : ""}`}
+            className={`${className ?? ""} ${isOver ? "ring-2 ring-[var(--color-coral)]" : ""}`}
         >
             {children}
         </div>
@@ -361,7 +362,7 @@ export default function EditorLlaves({
             <Zona
                 id={`dest:${p.id}:${lado}`}
                 destino={{ tipo: "lado", partidoId: p.id, lado }}
-                className="flex min-h-9 items-center justify-between gap-2 rounded-md border border-dashed border-[#D5D9DC] bg-white px-2 py-1 text-sm"
+                className="flex min-h-9 items-center justify-between gap-2 rounded-md border border-dashed border-[var(--color-border)] bg-white px-2 py-1 text-sm"
             >
                 {valor ? (
                     <>
@@ -371,14 +372,14 @@ export default function EditorLlaves({
                         <button
                             type="button"
                             onClick={() => quitarLado(p.id, lado)}
-                            className="text-xs text-[#68737D]"
+                            className="text-xs text-[var(--color-muted)]"
                             aria-label="Quitar"
                         >
                             ×
                         </button>
                     </>
                 ) : (
-                    <span className="text-[#68737D]">Arrastra aquí</span>
+                    <span className="text-[var(--color-muted)]">Arrastra aquí</span>
                 )}
             </Zona>
         );
@@ -388,21 +389,21 @@ export default function EditorLlaves({
         const auto = automaticos.find((a) => a.cuadro === c);
 
         return (
-            <section key={c} className="rounded-xl bg-white p-4 ring-1 ring-[#D5D9DC]">
+            <section key={c} className="rounded-xl bg-white p-4 ring-1 ring-[var(--color-border)]">
                 <h2 className="mb-3 text-lg font-semibold">{NOMBRE_CUADRO[c]}</h2>
 
                 <Zona
                     id={`auto:${c}`}
                     destino={{ tipo: "automatico", cuadro: c }}
-                    className="mb-4 rounded-md border border-dashed border-[#D5D9DC] p-2"
+                    className="mb-4 rounded-md border border-dashed border-[var(--color-border)] p-2"
                 >
-                    <div className="mb-1 flex items-center justify-between text-xs text-[#68737D]">
+                    <div className="mb-1 flex items-center justify-between text-xs text-[var(--color-muted)]">
                         <span>Campeón automático (sin partido)</span>
                         {auto?.inscripcionId && (
                             <button
                                 type="button"
                                 onClick={() => reemplazarAutomatico(c, null)}
-                                className="text-[#C73535]"
+                                className="text-[var(--color-danger)]"
                             >
                                 Quitar
                             </button>
@@ -416,7 +417,7 @@ export default function EditorLlaves({
                             {textoDe.get(auto.inscripcionId) ?? "Pareja"}
                         </Chip>
                     ) : (
-                        <span className="text-sm text-[#68737D]">Arrastra una pareja aquí</span>
+                        <span className="text-sm text-[var(--color-muted)]">Arrastra una pareja aquí</span>
                     )}
                 </Zona>
 
@@ -431,7 +432,7 @@ export default function EditorLlaves({
                                 <button
                                     type="button"
                                     onClick={() => anadirPartido(c, r)}
-                                    className="text-xs font-medium text-[#F0443A]"
+                                    className="text-xs font-medium text-[var(--color-coral)]"
                                 >
                                     + partido
                                 </button>
@@ -439,16 +440,16 @@ export default function EditorLlaves({
 
                             <div className="space-y-2">
                                 {lista.map((p) => (
-                                    <div key={p.id} className="rounded-lg bg-[#F4F5F4] p-2">
+                                    <div key={p.id} className="rounded-lg bg-[var(--color-surface)] p-2">
                                         <div className="mb-2 flex flex-wrap items-center gap-1 text-xs">
-                                            <span className="mr-1 font-medium text-[#68737D]">P{numeroDe(p.id)}</span>
+                                            <span className="mr-1 font-medium text-[var(--color-muted)]">P{numeroDe(p.id)}</span>
 
                                             <select
                                                 value={p.cuadro}
                                                 onChange={(e) =>
                                                     cambiarPartido(p.id, { cuadro: e.target.value as Cuadro })
                                                 }
-                                                className="rounded border border-[#D5D9DC] bg-white px-1 py-0.5"
+                                                className="rounded border border-[var(--color-border)] bg-white px-1 py-0.5"
                                                 aria-label="Cuadro"
                                             >
                                                 {CUADROS_ORDEN.map((x) => (
@@ -463,7 +464,7 @@ export default function EditorLlaves({
                                                 onChange={(e) =>
                                                     cambiarPartido(p.id, { ronda: e.target.value as Ronda })
                                                 }
-                                                className="rounded border border-[#D5D9DC] bg-white px-1 py-0.5"
+                                                className="rounded border border-[var(--color-border)] bg-white px-1 py-0.5"
                                                 aria-label="Ronda"
                                             >
                                                 {RONDAS.map((x) => (
@@ -480,7 +481,7 @@ export default function EditorLlaves({
                                                         formato: e.target.value as "fase_final" | "final",
                                                     })
                                                 }
-                                                className="rounded border border-[#D5D9DC] bg-white px-1 py-0.5"
+                                                className="rounded border border-[var(--color-border)] bg-white px-1 py-0.5"
                                                 aria-label="Formato"
                                             >
                                                 <option value="fase_final">1 set · 9 juegos</option>
@@ -490,7 +491,7 @@ export default function EditorLlaves({
                                             <button
                                                 type="button"
                                                 onClick={() => moverPartido(p.id, -1)}
-                                                className="rounded px-1 text-[#68737D] hover:bg-white"
+                                                className="rounded px-1 text-[var(--color-muted)] hover:bg-white"
                                                 aria-label="Subir"
                                             >
                                                 ↑
@@ -498,7 +499,7 @@ export default function EditorLlaves({
                                             <button
                                                 type="button"
                                                 onClick={() => moverPartido(p.id, 1)}
-                                                className="rounded px-1 text-[#68737D] hover:bg-white"
+                                                className="rounded px-1 text-[var(--color-muted)] hover:bg-white"
                                                 aria-label="Bajar"
                                             >
                                                 ↓
@@ -507,7 +508,7 @@ export default function EditorLlaves({
                                             <button
                                                 type="button"
                                                 onClick={() => quitarPartido(p.id)}
-                                                className="ml-auto text-[#C73535]"
+                                                className="ml-auto text-[var(--color-danger)]"
                                             >
                                                 Eliminar
                                             </button>
@@ -549,7 +550,7 @@ export default function EditorLlaves({
                     <h1 className="text-2xl font-semibold">
                         Llaves · {ETIQUETAS_CATEGORIA[categoria]}
                     </h1>
-                    <p className="text-sm text-[#68737D]">
+                    <p className="text-sm text-[var(--color-muted)]">
                         {datos.parejas} parejas
                         {datos.sugerida ? " · plantilla sugerida, sin guardar" : ""}
                         {datos.bloqueado ? " · hay resultados registrados" : ""}
@@ -561,7 +562,7 @@ export default function EditorLlaves({
                         type="button"
                         onClick={sugerirSorteoCuartos}
                         disabled={sorteando}
-                        className="rounded-lg bg-white px-3 py-2 text-sm ring-1 ring-[#D5D9DC] disabled:opacity-50"
+                        className="rounded-lg bg-white px-3 py-2 text-sm ring-1 ring-[var(--color-border)] disabled:opacity-50"
                     >
                         {sorteando
                             ? "Sorteando…"
@@ -574,11 +575,11 @@ export default function EditorLlaves({
 
             <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
                 <aside className="space-y-4">
-                    <section className="rounded-xl bg-white p-4 ring-1 ring-[#D5D9DC]">
+                    <section className="rounded-xl bg-white p-4 ring-1 ring-[var(--color-border)]">
                         <h3 className="mb-2 font-semibold">Clasificación de grupos</h3>
                         {datos.grupos.map((g) => (
                             <div key={g.letra} className="mb-3">
-                                <p className="text-xs uppercase text-[#68737D]">
+                                <p className="text-xs uppercase text-[var(--color-muted)]">
                                     Grupo {g.letra} {g.completo ? "" : "· provisional"}
                                 </p>
                                 <ol className="text-sm">
@@ -595,7 +596,7 @@ export default function EditorLlaves({
                     <Zona
                         id="pendientes"
                         destino={{ tipo: "pendientes" }}
-                        className="min-h-24 rounded-xl bg-white p-4 ring-1 ring-[#D5D9DC]"
+                        className="min-h-24 rounded-xl bg-white p-4 ring-1 ring-[var(--color-border)]"
                     >
                         <h3 className="mb-2 font-semibold">Sin colocar ({pendientes.length})</h3>
                         <div className="flex flex-col gap-2">
@@ -611,37 +612,37 @@ export default function EditorLlaves({
                         </div>
                     </Zona>
 
-                    <section className="rounded-xl bg-white p-4 text-sm ring-1 ring-[#D5D9DC]">
+                    <section className="rounded-xl bg-white p-4 text-sm ring-1 ring-[var(--color-border)]">
                         <h3 className="mb-2 font-semibold">Validación</h3>
                         {errores.length === 0 && avisos.length === 0 && (
-                            <p className="text-[#16845B]">Sin incidencias.</p>
+                            <p className="text-[var(--color-success)]">Sin incidencias.</p>
                         )}
                         {errores.map((i, n) => (
-                            <p key={`e${n}`} className="mb-1 text-[#C73535]">
+                            <p key={`e${n}`} className="mb-1 text-[var(--color-danger)]">
                                 {i.mensaje}
                             </p>
                         ))}
                         {avisos.map((i, n) => (
-                            <p key={`a${n}`} className="mb-1 text-[#B77912]">
+                            <p key={`a${n}`} className="mb-1 text-[var(--color-warning)]">
                                 {i.mensaje}
                             </p>
                         ))}
                     </section>
 
-                    <button
+                    <Boton variante="primario" tamano="md"
                         type="button"
                         onClick={guardar}
                         disabled={enviando || errores.length > 0}
-                        className="w-full rounded-lg bg-[#F0443A] px-4 py-2 font-medium text-white disabled:opacity-50"
+                        className="w-full disabled:opacity-50"
                     >
                         {enviando ? "Guardando…" : "Guardar llaves"}
-                    </button>
+                    </Boton>
 
                     {mensaje && (
                         <div
                             className={`rounded-lg p-3 text-sm ${mensaje.tipo === "ok"
-                                    ? "bg-[#EAF6EF] text-[#16845B]"
-                                    : "bg-[#FDECEC] text-[#C73535]"
+                                    ? "bg-[var(--color-success-bg)] text-[var(--color-success)]"
+                                    : "bg-[var(--color-danger-bg)] text-[var(--color-danger)]"
                                 }`}
                         >
                             {mensaje.lineas.map((l, n) => (

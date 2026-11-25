@@ -1,5 +1,7 @@
 "use client";
 
+import Boton from "@/components/ui/Boton";
+
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { registrarCheckin, type FichaCheckin } from "@/actions/checkin";
@@ -47,7 +49,7 @@ export default function BotonCheckin({ token, ficha }: Props) {
     return (
         <section className="space-y-4">
             {ficha.checkinAt ? (
-                <p className="rounded-lg bg-[#EAF6EF] p-3 text-sm text-[#16845B]">
+                <p className="rounded-lg bg-[var(--color-success-bg)] p-3 text-sm text-[var(--color-success)]">
                     Llegada registrada a las{" "}
                     {new Date(ficha.checkinAt).toLocaleTimeString("es-ES", {
                         hour: "2-digit",
@@ -56,27 +58,27 @@ export default function BotonCheckin({ token, ficha }: Props) {
                     })}
                 </p>
             ) : ficha.motivoBloqueo ? (
-                <p className="rounded-lg bg-[#FFF4DE] p-3 text-sm text-[#B77912]">
+                <p className="rounded-lg bg-[var(--color-warning-bg)] p-3 text-sm text-[var(--color-warning)]">
                     {ficha.motivoBloqueo}
                 </p>
             ) : null}
 
             <div className="flex flex-col gap-2">
-                <button
+                <Boton variante="primario" tamano="lg"
                     type="button"
                     onClick={fichar}
                     disabled={enviando || !ficha.puedeRegistrar}
-                    className="rounded-lg bg-[#F0443A] px-4 py-3 font-medium text-white disabled:opacity-50"
+                    className="font-medium disabled:opacity-50"
                 >
                     Registrar llegada
-                </button>
+                </Boton>
 
                 {ficha.puedePagar && (
                     <button
                         type="button"
                         onClick={marcarPago}
                         disabled={enviando}
-                        className="rounded-lg bg-white px-4 py-3 font-medium ring-1 ring-[#D5D9DC] disabled:opacity-50"
+                        className="rounded-lg bg-white px-4 py-3 font-medium ring-1 ring-[var(--color-border)] disabled:opacity-50"
                     >
                         Marcar pago en efectivo
                     </button>
@@ -86,8 +88,8 @@ export default function BotonCheckin({ token, ficha }: Props) {
             {mensaje && (
                 <div
                     className={`rounded-lg p-3 text-sm ${mensaje.tipo === "ok"
-                            ? "bg-[#EAF6EF] text-[#16845B]"
-                            : "bg-[#FDECEC] text-[#C73535]"
+                            ? "bg-[var(--color-success-bg)] text-[var(--color-success)]"
+                            : "bg-[var(--color-danger-bg)] text-[var(--color-danger)]"
                         }`}
                 >
                     {mensaje.texto}

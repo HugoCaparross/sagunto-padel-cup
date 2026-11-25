@@ -8,7 +8,7 @@ import { TIPOS_DOCUMENTO, type TipoDocumento } from "@/lib/legal/requisitos";
 
 export default async function PaginaLegal() {
     const estado = await estadoLegal();
-    if (!estado.ok) return <p className="p-6 text-[#C73535]">{estado.error}</p>;
+    if (!estado.ok) return <p className="p-6 text-[var(--color-danger)]">{estado.error}</p>;
 
     const entradas = await Promise.all(
         TIPOS_DOCUMENTO.map(async (tipo) => {

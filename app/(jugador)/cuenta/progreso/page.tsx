@@ -44,17 +44,17 @@ export default async function PaginaProgreso() {
       <header className="space-y-4">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h1 className="text-2xl font-semibold">Mi progreso</h1>
-          <p className="text-sm text-[#68737D]">
+          <p className="text-sm text-[var(--color-muted)]">
             Nivel {progreso.nivel} · {progreso.tier}
           </p>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-[#F4F5F4]">
+        <div className="h-2 overflow-hidden rounded-full bg-[var(--color-surface)]">
           <div
-            className="h-full rounded-full bg-[#A7C4A0]"
+            className="h-full rounded-full bg-[var(--color-sage)]"
             style={{ width: `${Math.round(progreso.progreso * 100)}%` }}
           />
         </div>
-        <p className="text-sm text-[#68737D]">
+        <p className="text-sm text-[var(--color-muted)]">
           {progreso.esMaximo
             ? "Nivel máximo alcanzado"
             : `${progreso.xpFaltante} XP para el nivel ${progreso.nivel + 1}`}
@@ -63,14 +63,14 @@ export default async function PaginaProgreso() {
 
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {tarjetas.map((t) => (
-          <div key={t.etiqueta} className="rounded-xl bg-white p-4 ring-1 ring-[#D5D9DC]">
-            <p className="text-xs text-[#68737D]">{t.etiqueta}</p>
+          <div key={t.etiqueta} className="rounded-xl bg-white p-4 ring-1 ring-[var(--color-border)]">
+            <p className="text-xs text-[var(--color-muted)]">{t.etiqueta}</p>
             <p className="mt-1 text-2xl font-semibold">{t.valor}</p>
           </div>
         ))}
       </section>
 
-      <section className="rounded-xl bg-white p-5 ring-1 ring-[#D5D9DC]">
+      <section className="rounded-xl bg-white p-5 ring-1 ring-[var(--color-border)]">
         <h2 className="font-semibold">Mejor resultado</h2>
         <p className="mt-1 text-sm">
           {mejor
@@ -83,11 +83,11 @@ export default async function PaginaProgreso() {
         <h2 className="font-semibold">Historial de puntos</h2>
 
         {puntos.length === 0 ? (
-          <p className="text-sm text-[#68737D]">Cuando se publiquen tus resultados aparecerán aquí.</p>
+          <p className="text-sm text-[var(--color-muted)]">Cuando se publiquen tus resultados aparecerán aquí.</p>
         ) : (
-          <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[#D5D9DC]">
+          <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[var(--color-border)]">
             <table className="w-full text-sm">
-              <thead className="bg-[#F4F5F4] text-left text-xs uppercase text-[#68737D]">
+              <thead className="bg-[var(--color-surface)] text-left text-xs uppercase text-[var(--color-muted)]">
                 <tr>
                   <th className="px-4 py-2">Prueba</th>
                   <th className="px-4 py-2">Fecha</th>
@@ -99,7 +99,7 @@ export default async function PaginaProgreso() {
               </thead>
               <tbody>
                 {puntos.map((p, i) => (
-                  <tr key={i} className="border-t border-[#D5D9DC]">
+                  <tr key={i} className="border-t border-[var(--color-border)]">
                     <td className="px-4 py-2">{p.prueba}</td>
                     <td className="px-4 py-2">{fechaCorta(p.fecha)}</td>
                     <td className="px-4 py-2">{ETIQUETAS_CATEGORIA[p.categoria]}</td>

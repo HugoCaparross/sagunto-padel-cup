@@ -8,7 +8,7 @@ type Props = {
 export default function TablaRankingAdmin({ filas, marcas }: Props) {
     if (filas.length === 0) {
         return (
-            <p className="rounded-xl bg-white p-4 text-sm text-[#68737D] ring-1 ring-[#D5D9DC]">
+            <p className="rounded-xl bg-white p-4 text-sm text-[var(--color-muted)] ring-1 ring-[var(--color-border)]">
                 Sin resultados en la ventana de esta fecha.
             </p>
         );
@@ -16,9 +16,9 @@ export default function TablaRankingAdmin({ filas, marcas }: Props) {
 
     return (
         <div className="space-y-2">
-            <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[#D5D9DC]">
+            <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[var(--color-border)]">
                 <table className="w-full text-sm">
-                    <thead className="bg-[#F4F5F4] text-left text-xs uppercase text-[#68737D]">
+                    <thead className="bg-[var(--color-surface)] text-left text-xs uppercase text-[var(--color-muted)]">
                         <tr>
                             <th className="px-3 py-2">Pos.</th>
                             <th className="px-3 py-2">Jugador</th>
@@ -37,12 +37,12 @@ export default function TablaRankingAdmin({ filas, marcas }: Props) {
                             const marca = marcas[f.clave];
                             const fondo =
                                 marca === "ascenso"
-                                    ? "bg-[#EAF6EF]"
+                                    ? "bg-[var(--color-success-bg)]"
                                     : marca === "descenso"
-                                        ? "bg-[#FDECEC]"
+                                        ? "bg-[var(--color-danger-bg)]"
                                         : "";
                             return (
-                                <tr key={f.clave} className={`border-t border-[#D5D9DC] ${fondo}`}>
+                                <tr key={f.clave} className={`border-t border-[var(--color-border)] ${fondo}`}>
                                     <td className="px-3 py-2 font-medium">{f.posicion}</td>
                                     <td className="px-3 py-2">{f.nombre}</td>
                                     <td className="px-3 py-2 text-right font-medium">{f.puntos}</td>
@@ -60,12 +60,12 @@ export default function TablaRankingAdmin({ filas, marcas }: Props) {
                 </table>
             </div>
 
-            <p className="flex flex-wrap gap-4 text-xs text-[#68737D]">
+            <p className="flex flex-wrap gap-4 text-xs text-[var(--color-muted)]">
                 <span className="flex items-center gap-1">
-                    <span className="inline-block h-3 w-3 rounded bg-[#EAF6EF]" /> Zona de ascenso
+                    <span className="inline-block h-3 w-3 rounded bg-[var(--color-success-bg)]" /> Zona de ascenso
                 </span>
                 <span className="flex items-center gap-1">
-                    <span className="inline-block h-3 w-3 rounded bg-[#FDECEC]" /> Zona de descenso
+                    <span className="inline-block h-3 w-3 rounded bg-[var(--color-danger-bg)]" /> Zona de descenso
                 </span>
             </p>
         </div>

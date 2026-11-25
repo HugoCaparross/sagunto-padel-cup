@@ -1,5 +1,7 @@
 "use client";
 
+import Boton from "@/components/ui/Boton";
+
 import { useState } from "react";
 import {
     calcularPosicionesCategoria,
@@ -74,11 +76,11 @@ export default function CierreCategoria({ pruebaId, categoria }: Props) {
     }
 
     return (
-        <section className="space-y-4 rounded-xl bg-white p-4 ring-1 ring-[#D5D9DC]">
+        <section className="space-y-4 rounded-xl bg-white p-4 ring-1 ring-[var(--color-border)]">
             <header className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h2 className="text-lg font-semibold">Cierre de categoría</h2>
-                    <p className="text-sm text-[#68737D]">
+                    <p className="text-sm text-[var(--color-muted)]">
                         Calcula las posiciones finales a partir de los resultados y publica los puntos.
                     </p>
                 </div>
@@ -87,23 +89,23 @@ export default function CierreCategoria({ pruebaId, categoria }: Props) {
                         type="button"
                         onClick={calcular}
                         disabled={cargando}
-                        className="rounded-lg bg-white px-3 py-2 text-sm ring-1 ring-[#D5D9DC] disabled:opacity-50"
+                        className="rounded-lg bg-white px-3 py-2 text-sm ring-1 ring-[var(--color-border)] disabled:opacity-50"
                     >
                         Calcular posiciones
                     </button>
-                    <button
+                    <Boton variante="primario" tamano="md"
                         type="button"
                         onClick={publicar}
                         disabled={cargando || !filas}
-                        className="rounded-lg bg-[#F0443A] px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+                        className="font-medium disabled:opacity-50"
                     >
                         {cargando ? "Procesando…" : "Publicar puntos"}
-                    </button>
+                    </Boton>
                 </div>
             </header>
 
             {motivos.length > 0 && (
-                <div className="rounded-lg bg-[#FFF4DE] p-3 text-sm text-[#B77912]">
+                <div className="rounded-lg bg-[var(--color-warning-bg)] p-3 text-sm text-[var(--color-warning)]">
                     {motivos.map((m) => (
                         <p key={m}>{m}</p>
                     ))}
@@ -113,7 +115,7 @@ export default function CierreCategoria({ pruebaId, categoria }: Props) {
             {filas && (
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="text-left text-xs uppercase text-[#68737D]">
+                        <thead className="text-left text-xs uppercase text-[var(--color-muted)]">
                             <tr>
                                 <th className="py-2">Pareja</th>
                                 <th className="py-2">Cuadro</th>
@@ -123,7 +125,7 @@ export default function CierreCategoria({ pruebaId, categoria }: Props) {
                         </thead>
                         <tbody>
                             {filas.map((f) => (
-                                <tr key={f.inscripcionId} className="border-t border-[#D5D9DC]">
+                                <tr key={f.inscripcionId} className="border-t border-[var(--color-border)]">
                                     <td className="py-2">{f.texto}</td>
                                     <td className="py-2">{ETIQUETAS_CUADRO[f.cuadro]}</td>
                                     <td className="py-2">{ETIQUETAS_RONDA[f.ronda]}</td>
@@ -133,7 +135,7 @@ export default function CierreCategoria({ pruebaId, categoria }: Props) {
                         </tbody>
                     </table>
                     {requiereMotivo && (
-                        <p className="mt-3 text-xs text-[#B77912]">
+                        <p className="mt-3 text-xs text-[var(--color-warning)]">
                             {razon}. Al publicar se pedirá un motivo.
                         </p>
                     )}
@@ -143,8 +145,8 @@ export default function CierreCategoria({ pruebaId, categoria }: Props) {
             {mensaje && (
                 <div
                     className={`rounded-lg p-3 text-sm ${mensaje.tipo === "ok"
-                            ? "bg-[#EAF6EF] text-[#16845B]"
-                            : "bg-[#FDECEC] text-[#C73535]"
+                            ? "bg-[var(--color-success-bg)] text-[var(--color-success)]"
+                            : "bg-[var(--color-danger-bg)] text-[var(--color-danger)]"
                         }`}
                 >
                     {mensaje.texto}

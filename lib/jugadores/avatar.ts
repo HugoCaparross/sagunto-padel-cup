@@ -1,4 +1,4 @@
-const FONDOS = ["#F0443A", "#0D1B2A", "#A7C4A0"] as const;
+const FONDOS = ["coral", "navy", "sage"] as const;
 
 export function inicialesJugador(nombre: string): string {
     const palabras = nombre.trim().split(/\s+/).filter(Boolean);

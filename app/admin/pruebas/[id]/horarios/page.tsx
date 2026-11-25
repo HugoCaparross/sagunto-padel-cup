@@ -14,7 +14,7 @@ export default async function PaginaHorarios({ params }: Props) {
             {res.ok ? (
                 <EditorHorarios pruebaId={id} datos={res.datos} />
             ) : (
-                <p className="text-[#C73535]">{res.error}</p>
+                <p className="text-[var(--color-danger)]">{res.error}</p>
             )}
         </main>
     );

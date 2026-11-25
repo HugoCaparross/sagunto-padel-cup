@@ -97,30 +97,30 @@ export default async function PaginaPerfil() {
       </section>
 
       <aside className="space-y-6">
-        <section className="space-y-3 rounded-xl bg-white p-5 ring-1 ring-[#D5D9DC]">
+        <section className="space-y-3 rounded-xl bg-white p-5 ring-1 ring-[var(--color-border)]">
           <h2 className="font-semibold">Historial de consentimientos</h2>
           {filas.length === 0 ? (
-            <p className="text-sm text-[#68737D]">Todavía no hay registros.</p>
+            <p className="text-sm text-[var(--color-muted)]">Todavía no hay registros.</p>
           ) : (
-            <ul className="divide-y divide-[#D5D9DC] text-sm">
+            <ul className="divide-y divide-[var(--color-border)] text-sm">
               {filas.map((f) => (
                 <li key={f.id} className="py-2">
                   <p>
                     {ETIQUETA_CONSENTIMIENTO[f.tipo] ?? f.tipo}:{" "}
-                    <span className={f.concedido ? "text-[#16845B]" : "text-[#C73535]"}>
+                    <span className={f.concedido ? "text-[var(--color-success)]" : "text-[var(--color-danger)]"}>
                       {f.concedido ? "aceptado" : "retirado"}
                     </span>
                   </p>
-                  <p className="text-xs text-[#68737D]">{fechaCorta(f.registradoAt)}</p>
+                  <p className="text-xs text-[var(--color-muted)]">{fechaCorta(f.registradoAt)}</p>
                 </li>
               ))}
             </ul>
           )}
         </section>
 
-        <section className="space-y-2 rounded-xl bg-white p-5 ring-1 ring-[#D5D9DC] text-sm">
+        <section className="space-y-2 rounded-xl bg-white p-5 ring-1 ring-[var(--color-border)] text-sm">
           <h2 className="font-semibold">Contraseña</h2>
-          <p className="text-[#68737D]">Si quieres cambiarla, pide un enlace de recuperación.</p>
+          <p className="text-[var(--color-muted)]">Si quieres cambiarla, pide un enlace de recuperación.</p>
           <Link href="/recuperar" className="underline">
             Cambiar contraseña
           </Link>

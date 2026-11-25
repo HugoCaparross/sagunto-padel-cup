@@ -11,7 +11,7 @@ export default async function PaginaPruebas() {
     const res = await listarPruebasAdmin();
 
     if (!res.ok) {
-        return <p className="p-6 text-[#C73535]">{res.error}</p>;
+        return <p className="p-6 text-[var(--color-danger)]">{res.error}</p>;
     }
 
     return (
@@ -20,15 +20,15 @@ export default async function PaginaPruebas() {
                 <h1 className="text-2xl font-semibold">Pruebas</h1>
                 <Link
                     href="/admin/pruebas/nueva"
-                    className="rounded-lg bg-[#F0443A] px-3 py-2 text-sm font-medium text-white"
+                    className="btn btn-primario btn-md"
                 >
                     Nueva prueba
                 </Link>
             </header>
 
-            <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[#D5D9DC]">
+            <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[var(--color-border)]">
                 <table className="w-full text-sm">
-                    <thead className="bg-[#F4F5F4] text-left text-xs uppercase text-[#68737D]">
+                    <thead className="bg-[var(--color-surface)] text-left text-xs uppercase text-[var(--color-muted)]">
                         <tr>
                             <th className="px-4 py-2">Prueba</th>
                             <th className="px-4 py-2">Fechas</th>
@@ -41,13 +41,13 @@ export default async function PaginaPruebas() {
                     </thead>
                     <tbody>
                         {res.pruebas.map((p) => (
-                            <tr key={p.id} className="border-t border-[#D5D9DC]">
+                            <tr key={p.id} className="border-t border-[var(--color-border)]">
                                 <td className="px-4 py-2">
                                     <Link href={`/admin/pruebas/${p.id}`} className="font-medium hover:underline">
                                         {p.nombre}
                                     </Link>
                                     {p.esMaster && (
-                                        <span className="ml-2 rounded bg-[#FFF4DE] px-1.5 py-0.5 text-xs text-[#B77912]">
+                                        <span className="ml-2 rounded bg-[var(--color-warning-bg)] px-1.5 py-0.5 text-xs text-[var(--color-warning)]">
                                             Máster
                                         </span>
                                     )}
@@ -71,7 +71,7 @@ export default async function PaginaPruebas() {
                         ))}
                         {res.pruebas.length === 0 && (
                             <tr>
-                                <td colSpan={7} className="px-4 py-6 text-center text-[#68737D]">
+                                <td colSpan={7} className="px-4 py-6 text-center text-[var(--color-muted)]">
                                     Todavía no hay pruebas. Crea la primera.
                                 </td>
                             </tr>

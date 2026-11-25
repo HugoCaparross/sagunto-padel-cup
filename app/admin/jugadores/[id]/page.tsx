@@ -24,7 +24,7 @@ const ETIQUETA_CONSENTIMIENTO: Record<string, string> = {
 
 function Bloque({ titulo, children }: { titulo: string; children: React.ReactNode }) {
     return (
-        <section className="space-y-3 rounded-xl bg-white p-5 ring-1 ring-[#D5D9DC]">
+        <section className="space-y-3 rounded-xl bg-white p-5 ring-1 ring-[var(--color-border)]">
             <h2 className="font-semibold">{titulo}</h2>
             {children}
         </section>
@@ -49,7 +49,7 @@ export default async function PaginaFichaJugador({ params }: Props) {
 
     return (
         <main className="space-y-6">
-            <nav className="text-sm text-[#68737D]">
+            <nav className="text-sm text-[var(--color-muted)]">
                 <Link href="/admin/jugadores" className="hover:underline">
                     Jugadores
                 </Link>
@@ -59,21 +59,21 @@ export default async function PaginaFichaJugador({ params }: Props) {
             <header className="flex flex-wrap items-start justify-between gap-4">
                 <div className="space-y-1">
                     <h1 className="text-2xl font-semibold">{perfil.nombre}</h1>
-                    <p className="text-sm text-[#68737D]">
+                    <p className="text-sm text-[var(--color-muted)]">
                         {perfil.email ?? "Sin email"} · alta el {fechaLarga(perfil.creadoAt)}
                     </p>
                 </div>
                 <div className="flex gap-2 text-xs">
                     {perfil.rol === "organizador" && (
-                        <span className="rounded bg-[#0D1B2A] px-2 py-1 text-white">Organizador</span>
+                        <span className="rounded bg-[var(--color-navy)] px-2 py-1 text-white">Organizador</span>
                     )}
                     <span
-                        className={`rounded px-2 py-1 ${perfil.onboardingAt ? "bg-[#EAF6EF] text-[#16845B]" : "bg-[#FFF4DE] text-[#B77912]"
+                        className={`rounded px-2 py-1 ${perfil.onboardingAt ? "bg-[var(--color-success-bg)] text-[var(--color-success)]" : "bg-[var(--color-warning-bg)] text-[var(--color-warning)]"
                             }`}
                     >
                         {perfil.onboardingAt ? "Perfil completo" : "Perfil sin completar"}
                     </span>
-                    <span className="rounded bg-[#F4F5F4] px-2 py-1 text-[#68737D]">
+                    <span className="rounded bg-[var(--color-surface)] px-2 py-1 text-[var(--color-muted)]">
                         {perfil.visible ? "Perfil público" : "Perfil privado"}
                     </span>
                 </div>
@@ -83,23 +83,23 @@ export default async function PaginaFichaJugador({ params }: Props) {
                 <aside className="space-y-6">
                     <Bloque titulo="Nivel">
                         <p className="text-3xl font-semibold">Nivel {nivel.nivel}</p>
-                        <p className="text-sm text-[#68737D]">{nivel.tier}</p>
-                        <div className="h-2 overflow-hidden rounded-full bg-[#F4F5F4]">
+                        <p className="text-sm text-[var(--color-muted)]">{nivel.tier}</p>
+                        <div className="h-2 overflow-hidden rounded-full bg-[var(--color-surface)]">
                             <div
-                                className="h-full rounded-full bg-[#A7C4A0]"
+                                className="h-full rounded-full bg-[var(--color-sage)]"
                                 style={{ width: `${Math.round(nivel.progreso * 100)}%` }}
                             />
                         </div>
                         <dl className="grid grid-cols-2 gap-2 text-sm">
-                            <dt className="text-[#68737D]">Puntos</dt>
+                            <dt className="text-[var(--color-muted)]">Puntos</dt>
                             <dd className="text-right">{estadisticas.puntosHistoricos}</dd>
-                            <dt className="text-[#68737D]">Pruebas</dt>
+                            <dt className="text-[var(--color-muted)]">Pruebas</dt>
                             <dd className="text-right">{estadisticas.pruebasJugadas}</dd>
-                            <dt className="text-[#68737D]">Partidos</dt>
+                            <dt className="text-[var(--color-muted)]">Partidos</dt>
                             <dd className="text-right">{estadisticas.partidos}</dd>
-                            <dt className="text-[#68737D]">% victorias</dt>
+                            <dt className="text-[var(--color-muted)]">% victorias</dt>
                             <dd className="text-right">{estadisticas.porcentajeVictorias}%</dd>
-                            <dt className="text-[#68737D]">Sets</dt>
+                            <dt className="text-[var(--color-muted)]">Sets</dt>
                             <dd className="text-right">
                                 {estadisticas.setsGanados} / {estadisticas.setsPerdidos}
                             </dd>
@@ -108,21 +108,21 @@ export default async function PaginaFichaJugador({ params }: Props) {
 
                     <Bloque titulo="Datos del perfil">
                         <dl className="grid grid-cols-2 gap-2 text-sm">
-                            <dt className="text-[#68737D]">Talla</dt>
+                            <dt className="text-[var(--color-muted)]">Talla</dt>
                             <dd className="text-right">{perfil.talla ?? "—"}</dd>
-                            <dt className="text-[#68737D]">Imagen</dt>
+                            <dt className="text-[var(--color-muted)]">Imagen</dt>
                             <dd className="text-right">{perfil.consentimientoImagen ? "Autorizada" : "No autorizada"}</dd>
                         </dl>
                     </Bloque>
 
                     <Bloque titulo="Datos deportivos">
                         {datos.length === 0 ? (
-                            <p className="text-sm text-[#68737D]">El jugador no ha rellenado estos datos.</p>
+                            <p className="text-sm text-[var(--color-muted)]">El jugador no ha rellenado estos datos.</p>
                         ) : (
                             <dl className="grid grid-cols-2 gap-2 text-sm">
                                 {datos.map(([clave, valor]) => (
                                     <div key={clave} className="contents">
-                                        <dt className="text-[#68737D]">{clave}</dt>
+                                        <dt className="text-[var(--color-muted)]">{clave}</dt>
                                         <dd className="text-right">{valor}</dd>
                                     </div>
                                 ))}
@@ -134,11 +134,11 @@ export default async function PaginaFichaJugador({ params }: Props) {
                 <div className="space-y-6">
                     <Bloque titulo="Inscripciones">
                         {ficha.inscripciones.length === 0 ? (
-                            <p className="text-sm text-[#68737D]">Sin inscripciones.</p>
+                            <p className="text-sm text-[var(--color-muted)]">Sin inscripciones.</p>
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
-                                    <thead className="text-left text-xs uppercase text-[#68737D]">
+                                    <thead className="text-left text-xs uppercase text-[var(--color-muted)]">
                                         <tr>
                                             <th className="py-2">Prueba</th>
                                             <th className="py-2">Categoría</th>
@@ -149,7 +149,7 @@ export default async function PaginaFichaJugador({ params }: Props) {
                                     </thead>
                                     <tbody>
                                         {ficha.inscripciones.map((i) => (
-                                            <tr key={i.id} className="border-t border-[#D5D9DC]">
+                                            <tr key={i.id} className="border-t border-[var(--color-border)]">
                                                 <td className="py-2">
                                                     <Link href={`/admin/pruebas/${i.pruebaId}`} className="hover:underline">
                                                         {i.prueba}
@@ -169,11 +169,11 @@ export default async function PaginaFichaJugador({ params }: Props) {
 
                     <Bloque titulo="Puntos obtenidos">
                         {ficha.puntos.length === 0 ? (
-                            <p className="text-sm text-[#68737D]">Sin puntos publicados.</p>
+                            <p className="text-sm text-[var(--color-muted)]">Sin puntos publicados.</p>
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
-                                    <thead className="text-left text-xs uppercase text-[#68737D]">
+                                    <thead className="text-left text-xs uppercase text-[var(--color-muted)]">
                                         <tr>
                                             <th className="py-2">Prueba</th>
                                             <th className="py-2">Fecha</th>
@@ -185,7 +185,7 @@ export default async function PaginaFichaJugador({ params }: Props) {
                                     </thead>
                                     <tbody>
                                         {ficha.puntos.map((p, i) => (
-                                            <tr key={i} className="border-t border-[#D5D9DC]">
+                                            <tr key={i} className="border-t border-[var(--color-border)]">
                                                 <td className="py-2">{p.prueba}</td>
                                                 <td className="py-2">{fechaCorta(p.fecha)}</td>
                                                 <td className="py-2">{ETIQUETAS_CATEGORIA[p.categoria]}</td>
@@ -202,23 +202,23 @@ export default async function PaginaFichaJugador({ params }: Props) {
 
                     <Bloque titulo="Consentimientos">
                         {ficha.consentimientos.length === 0 ? (
-                            <p className="text-sm text-[#68737D]">Sin registros.</p>
+                            <p className="text-sm text-[var(--color-muted)]">Sin registros.</p>
                         ) : (
-                            <ul className="divide-y divide-[#D5D9DC] text-sm">
+                            <ul className="divide-y divide-[var(--color-border)] text-sm">
                                 {ficha.consentimientos.map((c) => (
                                     <li key={c.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
                                         <span>
                                             {ETIQUETA_CONSENTIMIENTO[c.tipo] ?? c.tipo}:{" "}
-                                            <span className={c.concedido ? "text-[#16845B]" : "text-[#C73535]"}>
+                                            <span className={c.concedido ? "text-[var(--color-success)]" : "text-[var(--color-danger)]"}>
                                                 {c.concedido ? "aceptado" : "retirado"}
                                             </span>
                                             {c.titulo && (
-                                                <span className="text-[#68737D]">
+                                                <span className="text-[var(--color-muted)]">
                                                     {" "}· {c.titulo}, versión {c.version}
                                                 </span>
                                             )}
                                         </span>
-                                        <span className="text-xs text-[#68737D]">{fechaCorta(c.registradoAt)}</span>
+                                        <span className="text-xs text-[var(--color-muted)]">{fechaCorta(c.registradoAt)}</span>
                                     </li>
                                 ))}
                             </ul>

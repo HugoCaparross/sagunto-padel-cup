@@ -28,11 +28,11 @@ export default function BotonRetirar({ inscripcionId }: { inscripcionId: string 
                 type="button"
                 onClick={retirar}
                 disabled={pendiente}
-                className="text-sm text-[#C73535] underline disabled:opacity-50"
+                className="text-sm text-[var(--color-danger)] underline disabled:opacity-50"
             >
                 {pendiente ? "Retirando…" : "Retirarme"}
             </button>
-            {error && <p className="text-xs text-[#C73535]">{error}</p>}
+            {error && <p className="text-xs text-[var(--color-danger)]">{error}</p>}
         </div>
     );
 }

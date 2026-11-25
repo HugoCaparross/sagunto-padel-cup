@@ -54,7 +54,7 @@ export default function PanelNoticias({ noticias }: { noticias: NoticiaAdmin[] }
 
     if (noticias.length === 0) {
         return (
-            <p className="rounded-xl bg-white p-6 text-sm text-[#68737D] ring-1 ring-[#D5D9DC]">
+            <p className="rounded-xl bg-white p-6 text-sm text-[var(--color-muted)] ring-1 ring-[var(--color-border)]">
                 Todavía no hay noticias. Crea la primera.
             </p>
         );
@@ -64,16 +64,16 @@ export default function PanelNoticias({ noticias }: { noticias: NoticiaAdmin[] }
         <div className="space-y-4">
             {mensaje && (
                 <p
-                    className={`rounded-lg p-3 text-sm ${mensaje.tipo === "ok" ? "bg-[#EAF6EF] text-[#16845B]" : "bg-[#FDECEC] text-[#C73535]"
+                    className={`rounded-lg p-3 text-sm ${mensaje.tipo === "ok" ? "bg-[var(--color-success-bg)] text-[var(--color-success)]" : "bg-[var(--color-danger-bg)] text-[var(--color-danger)]"
                         }`}
                 >
                     {mensaje.texto}
                 </p>
             )}
 
-            <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[#D5D9DC]">
+            <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[var(--color-border)]">
                 <table className="w-full text-sm">
-                    <thead className="bg-[#F4F5F4] text-left text-xs uppercase text-[#68737D]">
+                    <thead className="bg-[var(--color-surface)] text-left text-xs uppercase text-[var(--color-muted)]">
                         <tr>
                             <th className="px-4 py-2">Título</th>
                             <th className="px-4 py-2">Categoría</th>
@@ -84,15 +84,15 @@ export default function PanelNoticias({ noticias }: { noticias: NoticiaAdmin[] }
                     </thead>
                     <tbody>
                         {noticias.map((n) => (
-                            <tr key={n.id} className="border-t border-[#D5D9DC]">
+                            <tr key={n.id} className="border-t border-[var(--color-border)]">
                                 <td className="px-4 py-2">
                                     <p className="font-medium">{n.titulo}</p>
-                                    <p className="text-xs text-[#68737D]">/noticias/{n.slug}</p>
+                                    <p className="text-xs text-[var(--color-muted)]">/noticias/{n.slug}</p>
                                 </td>
                                 <td className="px-4 py-2">{ETIQUETAS_NOTICIA[n.categoria]}</td>
                                 <td className="px-4 py-2">
                                     <span
-                                        className={`rounded px-2 py-0.5 text-xs ${n.publicada ? "bg-[#EAF6EF] text-[#16845B]" : "bg-[#F4F5F4] text-[#68737D]"
+                                        className={`rounded px-2 py-0.5 text-xs ${n.publicada ? "bg-[var(--color-success-bg)] text-[var(--color-success)]" : "bg-[var(--color-surface)] text-[var(--color-muted)]"
                                             }`}
                                     >
                                         {n.publicada ? "Publicada" : "Borrador"}
@@ -116,7 +116,7 @@ export default function PanelNoticias({ noticias }: { noticias: NoticiaAdmin[] }
                                             type="button"
                                             onClick={() => eliminar(n)}
                                             disabled={pendiente}
-                                            className="text-[#C73535] underline disabled:opacity-50"
+                                            className="text-[var(--color-danger)] underline disabled:opacity-50"
                                         >
                                             Eliminar
                                         </button>

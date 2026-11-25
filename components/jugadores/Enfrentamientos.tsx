@@ -48,17 +48,17 @@ export default function Enfrentamientos({ jugadorId, jugadorNombre, candidatos }
     }
 
     if (candidatos.length === 0) {
-        return <p className="text-sm text-[#68737D]">No hay otros jugadores públicos todavía.</p>;
+        return <p className="text-sm text-[var(--color-muted)]">No hay otros jugadores públicos todavía.</p>;
     }
 
     return (
-        <div className="space-y-4 rounded-xl bg-white p-5 ring-1 ring-[#D5D9DC]">
+        <div className="space-y-4 rounded-xl bg-white p-5 ring-1 ring-[var(--color-border)]">
             <label className="flex flex-col gap-1 text-sm">
-                <span className="text-[#68737D]">Compara con otro jugador</span>
+                <span className="text-[var(--color-muted)]">Compara con otro jugador</span>
                 <select
                     value={rivalId}
                     onChange={(e) => consultar(e.target.value)}
-                    className="rounded-md border border-[#D5D9DC] bg-white px-2 py-1.5"
+                    className="rounded-md border border-[var(--color-border)] bg-white px-2 py-1.5"
                 >
                     <option value="">Elige un jugador</option>
                     {candidatos.map((c) => (
@@ -69,25 +69,25 @@ export default function Enfrentamientos({ jugadorId, jugadorNombre, candidatos }
                 </select>
             </label>
 
-            {pendiente && <p className="text-sm text-[#68737D]">Calculando…</p>}
+            {pendiente && <p className="text-sm text-[var(--color-muted)]">Calculando…</p>}
 
-            {error && <p className="text-sm text-[#C73535]">{error}</p>}
+            {error && <p className="text-sm text-[var(--color-danger)]">{error}</p>}
 
             {resultado && (
                 <div className="space-y-2 text-sm">
-                    <p className="text-[#68737D]">
+                    <p className="text-[var(--color-muted)]">
                         {resultado.partidos === 0
                             ? `${jugadorNombre} y ${resultado.nombreRival} no se han enfrentado todavía.`
                             : `${resultado.partidos} partidos entre ambos`}
                     </p>
                     {resultado.partidos > 0 && (
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="rounded-lg bg-[#F4F5F4] p-3 text-center">
-                                <p className="text-xs text-[#68737D]">{jugadorNombre}</p>
+                            <div className="rounded-lg bg-[var(--color-surface)] p-3 text-center">
+                                <p className="text-xs text-[var(--color-muted)]">{jugadorNombre}</p>
                                 <p className="text-2xl font-semibold">{resultado.victoriasA}</p>
                             </div>
-                            <div className="rounded-lg bg-[#F4F5F4] p-3 text-center">
-                                <p className="text-xs text-[#68737D]">{resultado.nombreRival}</p>
+                            <div className="rounded-lg bg-[var(--color-surface)] p-3 text-center">
+                                <p className="text-xs text-[var(--color-muted)]">{resultado.nombreRival}</p>
                                 <p className="text-2xl font-semibold">{resultado.victoriasB}</p>
                             </div>
                         </div>

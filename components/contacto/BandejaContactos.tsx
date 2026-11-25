@@ -1,5 +1,7 @@
 "use client";
 
+import Boton from "@/components/ui/Boton";
+
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { actualizarContacto, type ContactoFila } from "@/actions/contacto";
@@ -14,10 +16,10 @@ import {
 type Props = { filas: ContactoFila[] };
 
 const COLOR_ESTADO: Record<EstadoContacto, string> = {
-    nueva: "bg-[#E8F0FB] text-[#2767B1]",
-    en_curso: "bg-[#FFF4DE] text-[#B77912]",
-    respondida: "bg-[#EAF6EF] text-[#16845B]",
-    archivada: "bg-[#F4F5F4] text-[#68737D]",
+    nueva: "bg-[var(--color-info-bg)] text-[var(--color-info)]",
+    en_curso: "bg-[var(--color-warning-bg)] text-[var(--color-warning)]",
+    respondida: "bg-[var(--color-success-bg)] text-[var(--color-success)]",
+    archivada: "bg-[var(--color-surface)] text-[var(--color-muted)]",
 };
 
 const ETIQUETA_TIPO = ETIQUETAS_TIPO_CONTACTO;
@@ -26,26 +28,26 @@ export default function BandejaContactos({ filas }: Props) {
     const [seleccionadoId, setSeleccionadoId] = useState<string | null>(filas[0]?.id ?? null);
 
     if (filas.length === 0) {
-        return <p className="text-sm text-[#68737D]">No hay mensajes con este filtro.</p>;
+        return <p className="text-sm text-[var(--color-muted)]">No hay mensajes con este filtro.</p>;
     }
 
     const actual = filas.find((f) => f.id === seleccionadoId) ?? filas[0];
 
     return (
         <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
-            <ul className="divide-y divide-[#D5D9DC] overflow-hidden rounded-xl bg-white ring-1 ring-[#D5D9DC]">
+            <ul className="divide-y divide-[var(--color-border)] overflow-hidden rounded-xl bg-white ring-1 ring-[var(--color-border)]">
                 {filas.map((f) => (
                     <li key={f.id}>
                         <button
                             type="button"
                             onClick={() => setSeleccionadoId(f.id)}
-                            className={`flex w-full items-start justify-between gap-3 px-4 py-3 text-left text-sm hover:bg-[#F4F5F4] ${f.id === actual.id ? "bg-[#F4F5F4]" : ""
+                            className={`flex w-full items-start justify-between gap-3 px-4 py-3 text-left text-sm hover:bg-[var(--color-surface)] ${f.id === actual.id ? "bg-[var(--color-surface)]" : ""
                                 }`}
                         >
                             <span className="min-w-0 space-y-0.5">
                                 <span className="block font-medium">{f.nombre}</span>
-                                <span className="block truncate text-[#68737D]">{f.mensaje}</span>
-                                <span className="block text-xs text-[#68737D]">
+                                <span className="block truncate text-[var(--color-muted)]">{f.mensaje}</span>
+                                <span className="block text-xs text-[var(--color-muted)]">
                                     {ETIQUETA_TIPO[f.tipo]} · {fechaCorta(f.createdAt)}
                                     {f.identificado ? " · cuenta" : " · anónimo"}
                                 </span>
@@ -90,10 +92,10 @@ function DetalleContacto({ fila }: { fila: ContactoFila }) {
     }
 
     return (
-        <section className="space-y-4 rounded-xl bg-white p-5 ring-1 ring-[#D5D9DC]">
+        <section className="space-y-4 rounded-xl bg-white p-5 ring-1 ring-[var(--color-border)]">
             <header className="space-y-1">
                 <h2 className="text-lg font-semibold">{fila.nombre}</h2>
-                <p className="text-sm text-[#68737D]">
+                <p className="text-sm text-[var(--color-muted)]">
                     {ETIQUETA_TIPO[fila.tipo]} · {fechaCorta(fila.createdAt)} ·{" "}
                     <a href={`mailto:${fila.email}`} className="underline">
                         {fila.email}
@@ -101,16 +103,16 @@ function DetalleContacto({ fila }: { fila: ContactoFila }) {
                 </p>
             </header>
 
-            <p className="whitespace-pre-line rounded-lg bg-[#F4F5F4] p-4 text-sm leading-relaxed">
+            <p className="whitespace-pre-line rounded-lg bg-[var(--color-surface)] p-4 text-sm leading-relaxed">
                 {fila.mensaje}
             </p>
 
             <label className="flex flex-col gap-1 text-sm">
-                <span className="text-[#68737D]">Estado</span>
+                <span className="text-[var(--color-muted)]">Estado</span>
                 <select
                     value={estado}
                     onChange={(e) => setEstado(e.target.value as EstadoContacto)}
-                    className="rounded-md border border-[#D5D9DC] bg-white px-2 py-1.5 text-sm"
+                    className="rounded-md border border-[var(--color-border)] bg-white px-2 py-1.5 text-sm"
                 >
                     {ESTADOS_CONTACTO.map((e) => (
                         <option key={e} value={e}>
@@ -121,30 +123,30 @@ function DetalleContacto({ fila }: { fila: ContactoFila }) {
             </label>
 
             <label className="flex flex-col gap-1 text-sm">
-                <span className="text-[#68737D]">Notas internas (solo visibles para el organizador)</span>
+                <span className="text-[var(--color-muted)]">Notas internas (solo visibles para el organizador)</span>
                 <textarea
                     value={notas}
                     onChange={(e) => setNotas(e.target.value)}
                     maxLength={2000}
                     rows={4}
-                    className="rounded-md border border-[#D5D9DC] bg-white px-2 py-1.5 text-sm"
+                    className="rounded-md border border-[var(--color-border)] bg-white px-2 py-1.5 text-sm"
                 />
             </label>
 
-            <button
+            <Boton variante="primario" tamano="md"
                 type="button"
                 onClick={guardar}
                 disabled={pendiente}
-                className="rounded-lg bg-[#F0443A] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                className="font-medium disabled:opacity-50"
             >
                 {pendiente ? "Guardando…" : "Guardar"}
-            </button>
+            </Boton>
 
             {mensaje && (
                 <p
                     className={`rounded-lg p-3 text-sm ${mensaje.tipo === "ok"
-                            ? "bg-[#EAF6EF] text-[#16845B]"
-                            : "bg-[#FDECEC] text-[#C73535]"
+                            ? "bg-[var(--color-success-bg)] text-[var(--color-success)]"
+                            : "bg-[var(--color-danger-bg)] text-[var(--color-danger)]"
                         }`}
                 >
                     {mensaje.texto}

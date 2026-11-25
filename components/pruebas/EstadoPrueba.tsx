@@ -43,8 +43,8 @@ export default function EstadoPrueba({ pruebaId, estado }: Props) {
     const siguientes = TRANSICIONES[estado];
 
     return (
-        <section className="space-y-3 rounded-xl bg-white p-4 ring-1 ring-[#D5D9DC]">
-            <p className="text-sm text-[#68737D]">Estado actual</p>
+        <section className="space-y-3 rounded-xl bg-white p-4 ring-1 ring-[var(--color-border)]">
+            <p className="text-sm text-[var(--color-muted)]">Estado actual</p>
             <p className="text-lg font-semibold">{ETIQUETAS_ESTADO_PRUEBA[estado]}</p>
 
             {siguientes.length > 0 && (
@@ -55,7 +55,7 @@ export default function EstadoPrueba({ pruebaId, estado }: Props) {
                             type="button"
                             onClick={() => cambiar(s)}
                             disabled={enviando}
-                            className="rounded-lg bg-white px-3 py-2 text-sm ring-1 ring-[#D5D9DC] disabled:opacity-50"
+                            className="rounded-lg bg-white px-3 py-2 text-sm ring-1 ring-[var(--color-border)] disabled:opacity-50"
                         >
                             Pasar a: {ETIQUETAS_ESTADO_PRUEBA[s]}
                         </button>
@@ -64,7 +64,7 @@ export default function EstadoPrueba({ pruebaId, estado }: Props) {
             )}
 
             {error && (
-                <div className="rounded-lg bg-[#FDECEC] p-3 text-sm text-[#C73535]">
+                <div className="rounded-lg bg-[var(--color-danger-bg)] p-3 text-sm text-[var(--color-danger)]">
                     <p>{error}</p>
                     {pendientes.map((p) => (
                         <p key={p}>· {p}</p>

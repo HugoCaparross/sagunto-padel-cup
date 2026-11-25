@@ -1,5 +1,7 @@
 "use client";
 
+import Boton from "@/components/ui/Boton";
+
 import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { actualizarDatosDeportivos } from "@/actions/estadisticas";
@@ -19,7 +21,7 @@ type Props = {
     };
 };
 
-const CAMPO = "rounded-md border border-[#D5D9DC] bg-white px-3 py-2 text-sm";
+const CAMPO = "rounded-md border border-[var(--color-border)] bg-white px-3 py-2 text-sm";
 
 function parseOtros(texto: string): Record<string, string> {
     const salida: Record<string, string> = {};
@@ -82,12 +84,12 @@ export default function FormularioPerfil({ inicial }: Props) {
                 <legend className="mb-3 text-lg font-semibold">Datos personales</legend>
 
                 <label className="flex flex-col gap-1 text-sm sm:col-span-2">
-                    <span className="text-[#68737D]">Nombre y apellidos visibles</span>
+                    <span className="text-[var(--color-muted)]">Nombre y apellidos visibles</span>
                     <input name="nombre" defaultValue={inicial.nombre} required minLength={2} maxLength={80} className={CAMPO} />
                 </label>
 
                 <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-[#68737D]">Talla de camiseta</span>
+                    <span className="text-[var(--color-muted)]">Talla de camiseta</span>
                     <select name="talla" defaultValue={inicial.talla ?? ""} className={CAMPO}>
                         <option value="">Sin indicar</option>
                         {TALLAS.map((t) => (
@@ -123,7 +125,7 @@ export default function FormularioPerfil({ inicial }: Props) {
                 <legend className="mb-3 text-lg font-semibold">Datos deportivos (opcionales)</legend>
 
                 <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-[#68737D]">Lado de pista</span>
+                    <span className="text-[var(--color-muted)]">Lado de pista</span>
                     <select name="lado" defaultValue={inicial.ladoPista ?? ""} className={CAMPO}>
                         <option value="">Sin indicar</option>
                         <option value="derecha">Derecha</option>
@@ -133,7 +135,7 @@ export default function FormularioPerfil({ inicial }: Props) {
                 </label>
 
                 <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-[#68737D]">Mano hábil</span>
+                    <span className="text-[var(--color-muted)]">Mano hábil</span>
                     <select name="mano" defaultValue={inicial.manoHabil ?? ""} className={CAMPO}>
                         <option value="">Sin indicar</option>
                         <option value="diestra">Diestra</option>
@@ -142,32 +144,32 @@ export default function FormularioPerfil({ inicial }: Props) {
                 </label>
 
                 <label className="flex flex-col gap-1 text-sm sm:col-span-2">
-                    <span className="text-[#68737D]">Pala</span>
+                    <span className="text-[var(--color-muted)]">Pala</span>
                     <input name="pala" defaultValue={inicial.pala} maxLength={80} className={CAMPO} />
                 </label>
 
                 <label className="flex flex-col gap-1 text-sm sm:col-span-2">
-                    <span className="text-[#68737D]">Otros datos (una línea por campo, formato &quot;Campo: valor&quot;, máximo 10)</span>
+                    <span className="text-[var(--color-muted)]">Otros datos (una línea por campo, formato &quot;Campo: valor&quot;, máximo 10)</span>
                     <textarea name="otros" defaultValue={inicial.otros} rows={4} className={CAMPO} />
                 </label>
             </fieldset>
 
             {mensaje && (
                 <p
-                    className={`rounded-lg p-3 text-sm ${mensaje.tipo === "ok" ? "bg-[#EAF6EF] text-[#16845B]" : "bg-[#FDECEC] text-[#C73535]"
+                    className={`rounded-lg p-3 text-sm ${mensaje.tipo === "ok" ? "bg-[var(--color-success-bg)] text-[var(--color-success)]" : "bg-[var(--color-danger-bg)] text-[var(--color-danger)]"
                         }`}
                 >
                     {mensaje.texto}
                 </p>
             )}
 
-            <button
+            <Boton variante="primario" tamano="md"
                 type="submit"
                 disabled={pendiente}
-                className="rounded-lg bg-[#F0443A] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                className="font-medium disabled:opacity-50"
             >
                 {pendiente ? "Guardando…" : "Guardar cambios"}
-            </button>
+            </Boton>
         </form>
     );
 }

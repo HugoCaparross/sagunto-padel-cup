@@ -11,13 +11,14 @@ type Props = {
 };
 
 export default function AvatarJugador({ nombre, src, alt = "", className = "", sizes = "96px" }: Props) {
-    const fondo = colorAvatarJugador(nombre);
-    const esNavy = fondo === "#0D1B2A";
+    const colorMarca = colorAvatarJugador(nombre);
+    const fondo = `var(--color-${colorMarca})`;
+    const esNavy = colorMarca === "navy";
 
     return (
         <span
             className={`${s.avatar} ${className}`.trim()}
-            style={{ backgroundColor: fondo, color: esNavy ? "#fff" : "#0D1B2A" }}
+            style={{ backgroundColor: fondo, color: esNavy ? "white" : "var(--color-navy)" }}
             aria-label={src ? undefined : nombre}
         >
             {src ? (

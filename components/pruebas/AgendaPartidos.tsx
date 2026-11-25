@@ -22,7 +22,7 @@ function etiquetaPartido(p: PartidoPublico): string {
 export default function AgendaPartidos({ partidos }: { partidos: PartidoPublico[] }) {
     if (partidos.length === 0) {
         return (
-            <p className="rounded-xl bg-white p-6 text-sm text-[#68737D] ring-1 ring-[#D5D9DC]">
+            <p className="rounded-xl bg-white p-6 text-sm text-[var(--color-muted)] ring-1 ring-[var(--color-border)]">
                 Los partidos se publicarán cuando el organizador genere los cuadros.
             </p>
         );
@@ -37,22 +37,22 @@ export default function AgendaPartidos({ partidos }: { partidos: PartidoPublico[
                 return (
                     <section key={c} className="space-y-3">
                         <h3 className="font-semibold">{ETIQUETAS_CATEGORIA[c]}</h3>
-                        <ul className="divide-y divide-[#D5D9DC] overflow-hidden rounded-xl bg-white ring-1 ring-[#D5D9DC]">
+                        <ul className="divide-y divide-[var(--color-border)] overflow-hidden rounded-xl bg-white ring-1 ring-[var(--color-border)]">
                             {lista.map((p) => (
                                 <li
                                     key={p.id}
                                     className="grid gap-2 px-4 py-3 text-sm md:grid-cols-[160px_1fr_auto] md:items-center"
                                 >
-                                    <span className="text-xs text-[#68737D]">{etiquetaPartido(p)}</span>
+                                    <span className="text-xs text-[var(--color-muted)]">{etiquetaPartido(p)}</span>
                                     <span>
-                                        {p.ladoA} <span className="text-[#68737D]">vs</span> {p.ladoB}
+                                        {p.ladoA} <span className="text-[var(--color-muted)]">vs</span> {p.ladoB}
                                     </span>
-                                    <span className="text-xs text-[#68737D] md:text-right">
+                                    <span className="text-xs text-[var(--color-muted)] md:text-right">
                                         {p.pista !== null && p.hora && p.fecha
                                             ? `Pista ${p.pista} · ${fechaCorta(p.fecha)} ${p.hora}`
                                             : "Horario por confirmar"}
                                         {p.resultado && (
-                                            <span className="ml-3 font-medium text-[#18232D]">{p.resultado}</span>
+                                            <span className="ml-3 font-medium text-[var(--color-ink)]">{p.resultado}</span>
                                         )}
                                     </span>
                                 </li>

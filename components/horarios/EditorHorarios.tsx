@@ -1,5 +1,7 @@
 "use client";
 
+import Boton from "@/components/ui/Boton";
+
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 import {
     DndContext,
@@ -62,7 +64,7 @@ function Arrastre({
                 ref={setNodeRef}
                 {...listeners}
                 {...attributes}
-                className="cursor-grab select-none px-1 text-[#68737D]"
+                className="cursor-grab select-none px-1 text-[var(--color-muted)]"
                 aria-label="Arrastrar partido"
             >
                 ⠿
@@ -99,12 +101,12 @@ function Columna({
     return (
         <section
             ref={setNodeRef}
-            className={`flex w-72 shrink-0 flex-col rounded-xl bg-white p-3 ring-1 ring-[#D5D9DC] ${isOver ? "ring-2 ring-[#F0443A]" : ""
+            className={`flex w-72 shrink-0 flex-col rounded-xl bg-white p-3 ring-1 ring-[var(--color-border)] ${isOver ? "ring-2 ring-[var(--color-coral)]" : ""
                 }`}
         >
             <header className="mb-2">
                 <h3 className="font-semibold">{titulo}</h3>
-                {subtitulo && <p className="text-xs text-[#68737D]">{subtitulo}</p>}
+                {subtitulo && <p className="text-xs text-[var(--color-muted)]">{subtitulo}</p>}
             </header>
             <div className="flex flex-col gap-2">{children}</div>
         </section>
@@ -122,13 +124,13 @@ function Campo({
 }) {
     return (
         <label className="flex flex-col gap-1 text-sm">
-            <span className="text-[#68737D]">{etiqueta}</span>
+            <span className="text-[var(--color-muted)]">{etiqueta}</span>
             <input
                 name={nombre}
                 type="number"
                 min={1}
                 defaultValue={defecto}
-                className="rounded-md border border-[#D5D9DC] bg-white px-2 py-1"
+                className="rounded-md border border-[var(--color-border)] bg-white px-2 py-1"
             />
         </label>
     );
@@ -392,7 +394,7 @@ export default function EditorHorarios({
                 <header className="flex flex-wrap items-start justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-semibold">Horarios y pistas</h1>
-                        <p className="text-sm text-[#68737D]">
+                        <p className="text-sm text-[var(--color-muted)]">
                             {datos.partidos.length} partidos · {datos.pistas.length} pistas · descanso{" "}
                             {descanso} min
                         </p>
@@ -411,22 +413,22 @@ export default function EditorHorarios({
                             type="button"
                             onClick={planificar}
                             disabled={enviando}
-                            className="rounded-lg bg-white px-3 py-2 text-sm ring-1 ring-[#D5D9DC] disabled:opacity-50"
+                            className="rounded-lg bg-white px-3 py-2 text-sm ring-1 ring-[var(--color-border)] disabled:opacity-50"
                         >
                             Proponer horarios
                         </button>
-                        <button
+                        <Boton variante="primario" tamano="md"
                             type="button"
                             onClick={guardar}
                             disabled={bloqueoGuardar}
-                            className="rounded-lg bg-[#F0443A] px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+                            className="font-medium disabled:opacity-50"
                         >
                             {enviando ? "Guardando…" : "Guardar horarios"}
-                        </button>
+                        </Boton>
                     </div>
                 </header>
 
-                <details className="rounded-xl bg-white p-4 ring-1 ring-[#D5D9DC]">
+                <details className="rounded-xl bg-white p-4 ring-1 ring-[var(--color-border)]">
                     <summary className="cursor-pointer font-semibold">
                         Configuración de la prueba
                     </summary>
@@ -442,7 +444,7 @@ export default function EditorHorarios({
                         <button
                             type="submit"
                             disabled={enviando}
-                            className="rounded-lg bg-white px-3 py-2 text-sm ring-1 ring-[#D5D9DC] disabled:opacity-50"
+                            className="rounded-lg bg-white px-3 py-2 text-sm ring-1 ring-[var(--color-border)] disabled:opacity-50"
                         >
                             Guardar configuración
                         </button>
@@ -455,7 +457,7 @@ export default function EditorHorarios({
                             key={d}
                             type="button"
                             onClick={() => setDia(d)}
-                            className={`rounded-md px-3 py-1 text-sm ${d === dia ? "bg-[#0D1B2A] text-white" : "bg-white ring-1 ring-[#D5D9DC]"
+                            className={`rounded-md px-3 py-1 text-sm ${d === dia ? "bg-[var(--color-navy)] text-white" : "bg-white ring-1 ring-[var(--color-border)]"
                                 }`}
                         >
                             {d}
@@ -466,8 +468,8 @@ export default function EditorHorarios({
                 {aviso && (
                     <div
                         className={`rounded-lg p-3 text-sm ${aviso.tipo === "ok"
-                                ? "bg-[#EAF6EF] text-[#16845B]"
-                                : "bg-[#FDECEC] text-[#C73535]"
+                                ? "bg-[var(--color-success-bg)] text-[var(--color-success)]"
+                                : "bg-[var(--color-danger-bg)] text-[var(--color-danger)]"
                             }`}
                     >
                         {aviso.texto}
@@ -475,7 +477,7 @@ export default function EditorHorarios({
                 )}
 
                 {conflictos.length > 0 && (
-                    <div className="rounded-lg bg-[#FDECEC] p-3 text-sm text-[#C73535]">
+                    <div className="rounded-lg bg-[var(--color-danger-bg)] p-3 text-sm text-[var(--color-danger)]">
                         {conflictos.map((c, i) => (
                             <p key={i}>
                                 {c.mensaje}: {c.partidoIds.map(etiquetaPorId).join(" · ")}
@@ -495,10 +497,10 @@ export default function EditorHorarios({
                             <Arrastre
                                 key={f.id}
                                 partidoId={f.id}
-                                className="rounded-lg bg-[#F4F5F4] p-2 text-xs ring-1 ring-[#D5D9DC]"
+                                className="rounded-lg bg-[var(--color-surface)] p-2 text-xs ring-1 ring-[var(--color-border)]"
                             >
                                 <p className="font-medium">{etiquetaDe(f)}</p>
-                                <p className="text-[#68737D]">{f.duracionMin} min</p>
+                                <p className="text-[var(--color-muted)]">{f.duracionMin} min</p>
                             </Arrastre>
                         ))}
                     </Columna>
@@ -518,17 +520,17 @@ export default function EditorHorarios({
                                     return (
                                         <div
                                             key={f.id}
-                                            className="rounded-lg bg-[#F4F5F4] p-2 text-xs ring-1 ring-[#D5D9DC]"
+                                            className="rounded-lg bg-[var(--color-surface)] p-2 text-xs ring-1 ring-[var(--color-border)]"
                                         >
                                             <div className="mb-1 flex items-center justify-between gap-2">
                                                 <Arrastre partidoId={f.id} soloMango />
-                                                <span className="flex-1 truncate text-[#68737D]">
+                                                <span className="flex-1 truncate text-[var(--color-muted)]">
                                                     {f.categoria} · {f.cuadro ?? "grupo"}
                                                 </span>
                                                 <button
                                                     type="button"
                                                     onClick={() => quitar(f.id)}
-                                                    className="text-[#C73535]"
+                                                    className="text-[var(--color-danger)]"
                                                     aria-label="Quitar horario"
                                                 >
                                                     ×
@@ -544,7 +546,7 @@ export default function EditorHorarios({
                                                     type="date"
                                                     value={a.fecha ?? ""}
                                                     onChange={(e) => cambiar(f.id, { fecha: e.target.value })}
-                                                    className="rounded border border-[#D5D9DC] bg-white px-1 py-0.5"
+                                                    className="rounded border border-[var(--color-border)] bg-white px-1 py-0.5"
                                                     aria-label="Fecha"
                                                 />
                                                 <input
@@ -553,7 +555,7 @@ export default function EditorHorarios({
                                                     onChange={(e) =>
                                                         cambiar(f.id, { inicioMin: aMinutos(e.target.value) })
                                                     }
-                                                    className="rounded border border-[#D5D9DC] bg-white px-1 py-0.5"
+                                                    className="rounded border border-[var(--color-border)] bg-white px-1 py-0.5"
                                                     aria-label="Hora"
                                                 />
                                                 <input
@@ -564,10 +566,10 @@ export default function EditorHorarios({
                                                     onChange={(e) =>
                                                         cambiar(f.id, { duracionMin: Number(e.target.value) })
                                                     }
-                                                    className="w-16 rounded border border-[#D5D9DC] bg-white px-1 py-0.5"
+                                                    className="w-16 rounded border border-[var(--color-border)] bg-white px-1 py-0.5"
                                                     aria-label="Duración en minutos"
                                                 />
-                                                <span className="text-[#68737D]">min</span>
+                                                <span className="text-[var(--color-muted)]">min</span>
                                             </div>
                                         </div>
                                     );

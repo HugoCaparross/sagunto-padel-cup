@@ -13,11 +13,11 @@ export default async function PaginaContenido() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Noticias</h1>
-          <p className="text-sm text-[#68737D]">Borradores y publicadas</p>
+          <p className="text-sm text-[var(--color-muted)]">Borradores y publicadas</p>
         </div>
         <Link
           href="/admin/contenido/nueva"
-          className="rounded-lg bg-[#F0443A] px-3 py-2 text-sm font-medium text-white"
+          className="btn btn-primario btn-md"
         >
           Nueva noticia
         </Link>
@@ -26,7 +26,7 @@ export default async function PaginaContenido() {
       {res.ok ? (
         <PanelNoticias noticias={res.noticias} />
       ) : (
-        <p className="rounded-lg bg-[#FDECEC] p-3 text-sm text-[#C73535]">{res.error}</p>
+        <p className="rounded-lg bg-[var(--color-danger-bg)] p-3 text-sm text-[var(--color-danger)]">{res.error}</p>
       )}
     </main>
   );
