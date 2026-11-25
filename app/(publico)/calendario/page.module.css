@@ -12,6 +12,7 @@
 .heroEstadisticas strong { color: #fff; font-family: var(--font-poppins), sans-serif; font-size: 1.85rem; line-height: 1.1; }
 .heroEstadisticas span { color: var(--color-reference-d0d5d1); font-size: .75rem; }
 .bajar { display: inline-flex; align-items: center; gap: .5rem; margin-top: 2rem; color: var(--color-reference-d8edbd); font-size: .8rem; font-weight: 700; text-decoration: none; transition: gap 160ms ease; }
+.bajar { color: var(--color-ink); }
 .bajar:hover { gap: .8rem; }
 .heroDeco { position: absolute; top: 50%; right: max(-10rem, calc((100vw - 1200px) / 2 - 14rem)); width: min(49vw, 39rem); aspect-ratio: 1; transform: translateY(-50%) rotate(-16deg); }
 .heroDeco span { position: absolute; inset: 0; border: 1px solid rgb(216 237 189 / .18); border-radius: 50%; }
@@ -35,6 +36,9 @@
 .filtros { display: flex; gap: .65rem; }
 .selector { position: relative; z-index: 4; display: grid; min-width: 12rem; gap: .32rem; }
 .selectorEtiqueta { color: var(--color-reference-59615b); font-family: var(--font-inter), sans-serif; font-size: .68rem; font-weight: 700; }
+.selector select { width: 100%; min-height: 2.85rem; border: 1px solid var(--color-reference-cbd2ca); border-radius: .65rem; background: #fff; padding: .65rem 2.3rem .65rem .8rem; color: var(--color-ink); font-size: .85rem; font-weight: 600; cursor: pointer; transition: border-color 150ms ease, box-shadow 150ms ease; }
+.selector select:hover { border-color: var(--color-sage); }
+.selector select:focus-visible { outline: 3px solid rgb(167 196 160 / .55); outline-offset: 2px; border-color: var(--color-navy); }
 .selectorBoton { display: flex; min-height: 2.85rem; align-items: center; justify-content: space-between; gap: .7rem; border: 1px solid var(--color-reference-cbd2ca); border-radius: .65rem; background: #fff; padding: .65rem .8rem; color: var(--color-reference-252b26); font-size: .8rem; font-weight: 600; text-align: left; transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease; }
 .selectorBoton:hover, .selectorBoton[aria-expanded="true"] { border-color: var(--color-reference-567b36); background: var(--color-reference-f7faf4); box-shadow: 0 0 0 3px rgb(121 184 58 / .14); }
 .selectorBoton > :last-child { color: var(--color-reference-45652a); }

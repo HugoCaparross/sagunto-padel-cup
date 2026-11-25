@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { CATEGORIAS, ETIQUETAS_CATEGORIA, ETIQUETAS_ESTADO_PRUEBA } from "@/lib/constantes";
 import type { PruebaPublica } from "@/lib/pruebas/publico";
 import { fechaLarga } from "@/lib/formato";
@@ -9,53 +9,11 @@ import { formatoFechaInscripcion } from "@/lib/pruebas/fechas-clave";
 import GoogleIcon from "@/components/ui/GoogleIcon";
 import s from "./page.module.css";
 
-type Opcion = { valor: string; etiqueta: string };
-const OPCIONES_CATEGORIA: Opcion[] = [{ valor: "todas", etiqueta: "Todas las categorías" }, ...CATEGORIAS.map((categoria) => ({ valor: categoria, etiqueta: ETIQUETAS_CATEGORIA[categoria] }))];
-const OPCIONES_ESTADO: Opcion[] = [{ valor: "todas", etiqueta: "Todas las pruebas" }, { valor: "proximas", etiqueta: "Por disputar" }, { valor: "finalizadas", etiqueta: "Finalizadas" }];
-
-function Selector({ etiqueta, valor, opciones, alCambiar }: { etiqueta: string; valor: string; opciones: Opcion[]; alCambiar: (valor: string) => void }) {
-  const [abierto, setAbierto] = useState(false);
-  const raiz = useRef<HTMLDivElement>(null);
-  const opcionesRef = useRef<Array<HTMLButtonElement | null>>([]);
-
-  useEffect(() => {
-    function cerrarFuera(evento: MouseEvent) {
-      if (!raiz.current?.contains(evento.target as Node)) setAbierto(false);
-    }
-    function cerrarEscape(evento: KeyboardEvent) {
-      if (evento.key === "Escape") setAbierto(false);
-    }
-    document.addEventListener("mousedown", cerrarFuera);
-    document.addEventListener("keydown", cerrarEscape);
-    return () => {
-      document.removeEventListener("mousedown", cerrarFuera);
-      document.removeEventListener("keydown", cerrarEscape);
-    };
-  }, []);
-
-  const actual = opciones.find((opcion) => opcion.valor === valor)?.etiqueta ?? opciones[0]?.etiqueta;
-  return <div className={s.selector} ref={raiz}>
-    <span className={s.selectorEtiqueta}>{etiqueta}</span>
-    <button type="button" className={s.selectorBoton} aria-haspopup="listbox" aria-expanded={abierto} onClick={() => setAbierto(!abierto)} onKeyDown={(evento) => {
-      if (evento.key === "ArrowDown" || evento.key === "Enter" || evento.key === " ") {
-        evento.preventDefault();
-        setAbierto(true);
-        requestAnimationFrame(() => opcionesRef.current[Math.max(0, opciones.findIndex((opcion) => opcion.valor === valor))]?.focus());
-      }
-    }}>
-      <span>{actual}</span><GoogleIcon name={abierto ? "keyboard_arrow_up" : "keyboard_arrow_down"} />
-    </button>
-    {abierto && <div className={s.selectorPopup} role="listbox" aria-label={etiqueta}>{opciones.map((opcion, indice) => <button type="button" role="option" aria-selected={valor === opcion.valor} className={valor === opcion.valor ? s.opcionActiva : ""} key={opcion.valor} ref={(elemento) => { opcionesRef.current[indice] = elemento; }} onKeyDown={(evento) => {
-      if (evento.key === "ArrowDown" || evento.key === "ArrowUp") {
-        evento.preventDefault();
-        const paso = evento.key === "ArrowDown" ? 1 : -1;
-        opcionesRef.current[(indice + paso + opciones.length) % opciones.length]?.focus();
-      }
-      if (evento.key === "Home") { evento.preventDefault(); opcionesRef.current[0]?.focus(); }
-      if (evento.key === "End") { evento.preventDefault(); opcionesRef.current[opciones.length - 1]?.focus(); }
-    }} onClick={() => { alCambiar(opcion.valor); setAbierto(false); }}>{opcion.etiqueta}{valor === opcion.valor && <GoogleIcon name="check" />}</button>)}</div>}
-  </div>;
-}
+const OPCIONES_ESTADO = [
+  { valor: "todas", etiqueta: "Todas las pruebas" },
+  { valor: "proximas", etiqueta: "Por disputar" },
+  { valor: "finalizadas", etiqueta: "Finalizadas" },
+];
 
 export default function CalendarBrowser({ pruebas }: { pruebas: PruebaPublica[] }) {
   const [categoria, setCategoria] = useState("todas");
@@ -67,29 +25,37 @@ export default function CalendarBrowser({ pruebas }: { pruebas: PruebaPublica[] 
 
   return <div className={s.browser}>
     <header className={s.browserCabecera}>
-      <div><p className={s.eyebrowOscuro}>Fechas importantes de cada prueba</p><h2>Tres momentos para tener en cuenta</h2><p>Consulta cuándo se abren las inscripciones, cuándo se cierran y qué días se juega cada torneo.</p></div>
-      <div className={s.filtros}><Selector etiqueta="Categoría" valor={categoria} opciones={OPCIONES_CATEGORIA} alCambiar={setCategoria} /><Selector etiqueta="Estado" valor={estado} opciones={OPCIONES_ESTADO} alCambiar={setEstado} /></div>
+      <div><p className={s.eyebrowOscuro}>Explora las pruebas</p><h2>Calendario del circuito</h2><p>Filtra por categoría o estado y abre una prueba para ver todos sus detalles.</p></div>
+      <div className={s.filtros}>
+        <label className={s.selector} htmlFor="filtro-categoria"><span className={s.selectorEtiqueta}>Categoría</span>
+          <select id="filtro-categoria" value={categoria} onChange={(event) => setCategoria(event.target.value)}>
+            <option value="todas">Todas las categorías</option>
+            {CATEGORIAS.map((item) => <option value={item} key={item}>{ETIQUETAS_CATEGORIA[item]}</option>)}
+          </select>
+        </label>
+        <label className={s.selector} htmlFor="filtro-estado"><span className={s.selectorEtiqueta}>Estado</span>
+          <select id="filtro-estado" value={estado} onChange={(event) => setEstado(event.target.value)}>
+            {OPCIONES_ESTADO.map((item) => <option value={item.valor} key={item.valor}>{item.etiqueta}</option>)}
+          </select>
+        </label>
+      </div>
     </header>
 
-    <p className={s.cuentaPruebas}><strong>{visibles.length}</strong> {visibles.length === 1 ? "prueba" : "pruebas"}</p>
+    <p className={s.cuentaPruebas} role="status" aria-live="polite"><strong>{visibles.length}</strong> {visibles.length === 1 ? "prueba" : "pruebas"} mostradas</p>
     {visibles.length > 0 ? <ol className={s.listaPruebas}>
       {visibles.map((prueba) => {
         const apertura = prueba.inscripcionesAbrenAt;
         const cierre = prueba.inscripcionesCierranAt;
-        const torneo = prueba.fechaInicio === prueba.fechaFin
-          ? fechaLarga(prueba.fechaInicio)
-          : `${fechaLarga(prueba.fechaInicio)} – ${fechaLarga(prueba.fechaFin)}`;
+        const torneo = prueba.fechaInicio === prueba.fechaFin ? fechaLarga(prueba.fechaInicio) : `${fechaLarga(prueba.fechaInicio)} – ${fechaLarga(prueba.fechaFin)}`;
         return <li key={prueba.id}>
           <Link href={`/pruebas/${prueba.slug}`} className={s.tarjetaPrueba}>
             <header className={s.tarjetaCabecera}><div><p className={s.tarjetaEyebrow}>{prueba.esMaster ? "Máster Final" : "Prueba del circuito"}</p><h3>{prueba.nombre}</h3></div><span className={s.estadoPrueba} data-estado={prueba.estado}>{ETIQUETAS_ESTADO_PRUEBA[prueba.estado]}</span></header>
             <div className={s.hitos}>
               <div className={`${s.hito} ${s.hitoApertura}`}><span className={s.hitoIcono}><GoogleIcon name="event_available" /></span><span className={s.hitoTexto}><span className={s.hitoEtiqueta}>Apertura de inscripciones</span>{apertura ? <time dateTime={apertura}>{formatoFechaInscripcion(apertura)}</time> : <span>{formatoFechaInscripcion(apertura)}</span>}<small>{apertura ? "Fecha indicada por la organización" : "La organización la anunciará"}</small></span></div>
-              <div className={s.hito}>
-                <span className={s.hitoIcono}><GoogleIcon name="event" /></span><span className={s.hitoTexto}><span className={s.hitoEtiqueta}>Cierre de inscripciones</span>{cierre ? <time dateTime={cierre}>{formatoFechaInscripcion(cierre)}</time> : <span>{formatoFechaInscripcion(cierre)}</span>}<small>{cierre ? "Fecha indicada por la organización" : "La organización la anunciará"}</small></span>
-              </div>
+              <div className={s.hito}><span className={s.hitoIcono}><GoogleIcon name="event" /></span><span className={s.hitoTexto}><span className={s.hitoEtiqueta}>Cierre de inscripciones</span>{cierre ? <time dateTime={cierre}>{formatoFechaInscripcion(cierre)}</time> : <span>{formatoFechaInscripcion(cierre)}</span>}<small>{cierre ? "Fecha indicada por la organización" : "La organización la anunciará"}</small></span></div>
               <div className={`${s.hito} ${s.hitoTorneo}`}><span className={s.hitoIcono}><GoogleIcon name="sports_tennis" /></span><span className={s.hitoTexto}><span className={s.hitoEtiqueta}>{prueba.fechaInicio === prueba.fechaFin ? "Día del torneo" : "Fechas del torneo"}</span><span>{torneo}</span><small>Calendario del torneo</small></span></div>
             </div>
-            <footer className={s.tarjetaPie}><span><GoogleIcon name="location_on" />{prueba.sede}</span><span>{prueba.categorias.map((categoriaPrueba) => ETIQUETAS_CATEGORIA[categoriaPrueba]).join(" · ")}</span><span className={s.verPrueba}>Ver detalles <GoogleIcon name="arrow_forward" /></span></footer>
+            <footer className={s.tarjetaPie}><span><GoogleIcon name="location_on" />{prueba.sede}</span><span>{prueba.categorias.map((item) => ETIQUETAS_CATEGORIA[item]).join(" · ")}</span><span className={s.verPrueba}>Ver detalles <GoogleIcon name="arrow_forward" /></span></footer>
           </Link>
         </li>;
       })}

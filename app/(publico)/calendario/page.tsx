@@ -9,19 +9,16 @@ export const metadata: Metadata = { title: "Calendario" };
 
 export default async function PaginaCalendario() {
   const pruebas = await listarPruebasPublicas();
-  const proximas = pruebas.filter((p) => p.estado !== "finalizada");
-  const categorias = new Set(pruebas.flatMap((prueba) => prueba.categorias));
 
   return <main className={s.pagina}>
     <header className={s.hero}>
       <div className={`container ${s.heroContenido}`}>
         <div className={s.heroTexto}>
           <p className={s.eyebrow}>Sagunto Padel Cup · Temporada 2026–2027</p>
-          <h1>Tu próxima prueba.<br /><span>Tres fechas claras.</span></h1>
-          <p className={s.descripcion}>Consulta cuándo abren las inscripciones, cuándo cierran y el día exacto del torneo. Sin perderte entre fechas.</p>
-          <a href="#calendario" className={s.bajar}>Ver fechas importantes <GoogleIcon name="arrow_downward" /></a>
+          <h1>El calendario.<br /><span>De un vistazo.</span></h1>
+          <p className={s.descripcion}>Consulta las próximas pruebas, sus fechas de inscripción y el día del torneo.</p>
+          <a href="#calendario" className={`btn btn-primario ${s.bajar}`}>Ver próximas pruebas <GoogleIcon name="arrow_downward" /></a>
         </div>
-        <div className={s.heroEstadisticas}><div><strong>{pruebas.length}</strong><span>pruebas publicadas</span></div><div><strong>{proximas.length}</strong><span>por disputar</span></div><div><strong>{categorias.size}</strong><span>categorías</span></div></div>
       </div>
       <div className={s.heroDeco} aria-hidden="true"><span /><span /><span /></div>
     </header>
