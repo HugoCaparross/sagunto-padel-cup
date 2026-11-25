@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { CATEGORIAS, ETIQUETAS_CATEGORIA, type Categoria } from "@/lib/constantes";
 import type { FilaTop } from "@/lib/home/datos";
 import GoogleIcon from "@/components/ui/GoogleIcon";
+import AvatarJugador from "@/components/ui/AvatarJugador";
 import s from "./home.module.css";
 
 type CategoriaRanking = Categoria | "general";
@@ -15,16 +15,8 @@ type Props = {
 };
 
 const CATEGORIAS_RANKING: CategoriaRanking[] = ["general", ...CATEGORIAS];
-const FOTOS_FALLBACK = ["/images/padel-player.jpg", "/images/padel-woman.jpg"];
-
 function etiquetaCategoria(categoria: CategoriaRanking): string {
     return categoria === "general" ? "General" : ETIQUETAS_CATEGORIA[categoria];
-}
-
-function fotoJugador(fila: FilaTop): string {
-    if (fila.fotoUrl) return fila.fotoUrl;
-    const indice = [...fila.nombre].reduce((total, letra) => total + letra.charCodeAt(0), 0);
-    return FOTOS_FALLBACK[indice % FOTOS_FALLBACK.length];
 }
 
 export default function RankingTop5({ ranking, rankingGeneral }: Props) {
@@ -126,15 +118,7 @@ export default function RankingTop5({ ranking, rankingGeneral }: Props) {
                                     {filas.map((fila) => (
                                         <li key={`${fila.jugadorId ?? fila.nombre}-${fila.posicion}`} className={`${s.rankFila} ${fila.posicion === 1 ? s.rankOro : fila.posicion === 2 ? s.rankPlata : fila.posicion === 3 ? s.rankBronce : ""}`}>
                                             <span className={s.rankPos}>{fila.posicion}</span>
-                                            <span className={s.rankAvatar}>
-                                                <Image
-                                                    src={fotoJugador(fila)}
-                                                    alt=""
-                                                    fill
-                                                    sizes="56px"
-                                                    unoptimized={Boolean(fila.fotoUrl?.startsWith("http"))}
-                                                />
-                                            </span>
+                                            <AvatarJugador nombre={fila.nombre} src={fila.fotoUrl} className={s.rankAvatar} sizes="56px" />
                                             {fila.jugadorId ? (
                                                 <button
                                                     type="button"
@@ -173,15 +157,7 @@ export default function RankingTop5({ ranking, rankingGeneral }: Props) {
             >
                 {seleccionado && (
                     <article className={s.playerCard}>
-                        <div className={s.playerFoto}>
-                            <Image
-                                src={fotoJugador(seleccionado)}
-                                alt=""
-                                fill
-                                sizes="(max-width: 700px) 100vw, 45vw"
-                                unoptimized={Boolean(seleccionado.fotoUrl?.startsWith("http"))}
-                            />
-                        </div>
+                        <AvatarJugador nombre={seleccionado.nombre} src={seleccionado.fotoUrl} className={s.playerFoto} sizes="(max-width: 700px) 100vw, 45vw" />
                         <div className={s.playerContenido}>
                             <p className={s.playerEyebrow}>
                                 Sagunto Padel Cup · Ranking {etiquetaCategoria(activa)}

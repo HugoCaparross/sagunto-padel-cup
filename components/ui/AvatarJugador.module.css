@@ -1,0 +1,14 @@
+.avatar {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.avatar img {
+    object-fit: cover;
+}

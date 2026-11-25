@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Enfrentamientos from "@/components/jugadores/Enfrentamientos";
 import PremiosGanados from "@/components/jugadores/PremiosGanados";
+import AvatarJugador from "@/components/ui/AvatarJugador";
 import SimuladorJugador from "@/components/jugadores/SimuladorJugador";
 import { usuarioActual } from "@/lib/auth/organizador";
 import { cargarInscripcionesJugador } from "@/lib/cuenta/cargar";
@@ -65,12 +66,15 @@ export default async function PaginaJugador({ params }: Props) {
     <main className="container space-y-10 py-12">
       <header className="space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <div className="space-y-1">
+          <div className="flex items-center gap-4">
+            <AvatarJugador nombre={ficha.nombre} src={ficha.fotoUrl} className="h-24 w-24 rounded-full text-2xl" sizes="96px" />
+            <div className="space-y-1">
             <p className="text-xs uppercase tracking-wide text-muted">Jugador</p>
             <h1 className="heading-font text-5xl">{ficha.nombre}</h1>
             {!ficha.visible && (
               <p className="text-sm text-muted">Perfil visible solo para ti.</p>
             )}
+            </div>
           </div>
           <div className="text-right">
             <p className="heading-font text-4xl">Nivel {nivel.nivel}</p>

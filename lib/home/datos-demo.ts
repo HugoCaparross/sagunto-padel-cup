@@ -58,7 +58,7 @@ function filasDemo(nombres: string[], puntosBase: number): FilaTop[] {
         partidos: 12 - index,
         victorias: 9 - index,
         porcentajeVictorias: Math.round(((9 - index) / (12 - index)) * 1000) / 10,
-        fotoUrl: index % 2 === 0 ? "/images/padel-woman.jpg" : "/images/padel-player.jpg",
+        fotoUrl: null,
     }));
 }
 

@@ -1,6 +1,7 @@
 import type { Categoria } from "@/lib/constantes";
 import { cargarDatosRanking } from "@/lib/ranking/cargar";
 import { crearSlugJugador } from "@/lib/jugadores/slug";
+import { urlsFirmadasFotos } from "@/lib/jugadores/fotos";
 import { progresoDeJugador } from "@/lib/xp/niveles";
 
 export type JugadorListado = {
@@ -15,6 +16,7 @@ export type JugadorListado = {
     nivel: number;
     tier: string;
     progreso: number;
+    fotoUrl: string | null;
 };
 
 type Acumulado = {
@@ -87,6 +89,7 @@ export async function listarJugadoresListado(): Promise<JugadorListado[]> {
             id,
             slug: perfil.slug ?? crearSlugJugador(perfil.nombre, id),
             nombre: perfil.nombre || "Jugador",
+            fotoUrl: null,
             categoria: a.ultimaCategoria,
             puntos: a.puntos,
             pruebas: a.pruebas.size,
@@ -98,8 +101,18 @@ export async function listarJugadoresListado(): Promise<JugadorListado[]> {
         });
     }
 
-    return salida.sort(
+    const ordenada = salida.sort(
         (x, y) =>
             y.nivel - x.nivel || y.puntos - x.puntos || x.nombre.localeCompare(y.nombre, "es")
     );
+    const rutas = ordenada.flatMap((jugador) => {
+        const path = datos.perfiles.get(jugador.id)?.fotoPath;
+        return path ? [path] : [];
+    });
+    const urls = await urlsFirmadasFotos(rutas);
+
+    return ordenada.map((jugador) => {
+        const path = datos.perfiles.get(jugador.id)?.fotoPath;
+        return { ...jugador, fotoUrl: path ? urls.get(path) ?? null : null };
+    });
 }

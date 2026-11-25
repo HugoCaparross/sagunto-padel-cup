@@ -1,6 +1,7 @@
 import type { Categoria, Cuadro, Ronda } from "@/lib/constantes";
 import { type EstadisticasJugador } from "@/lib/estadisticas/calcular";
 import { cargarDatosRanking } from "@/lib/ranking/cargar";
+import { urlFirmadaFoto } from "@/lib/jugadores/fotos";
 import { crearClienteAdmin } from "@/lib/supabase/server";
 import { progresoDeJugador, type ProgresoNivel } from "@/lib/xp/niveles";
 import { estadisticasHistoricas } from "@/lib/xp/cargar";
@@ -17,6 +18,7 @@ export type PruebaJugador = {
 export type FichaPublica = {
     id: string;
     nombre: string;
+    fotoUrl: string | null;
     visible: boolean;
     esPropio: boolean;
     datosDeportivos: Record<string, unknown> | null;
@@ -94,10 +96,13 @@ export async function cargarFichaPublica(
         }).find((f) => f.clave === data.id);
         return fila ? [{ categoria, posicion: fila.posicion, puntos: fila.puntos }] : [];
     });
+    const fotoPath = data.visibilidad_publica ? datos.perfiles.get(data.id)?.fotoPath ?? null : null;
+    const fotoUrl = await urlFirmadaFoto(fotoPath);
 
     return {
         id: data.id,
         nombre: data.nombre || "Jugador",
+        fotoUrl,
         visible: data.visibilidad_publica,
         esPropio,
         datosDeportivos: data.visibilidad_publica ? (data.datos_deportivos ?? null) : null,

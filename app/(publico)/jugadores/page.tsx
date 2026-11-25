@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CATEGORIAS, ETIQUETAS_CATEGORIA, type Categoria } from "@/lib/constantes";
 import { listarJugadoresListado } from "@/lib/jugadores/listado";
+import AvatarJugador from "@/components/ui/AvatarJugador";
 
 export const metadata: Metadata = { title: "Jugadores" };
 
@@ -76,11 +77,14 @@ export default async function PaginaJugadores({ searchParams }: Props) {
             <li key={j.id}>
               <Link href={`/jugadores/${j.slug}`} className="card block h-full space-y-4 p-5 hover:border-navy">
                 <div className="flex items-start justify-between gap-3">
-                  <div>
+                  <div className="flex items-center gap-3">
+                    <AvatarJugador nombre={j.nombre} src={j.fotoUrl} className="h-14 w-14 rounded-full text-lg" sizes="56px" />
+                    <div>
                     <p className="heading-font text-2xl leading-tight">{j.nombre}</p>
                     <p className="text-xs text-muted">
                       {j.categoria ? ETIQUETAS_CATEGORIA[j.categoria] : "Sin categoría"}
                     </p>
+                    </div>
                   </div>
                   <span className="badge badge-marca">Nivel {j.nivel}</span>
                 </div>
