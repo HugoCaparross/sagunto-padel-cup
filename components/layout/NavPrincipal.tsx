@@ -36,16 +36,16 @@ export default function NavPrincipal() {
             <ul className="flex items-center gap-5 xl:gap-7 text-sm font-medium">
                 {NAVEGACION_PRINCIPAL.map(({ href, texto }) => {
                     const activo = pathname === href || pathname.startsWith(`${href}/`);
-                    return <li key={href}><Link href={href} aria-current={activo ? "page" : undefined} className={`transition-colors hover:text-coral ${activo ? "text-coral" : "text-white/85"}`}>{texto}</Link></li>;
+                    return <li key={href}><Link href={href} aria-current={activo ? "page" : undefined} className={`underline-offset-4 transition-colors hover:text-white hover:underline hover:decoration-coral ${activo ? "text-white underline decoration-coral" : "text-white/85"}`}>{texto}</Link></li>;
                 })}
                 <li className="relative">
-                    <button ref={trigger} type="button" aria-expanded={abierto} aria-controls="navegacion-mas" onClick={() => setAbierto((value) => !value)} className={`inline-flex items-center gap-1 transition-colors hover:text-coral ${masActivo ? "text-coral" : "text-white/85"}`}>
+                    <button ref={trigger} type="button" aria-expanded={abierto} aria-controls="navegacion-mas" onClick={() => setAbierto((value) => !value)} className={`inline-flex items-center gap-1 underline-offset-4 transition-colors hover:text-white hover:underline hover:decoration-coral ${masActivo ? "text-white underline decoration-coral" : "text-white/85"}`}>
                         Más <span aria-hidden="true">⌄</span>
                     </button>
                     {abierto && <ul id="navegacion-mas" ref={menu} className="absolute right-0 top-full z-50 mt-3 min-w-56 space-y-1 rounded-xl border border-white/10 bg-navy p-2 shadow-xl">
                         {NAVEGACION_MAS.map(({ href, texto }) => {
                             const activo = pathname === href || pathname.startsWith(`${href}/`);
-                            return <li key={href}><Link href={href} aria-current={activo ? "page" : undefined} onClick={() => setAbierto(false)} className={`block rounded-lg px-4 py-3 transition-colors hover:bg-white/10 hover:text-coral ${activo ? "text-coral" : "text-white"}`}>{texto}</Link></li>;
+                            return <li key={href}><Link href={href} aria-current={activo ? "page" : undefined} onClick={() => setAbierto(false)} className={`block rounded-lg px-4 py-3 transition-colors hover:bg-white/10 hover:text-white ${activo ? "bg-white/10 text-white underline decoration-coral underline-offset-4" : "text-white"}`}>{texto}</Link></li>;
                         })}
                     </ul>}
                 </li>

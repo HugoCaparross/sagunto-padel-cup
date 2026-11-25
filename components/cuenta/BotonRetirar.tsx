@@ -32,7 +32,7 @@ export default function BotonRetirar({ inscripcionId }: { inscripcionId: string 
             >
                 {pendiente ? "Retirando…" : "Retirarme"}
             </button>
-            {error && <p className="text-xs text-[var(--color-danger)]">{error}</p>}
+            {error && <p className="text-sm text-[var(--color-danger)]">{error}</p>}
         </div>
     );
 }

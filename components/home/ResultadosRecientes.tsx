@@ -47,6 +47,8 @@ function NombresPareja({ nombre, className }: { nombre: string; className: strin
 }
 
 export default function ResultadosRecientes({ resultados }: Props) {
+    if (resultados.length === 0) return null;
+
     return (
         <section className={`${s.section} ${s.sectionDark}`}>
             <div className="container">

@@ -162,7 +162,7 @@ export default function PanelPropuestas({
             ) : (
                 <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[var(--color-border)]">
                     <table className="w-full text-sm">
-                        <thead className="bg-[var(--color-surface)] text-left text-xs uppercase text-[var(--color-muted)]">
+                        <thead className="bg-[var(--color-surface)] text-left text-sm uppercase text-[var(--color-muted)]">
                             <tr>
                                 <th className="px-3 py-2">Jugador</th>
                                 <th className="px-3 py-2">Movimiento</th>
@@ -177,7 +177,7 @@ export default function PanelPropuestas({
                                     <tr key={p.id} className="border-t border-[var(--color-border)]">
                                         <td className="px-3 py-2">{p.nombre}</td>
                                         <td className="px-3 py-2">
-                                            <span className="text-xs text-[var(--color-muted)]">
+                                            <span className="text-sm text-[var(--color-muted)]">
                                                 {p.tipo === "ascenso" ? "Ascenso" : "Descenso"}:
                                             </span>{" "}
                                             {ETIQUETAS_CATEGORIA[p.categoriaOrigen]} →{" "}
@@ -186,7 +186,7 @@ export default function PanelPropuestas({
                                         <td className="px-3 py-2">
                                             {p.posicion}
                                             {p.empate && (
-                                                <span className="ml-2 rounded bg-[var(--color-warning-bg)] px-1.5 py-0.5 text-xs text-[var(--color-warning)]">
+                                                <span className="ml-2 rounded bg-[var(--color-warning-bg)] px-1.5 py-0.5 text-sm text-[var(--color-warning)]">
                                                     Empate
                                                 </span>
                                             )}
@@ -194,7 +194,7 @@ export default function PanelPropuestas({
                                         <td className="px-3 py-2">
                                             {ETIQUETA_ESTADO[p.estado]}
                                             {p.estado === "modificada" && p.motivo && (
-                                                <span className="block text-xs text-[var(--color-muted)]">{p.motivo}</span>
+                                                <span className="block text-sm text-[var(--color-muted)]">{p.motivo}</span>
                                             )}
                                         </td>
                                         <td className="px-3 py-2">

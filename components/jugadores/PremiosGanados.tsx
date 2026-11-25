@@ -11,7 +11,7 @@ export default function PremiosGanados({ premios }: { premios: PremioGanado[] })
             <ul className="grid gap-4 md:grid-cols-2">
                 {premios.map((p, i) => (
                     <li key={i} className="card space-y-2 p-5">
-                        <p className="text-xs uppercase tracking-wide text-muted">
+                        <p className="text-sm uppercase tracking-wide text-muted">
                             {p.prueba} · {ETIQUETAS_CATEGORIA[p.categoria]} · {ETIQUETAS_CUADRO[p.cuadro]}
                         </p>
                         {p.revelado ? (

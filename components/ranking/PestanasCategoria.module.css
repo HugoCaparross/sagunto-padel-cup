@@ -1,8 +1,8 @@
 .tabs { display: flex; width: fit-content; max-width: 100%; flex-wrap: wrap; gap: 0.3rem; border: 1px solid var(--color-border); background: var(--color-surface); padding: 0.3rem; }
-.tab { display: inline-flex; min-height: 2.55rem; align-items: center; justify-content: center; padding: 0.55rem 0.8rem; color: var(--color-reference-42494f); font-size: 0.82rem; font-weight: 600; line-height: 1.2; text-align: center; text-decoration: none; transition: background-color 160ms ease, color 160ms ease; }
-.tab:hover { background: var(--color-reference-e6e6e6); color: var(--color-navy); }
+.tab { display: inline-flex; min-height: 2.55rem; align-items: center; justify-content: center; padding: 0.55rem 0.8rem; color: var(--color-muted); font-size:var(--spc-text-small); font-weight: 600; line-height: 1.2; text-align: center; text-decoration: none; transition: background-color 160ms ease, color 160ms ease; }
+.tab:hover { background: var(--color-success-bg); color: var(--color-navy); }
 .tab:focus-visible { position: relative; z-index: 1; outline: 3px solid var(--color-coral); outline-offset: 2px; }
 .tab[data-active="true"] { background: var(--color-navy); color: #fff; }
 .tab[data-active="true"]:hover { background: var(--color-coral); color: var(--color-navy); }
-@media (max-width: 540px) { .tabs { display: grid; width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 639.98px) { .tabs { display: grid; width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (prefers-reduced-motion: reduce) { .tab { transition: none; } }

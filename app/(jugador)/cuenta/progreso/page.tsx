@@ -64,7 +64,7 @@ export default async function PaginaProgreso() {
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {tarjetas.map((t) => (
           <div key={t.etiqueta} className="rounded-xl bg-white p-4 ring-1 ring-[var(--color-border)]">
-            <p className="text-xs text-[var(--color-muted)]">{t.etiqueta}</p>
+            <p className="text-sm text-[var(--color-muted)]">{t.etiqueta}</p>
             <p className="mt-1 text-2xl font-semibold">{t.valor}</p>
           </div>
         ))}
@@ -87,7 +87,7 @@ export default async function PaginaProgreso() {
         ) : (
           <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[var(--color-border)]">
             <table className="w-full text-sm">
-              <thead className="bg-[var(--color-surface)] text-left text-xs uppercase text-[var(--color-muted)]">
+              <thead className="bg-[var(--color-surface)] text-left text-sm uppercase text-[var(--color-muted)]">
                 <tr>
                   <th className="px-4 py-2">Prueba</th>
                   <th className="px-4 py-2">Fecha</th>

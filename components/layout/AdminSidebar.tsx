@@ -34,7 +34,7 @@ export default function AdminSidebar() {
                     <Link href="/admin" aria-label="Administración Sagunto Padel Cup">
                         <Logo compact />
                     </Link>
-                    <Link href="/" className="text-xs text-white/60 hover:text-white">
+                    <Link href="/" className="text-sm text-white/60 hover:text-white">
                         Ver web
                     </Link>
                 </div>

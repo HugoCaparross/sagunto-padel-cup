@@ -40,7 +40,7 @@ export default function BotonExportar({ recurso, etiqueta }: Props) {
             >
                 {pendiente ? "Preparando…" : etiqueta}
             </button>
-            {error && <p className="text-xs text-danger">{error}</p>}
+            {error && <p className="text-sm text-danger">{error}</p>}
         </div>
     );
 }

@@ -19,7 +19,7 @@ function BloqueLegal({ bloque }: { bloque: Bloque }) {
 export default async function DocumentoLegal({ tipo }: { tipo: TipoDocumento }) {
     const doc = await obtenerDocumentoVigente(tipo);
 
-    if (!doc) return <main className="min-h-[55vh] bg-[var(--color-surface)] pb-16 text-[var(--color-ink)]">
+    if (!doc) return <main className=" bg-[var(--color-surface)] pb-16 text-[var(--color-ink)]">
         <header className="bg-[var(--color-navy)] py-14 text-white md:py-20"><div className="container"><p className="mb-3 text-sm font-semibold uppercase tracking-widest text-[var(--color-sage)]">Sagunto Padel Cup</p><h1 className="text-3xl font-bold md:text-5xl">Documento en preparación</h1></div></header>
         <div className="container max-w-3xl py-10"><p className="text-lg leading-relaxed text-[var(--color-muted)]">Este documento todavía no está publicado. Estamos preparando su contenido para que puedas consultarlo aquí.</p></div>
     </main>;

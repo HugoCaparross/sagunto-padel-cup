@@ -372,7 +372,7 @@ export default function EditorLlaves({
                         <button
                             type="button"
                             onClick={() => quitarLado(p.id, lado)}
-                            className="text-xs text-[var(--color-muted)]"
+                            className="text-sm text-[var(--color-muted)]"
                             aria-label="Quitar"
                         >
                             ×
@@ -397,7 +397,7 @@ export default function EditorLlaves({
                     destino={{ tipo: "automatico", cuadro: c }}
                     className="mb-4 rounded-md border border-dashed border-[var(--color-border)] p-2"
                 >
-                    <div className="mb-1 flex items-center justify-between text-xs text-[var(--color-muted)]">
+                    <div className="mb-1 flex items-center justify-between text-sm text-[var(--color-muted)]">
                         <span>Campeón automático (sin partido)</span>
                         {auto?.inscripcionId && (
                             <button
@@ -432,7 +432,7 @@ export default function EditorLlaves({
                                 <button
                                     type="button"
                                     onClick={() => anadirPartido(c, r)}
-                                    className="text-xs font-medium text-[var(--color-coral)]"
+                                    className="text-sm font-medium text-[var(--color-coral)]"
                                 >
                                     + partido
                                 </button>
@@ -441,7 +441,7 @@ export default function EditorLlaves({
                             <div className="space-y-2">
                                 {lista.map((p) => (
                                     <div key={p.id} className="rounded-lg bg-[var(--color-surface)] p-2">
-                                        <div className="mb-2 flex flex-wrap items-center gap-1 text-xs">
+                                        <div className="mb-2 flex flex-wrap items-center gap-1 text-sm">
                                             <span className="mr-1 font-medium text-[var(--color-muted)]">P{numeroDe(p.id)}</span>
 
                                             <select
@@ -579,7 +579,7 @@ export default function EditorLlaves({
                         <h3 className="mb-2 font-semibold">Clasificación de grupos</h3>
                         {datos.grupos.map((g) => (
                             <div key={g.letra} className="mb-3">
-                                <p className="text-xs uppercase text-[var(--color-muted)]">
+                                <p className="text-sm uppercase text-[var(--color-muted)]">
                                     Grupo {g.letra} {g.completo ? "" : "· provisional"}
                                 </p>
                                 <ol className="text-sm">

@@ -18,7 +18,7 @@ export default function TablaRankingAdmin({ filas, marcas }: Props) {
         <div className="space-y-2">
             <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[var(--color-border)]">
                 <table className="w-full text-sm">
-                    <thead className="bg-[var(--color-surface)] text-left text-xs uppercase text-[var(--color-muted)]">
+                    <thead className="bg-[var(--color-surface)] text-left text-sm uppercase text-[var(--color-muted)]">
                         <tr>
                             <th className="px-3 py-2">Pos.</th>
                             <th className="px-3 py-2">Jugador</th>
@@ -60,7 +60,7 @@ export default function TablaRankingAdmin({ filas, marcas }: Props) {
                 </table>
             </div>
 
-            <p className="flex flex-wrap gap-4 text-xs text-[var(--color-muted)]">
+            <p className="flex flex-wrap gap-4 text-sm text-[var(--color-muted)]">
                 <span className="flex items-center gap-1">
                     <span className="inline-block h-3 w-3 rounded bg-[var(--color-success-bg)]" /> Zona de ascenso
                 </span>

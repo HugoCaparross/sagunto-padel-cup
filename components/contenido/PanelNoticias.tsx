@@ -73,7 +73,7 @@ export default function PanelNoticias({ noticias }: { noticias: NoticiaAdmin[] }
 
             <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[var(--color-border)]">
                 <table className="w-full text-sm">
-                    <thead className="bg-[var(--color-surface)] text-left text-xs uppercase text-[var(--color-muted)]">
+                    <thead className="bg-[var(--color-surface)] text-left text-sm uppercase text-[var(--color-muted)]">
                         <tr>
                             <th className="px-4 py-2">Título</th>
                             <th className="px-4 py-2">Categoría</th>
@@ -87,12 +87,12 @@ export default function PanelNoticias({ noticias }: { noticias: NoticiaAdmin[] }
                             <tr key={n.id} className="border-t border-[var(--color-border)]">
                                 <td className="px-4 py-2">
                                     <p className="font-medium">{n.titulo}</p>
-                                    <p className="text-xs text-[var(--color-muted)]">/noticias/{n.slug}</p>
+                                    <p className="text-sm text-[var(--color-muted)]">/noticias/{n.slug}</p>
                                 </td>
                                 <td className="px-4 py-2">{ETIQUETAS_NOTICIA[n.categoria]}</td>
                                 <td className="px-4 py-2">
                                     <span
-                                        className={`rounded px-2 py-0.5 text-xs ${n.publicada ? "bg-[var(--color-success-bg)] text-[var(--color-success)]" : "bg-[var(--color-surface)] text-[var(--color-muted)]"
+                                        className={`rounded px-2 py-0.5 text-sm ${n.publicada ? "bg-[var(--color-success-bg)] text-[var(--color-success)]" : "bg-[var(--color-surface)] text-[var(--color-muted)]"
                                             }`}
                                     >
                                         {n.publicada ? "Publicada" : "Borrador"}

@@ -1,65 +1,38 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import SelectorPrueba from "@/components/patrocinio/SelectorPrueba";
 import TarjetaPremio from "@/components/patrocinio/TarjetaPremio";
+import CabeceraPagina from "@/components/ui/CabeceraPagina";
+import LlamadaFinal from "@/components/ui/LlamadaFinal";
+import Migas from "@/components/ui/Migas";
+import Seccion from "@/components/ui/Seccion";
+import Vacio from "@/components/ui/Vacio";
 import { CATEGORIAS, ETIQUETAS_CATEGORIA } from "@/lib/constantes";
-import {
-  elegirPrueba,
-  listarPruebasSelector,
-  premiosDePrueba,
-} from "@/lib/patrocinio/publico";
+import { elegirPrueba, listarPruebasSelector, premiosDePrueba } from "@/lib/patrocinio/publico";
 
 export const metadata: Metadata = { title: "Premios" };
-
 type Props = { searchParams: Promise<{ prueba?: string }> };
 
 export default async function PaginaPremios({ searchParams }: Props) {
   const { prueba: slug } = await searchParams;
-
   const pruebas = await listarPruebasSelector();
   const elegida = elegirPrueba(pruebas, slug);
+  const premios = elegida ? await premiosDePrueba(elegida.id) : [];
 
-  if (!elegida) {
-    return (
-      <main className="container py-12">
-        <p className="text-sm text-muted">Todavía no hay pruebas en el circuito.</p>
-      </main>
-    );
-  }
-
-  const premios = await premiosDePrueba(elegida.id);
-
-  return (
-    <main className="container space-y-10 py-12">
-      <header className="space-y-4">
-        <h1 className="heading-font text-6xl">Premios</h1>
-        <p className="text-lg text-muted">
-          En cada categoría, solo los campeones y subcampeones del cuadro Oro reciben premio.
-          Algunos premios se revelan el día de la prueba.
-        </p>
-        <SelectorPrueba pruebas={pruebas} activaId={elegida.id} ruta="/premios" />
-      </header>
-
-      {premios.length === 0 ? (
-        <p className="card p-6 text-sm text-muted">
-          Los premios de esta prueba se publicarán próximamente.
-        </p>
-      ) : (
-        CATEGORIAS.map((c) => {
-          const lista = premios.filter((p) => p.categoria === c);
-          if (lista.length === 0) return null;
-
-          return (
-            <section key={c} className="space-y-4">
-              <h2 className="heading-font text-3xl">{ETIQUETAS_CATEGORIA[c]}</h2>
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {lista.map((p) => (
-                  <TarjetaPremio key={p.id} premio={p} />
-                ))}
-              </div>
-            </section>
-          );
-        })
-      )}
-    </main>
-  );
+  return <main>
+    <Migas items={[{ texto: "Premios" }]} />
+    <CabeceraPagina eyebrow="Reconocimientos" titulo="Premios de cada prueba" descripcion="Cada resultado tiene su recompensa. Consulta los premios asignados a cada categoría." />
+    <Seccion variante="alterna">
+      {pruebas.length > 0 && <div className="mb-8 max-w-2xl"><SelectorPrueba pruebas={pruebas} activaId={elegida?.id ?? ""} ruta="/premios" /></div>}
+      {!elegida ? <Vacio titulo="Todavía no hay pruebas publicadas" texto="Cuando se publique el calendario, aquí podrás consultar los premios de cada prueba." cta={<Link href="/calendario" className="btn btn-primario">Ver calendario</Link>} /> : premios.length === 0 ? <Vacio titulo="Premios por confirmar" texto="Los premios de esta prueba se publicarán más adelante." /> : CATEGORIAS.map((categoria) => {
+        const lista = premios.filter((premio) => premio.categoria === categoria);
+        if (!lista.length) return null;
+        return <section key={categoria} className="mb-10 last:mb-0" aria-labelledby={`premios-${categoria}`}>
+          <h2 id={`premios-${categoria}`} className="spc-h2 mb-5">{ETIQUETAS_CATEGORIA[categoria]}</h2>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{lista.map((premio) => <TarjetaPremio key={premio.id} premio={premio} />)}</div>
+        </section>;
+      })}
+    </Seccion>
+    <LlamadaFinal titulo="Vive el circuito" texto="Descubre las próximas pruebas, compite y suma puntos esta temporada." cta={<Link href="/calendario" className="btn btn-primario">Ver calendario</Link>} />
+  </main>;
 }

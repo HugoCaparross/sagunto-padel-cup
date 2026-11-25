@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import GoogleIcon from "@/components/ui/GoogleIcon";
 import { ETIQUETAS_CATEGORIA, ETIQUETAS_ESTADO_PRUEBA } from "@/lib/constantes";
-import { euros, fechaLarga } from "@/lib/formato";
+import { euros, fechaRangoPrueba } from "@/lib/formato";
 import type { PruebaHome } from "@/lib/home/datos";
 import s from "./home.module.css";
 
@@ -14,10 +14,7 @@ type Props = {
 };
 
 function fechasDePrueba(prueba: PruebaHome): string {
-    const inicio = fechaLarga(prueba.fechaInicio);
-    return prueba.fechaInicio === prueba.fechaFin
-        ? inicio
-        : `${inicio} – ${fechaLarga(prueba.fechaFin)}`;
+    return fechaRangoPrueba(prueba.fechaInicio, prueba.fechaFin);
 }
 
 export default function Hero({ temporada, proxima, pruebas, proximaHref }: Props) {
@@ -38,12 +35,7 @@ export default function Hero({ temporada, proxima, pruebas, proximaHref }: Props
                     <p className={s.kicker}>
                         Sagunto Padel Cup{temporada ? ` · Temporada ${temporada}` : ""}
                     </p>
-                    <h1 className={s.heroTitle}>
-                        <span>Compite</span>
-                        <span>en Sagunto.</span>
-                        <span className={s.heroTitleAccent}>Suma puntos.</span>
-                        <span>Vive el pádel.</span>
-                    </h1>
+                    <h1 className={s.heroTitle}>Vive el pádel en Sagunto.</h1>
                     <p className={s.heroLead}>
                         {pruebas} pruebas. Un ranking individual.
                         <br />
@@ -52,7 +44,7 @@ export default function Hero({ temporada, proxima, pruebas, proximaHref }: Props
                     <div className={s.heroActions}>
                         <Link href={href} className="btn btn-cta">
                             <GoogleIcon name="calendar_month" />
-                            Ver próxima prueba
+                            {inscripcionesAbiertas ? "Inscribirme" : "Ver próxima prueba"}
                             <GoogleIcon name="arrow_forward" />
                         </Link>
                         <Link href="/circuito" className="btn btn-claro">
@@ -68,7 +60,7 @@ export default function Hero({ temporada, proxima, pruebas, proximaHref }: Props
                             alt=""
                             fill
                             loading="eager"
-                            sizes="(max-width: 760px) 100vw, 34vw"
+                            sizes="(max-width: 768px) 100vw, 34vw"
                         />
                         <span className={s.heroProximaEstado}>
                             {proxima ? ETIQUETAS_ESTADO_PRUEBA[proxima.estado] : "Próximamente"}

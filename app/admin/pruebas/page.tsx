@@ -28,7 +28,7 @@ export default async function PaginaPruebas() {
 
             <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[var(--color-border)]">
                 <table className="w-full text-sm">
-                    <thead className="bg-[var(--color-surface)] text-left text-xs uppercase text-[var(--color-muted)]">
+                    <thead className="bg-[var(--color-surface)] text-left text-sm uppercase text-[var(--color-muted)]">
                         <tr>
                             <th className="px-4 py-2">Prueba</th>
                             <th className="px-4 py-2">Fechas</th>
@@ -47,7 +47,7 @@ export default async function PaginaPruebas() {
                                         {p.nombre}
                                     </Link>
                                     {p.esMaster && (
-                                        <span className="ml-2 rounded bg-[var(--color-warning-bg)] px-1.5 py-0.5 text-xs text-[var(--color-warning)]">
+                                        <span className="ml-2 rounded bg-[var(--color-warning-bg)] px-1.5 py-0.5 text-sm text-[var(--color-warning)]">
                                             Máster
                                         </span>
                                     )}

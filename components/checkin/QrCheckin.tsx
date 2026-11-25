@@ -20,7 +20,7 @@ export default function QrCheckin({ url, llegadaAt }: Props) {
     return (
         <div className="flex flex-col items-center gap-2 rounded-xl bg-white p-4 ring-1 ring-[var(--color-border)]">
             <QRCodeSVG value={url} size={220} level="M" />
-            <p className="text-xs text-[var(--color-muted)]">Enseña este código al llegar a la prueba</p>
+            <p className="text-sm text-[var(--color-muted)]">Enseña este código al llegar a la prueba</p>
         </div>
     );
 }

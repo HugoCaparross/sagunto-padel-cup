@@ -1,16 +1,14 @@
 import Link from "next/link";
+import Boton from "@/components/ui/Boton";
+import CabeceraPagina from "@/components/ui/CabeceraPagina";
 
 export default function NotFound() {
-    return (
-        <main className="not-found">
-            <div className="not-found__content">
-                <p className="not-found__eyebrow">Error 404</p>
-                <h1>Página no encontrada</h1>
-                <p>
-                    La página que buscas no existe, ha cambiado de dirección o ya no está disponible.
-                </p>
-                <Link href="/">Volver al inicio</Link>
-            </div>
-        </main>
-    );
+    return <main>
+        <CabeceraPagina
+            eyebrow="Error 404"
+            titulo="Página no encontrada"
+            descripcion="La dirección no existe o ha cambiado. Puedes continuar desde una de estas secciones."
+            acciones={<><Boton asChild><Link href="/calendario">Calendario</Link></Boton><Boton asChild variante="secundario"><Link href="/ranking">Ranking</Link></Boton><Boton asChild variante="fantasma"><Link href="/contacto">Contacto</Link></Boton></>}
+        />
+    </main>;
 }

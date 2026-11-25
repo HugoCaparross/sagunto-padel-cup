@@ -96,7 +96,7 @@ export default function FormularioNoticia({ inicial }: Props) {
                     className={CAMPO}
                 />
                 {slugCambiado && (
-                    <span className="text-xs text-[var(--color-warning)]">
+                    <span className="text-sm text-[var(--color-warning)]">
                         Si cambias el slug, la dirección anterior dejará de funcionar.
                     </span>
                 )}
@@ -162,7 +162,7 @@ export default function FormularioNoticia({ inicial }: Props) {
             )}
 
             {inicial && (
-                <p className="text-xs text-[var(--color-muted)]">
+                <p className="text-sm text-[var(--color-muted)]">
                     Para publicar o pasar a borrador, usa el listado de noticias.
                 </p>
             )}

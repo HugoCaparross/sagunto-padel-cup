@@ -69,7 +69,7 @@ export default async function PaginaJugador({ params }: Props) {
           <div className="flex items-center gap-4">
             <AvatarJugador nombre={ficha.nombre} src={ficha.fotoUrl} className="h-24 w-24 rounded-full text-2xl" sizes="96px" />
             <div className="space-y-1">
-            <p className="text-xs uppercase tracking-wide text-muted">Jugador</p>
+            <p className="text-sm uppercase tracking-wide text-muted">Jugador</p>
             <h1 className="heading-font text-5xl">{ficha.nombre}</h1>
             {!ficha.visible && (
               <p className="text-sm text-muted">Perfil visible solo para ti.</p>
@@ -101,7 +101,7 @@ export default async function PaginaJugador({ params }: Props) {
           { etiqueta: "% victorias", valor: `${estadisticas.porcentajeVictorias}%` },
         ].map((t) => (
           <div key={t.etiqueta} className="card p-4">
-            <p className="text-xs text-muted">{t.etiqueta}</p>
+            <p className="text-sm text-muted">{t.etiqueta}</p>
             <p className="mt-1 text-2xl font-semibold">{t.valor}</p>
           </div>
         ))}
@@ -118,7 +118,7 @@ export default async function PaginaJugador({ params }: Props) {
             ) : (
               <div className="card overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-surface text-left text-xs uppercase text-muted">
+                  <thead className="bg-surface text-left text-sm uppercase text-muted">
                     <tr>
                       <th className="px-4 py-2">Prueba</th>
                       <th className="px-4 py-2">Fecha</th>

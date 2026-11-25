@@ -78,7 +78,7 @@ export default function PanelPremios({ pruebaId, premios }: Props) {
         <section className="space-y-4">
             <div>
                 <h2 className="font-semibold">Premios</h2>
-                <p className="text-xs text-[var(--color-muted)]">
+                <p className="text-sm text-[var(--color-muted)]">
                     Con fecha de revelación, el premio aparece como sorpresa hasta ese día. Sin fecha, se ve de inmediato.
                 </p>
             </div>
@@ -157,7 +157,7 @@ export default function PanelPremios({ pruebaId, premios }: Props) {
             ) : (
                 <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[var(--color-border)]">
                     <table className="w-full text-sm">
-                        <thead className="bg-[var(--color-surface)] text-left text-xs uppercase text-[var(--color-muted)]">
+                        <thead className="bg-[var(--color-surface)] text-left text-sm uppercase text-[var(--color-muted)]">
                             <tr>
                                 <th className="px-4 py-2">Categoría</th>
                                 <th className="px-4 py-2">Cuadro</th>

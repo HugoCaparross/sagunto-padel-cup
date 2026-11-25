@@ -1,0 +1,25 @@
+export const TOKENS_DISENO = {
+    coral: "#F0443A",
+    coralTexto: "#C2362D",
+    navy: "#0D1B2A",
+    sage: "#A7C4A0",
+    fondo: "#F7F8F6",
+    surface: "#FFFFFF",
+    surfaceAlt: "#F4F5F4",
+    ink: "#18232D",
+    muted: "#5B6670",
+    borde: "#D5D9DC",
+    bordeCampo: "#8A949C",
+    foco: "#F0443A",
+    exitoTexto: "#0E6B47",
+    exitoBg: "#EAF6EF",
+    avisoTexto: "#7A4E0A",
+    avisoBg: "#FFF4DE",
+    errorTexto: "#A32828",
+    errorBg: "#FDECEC",
+    infoTexto: "#1F5486",
+    infoBg: "#EAF1F8",
+    blanco: "#FFFFFF",
+} as const;
+
+export type TokenDiseno = keyof typeof TOKENS_DISENO;

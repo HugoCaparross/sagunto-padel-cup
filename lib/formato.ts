@@ -34,6 +34,11 @@ export function fechaLarga(valor: string | Date): string {
     return fechaLargaFmt.format(aFecha(valor));
 }
 
+export function fechaRangoPrueba(inicio: string | Date, fin: string | Date): string {
+    const fechaInicio = fechaLarga(inicio);
+    return fechaInicio === fechaLarga(fin) ? fechaInicio : `${fechaInicio} – ${fechaLarga(fin)}`;
+}
+
 // "2026-09-12" -> "12/09/2026"
 export function fechaCorta(valor: string | Date): string {
     return fechaCortaFmt.format(aFecha(valor));

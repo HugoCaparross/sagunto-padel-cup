@@ -47,13 +47,13 @@ export default function BandejaContactos({ filas }: Props) {
                             <span className="min-w-0 space-y-0.5">
                                 <span className="block font-medium">{f.nombre}</span>
                                 <span className="block truncate text-[var(--color-muted)]">{f.mensaje}</span>
-                                <span className="block text-xs text-[var(--color-muted)]">
+                                <span className="block text-sm text-[var(--color-muted)]">
                                     {ETIQUETA_TIPO[f.tipo]} · {fechaCorta(f.createdAt)}
                                     {f.identificado ? " · cuenta" : " · anónimo"}
                                 </span>
                             </span>
                             <span
-                                className={`shrink-0 rounded px-2 py-0.5 text-xs ${COLOR_ESTADO[f.estado]}`}
+                                className={`shrink-0 rounded px-2 py-0.5 text-sm ${COLOR_ESTADO[f.estado]}`}
                             >
                                 {ETIQUETAS_ESTADO_CONTACTO[f.estado]}
                             </span>

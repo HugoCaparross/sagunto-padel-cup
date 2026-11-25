@@ -7,7 +7,7 @@ export default function LayoutPublico({
     return (
         <>
             <SiteHeader />
-            <div className="site-content min-h-[70vh]">{children}</div>
+            <div className="site-content ">{children}</div>
             <SiteFooter />
         </>
     );

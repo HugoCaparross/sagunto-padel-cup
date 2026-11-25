@@ -83,11 +83,11 @@ export default function Enfrentamientos({ jugadorId, jugadorNombre, candidatos }
                     {resultado.partidos > 0 && (
                         <div className="grid grid-cols-2 gap-4">
                             <div className="rounded-lg bg-[var(--color-surface)] p-3 text-center">
-                                <p className="text-xs text-[var(--color-muted)]">{jugadorNombre}</p>
+                                <p className="text-sm text-[var(--color-muted)]">{jugadorNombre}</p>
                                 <p className="text-2xl font-semibold">{resultado.victoriasA}</p>
                             </div>
                             <div className="rounded-lg bg-[var(--color-surface)] p-3 text-center">
-                                <p className="text-xs text-[var(--color-muted)]">{resultado.nombreRival}</p>
+                                <p className="text-sm text-[var(--color-muted)]">{resultado.nombreRival}</p>
                                 <p className="text-2xl font-semibold">{resultado.victoriasB}</p>
                             </div>
                         </div>

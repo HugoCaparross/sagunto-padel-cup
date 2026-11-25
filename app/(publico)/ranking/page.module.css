@@ -1,9 +1,9 @@
 .page {
   --rank-ink: var(--color-navy);
-  --rank-muted: var(--color-muted-strong);
+  --rank-muted: var(--color-muted);
   --rank-border: var(--color-border);
   color: var(--rank-ink);
-  background: var(--color-reference-fafaf9);
+  background: var(--color-fondo);
 }
 
 .hero {
@@ -53,7 +53,7 @@
   align-items: center;
   gap: 0.7rem;
   margin: 0 0 1.2rem;
-  font-size: 0.72rem;
+  font-size:var(--spc-text-small);
   font-weight: 700;
   letter-spacing: 0.14em;
   line-height: 1.4;
@@ -64,17 +64,17 @@
 .eyebrow > span { width: 1.5rem; height: 2px; background: var(--color-coral); }
 .hero h1 { margin: 0; font-size: clamp(3.6rem, 8vw, 6.6rem); font-weight: 700; letter-spacing: -0.075em; line-height: 0.92; }
 .hero h1 em { color: var(--color-sage); font-style: normal; }
-.heroText { max-width: 32rem; margin: 1.5rem 0 0; color: var(--color-reference-e6e6e6); font-size: 1.05rem; line-height: 1.65; }
+.heroText { max-width: 32rem; margin: 1.5rem 0 0; color: var(--color-success-bg); font-size: 1.05rem; line-height: 1.65; }
 .heroActions { display: flex; flex-wrap: wrap; align-items: center; gap: 1.4rem; margin-top: 2rem; }
 .primaryLink, .secondaryLink, .footerCta > a { display: inline-flex; min-height: 3rem; align-items: center; justify-content: center; gap: 0.8rem; text-decoration: none; transition: transform 180ms ease, color 180ms ease, background-color 180ms ease; }
 .primaryLink { background: var(--color-coral); padding: 0.75rem 1.1rem; color: var(--color-navy); font-size: 0.88rem; font-weight: 700; }
-.primaryLink:hover { transform: translateY(-2px); background: var(--color-reference-e6e6e6); }
+.primaryLink:hover { transform: translateY(-2px); background: var(--color-success-bg); }
 .secondaryLink { color: #fff; font-size: 0.9rem; font-weight: 600; }
 .secondaryLink:hover { color: var(--color-sage); }
 .heroMark { display: grid; width: 11rem; flex: 0 0 11rem; grid-template-columns: 1fr auto; align-items: end; gap: 1rem; border-left: 1px solid rgb(255 255 255 / 0.22); padding: 1rem 0 0 1.4rem; }
-.markIndex { grid-column: 1 / -1; align-self: start; color: var(--color-sage); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; }
+.markIndex { grid-column: 1 / -1; align-self: start; color: var(--color-sage); font-size:var(--spc-text-small); font-weight: 700; letter-spacing: 0.15em; }
 .markLetters { color: rgb(255 255 255 / 0.15); font-size: 4.8rem; font-weight: 700; letter-spacing: -0.1em; line-height: 0.76; }
-.markCaption { padding-bottom: 0.2rem; color: #fff; font-size: 0.78rem; font-weight: 600; line-height: 1.35; }
+.markCaption { padding-bottom: 0.2rem; color: #fff; font-size:var(--spc-text-small); font-weight: 600; line-height: 1.35; }
 
 .intro { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 4rem; padding-block: 5rem; }
 .kicker { margin-bottom: 0.8rem; color: var(--color-navy); }
@@ -86,10 +86,10 @@
 .competition { padding-block: 1rem 5.5rem; }
 .sectionHeader { display: flex; align-items: end; justify-content: space-between; gap: 2rem; border-bottom: 1px solid var(--rank-border); padding-bottom: 1.4rem; }
 .sectionHeader .kicker { margin-bottom: 0.5rem; }
-.cutoff { margin: 0; color: var(--rank-muted); font-size: 0.85rem; line-height: 1.7; text-align: right; }
+.cutoff { margin: 0; color: var(--rank-muted); font-size:var(--spc-text-small); line-height: 1.7; text-align: right; }
 .cutoff strong { color: var(--rank-ink); font-weight: 600; }
 .filters { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding-block: 1.2rem; }
-.dateForm { display: flex; flex-wrap: wrap; align-items: center; justify-content: end; gap: 0.6rem; color: var(--rank-muted); font-size: 0.78rem; }
+.dateForm { display: flex; flex-wrap: wrap; align-items: center; justify-content: end; gap: 0.6rem; color: var(--rank-muted); font-size:var(--spc-text-small); }
 .dateForm input { min-height: 2.75rem; border: 1px solid var(--rank-border); border-radius: 0.35rem; background: #fff; padding: 0.5rem 0.65rem; color: var(--rank-ink); font: inherit; }
 .dateForm input:focus-visible { outline: 3px solid rgb(240 68 58 / 0.35); outline-offset: 2px; }
 .dateForm button { min-height: 2.75rem; border: 0; border-radius: 0.35rem; background: var(--color-navy); padding: 0.5rem 0.9rem; color: #fff; font: inherit; font-weight: 700; cursor: pointer; transition: background-color 160ms ease, transform 160ms ease; }
@@ -97,15 +97,15 @@
 .categoryHeading { display: flex; align-items: center; justify-content: space-between; margin-block: 1rem 1.1rem; }
 .categoryHeading > div { display: flex; align-items: center; gap: 0.65rem; }
 .categoryHeading h3 { margin: 0; font-size: 1.25rem; letter-spacing: -0.025em; }
-.categoryHeading > span { color: var(--rank-muted); font-size: 0.78rem; }
+.categoryHeading > span { color: var(--rank-muted); font-size:var(--spc-text-small); }
 .categoryDot { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--color-coral); }
 
 .footerCta { display: flex; align-items: end; justify-content: space-between; gap: 2rem; border-top: 1px solid var(--rank-border); padding-block: 2.5rem 4rem; }
 .footerCta h2 { font-size: clamp(2rem, 4vw, 3rem); }
 .footerCta > a { background: var(--color-sage); padding: 0.8rem 1rem; color: var(--color-navy); font-size: 0.88rem; font-weight: 700; }
-.footerCta > a:hover { transform: translateY(-2px); background: var(--color-reference-e6e6e6); }
+.footerCta > a:hover { transform: translateY(-2px); background: var(--color-success-bg); }
 
-@media (max-width: 900px) {
+@media (max-width: 1023.98px) {
   .heroInner, .intro, .competition, .footerCta { width: min(calc(100% - 2rem), 1200px); }
   .heroInner { min-height: auto; gap: 1.5rem; padding-block: 4.5rem; }
   .heroMark { width: 7rem; flex-basis: 7rem; padding-left: 0.8rem; }
@@ -117,7 +117,7 @@
   .dateForm { justify-content: start; }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 639.98px) {
   .heroInner, .intro, .competition, .footerCta { width: min(calc(100% - 1.5rem), 1200px); }
   .heroInner { padding-block: 3.5rem; }
   .hero h1 { font-size: clamp(3.2rem, 16vw, 4.5rem); }

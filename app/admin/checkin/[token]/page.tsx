@@ -23,7 +23,7 @@ export default async function PaginaCheckin({ params }: Props) {
   return (
     <main className="mx-auto max-w-lg space-y-6 p-6">
       <header>
-        <p className="text-xs uppercase text-[var(--color-muted)]">Check-in</p>
+        <p className="text-sm uppercase text-[var(--color-muted)]">Check-in</p>
         <h1 className="text-2xl font-semibold">{f.pruebaNombre}</h1>
         <p className="text-sm text-[var(--color-muted)]">
           {ETIQUETAS_CATEGORIA[f.categoria]}

@@ -31,7 +31,7 @@ export default function BotonUnirse({ inscripcionId }: { inscripcionId: string }
             >
                 {pendiente ? "Uniéndome…" : "Unirme como pareja"}
             </button>
-            {error && <p className="text-xs text-danger">{error}</p>}
+            {error && <p className="text-sm text-danger">{error}</p>}
         </div>
     );
 }

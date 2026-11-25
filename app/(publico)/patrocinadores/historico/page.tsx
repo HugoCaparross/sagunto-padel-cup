@@ -26,7 +26,7 @@ export default async function PaginaHistorico() {
           <section key={prueba.id} className="space-y-4">
             <div>
               <h2 className="font-semibold">{prueba.nombre}</h2>
-              <p className="text-xs text-[var(--color-muted)]">{fechaLarga(prueba.fechaInicio)}</p>
+              <p className="text-sm text-[var(--color-muted)]">{fechaLarga(prueba.fechaInicio)}</p>
             </div>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               {patrocinadores.map((p) => (

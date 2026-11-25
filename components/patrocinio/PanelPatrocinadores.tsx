@@ -68,7 +68,7 @@ export default function PanelPatrocinadores({ pruebaId, patrocinadores, asignada
             <header className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h2 className="font-semibold">Patrocinadores</h2>
-                    <p className="text-xs text-[var(--color-muted)]">
+                    <p className="text-sm text-[var(--color-muted)]">
                         Los inactivos no se muestran en la web. Asígnalos a la prueba con la casilla.
                     </p>
                 </div>
@@ -127,7 +127,7 @@ export default function PanelPatrocinadores({ pruebaId, patrocinadores, asignada
             ) : (
                 <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[var(--color-border)]">
                     <table className="w-full text-sm">
-                        <thead className="bg-[var(--color-surface)] text-left text-xs uppercase text-[var(--color-muted)]">
+                        <thead className="bg-[var(--color-surface)] text-left text-sm uppercase text-[var(--color-muted)]">
                             <tr>
                                 <th className="px-4 py-2">Nombre</th>
                                 <th className="px-4 py-2">Tipo</th>

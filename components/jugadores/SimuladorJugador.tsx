@@ -79,13 +79,13 @@ export default function SimuladorJugador({ pruebas = [] }: Props) {
                     {datos && (
                         <div className="space-y-4">
                             {datos.avisos.map((a) => (
-                                <p key={a} className="rounded-lg bg-[var(--color-warning-bg)] p-2 text-xs text-[var(--color-warning)]">
+                                <p key={a} className="rounded-lg bg-[var(--color-warning-bg)] p-2 text-sm text-[var(--color-warning)]">
                                     {a}
                                 </p>
                             ))}
 
                             {datos.proximoPartido && (
-                                <div className="rounded-lg bg-[var(--color-surface)] p-3 text-xs">
+                                <div className="rounded-lg bg-[var(--color-surface)] p-3 text-sm">
                                     <p className="font-medium">Próximo partido</p>
                                     <p>Si ganas: {datos.proximoPartido.siGana}</p>
                                     <p>Si pierdes: {datos.proximoPartido.siPierde.texto}</p>
@@ -99,7 +99,7 @@ export default function SimuladorJugador({ pruebas = [] }: Props) {
                                         {c.filas
                                             .filter((f) => f.alcanzable)
                                             .map((f) => (
-                                                <li key={f.ronda} className="flex justify-between py-1.5 text-xs">
+                                                <li key={f.ronda} className="flex justify-between py-1.5 text-sm">
                                                     <span>{f.etiqueta}</span>
                                                     <span>
                                                         {f.puntos} pts

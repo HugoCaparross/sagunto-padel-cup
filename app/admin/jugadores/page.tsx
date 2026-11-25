@@ -69,7 +69,7 @@ export default async function PaginaJugadores({ searchParams }: Props) {
       ) : (
         <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-[var(--color-border)]">
           <table className="w-full text-sm">
-            <thead className="bg-[var(--color-surface)] text-left text-xs uppercase text-[var(--color-muted)]">
+            <thead className="bg-[var(--color-surface)] text-left text-sm uppercase text-[var(--color-muted)]">
               <tr>
                 <th className="px-4 py-2">Jugador</th>
                 <th className="px-4 py-2">Email</th>
@@ -88,12 +88,12 @@ export default async function PaginaJugadores({ searchParams }: Props) {
                       {j.nombre}
                     </Link>
                     {j.rol === "organizador" && (
-                      <span className="ml-2 rounded bg-[var(--color-navy)] px-1.5 py-0.5 text-xs text-white">
+                      <span className="ml-2 rounded bg-[var(--color-navy)] px-1.5 py-0.5 text-sm text-white">
                         Organizador
                       </span>
                     )}
                     {!j.visible && (
-                      <span className="ml-2 text-xs text-[var(--color-muted)]">privado</span>
+                      <span className="ml-2 text-sm text-[var(--color-muted)]">privado</span>
                     )}
                   </td>
                   <td className="px-4 py-2 text-[var(--color-muted)]">{j.email ?? "—"}</td>

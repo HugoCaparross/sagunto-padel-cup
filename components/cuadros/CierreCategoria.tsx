@@ -115,7 +115,7 @@ export default function CierreCategoria({ pruebaId, categoria }: Props) {
             {filas && (
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="text-left text-xs uppercase text-[var(--color-muted)]">
+                        <thead className="text-left text-sm uppercase text-[var(--color-muted)]">
                             <tr>
                                 <th className="py-2">Pareja</th>
                                 <th className="py-2">Cuadro</th>
@@ -135,7 +135,7 @@ export default function CierreCategoria({ pruebaId, categoria }: Props) {
                         </tbody>
                     </table>
                     {requiereMotivo && (
-                        <p className="mt-3 text-xs text-[var(--color-warning)]">
+                        <p className="mt-3 text-sm text-[var(--color-warning)]">
                             {razon}. Al publicar se pedirá un motivo.
                         </p>
                     )}

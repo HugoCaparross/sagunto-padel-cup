@@ -13,7 +13,7 @@ export default async function LayoutAdmin({
   if (!esOrganizador) redirect("/cuenta");
 
   return (
-    <div className="admin-shell min-h-screen bg-[var(--color-surface)] text-[var(--color-ink)] lg:grid lg:grid-cols-[220px_1fr]">
+    <div className="admin-shell  bg-[var(--color-surface)] text-[var(--color-ink)] lg:grid lg:grid-cols-[220px_1fr]">
       <AdminSidebar />
       <div className="admin-content min-w-0 p-4 lg:p-8">{children}</div>
     </div>

@@ -24,7 +24,7 @@ export default function SiteFooter() {
                 <Logo />
                 <p className="max-w-xs text-sm text-white/70">Circuito amateur de pádel en el Camp de Morvedre. Compite, suma puntos y lucha por el Master Final.</p>
                 <div className="pt-2">
-                    <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-white">Contáctanos</h2>
+                    <h2 className="mb-3 text-sm font-bold uppercase tracking-[0.12em] text-white">Contáctanos</h2>
                     <nav className="flex flex-wrap gap-2" aria-label="Contacto y redes sociales">
                         <a href="mailto:saguntopadelcup@gmail.com" aria-label="Escribir a Sagunto Padel Cup por Gmail" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/20 px-4 text-sm text-white/85 transition-colors hover:border-white/50 hover:bg-white/10 hover:text-white"><IconoGmail />Correo</a>
                         <a href="https://www.instagram.com/saguntopadelcup/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Sagunto Padel Cup (se abre en otra pestaña)" className="inline-flex min-h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white/85 transition-colors hover:border-white/50 hover:bg-white/10 hover:text-white"><IconoInstagram /></a>
@@ -32,9 +32,9 @@ export default function SiteFooter() {
                     </nav>
                 </div>
             </div>
-            <nav aria-label="Patrocinadores"><h2 className="mb-4 text-xs font-bold uppercase tracking-[0.12em] text-white">Colabora</h2><Link href="/patrocinadores" className="text-sm text-white/70 transition-colors hover:text-white">Patrocinadores</Link></nav>
-            {GRUPOS.map((grupo) => <nav key={grupo.titulo} aria-label={grupo.titulo}><h2 className="mb-4 text-xs font-bold uppercase tracking-[0.12em] text-white">{grupo.titulo}</h2><ul className="grid gap-2 text-sm text-white/70">{grupo.enlaces.map((enlace) => <li key={enlace.href}><Link href={enlace.href} className="transition-colors hover:text-white">{enlace.texto}</Link></li>)}</ul></nav>)}
+            <nav aria-label="Patrocinadores"><h2 className="mb-4 text-sm font-bold uppercase tracking-[0.12em] text-white">Colabora</h2><Link href="/patrocinadores" className="text-sm text-white/70 transition-colors hover:text-white">Patrocinadores</Link></nav>
+            {GRUPOS.map((grupo) => <nav key={grupo.titulo} aria-label={grupo.titulo}><h2 className="mb-4 text-sm font-bold uppercase tracking-[0.12em] text-white">{grupo.titulo}</h2><ul className="grid gap-2 text-sm text-white/70">{grupo.enlaces.map((enlace) => <li key={enlace.href}><Link href={enlace.href} className="transition-colors hover:text-white">{enlace.texto}</Link></li>)}</ul></nav>)}
         </div>
-        <div className="border-t border-white/10"><div className="container flex flex-col gap-3 py-5 text-xs text-white/60 md:flex-row md:items-center md:justify-between"><p>© {new Date().getFullYear()} Sagunto Padel Cup. Todos los derechos reservados.</p><p>Hecho en Sagunto.</p></div></div>
+        <div className="border-t border-white/10"><div className="container flex flex-col gap-3 py-5 text-sm text-white/60 md:flex-row md:items-center md:justify-between"><p>© {new Date().getFullYear()} Sagunto Padel Cup. Todos los derechos reservados.</p><p>Hecho en Sagunto.</p></div></div>
     </footer>;
 }

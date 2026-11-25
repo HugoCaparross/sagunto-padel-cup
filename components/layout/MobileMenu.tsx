@@ -48,7 +48,7 @@ export default function MobileMenu({ logueado, accionSalir }: Props) {
                 <ul className="space-y-5 text-lg font-semibold">
                     {NAVEGACION_MOVIL.map(({ href, texto }, index) => {
                         const activo = pathname === href || pathname.startsWith(`${href}/`);
-                        return <li key={href}><Link ref={index === 0 ? primerEnlace : undefined} href={href} aria-current={activo ? "page" : undefined} onClick={() => setAbierto(false)} className={`transition-colors hover:text-coral ${activo ? "text-coral" : "text-white"}`}>{texto}</Link></li>;
+                        return <li key={href}><Link ref={index === 0 ? primerEnlace : undefined} href={href} aria-current={activo ? "page" : undefined} onClick={() => setAbierto(false)} className={`underline-offset-4 transition-colors hover:text-white hover:underline hover:decoration-coral ${activo ? "text-white underline decoration-coral" : "text-white"}`}>{texto}</Link></li>;
                     })}
                 </ul>
                 <div className="mt-10 space-y-4 border-t border-white/10 pt-6">

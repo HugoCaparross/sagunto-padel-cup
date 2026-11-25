@@ -182,7 +182,7 @@ export default async function PaginaRankingAdmin({ searchParams }: Props) {
                   {ETIQUETA_ACCION[h.accion] ?? h.accion}
                   {h.motivo && <span className="text-[var(--color-muted)]"> · {h.motivo}</span>}
                 </span>
-                <span className="text-xs text-[var(--color-muted)]">{fechaCorta(h.creadoAt)}</span>
+                <span className="text-sm text-[var(--color-muted)]">{fechaCorta(h.creadoAt)}</span>
               </li>
             ))}
           </ul>

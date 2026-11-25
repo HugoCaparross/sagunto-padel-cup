@@ -9,7 +9,7 @@ import {
   ETIQUETAS_CATEGORIA,
   ETIQUETAS_ESTADO_PRUEBA,
 } from "@/lib/constantes";
-import { euros, fechaLarga } from "@/lib/formato";
+import { euros, fechaLarga, fechaRangoPrueba } from "@/lib/formato";
 import { formatoFechaInscripcion } from "@/lib/pruebas/fechas-clave";
 import {
   cargarPartidosPublicos,
@@ -48,11 +48,11 @@ export default async function PaginaPrueba({ params }: Props) {
 
       <header className="space-y-4">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded bg-[var(--color-navy)] px-2 py-1 text-xs text-white">
+          <span className="rounded bg-[var(--color-navy)] px-2 py-1 text-sm text-white">
             {ETIQUETAS_ESTADO_PRUEBA[prueba.estado]}
           </span>
           {prueba.esMaster && (
-            <span className="rounded bg-[var(--color-warning-bg)] px-2 py-1 text-xs text-[var(--color-warning)]">Máster</span>
+            <span className="rounded bg-[var(--color-warning-bg)] px-2 py-1 text-sm text-[var(--color-warning)]">Máster</span>
           )}
         </div>
 
@@ -62,8 +62,7 @@ export default async function PaginaPrueba({ params }: Props) {
           <div>
             <dt className="text-[var(--color-muted)]">Día del torneo</dt>
             <dd className="font-medium">
-              {fechaLarga(prueba.fechaInicio)}
-              {prueba.fechaFin !== prueba.fechaInicio && ` – ${fechaLarga(prueba.fechaFin)}`}
+              {fechaRangoPrueba(prueba.fechaInicio, prueba.fechaFin)}
             </dd>
           </div>
           <div>
@@ -96,19 +95,19 @@ export default async function PaginaPrueba({ params }: Props) {
           <h2 id="fechas-clave-titulo" className="mb-4 font-semibold">Fechas clave</h2>
           <div className="grid gap-3 md:grid-cols-3">
             <div className="rounded-lg border border-border bg-white p-4 shadow-card">
-              <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--color-reference-456c30)]"><GoogleIcon name="event_available" />Apertura de inscripciones</p>
+              <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--color-success)]"><GoogleIcon name="event_available" />Apertura de inscripciones</p>
               {prueba.inscripcionesAbrenAt ? <time dateTime={prueba.inscripcionesAbrenAt} className="block font-semibold text-ink">{formatoFechaInscripcion(prueba.inscripcionesAbrenAt)}</time> : <p className="font-semibold text-ink">{formatoFechaInscripcion(null)}</p>}
-              <p className="mt-1 text-xs text-muted">{prueba.inscripcionesAbrenAt ? "Fecha indicada por la organización" : "La organización la anunciará"}</p>
+              <p className="mt-1 text-sm text-muted">{prueba.inscripcionesAbrenAt ? "Fecha indicada por la organización" : "La organización la anunciará"}</p>
             </div>
             <div className="rounded-lg border border-border bg-white p-4 shadow-card">
-              <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-coral"><GoogleIcon name="event" />Cierre de inscripciones</p>
+              <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-coral-texto"><GoogleIcon name="event" />Cierre de inscripciones</p>
               {prueba.inscripcionesCierranAt ? <time dateTime={prueba.inscripcionesCierranAt} className="block font-semibold text-ink">{formatoFechaInscripcion(prueba.inscripcionesCierranAt)}</time> : <p className="font-semibold text-ink">{formatoFechaInscripcion(null)}</p>}
-              <p className="mt-1 text-xs text-muted">{prueba.inscripcionesCierranAt ? "Fecha indicada por la organización" : "La organización la anunciará"}</p>
+              <p className="mt-1 text-sm text-muted">{prueba.inscripcionesCierranAt ? "Fecha indicada por la organización" : "La organización la anunciará"}</p>
             </div>
             <div className="rounded-lg border border-border bg-white p-4 shadow-card">
               <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-navy"><GoogleIcon name="sports_tennis" />Día del torneo</p>
-              <p className="font-semibold text-ink">{fechaLarga(prueba.fechaInicio)}{prueba.fechaFin !== prueba.fechaInicio && ` – ${fechaLarga(prueba.fechaFin)}`}</p>
-              <p className="mt-1 text-xs text-muted">Fechas del torneo</p>
+              <p className="font-semibold text-ink">{fechaRangoPrueba(prueba.fechaInicio, prueba.fechaFin)}</p>
+              <p className="mt-1 text-sm text-muted">Fechas del torneo</p>
             </div>
           </div>
         </section>
@@ -143,7 +142,7 @@ export default async function PaginaPrueba({ params }: Props) {
             </li>
           ))}
         </ul>
-        <p className="text-xs text-[var(--color-muted)]">
+        <p className="text-sm text-[var(--color-muted)]">
           Una categoría se disputa si tiene al menos 3 parejas inscritas.
         </p>
       </section>
@@ -171,7 +170,7 @@ export default async function PaginaPrueba({ params }: Props) {
                           <li key={f.inscripcionId} className="flex justify-between py-2">
                             <span>{f.texto}</span>
                             {!f.ocupaPlaza && (
-                              <span className="text-xs text-[var(--color-warning)]">Lista de espera</span>
+                              <span className="text-sm text-[var(--color-warning)]">Lista de espera</span>
                             )}
                           </li>
                         ))}

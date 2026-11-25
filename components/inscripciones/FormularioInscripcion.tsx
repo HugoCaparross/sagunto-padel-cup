@@ -50,14 +50,14 @@ export default function FormularioInscripcion({ datos }: { datos: DatosInscripci
             </div>
         </div> : <>
             <header className="space-y-2">
-                <p className="text-sm font-semibold uppercase tracking-wider text-coral">Inscripción</p>
+                <p className="text-sm font-semibold uppercase tracking-wider text-coral-texto">Inscripción</p>
                 <h1 className="text-2xl font-semibold">{prueba.nombre}</h1>
                 <p className="text-sm text-muted">Elige categoría y confirma tu plaza.</p>
             </header>
             <div className="card grid gap-3 p-5 sm:grid-cols-3" aria-label="Resumen de la prueba">
-                <div><p className="text-xs font-semibold uppercase tracking-wide text-muted">Fecha</p><p className="mt-1 font-medium">{fecha}</p></div>
-                <div><p className="text-xs font-semibold uppercase tracking-wide text-muted">Sede</p><p className="mt-1 font-medium">{prueba.sede}</p></div>
-                <div><p className="text-xs font-semibold uppercase tracking-wide text-muted">Precio por pareja</p><p className="mt-1 font-medium">{euros(prueba.precioCentimos)}</p></div>
+                <div><p className="text-sm font-semibold uppercase tracking-wide text-muted">Fecha</p><p className="mt-1 font-medium">{fecha}</p></div>
+                <div><p className="text-sm font-semibold uppercase tracking-wide text-muted">Sede</p><p className="mt-1 font-medium">{prueba.sede}</p></div>
+                <div><p className="text-sm font-semibold uppercase tracking-wide text-muted">Precio por pareja</p><p className="mt-1 font-medium">{euros(prueba.precioCentimos)}</p></div>
             </div>
             <div className="card space-y-5 p-5 md:p-6">
                 <fieldset className="space-y-3">

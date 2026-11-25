@@ -5,13 +5,13 @@ import PodioRanking from "@/components/ranking/PodioRanking";
 import TablaRankingPublica from "@/components/ranking/TablaRankingPublica";
 import { CATEGORIAS, ETIQUETAS_CATEGORIA, type Categoria } from "@/lib/constantes";
 import { fechaLarga } from "@/lib/formato";
-import { obtenerRankingPublico } from "@/lib/ranking/publico";
+import { obtenerRankingsPublicos } from "@/lib/ranking/publico";
 import { hoyEnMadrid } from "@/lib/ranking/cargar";
 import s from "./page.module.css";
 
 export const metadata: Metadata = {
   title: "Ranking",
-  description: "Consulta la clasificación individual del Race To Master Sagunto Padel Cup.",
+  description: "Consulta los puntos acumulados por cada jugador en los últimos 12 meses.",
 };
 
 type Props = {
@@ -27,32 +27,28 @@ function fechaValida(valor?: string): valor is string {
 
 export default async function PaginaRanking({ searchParams }: Props) {
   const sp = await searchParams;
-  const categoria: Categoria = (CATEGORIAS as readonly string[]).includes(sp.categoria ?? "")
-    ? (sp.categoria as Categoria)
-    : "segunda";
   const hoy = hoyEnMadrid();
   const corteSolicitado = fechaValida(sp.corte) && sp.corte <= hoy ? sp.corte : hoy;
-  const filas = await obtenerRankingPublico(categoria, corteSolicitado);
+  const rankings = await obtenerRankingsPublicos(corteSolicitado);
+  const categoria: Categoria = (CATEGORIAS as readonly string[]).includes(sp.categoria ?? "")
+    ? (sp.categoria as Categoria)
+    : CATEGORIAS.find((item) => rankings[item].length > 0) ?? CATEGORIAS[0];
+  const filas = rankings[categoria];
 
   return (
     <main className={s.page}>
       <header className={s.hero}>
         <div className={s.heroInner}>
           <div className={s.heroCopy}>
-            <p className={s.eyebrow}><span aria-hidden="true" /> Race To Master · Sagunto Padel Cup</p>
-            <h1>El circuito<br /><em>se mide aquí.</em></h1>
+            <p className={s.eyebrow}><span aria-hidden="true" /> Sagunto Padel Cup · Temporada</p>
+            <h1>Clasificación<br /><em>de la temporada.</em></h1>
             <p className={s.heroText}>
-              La clasificación individual del Race To Master. Cada punto cuenta y cada jugador suma su propio camino.
+              Puntos acumulados en los últimos 12 meses. Cada jugador suma su propio recorrido.
             </p>
             <div className={s.heroActions}>
               <a className={s.primaryLink} href="#clasificacion">Ver clasificación <span aria-hidden="true">↓</span></a>
               <Link className={s.secondaryLink} href="/puntos">Cómo se puntúa <span aria-hidden="true">↗</span></Link>
             </div>
-          </div>
-          <div className={s.heroMark} aria-hidden="true">
-            <span className={s.markIndex}>SPC / 01</span>
-            <span className={s.markLetters}>R<br />T<br />M</span>
-            <span className={s.markCaption}>Race<br />To Master</span>
           </div>
         </div>
       </header>
@@ -94,13 +90,13 @@ export default async function PaginaRanking({ searchParams }: Props) {
         </div>
 
         <PodioRanking filas={filas.slice(0, 3)} />
-        <TablaRankingPublica filas={filas} />
+        <TablaRankingPublica filas={filas.slice(3)} />
       </section>
 
-      <footer className={s.footerCta}>
+      <section className={s.footerCta}>
         <div><p className={s.kicker}>Cada partido deja huella</p><h2>Entiende cómo<br />se gana cada punto.</h2></div>
         <Link href="/puntos">Explorar el sistema de puntos <span aria-hidden="true">↗</span></Link>
-      </footer>
+      </section>
     </main>
   );
 }

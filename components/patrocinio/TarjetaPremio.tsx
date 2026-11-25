@@ -26,7 +26,7 @@ export default function TarjetaPremio({ premio }: { premio: PremioPublico }) {
         return (
             <article className="space-y-3 rounded-xl bg-[var(--color-surface)] p-5 ring-1 ring-[var(--color-border)]">
                 <div className="flex items-center justify-between">
-                    <span className="text-xs uppercase tracking-wide text-[var(--color-muted)]">
+                    <span className="text-sm uppercase tracking-wide text-[var(--color-muted)]">
                         {ETIQUETAS_CUADRO[premio.cuadro]}
                     </span>
                     <Candado />
@@ -42,7 +42,7 @@ export default function TarjetaPremio({ premio }: { premio: PremioPublico }) {
     return (
         <article className="space-y-3 rounded-xl bg-white p-5 ring-1 ring-[var(--color-border)]">
             <div className="flex items-center justify-between">
-                <span className="text-xs uppercase tracking-wide text-[var(--color-muted)]">
+                <span className="text-sm uppercase tracking-wide text-[var(--color-muted)]">
                     {ETIQUETAS_CUADRO[premio.cuadro]}
                 </span>
                 <Trofeo />

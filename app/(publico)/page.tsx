@@ -34,7 +34,7 @@ export default async function PaginaInicio() {
     listarNoticias({ limite: 3 }),
   ]);
 
-  const usarDatosDemo = process.env.NODE_ENV === "development";
+  const usarDatosDemo = process.env.NODE_ENV === "development" && process.env.NEXT_PUBLIC_DATOS_DEMO === "1";
   const pruebaReal = datos.proxima;
   const prueba = usarDatosDemo ? PRUEBA_DEMO : pruebaReal;
   const historialPatrocinadoresVista = await historicoPatrocinadores();

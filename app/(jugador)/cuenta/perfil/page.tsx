@@ -111,7 +111,7 @@ export default async function PaginaPerfil() {
                       {f.concedido ? "aceptado" : "retirado"}
                     </span>
                   </p>
-                  <p className="text-xs text-[var(--color-muted)]">{fechaCorta(f.registradoAt)}</p>
+                  <p className="text-sm text-[var(--color-muted)]">{fechaCorta(f.registradoAt)}</p>
                 </li>
               ))}
             </ul>

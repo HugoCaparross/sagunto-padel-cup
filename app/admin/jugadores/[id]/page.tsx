@@ -63,7 +63,7 @@ export default async function PaginaFichaJugador({ params }: Props) {
                         {perfil.email ?? "Sin email"} · alta el {fechaLarga(perfil.creadoAt)}
                     </p>
                 </div>
-                <div className="flex gap-2 text-xs">
+                <div className="flex gap-2 text-sm">
                     {perfil.rol === "organizador" && (
                         <span className="rounded bg-[var(--color-navy)] px-2 py-1 text-white">Organizador</span>
                     )}
@@ -138,7 +138,7 @@ export default async function PaginaFichaJugador({ params }: Props) {
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
-                                    <thead className="text-left text-xs uppercase text-[var(--color-muted)]">
+                                    <thead className="text-left text-sm uppercase text-[var(--color-muted)]">
                                         <tr>
                                             <th className="py-2">Prueba</th>
                                             <th className="py-2">Categoría</th>
@@ -173,7 +173,7 @@ export default async function PaginaFichaJugador({ params }: Props) {
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
-                                    <thead className="text-left text-xs uppercase text-[var(--color-muted)]">
+                                    <thead className="text-left text-sm uppercase text-[var(--color-muted)]">
                                         <tr>
                                             <th className="py-2">Prueba</th>
                                             <th className="py-2">Fecha</th>
@@ -218,7 +218,7 @@ export default async function PaginaFichaJugador({ params }: Props) {
                                                 </span>
                                             )}
                                         </span>
-                                        <span className="text-xs text-[var(--color-muted)]">{fechaCorta(c.registradoAt)}</span>
+                                        <span className="text-sm text-[var(--color-muted)]">{fechaCorta(c.registradoAt)}</span>
                                     </li>
                                 ))}
                             </ul>

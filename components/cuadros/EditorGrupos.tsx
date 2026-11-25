@@ -187,7 +187,7 @@ export default function EditorGrupos({ pruebaId, categoria, datos }: Props) {
                         <ZonaGrupo key={letra} letra={letra}>
                             <h3 className="mb-2 font-medium">
                                 Grupo {letra}{" "}
-                                <span className="text-xs text-[var(--color-muted)]">
+                                <span className="text-sm text-[var(--color-muted)]">
                                     ({miembros(letra).length}/{esperados[letra]})
                                 </span>
                             </h3>

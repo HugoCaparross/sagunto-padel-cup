@@ -81,7 +81,7 @@ export default async function PaginaJugadores({ searchParams }: Props) {
                     <AvatarJugador nombre={j.nombre} src={j.fotoUrl} className="h-14 w-14 rounded-full text-lg" sizes="56px" />
                     <div>
                     <p className="heading-font text-2xl leading-tight">{j.nombre}</p>
-                    <p className="text-xs text-muted">
+                    <p className="text-sm text-muted">
                       {j.categoria ? ETIQUETAS_CATEGORIA[j.categoria] : "Sin categoría"}
                     </p>
                     </div>
@@ -95,15 +95,15 @@ export default async function PaginaJugadores({ searchParams }: Props) {
 
                 <dl className="grid grid-cols-3 gap-2 text-center text-sm">
                   <div>
-                    <dt className="text-xs text-muted">Puntos</dt>
+                    <dt className="text-sm text-muted">Puntos</dt>
                     <dd className="font-semibold">{j.puntos}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-muted">Pruebas</dt>
+                    <dt className="text-sm text-muted">Pruebas</dt>
                     <dd className="font-semibold">{j.pruebas}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-muted">% victorias</dt>
+                    <dt className="text-sm text-muted">% victorias</dt>
                     <dd className="font-semibold">{j.porcentajeVictorias}%</dd>
                   </div>
                 </dl>

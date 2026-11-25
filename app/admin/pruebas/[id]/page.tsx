@@ -64,7 +64,7 @@ export default async function PaginaPrueba({ params }: Props) {
                         <h2 className="font-semibold">Herramientas</h2>
                         <Link
                             href={`/admin/pruebas/${id}/horarios`}
-                            className="block rounded-lg bg-[var(--color-surface)] px-3 py-2 text-sm hover:bg-[var(--color-surface-hover)]"
+                            className="block rounded-lg bg-[var(--color-surface)] px-3 py-2 text-sm hover:bg-[var(--color-surface-alt)]"
                         >
                             Horarios y pistas
                         </Link>
@@ -72,7 +72,7 @@ export default async function PaginaPrueba({ params }: Props) {
                             <Link
                                 key={c}
                                 href={`/admin/pruebas/${id}/cuadros?categoria=${c}`}
-                                className="block rounded-lg bg-[var(--color-surface)] px-3 py-2 text-sm hover:bg-[var(--color-surface-hover)]"
+                                className="block rounded-lg bg-[var(--color-surface)] px-3 py-2 text-sm hover:bg-[var(--color-surface-alt)]"
                             >
                                 Cuadros · {ETIQUETAS_CATEGORIA[c]}
                             </Link>
@@ -106,7 +106,7 @@ export default async function PaginaPrueba({ params }: Props) {
                                         {lista.map((f) => (
                                             <li key={f.inscripcionId} className="flex items-center justify-between py-2">
                                                 <span>{f.texto}</span>
-                                                <span className="text-xs text-[var(--color-muted)]">
+                                                <span className="text-sm text-[var(--color-muted)]">
                                                     {f.estado ? ETIQUETAS_ESTADO_INSCRIPCION[f.estado] : ""}
                                                 </span>
                                             </li>

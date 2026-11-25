@@ -108,7 +108,7 @@ export default async function PaginaAjustes({ searchParams }: Props) {
         ) : (
           <div className="card overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-surface text-left text-xs uppercase text-muted">
+              <thead className="bg-surface text-left text-sm uppercase text-muted">
                 <tr>
                   <th className="px-4 py-2">Fecha</th>
                   <th className="px-4 py-2">Usuario</th>
@@ -123,9 +123,9 @@ export default async function PaginaAjustes({ searchParams }: Props) {
                   <tr key={f.id} className="border-t border-border align-top">
                     <td className="px-4 py-2 whitespace-nowrap">{fechaCorta(f.creadoAt)}</td>
                     <td className="px-4 py-2">{f.usuario}</td>
-                    <td className="px-4 py-2 font-mono text-xs">{f.accion}</td>
+                    <td className="px-4 py-2 font-mono text-sm">{f.accion}</td>
                     <td className="px-4 py-2 text-muted">{f.tabla}</td>
-                    <td className="px-4 py-2 font-mono text-xs text-muted break-all">{f.registroId ?? "—"}</td>
+                    <td className="px-4 py-2 font-mono text-sm text-muted break-all">{f.registroId ?? "—"}</td>
                     <td className="px-4 py-2">{f.motivo ?? "—"}</td>
                   </tr>
                 ))}

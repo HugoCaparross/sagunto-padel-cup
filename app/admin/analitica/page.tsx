@@ -28,7 +28,7 @@ export default async function PaginaAnalitica() {
       <section className="grid grid-cols-2 gap-4 xl:grid-cols-4">
         {tarjetas.map((t) => (
           <div key={t.etiqueta} className="card p-4">
-            <p className="text-xs text-muted">{t.etiqueta}</p>
+            <p className="text-sm text-muted">{t.etiqueta}</p>
             <p className="mt-1 text-2xl font-semibold">{t.valor}</p>
           </div>
         ))}

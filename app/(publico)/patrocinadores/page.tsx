@@ -13,7 +13,7 @@ export default async function PaginaPatrocinadores() {
   return (
     <main className="container space-y-12 py-12">
       <header className="max-w-3xl space-y-4">
-        <p className="text-xs font-bold uppercase tracking-[0.12em] text-coral">Comunidad SPC</p>
+        <p className="text-sm font-bold uppercase tracking-[0.12em] text-coral-texto">Comunidad SPC</p>
         <h1 className="heading-font text-5xl sm:text-6xl">Patrocinadores</h1>
         <p className="text-lg text-muted">Las entidades que hacen posible el circuito y apoyan el pádel local.</p>
       </header>
@@ -47,7 +47,7 @@ export default async function PaginaPatrocinadores() {
 
       <section className="rounded-2xl bg-sage p-8 text-navy sm:p-10">
         <div className="max-w-2xl space-y-4">
-          <p className="text-xs font-bold uppercase tracking-[0.12em]">Crezcamos juntos</p>
+          <p className="text-sm font-bold uppercase tracking-[0.12em]">Crezcamos juntos</p>
           <h2 className="heading-font text-3xl sm:text-4xl">¿Quieres patrocinar el circuito?</h2>
           <p>Conecta tu marca con el pádel local y acompaña a la comunidad de Sagunto durante toda la temporada.</p>
           <Link href="/contacto?tipo=patrocinio" className="btn btn-primario inline-flex">Contactar como patrocinador</Link>

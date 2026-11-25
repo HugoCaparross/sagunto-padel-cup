@@ -130,7 +130,7 @@ export default function PanelInscripciones({ filas }: { filas: FilaPanel[] }) {
 
             <div className="card overflow-x-auto">
                 <table className="w-full text-sm">
-                    <thead className="bg-surface text-left text-xs uppercase text-muted">
+                    <thead className="bg-surface text-left text-sm uppercase text-muted">
                         <tr>
                             <th className="w-10 px-4 py-2"><span className="sr-only">Seleccionar</span></th>
                             <th className="px-4 py-2">Pareja</th>

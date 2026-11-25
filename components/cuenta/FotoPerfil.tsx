@@ -100,7 +100,7 @@ export default function FotoPerfil({ inicialUrl, perfilPublico }: Props) {
 
     return (
         <section className="card grid items-center gap-5 p-5 sm:grid-cols-[6rem_minmax(0,1fr)_auto]">
-            <div className="relative grid size-24 place-items-center overflow-hidden rounded-full bg-[var(--color-reference-fbeaec)] text-[var(--color-reference-c6202b)]">
+            <div className="relative grid size-24 place-items-center overflow-hidden rounded-full bg-[var(--color-danger-bg)] text-[var(--color-coral-texto)]">
                 {fotoUrl ? (
                     <Image src={fotoUrl} alt="Foto de perfil" fill unoptimized sizes="96px" />
                 ) : (
@@ -115,7 +115,7 @@ export default function FotoPerfil({ inicialUrl, perfilPublico }: Props) {
                     JPG, PNG o WebP, hasta 5 MB.
                 </p>
                 {!perfilPublico && (
-                    <p className="text-sm font-medium text-[var(--color-reference-c6202b)]">
+                    <p className="text-sm font-medium text-[var(--color-coral-texto)]">
                         Activa y guarda la visibilidad pública para subir una foto.
                     </p>
                 )}

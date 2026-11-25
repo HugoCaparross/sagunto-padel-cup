@@ -28,7 +28,7 @@ export default function ErrorGlobal({
                         onClick={reset}
                         style={{
                             background: "var(--color-coral)",
-                            color: "var(--color-reference-ffffff)",
+                            color: "var(--color-surface)",
                             border: 0,
                             padding: "10px 16px",
                             borderRadius: 8,

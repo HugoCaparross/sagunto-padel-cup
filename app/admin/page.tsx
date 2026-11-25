@@ -30,7 +30,7 @@ function Kpi({
 }) {
   return (
     <div className="rounded-xl bg-white p-4 ring-1 ring-[var(--color-border)]">
-      <p className="text-xs text-[var(--color-muted)]">{etiqueta}</p>
+      <p className="text-sm text-[var(--color-muted)]">{etiqueta}</p>
       <p className={`mt-1 text-2xl font-semibold ${aviso ? "text-[var(--color-warning)]" : ""}`}>{valor}</p>
     </div>
   );
@@ -115,13 +115,13 @@ export default async function PaginaResumen() {
       <section className="space-y-3 rounded-xl bg-white p-5 ring-1 ring-[var(--color-border)]">
         <h2 className="font-semibold">Accesos rápidos</h2>
         <div className="flex flex-wrap gap-2 text-sm">
-          <Link href="/admin/pruebas/nueva" className="rounded-lg bg-[var(--color-surface)] px-3 py-2 hover:bg-[var(--color-surface-hover)]">
+          <Link href="/admin/pruebas/nueva" className="rounded-lg bg-[var(--color-surface)] px-3 py-2 hover:bg-[var(--color-surface-alt)]">
             Crear prueba
           </Link>
-          <Link href="/admin/contactos?estado=nueva" className="rounded-lg bg-[var(--color-surface)] px-3 py-2 hover:bg-[var(--color-surface-hover)]">
+          <Link href="/admin/contactos?estado=nueva" className="rounded-lg bg-[var(--color-surface)] px-3 py-2 hover:bg-[var(--color-surface-alt)]">
             Ver contactos nuevos
           </Link>
-          <Link href="/admin/legal" className="rounded-lg bg-[var(--color-surface)] px-3 py-2 hover:bg-[var(--color-surface-hover)]">
+          <Link href="/admin/legal" className="rounded-lg bg-[var(--color-surface)] px-3 py-2 hover:bg-[var(--color-surface-alt)]">
             Documentos legales
           </Link>
         </div>

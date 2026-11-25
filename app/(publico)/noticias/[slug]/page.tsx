@@ -43,7 +43,7 @@ export default async function PaginaNoticia({ params }: Props) {
         </nav>
 
         <header className="space-y-4">
-          <p className="text-xs uppercase tracking-wide text-muted">
+          <p className="text-sm uppercase tracking-wide text-muted">
             {ETIQUETAS_NOTICIA[noticia.categoria]}
             {noticia.publicadaAt && ` · ${fechaLarga(noticia.publicadaAt)}`}
           </p>

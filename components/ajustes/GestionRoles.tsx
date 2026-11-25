@@ -51,7 +51,7 @@ export default function GestionRoles({ organizadores, jugadores, usuarioId }: Pr
         <div className="space-y-6">
             <div className="card overflow-x-auto">
                 <table className="w-full text-sm">
-                    <thead className="bg-surface text-left text-xs uppercase text-muted">
+                    <thead className="bg-surface text-left text-sm uppercase text-muted">
                         <tr>
                             <th className="px-4 py-2">Organizador</th>
                             <th className="px-4 py-2">Email</th>
@@ -68,7 +68,7 @@ export default function GestionRoles({ organizadores, jugadores, usuarioId }: Pr
                                 <td className="px-4 py-2 text-muted">{o.email ?? "—"}</td>
                                 <td className="px-4 py-2 text-right">
                                     {o.id === usuarioId ? (
-                                        <span className="text-xs text-muted">No puedes quitarte el rol</span>
+                                        <span className="text-sm text-muted">No puedes quitarte el rol</span>
                                     ) : (
                                         <button
                                             type="button"

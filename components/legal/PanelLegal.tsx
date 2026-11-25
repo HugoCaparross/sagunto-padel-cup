@@ -162,7 +162,7 @@ export default function PanelLegal({ versiones, faltan }: Props) {
                                                 )}
                                             </span>
                                             {v.vigente ? (
-                                                <span className="rounded bg-[var(--color-success-bg)] px-2 py-0.5 text-xs text-[var(--color-success)]">
+                                                <span className="rounded bg-[var(--color-success-bg)] px-2 py-0.5 text-sm text-[var(--color-success)]">
                                                     Vigente
                                                 </span>
                                             ) : (
@@ -170,7 +170,7 @@ export default function PanelLegal({ versiones, faltan }: Props) {
                                                     type="button"
                                                     onClick={() => publicar(v.id)}
                                                     disabled={pendiente}
-                                                    className="rounded-md bg-white px-2 py-1 text-xs ring-1 ring-[var(--color-border)] disabled:opacity-50"
+                                                    className="rounded-md bg-white px-2 py-1 text-sm ring-1 ring-[var(--color-border)] disabled:opacity-50"
                                                 >
                                                     Publicar esta versión
                                                 </button>

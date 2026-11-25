@@ -106,7 +106,7 @@ function Columna({
         >
             <header className="mb-2">
                 <h3 className="font-semibold">{titulo}</h3>
-                {subtitulo && <p className="text-xs text-[var(--color-muted)]">{subtitulo}</p>}
+                {subtitulo && <p className="text-sm text-[var(--color-muted)]">{subtitulo}</p>}
             </header>
             <div className="flex flex-col gap-2">{children}</div>
         </section>
@@ -497,7 +497,7 @@ export default function EditorHorarios({
                             <Arrastre
                                 key={f.id}
                                 partidoId={f.id}
-                                className="rounded-lg bg-[var(--color-surface)] p-2 text-xs ring-1 ring-[var(--color-border)]"
+                                className="rounded-lg bg-[var(--color-surface)] p-2 text-sm ring-1 ring-[var(--color-border)]"
                             >
                                 <p className="font-medium">{etiquetaDe(f)}</p>
                                 <p className="text-[var(--color-muted)]">{f.duracionMin} min</p>
@@ -520,7 +520,7 @@ export default function EditorHorarios({
                                     return (
                                         <div
                                             key={f.id}
-                                            className="rounded-lg bg-[var(--color-surface)] p-2 text-xs ring-1 ring-[var(--color-border)]"
+                                            className="rounded-lg bg-[var(--color-surface)] p-2 text-sm ring-1 ring-[var(--color-border)]"
                                         >
                                             <div className="mb-1 flex items-center justify-between gap-2">
                                                 <Arrastre partidoId={f.id} soloMango />

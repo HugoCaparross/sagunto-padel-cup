@@ -43,11 +43,11 @@ export default function AgendaPartidos({ partidos }: { partidos: PartidoPublico[
                                     key={p.id}
                                     className="grid gap-2 px-4 py-3 text-sm md:grid-cols-[160px_1fr_auto] md:items-center"
                                 >
-                                    <span className="text-xs text-[var(--color-muted)]">{etiquetaPartido(p)}</span>
+                                    <span className="text-sm text-[var(--color-muted)]">{etiquetaPartido(p)}</span>
                                     <span>
                                         {p.ladoA} <span className="text-[var(--color-muted)]">vs</span> {p.ladoB}
                                     </span>
-                                    <span className="text-xs text-[var(--color-muted)] md:text-right">
+                                    <span className="text-sm text-[var(--color-muted)] md:text-right">
                                         {p.pista !== null && p.hora && p.fecha
                                             ? `Pista ${p.pista} · ${fechaCorta(p.fecha)} ${p.hora}`
                                             : "Horario por confirmar"}

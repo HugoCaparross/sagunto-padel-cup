@@ -20,7 +20,7 @@ export default function TarjetaNoticia({ noticia }: { noticia: NoticiaPublica })
             )}
 
             <div className="flex flex-1 flex-col gap-3 p-5">
-                <p className="text-xs text-[var(--color-muted)]">
+                <p className="text-sm text-[var(--color-muted)]">
                     {ETIQUETAS_NOTICIA[noticia.categoria]}
                     {noticia.publicadaAt && ` · ${fechaLarga(noticia.publicadaAt)}`}
                 </p>
