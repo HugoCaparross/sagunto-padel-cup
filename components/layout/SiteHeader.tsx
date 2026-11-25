@@ -4,6 +4,7 @@ import Logo from "@/components/brand/Logo";
 import MobileMenu from "@/components/layout/MobileMenu";
 import NavPrincipal from "@/components/layout/NavPrincipal";
 import { crearClienteServidor } from "@/lib/supabase/server";
+import GoogleIcon from "@/components/ui/GoogleIcon";
 
 export default async function SiteHeader() {
     const supabase = await crearClienteServidor();
@@ -23,16 +24,11 @@ export default async function SiteHeader() {
 
                 <NavPrincipal />
 
-                <div className="flex items-center gap-2 sm:gap-3">
-                    {user ? (
-                        <Link href="/cuenta" className="btn btn-claro hidden sm:inline-flex">
-                            Mi panel
-                        </Link>
-                    ) : (
-                        <Link href="/login" className="btn btn-claro hidden sm:inline-flex">
-                            Acceso jugadores
-                        </Link>
-                    )}
+                <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                    <Link href={user ? "/cuenta" : "/login"} aria-label={user ? "Mi panel de jugador" : "Acceso jugadores"} className="hidden h-11 w-11 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10 lg:inline-flex">
+                        <GoogleIcon name="person" />
+                        <span className="sr-only">{user ? "Mi panel de jugador" : "Acceso jugadores"}</span>
+                    </Link>
                     <Link href="/calendario" className="btn btn-primario">
                         Inscribirse
                     </Link>
