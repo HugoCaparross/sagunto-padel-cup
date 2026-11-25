@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LoginForm } from "@/components/auth/FormularioAuth";
+import Aviso from "@/components/ui/Aviso";
 
 export const metadata: Metadata = { title: "Entrar" };
 
@@ -14,9 +15,9 @@ export default async function PaginaLogin({ searchParams }: Props) {
     <main className="mx-auto max-w-sm space-y-6 px-4 py-16">
       <h1 className="text-2xl font-semibold">Entrar</h1>
       {error === "enlace" && (
-        <p className="rounded-lg bg-[#FFF4DE] p-3 text-sm text-[#B77912]">
+        <Aviso tipo="aviso">
           El enlace ha caducado o no es válido. Vuelve a intentarlo.
-        </p>
+        </Aviso>
       )}
       <LoginForm siguiente={siguiente} />
     </main>

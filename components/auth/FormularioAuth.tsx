@@ -12,6 +12,7 @@ import {
     type AccionAuth,
 } from "@/actions/auth";
 import { TALLAS } from "@/lib/validadores/auth";
+import Aviso from "@/components/ui/Aviso";
 
 const CAMPO = "rounded-md border border-[#D5D9DC] bg-white px-3 py-2 text-sm";
 const BOTON =
@@ -34,9 +35,9 @@ function useEnvio() {
     return { pendiente, error, enviar };
 }
 
-function Error({ texto }: { texto: string | null }) {
+function MensajeError({ texto }: { texto: string | null }) {
     if (!texto) return null;
-    return <p className="rounded-lg bg-[#FDECEC] p-3 text-sm text-[#C73535]">{texto}</p>;
+    return <Aviso tipo="error">{texto}</Aviso>;
 }
 
 function Campo({ etiqueta, children }: { etiqueta: string; children: ReactNode }) {
@@ -67,12 +68,12 @@ export function LoginForm({ siguiente }: { siguiente?: string }) {
     return (
         <form onSubmit={alEnviar} className="space-y-4">
             <Campo etiqueta="Email">
-                <input name="email" type="email" required className={CAMPO} />
+                <input name="email" type="email" autoComplete="email" required className={CAMPO} />
             </Campo>
             <Campo etiqueta="Contraseña">
-                <input name="password" type="password" required className={CAMPO} />
+                <input name="password" type="password" autoComplete="current-password" required className={CAMPO} />
             </Campo>
-            <Error texto={error} />
+            <MensajeError texto={error} />
             <button type="submit" disabled={pendiente} className={BOTON}>
                 {pendiente ? "Entrando…" : "Entrar"}
             </button>
@@ -108,13 +109,13 @@ export function RegistroForm() {
     return (
         <form onSubmit={alEnviar} className="space-y-4">
             <Campo etiqueta="Nombre">
-                <input name="nombre" required minLength={2} maxLength={80} className={CAMPO} />
+                <input name="nombre" autoComplete="name" required minLength={2} maxLength={80} className={CAMPO} />
             </Campo>
             <Campo etiqueta="Email">
-                <input name="email" type="email" required className={CAMPO} />
+                <input name="email" type="email" autoComplete="email" required className={CAMPO} />
             </Campo>
             <Campo etiqueta="Contraseña (mínimo 10 caracteres)">
-                <input name="password" type="password" required minLength={10} className={CAMPO} />
+                <input name="password" type="password" autoComplete="new-password" required minLength={10} className={CAMPO} />
             </Campo>
             <label className="flex items-start gap-2 text-sm">
                 <input name="acepta" type="checkbox" required className="mt-1" />
@@ -130,7 +131,7 @@ export function RegistroForm() {
                     .
                 </span>
             </label>
-            <Error texto={error} />
+            <MensajeError texto={error} />
             <button type="submit" disabled={pendiente} className={BOTON}>
                 {pendiente ? "Creando cuenta…" : "Crear cuenta"}
             </button>
@@ -151,9 +152,9 @@ export function RecuperarForm() {
     return (
         <form onSubmit={alEnviar} className="space-y-4">
             <Campo etiqueta="Email de tu cuenta">
-                <input name="email" type="email" required className={CAMPO} />
+                <input name="email" type="email" autoComplete="email" required className={CAMPO} />
             </Campo>
-            <Error texto={error} />
+            <MensajeError texto={error} />
             <button type="submit" disabled={pendiente} className={BOTON}>
                 Enviar enlace
             </button>
@@ -179,12 +180,12 @@ export function NuevaContrasenaForm() {
     return (
         <form onSubmit={alEnviar} className="space-y-4">
             <Campo etiqueta="Nueva contraseña (mínimo 10 caracteres)">
-                <input name="password" type="password" required minLength={10} className={CAMPO} />
+                <input name="password" type="password" autoComplete="new-password" required minLength={10} className={CAMPO} />
             </Campo>
             <Campo etiqueta="Repite la contraseña">
-                <input name="confirmacion" type="password" required minLength={10} className={CAMPO} />
+                <input name="confirmacion" type="password" autoComplete="new-password" required minLength={10} className={CAMPO} />
             </Campo>
-            <Error texto={error} />
+            <MensajeError texto={error} />
             <button type="submit" disabled={pendiente} className={BOTON}>
                 Guardar contraseña
             </button>
@@ -215,7 +216,7 @@ export function OnboardingForm({ nombreInicial }: { nombreInicial: string }) {
     return (
         <form onSubmit={alEnviar} className="space-y-6">
             <Campo etiqueta="Nombre que verán los demás jugadores">
-                <input name="nombre" defaultValue={nombreInicial} required minLength={2} maxLength={80} className={CAMPO} />
+                <input name="nombre" autoComplete="name" defaultValue={nombreInicial} required minLength={2} maxLength={80} className={CAMPO} />
             </Campo>
 
             <Campo etiqueta="Talla de camiseta (opcional)">
@@ -267,7 +268,7 @@ export function OnboardingForm({ nombreInicial }: { nombreInicial: string }) {
                 </label>
             </fieldset>
 
-            <Error texto={error} />
+            <MensajeError texto={error} />
             <button type="submit" disabled={pendiente} className={BOTON}>
                 {pendiente ? "Guardando…" : "Continuar"}
             </button>

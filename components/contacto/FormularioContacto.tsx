@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useTransition, type FormEvent } from "react";
 import { enviarContacto } from "@/actions/contacto";
 import type { TipoContacto } from "@/lib/validadores/contacto";
+import Aviso from "@/components/ui/Aviso";
 
 type Props = { logueado: boolean; tipoInicial?: TipoContacto };
 
@@ -62,12 +63,12 @@ export default function FormularioContacto({ logueado, tipoInicial = "consulta" 
 
             <label className="flex flex-col gap-1 text-sm">
                 <span className="text-[#68737D]">Nombre</span>
-                <input name="nombre" required minLength={2} maxLength={80} className={campo} />
+                <input name="nombre" autoComplete="name" required minLength={2} maxLength={80} className={campo} />
             </label>
 
             <label className="flex flex-col gap-1 text-sm">
                 <span className="text-[#68737D]">Email</span>
-                <input name="email" type="email" required maxLength={254} className={campo} />
+                <input name="email" type="email" autoComplete="email" required maxLength={254} className={campo} />
             </label>
 
             <label className="flex flex-col gap-1 text-sm">
@@ -99,12 +100,12 @@ export default function FormularioContacto({ logueado, tipoInicial = "consulta" 
                 </span>
             </label>
 
-            {error && <p className="rounded-lg bg-[#FDECEC] p-3 text-sm text-[#C73535]">{error}</p>}
+            {error && <Aviso tipo="error">{error}</Aviso>}
 
             {enviado && (
-                <p className="rounded-lg bg-[#EAF6EF] p-3 text-sm text-[#16845B]">
+                <Aviso tipo="exito">
                     Mensaje enviado. Te responderemos por email.
-                </p>
+                </Aviso>
             )}
 
             <button

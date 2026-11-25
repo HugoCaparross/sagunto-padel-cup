@@ -10,6 +10,7 @@ import {
     type EstadoInscripcion,
 } from "@/lib/constantes";
 import { euros, fechaLarga } from "@/lib/formato";
+import Aviso from "@/components/ui/Aviso";
 
 export type DatosInscripcion = {
     prueba: {
@@ -160,9 +161,9 @@ export default function FormularioInscripcion({ datos }: { datos: DatosInscripci
                     </dl>
 
                     {plazasLibres === 0 ? (
-                        <p className="alerta alerta-aviso">
+                        <Aviso tipo="aviso">
                             La prueba está completa. Tu inscripción quedará en lista de espera.
-                        </p>
+                        </Aviso>
                     ) : (
                         <p className="text-sm text-muted">Quedan {plazasLibres} plazas libres.</p>
                     )}
@@ -180,7 +181,7 @@ export default function FormularioInscripcion({ datos }: { datos: DatosInscripci
                         </span>
                     </label>
 
-                    {error && <p className="alerta alerta-error">{error}</p>}
+                    {error && <Aviso tipo="error">{error}</Aviso>}
 
                     <div className="flex gap-3">
                         <button
