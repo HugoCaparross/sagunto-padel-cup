@@ -17,12 +17,12 @@ import {
 } from "@/actions/cuadros";
 import { ETIQUETAS_CATEGORIA, type Categoria, type Cuadro } from "@/lib/constantes";
 import {
-    RONDAS,
+    FASES_CUADRO as RONDAS,
     validarLlaves,
     type AutomaticoEntrada,
     type LadoEntrada,
     type PartidoEntrada,
-    type Ronda,
+    type FaseCuadro as Ronda,
 } from "@/lib/cuadros/formatos";
 
 type Arrastre =

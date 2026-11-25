@@ -1,19 +1,25 @@
 /* eslint-disable @next/next/no-page-custom-font -- Material Symbols is shared from the root App Router layout. */
 import type { Metadata } from "next";
-import { Inter, Poppins } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const poppins = Poppins({
+const poppins = localFont({
+  src: [
+    { path: "./fonts/poppins/Poppins-Regular.ttf", weight: "400" },
+    { path: "./fonts/poppins/Poppins-Medium.ttf", weight: "500" },
+    { path: "./fonts/poppins/Poppins-SemiBold.ttf", weight: "600" },
+    { path: "./fonts/poppins/Poppins-Bold.ttf", weight: "700" },
+    { path: "./fonts/poppins/Poppins-ExtraBold.ttf", weight: "800" },
+    { path: "./fonts/poppins/Poppins-Black.ttf", weight: "900" },
+  ],
   variable: "--font-poppins",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
   display: "swap",
 });
 
-const inter = Inter({
+const inter = localFont({
+  src: "./fonts/inter/Inter-variable.ttf",
   variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: "100 900",
   display: "swap",
 });
 
@@ -43,8 +49,6 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${poppins.variable} ${inter.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,200..700,0..1,-50..200&display=swap"
           rel="stylesheet"

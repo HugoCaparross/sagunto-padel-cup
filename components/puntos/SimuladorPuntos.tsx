@@ -2,81 +2,48 @@
 
 import { useState } from "react";
 import {
-    CATEGORIAS,
-    CUADROS,
-    ETIQUETAS_CATEGORIA,
-    ETIQUETAS_CUADRO,
-    ETIQUETAS_RONDA,
-    RONDAS,
-    type Categoria,
-    type Cuadro,
-    type Ronda,
+  CATEGORIAS,
+  CUADROS,
+  ETIQUETAS_CATEGORIA,
+  ETIQUETAS_CUADRO,
+  ETIQUETAS_RONDA,
+  RONDAS,
+  type Categoria,
+  type Cuadro,
+  type Ronda,
 } from "@/lib/constantes";
 import { puntosPara } from "@/lib/puntos/escala";
+import s from "./SimuladorPuntos.module.css";
 
 export default function SimuladorPuntos() {
-    const [categoria, setCategoria] = useState<Categoria>("segunda");
-    const [cuadro, setCuadro] = useState<Cuadro>("oro");
-    const [ronda, setRonda] = useState<Ronda>("semifinalista");
+  const [categoria, setCategoria] = useState<Categoria>("segunda");
+  const [cuadro, setCuadro] = useState<Cuadro>("oro");
+  const [ronda, setRonda] = useState<Ronda>("semifinalista");
+  const puntos = puntosPara(categoria, cuadro, ronda);
 
-    const puntos = puntosPara(categoria, cuadro, ronda);
+  return (
+    <div className={s.simulator}>
+      <div className={s.controls}>
+        <label htmlFor="sim-categoria"><span>Categoría</span><select id="sim-categoria" value={categoria} onChange={(event) => setCategoria(event.target.value as Categoria)}>
+          {CATEGORIAS.map((value) => <option key={value} value={value}>{ETIQUETAS_CATEGORIA[value]}</option>)}
+        </select></label>
+        <label htmlFor="sim-cuadro"><span>Cuadro</span><select id="sim-cuadro" value={cuadro} onChange={(event) => setCuadro(event.target.value as Cuadro)}>
+          {CUADROS.map((value) => <option key={value} value={value}>{ETIQUETAS_CUADRO[value]}</option>)}
+        </select></label>
+        <label htmlFor="sim-ronda"><span>Ronda alcanzada</span><select id="sim-ronda" value={ronda} onChange={(event) => setRonda(event.target.value as Ronda)}>
+          {RONDAS.map((value) => <option key={value} value={value}>{ETIQUETAS_RONDA[value]}</option>)}
+        </select></label>
+      </div>
 
-    const selectClase =
-        "rounded-md border border-[#D5D9DC] bg-white px-3 py-2 text-sm";
-
-    return (
-        <div className="space-y-6 rounded-xl bg-white p-6 ring-1 ring-[#D5D9DC]">
-            <div className="grid gap-4 sm:grid-cols-3">
-                <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-[#68737D]">Categoría</span>
-                    <select
-                        value={categoria}
-                        onChange={(e) => setCategoria(e.target.value as Categoria)}
-                        className={selectClase}
-                    >
-                        {CATEGORIAS.map((c) => (
-                            <option key={c} value={c}>
-                                {ETIQUETAS_CATEGORIA[c]}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-
-                <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-[#68737D]">Cuadro</span>
-                    <select
-                        value={cuadro}
-                        onChange={(e) => setCuadro(e.target.value as Cuadro)}
-                        className={selectClase}
-                    >
-                        {CUADROS.map((q) => (
-                            <option key={q} value={q}>
-                                {ETIQUETAS_CUADRO[q]}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-
-                <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-[#68737D]">Ronda alcanzada</span>
-                    <select
-                        value={ronda}
-                        onChange={(e) => setRonda(e.target.value as Ronda)}
-                        className={selectClase}
-                    >
-                        {RONDAS.map((r) => (
-                            <option key={r} value={r}>
-                                {ETIQUETAS_RONDA[r]}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-            </div>
-
-            <div className="flex items-baseline justify-between rounded-lg bg-[#F4F5F4] p-4">
-                <span className="text-sm text-[#68737D]">Puntos por jugador</span>
-                <span className="heading-font text-5xl text-[#F0443A]">{puntos}</span>
-            </div>
+      <div className={s.result} aria-live="polite" aria-atomic="true">
+        <div className={s.resultCopy}>
+          <span className={s.resultLabel}>Resultado de la simulación</span>
+          <strong>{ETIQUETAS_CATEGORIA[categoria]} · {ETIQUETAS_CUADRO[cuadro]} · {ETIQUETAS_RONDA[ronda]}</strong>
+          <span className={s.individual}>Puntos que recibe cada jugador</span>
         </div>
-    );
+        <div className={s.resultValue}><strong>{puntos}</strong><span>PTS</span></div>
+      </div>
+      <p className={s.note}>El simulador consulta la escala oficial del circuito.</p>
+    </div>
+  );
 }

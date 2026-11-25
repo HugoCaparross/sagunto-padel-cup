@@ -1,6 +1,7 @@
 import type { Categoria } from "@/lib/constantes";
 import { calcularRanking, type FilaRanking } from "@/lib/ranking/calcular";
 import { cargarDatosRanking } from "@/lib/ranking/cargar";
+import { crearSlugJugador } from "@/lib/jugadores/slug";
 
 export type FilaRankingPublica = FilaRanking & {
     nombre: string;
@@ -30,7 +31,7 @@ export async function obtenerRankingPublico(
         return {
             ...f,
             nombre: visible && perfil ? perfil.nombre || "Jugador" : "Jugador privado",
-            enlace: visible ? `/jugadores/${f.clave}` : null,
+            enlace: visible && perfil ? `/jugadores/${crearSlugJugador(perfil.nombre, f.clave)}` : null,
         };
     });
 }
