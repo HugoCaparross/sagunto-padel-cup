@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import GoogleIcon from "@/components/ui/GoogleIcon";
 import { PATROCINADORES_LOCALES } from "@/lib/home/patrocinadores-locales";
 import type { HistoricoPatrocinador, PatrocinadorPublico } from "@/lib/patrocinio/publico";
@@ -45,7 +48,7 @@ function obtenerPatrocinadores(historial: HistoricoPatrocinador[]): Patrocinador
             tarjetas.set(patrocinador.id, {
                 id: patrocinador.id,
                 nombre: patrocinador.nombre,
-                logoUrl: patrocinador.logoUrl.trim() || logoLocal?.logoUrl || "",
+                logoUrl: patrocinador.logoUrl?.trim() || logoLocal?.logoUrl || "",
                 webUrl: patrocinador.webUrl,
                 tipo: patrocinador.tipo,
                 fondoOscuro: logoLocal?.fondoOscuro ?? false,
@@ -117,12 +120,14 @@ function LogoPatro({
 function CarrilPatrocinadores({
     patrocinadores,
     invertido,
+    pausado,
 }: {
     patrocinadores: PatrocinadorTarjeta[];
     invertido: boolean;
+    pausado: boolean;
 }) {
     return (
-        <div className={`${s.patroCarril} ${invertido ? s.patroCarrilInvertido : ""}`}>
+        <div className={`${s.patroCarril} ${invertido ? s.patroCarrilInvertido : ""} ${pausado ? s.patroCarrilPausado : ""}`}>
             {[0, 1].map((copia) => (
                 <ul className={s.patroGrupo} aria-hidden={copia === 1} key={copia}>
                     {patrocinadores.map((p) => (
@@ -137,6 +142,7 @@ function CarrilPatrocinadores({
 }
 
 export default function PatrocinadoresHome({ historial }: Props) {
+    const [pausado, setPausado] = useState(false);
     const patrocinadores = obtenerPatrocinadores(historial);
     const carriles = [
         patrocinadores.filter((_, index) => index % 2 === 0),
@@ -165,6 +171,7 @@ export default function PatrocinadoresHome({ historial }: Props) {
                                 <CarrilPatrocinadores
                                     patrocinadores={fila}
                                     invertido={index === 1}
+                                    pausado={pausado}
                                     key={index}
                                 />
                             ))}
@@ -178,6 +185,15 @@ export default function PatrocinadoresHome({ historial }: Props) {
                             </div>
                         </div>
                     )}
+                    <div className={s.patroAcciones}>
+                        <button type="button" className={s.patroPausar} aria-pressed={pausado} onClick={() => setPausado((valor) => !valor)}>
+                            {pausado ? "Reanudar carrusel" : "Pausar carrusel"}
+                        </button>
+                        <Link href="/patrocinadores" className={s.patroVerMas}>
+                            Ver todos los patrocinadores
+                            <GoogleIcon name="arrow_outward" />
+                        </Link>
+                    </div>
                     <Link href="/patrocinadores/historico" className={s.patroVerMas}>
                         Ver más patrocinadores
                         <GoogleIcon name="arrow_outward" />

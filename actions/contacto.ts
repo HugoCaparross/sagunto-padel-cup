@@ -43,7 +43,7 @@ type Fila = {
 const MAX_MENSAJES_POR_HORA = 3;
 
 // ---------------------------------------------------------
-// 1. Envío público (consulta o sugerencia)
+// 1. Envío público (consulta, sugerencia o patrocinio)
 // Las sugerencias exigen sesión. Las consultas pueden ser anónimas.
 // ---------------------------------------------------------
 export async function enviarContacto(entrada: unknown): Promise<AccionContacto> {

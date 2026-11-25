@@ -7,6 +7,7 @@ import { fechaCorta } from "@/lib/formato";
 import {
     ESTADOS_CONTACTO,
     ETIQUETAS_ESTADO_CONTACTO,
+    ETIQUETAS_TIPO_CONTACTO,
     type EstadoContacto,
 } from "@/lib/validadores/contacto";
 
@@ -19,7 +20,7 @@ const COLOR_ESTADO: Record<EstadoContacto, string> = {
     archivada: "bg-[#F4F5F4] text-[#68737D]",
 };
 
-const ETIQUETA_TIPO = { consulta: "Consulta", sugerencia: "Sugerencia" } as const;
+const ETIQUETA_TIPO = ETIQUETAS_TIPO_CONTACTO;
 
 export default function BandejaContactos({ filas }: Props) {
     const [seleccionadoId, setSeleccionadoId] = useState<string | null>(filas[0]?.id ?? null);

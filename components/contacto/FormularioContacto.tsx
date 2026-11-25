@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useState, useTransition, type FormEvent } from "react";
 import { enviarContacto } from "@/actions/contacto";
+import type { TipoContacto } from "@/lib/validadores/contacto";
 
-type Props = { logueado: boolean };
+type Props = { logueado: boolean; tipoInicial?: TipoContacto };
 
-export default function FormularioContacto({ logueado }: Props) {
+export default function FormularioContacto({ logueado, tipoInicial = "consulta" }: Props) {
     const [pendiente, startTransition] = useTransition();
     const [enviado, setEnviado] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -44,14 +45,18 @@ export default function FormularioContacto({ logueado }: Props) {
             <fieldset className="space-y-2">
                 <legend className="text-sm text-[#68737D]">Tipo de mensaje</legend>
                 <label className="flex items-center gap-2 text-sm">
-                    <input type="radio" name="tipo" value="consulta" defaultChecked />
+                    <input type="radio" name="tipo" value="consulta" defaultChecked={tipoInicial === "consulta"} />
                     Consulta
                 </label>
                 <label
                     className={`flex items-center gap-2 text-sm ${logueado ? "" : "opacity-50"}`}
                 >
-                    <input type="radio" name="tipo" value="sugerencia" disabled={!logueado} />
+                    <input type="radio" name="tipo" value="sugerencia" defaultChecked={tipoInicial === "sugerencia"} disabled={!logueado} />
                     Sugerencia {logueado ? "" : "(requiere iniciar sesión)"}
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                    <input type="radio" name="tipo" value="patrocinio" defaultChecked={tipoInicial === "patrocinio"} />
+                    Patrocinio
                 </label>
             </fieldset>
 

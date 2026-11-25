@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
 import FormularioContacto from "@/components/contacto/FormularioContacto";
 import { usuarioActual } from "@/lib/auth/organizador";
+import type { TipoContacto } from "@/lib/validadores/contacto";
 
 export const metadata: Metadata = { title: "Contacto" };
 
-export default async function PaginaContacto() {
+type Props = { searchParams: Promise<{ tipo?: string }> };
+
+export default async function PaginaContacto({ searchParams }: Props) {
+  const { tipo } = await searchParams;
   const logueado = (await usuarioActual()) !== null;
+  const tipoInicial: TipoContacto = tipo === "patrocinio" ? "patrocinio" : "consulta";
 
   return (
     <main className="mx-auto max-w-[640px] space-y-6 px-4 py-12">
@@ -17,7 +22,7 @@ export default async function PaginaContacto() {
         </p>
       </header>
 
-      <FormularioContacto logueado={logueado} />
+      <FormularioContacto logueado={logueado} tipoInicial={tipoInicial} />
     </main>
   );
 }

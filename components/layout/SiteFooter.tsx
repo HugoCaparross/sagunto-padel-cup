@@ -19,7 +19,7 @@ function IconoTikTok() {
 
 export default function SiteFooter() {
     return <footer className="bg-navy text-white">
-        <div className="container grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-[1.2fr_repeat(3,minmax(0,1fr))]">
+        <div className="container grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-[1.2fr_repeat(4,minmax(0,1fr))]">
             <div className="space-y-4">
                 <Logo />
                 <p className="max-w-xs text-sm text-white/70">Circuito amateur de pádel en el Camp de Morvedre. Compite, suma puntos y lucha por el Master Final.</p>
@@ -32,6 +32,7 @@ export default function SiteFooter() {
                     </nav>
                 </div>
             </div>
+            <nav aria-label="Patrocinadores"><h2 className="mb-4 text-xs font-bold uppercase tracking-[0.12em] text-white">Colabora</h2><Link href="/patrocinadores" className="text-sm text-white/70 transition-colors hover:text-white">Patrocinadores</Link></nav>
             {GRUPOS.map((grupo) => <nav key={grupo.titulo} aria-label={grupo.titulo}><h2 className="mb-4 text-xs font-bold uppercase tracking-[0.12em] text-white">{grupo.titulo}</h2><ul className="grid gap-2 text-sm text-white/70">{grupo.enlaces.map((enlace) => <li key={enlace.href}><Link href={enlace.href} className="transition-colors hover:text-white">{enlace.texto}</Link></li>)}</ul></nav>)}
         </div>
         <div className="border-t border-white/10"><div className="container flex flex-col gap-3 py-5 text-xs text-white/60 md:flex-row md:items-center md:justify-between"><p>© {new Date().getFullYear()} Sagunto Padel Cup. Todos los derechos reservados.</p><p>Hecho en Sagunto.</p></div></div>

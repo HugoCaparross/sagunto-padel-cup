@@ -9,7 +9,7 @@ import { crearClienteAdmin, crearClienteServidor } from "@/lib/supabase/server";
 export type PatrocinadorPublico = {
     id: string;
     nombre: string;
-    logoUrl: string;
+    logoUrl: string | null;
     webUrl: string | null;
     tipo: "institucional" | "comercial";
 };
@@ -39,7 +39,7 @@ export type HistoricoPatrocinador = {
 type PatrocinadorFila = {
     id: string;
     nombre: string;
-    logo_url: string;
+    logo_url: string | null;
     web_url: string | null;
     tipo: "institucional" | "comercial";
 };
@@ -75,10 +75,21 @@ function aPatrocinador(p: PatrocinadorFila): PatrocinadorPublico {
     return {
         id: p.id,
         nombre: p.nombre,
-        logoUrl: p.logo_url,
+        logoUrl: p.logo_url?.trim() || null,
         webUrl: p.web_url,
         tipo: p.tipo,
     };
+}
+
+export async function patrocinadoresActivos(): Promise<PatrocinadorPublico[]> {
+    const admin = crearClienteAdmin();
+    const { data, error } = await admin
+        .from("patrocinadores")
+        .select("id, nombre, logo_url, web_url, tipo")
+        .eq("activo", true)
+        .order("nombre", { ascending: true });
+    if (error) throw new Error(error.message);
+    return ((data ?? []) as PatrocinadorFila[]).map(aPatrocinador);
 }
 
 export async function patrocinadoresDePrueba(pruebaId: string): Promise<PatrocinadorPublico[]> {

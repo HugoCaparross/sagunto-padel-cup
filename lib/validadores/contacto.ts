@@ -1,7 +1,12 @@
 import { z } from "zod";
 
-export const TIPOS_CONTACTO = ["consulta", "sugerencia"] as const;
+export const TIPOS_CONTACTO = ["consulta", "sugerencia", "patrocinio"] as const;
 export type TipoContacto = (typeof TIPOS_CONTACTO)[number];
+export const ETIQUETAS_TIPO_CONTACTO: Record<TipoContacto, string> = {
+    consulta: "Consulta",
+    sugerencia: "Sugerencia",
+    patrocinio: "Patrocinio",
+};
 
 export const ESTADOS_CONTACTO = [
     "nueva",
