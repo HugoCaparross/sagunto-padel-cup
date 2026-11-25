@@ -31,7 +31,7 @@ export async function obtenerRankingPublico(
         return {
             ...f,
             nombre: visible && perfil ? perfil.nombre || "Jugador" : "Jugador privado",
-            enlace: visible && perfil ? `/jugadores/${crearSlugJugador(perfil.nombre, f.clave)}` : null,
+            enlace: visible && perfil ? `/jugadores/${perfil.slug ?? crearSlugJugador(perfil.nombre, f.clave)}` : null,
         };
     });
 }

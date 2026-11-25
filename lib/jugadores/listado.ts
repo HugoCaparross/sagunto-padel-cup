@@ -1,9 +1,11 @@
 import type { Categoria } from "@/lib/constantes";
 import { cargarDatosRanking } from "@/lib/ranking/cargar";
+import { crearSlugJugador } from "@/lib/jugadores/slug";
 import { progresoDeJugador } from "@/lib/xp/niveles";
 
 export type JugadorListado = {
     id: string;
+    slug: string;
     nombre: string;
     categoria: Categoria | null;
     puntos: number;
@@ -83,6 +85,7 @@ export async function listarJugadoresListado(): Promise<JugadorListado[]> {
 
         salida.push({
             id,
+            slug: perfil.slug ?? crearSlugJugador(perfil.nombre, id),
             nombre: perfil.nombre || "Jugador",
             categoria: a.ultimaCategoria,
             puntos: a.puntos,

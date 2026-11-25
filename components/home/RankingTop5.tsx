@@ -209,9 +209,9 @@ export default function RankingTop5({ ranking, rankingGeneral }: Props) {
                                     <span>Victorias</span>
                                 </div>
                             </div>
-                            {seleccionado.jugadorId && !seleccionado.jugadorId.startsWith("demo-") && (
+                            {seleccionado.jugadorSlug && !seleccionado.jugadorId?.startsWith("demo-") && (
                                 <Link
-                                    href={`/jugadores/${seleccionado.jugadorId}`}
+                                    href={`/jugadores/${seleccionado.jugadorSlug}`}
                                     className={s.playerEnlace}
                                 >
                                     Ver perfil completo

@@ -74,7 +74,7 @@ export default async function PaginaJugadores({ searchParams }: Props) {
         <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {filtrados.map((j) => (
             <li key={j.id}>
-              <Link href={`/jugadores/${j.id}`} className="card block h-full space-y-4 p-5 hover:border-navy">
+              <Link href={`/jugadores/${j.slug}`} className="card block h-full space-y-4 p-5 hover:border-navy">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="heading-font text-2xl leading-tight">{j.nombre}</p>

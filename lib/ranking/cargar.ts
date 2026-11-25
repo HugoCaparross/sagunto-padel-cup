@@ -17,7 +17,7 @@ export type FilaRankingPublico = FilaRanking & {
 
 type FilaPrueba = { id: string; fecha_fin: string; es_master: boolean };
 type FilaInscripcion = { id: string; jugador_1: string; jugador_2: string | null };
-type FilaPerfil = { id: string; nombre: string; visibilidad_publica: boolean };
+type FilaPerfil = { id: string; nombre: string; visibilidad_publica: boolean; slug: string | null };
 type FilaFotoPerfil = {
     id: string;
     foto_perfil_path: string | null;
@@ -43,7 +43,7 @@ type FilaPartido = {
 export type DatosRanking = {
     puntos: RegistroPuntos[];
     partidos: RegistroPartido[];
-    perfiles: Map<string, { nombre: string; visible: boolean; fotoPath: string | null }>;
+    perfiles: Map<string, { nombre: string; visible: boolean; slug: string | null; fotoPath: string | null }>;
 };
 
 function leer<T>(
@@ -84,7 +84,7 @@ export async function cargarDatosRanking(
 
     const filasPerfiles = leer<FilaPerfil>(
         "perfiles",
-        await supabase.from("perfiles").select("id, nombre, visibilidad_publica")
+        await supabase.from("perfiles").select("id, nombre, visibilidad_publica, slug")
     );
     const { data: fotosData, error: errorFotos } = await supabase
         .from("perfiles")
@@ -100,11 +100,12 @@ export async function cargarDatosRanking(
     const rutasFotos = new Map(
         ((fotosData ?? []) as FilaFotoPerfil[]).map((fila) => [fila.id, fila])
     );
-    const perfiles = new Map<string, { nombre: string; visible: boolean; fotoPath: string | null }>();
+    const perfiles = new Map<string, { nombre: string; visible: boolean; slug: string | null; fotoPath: string | null }>();
     for (const p of filasPerfiles) {
         perfiles.set(p.id, {
             nombre: p.nombre,
             visible: p.visibilidad_publica,
+            slug: p.slug,
             fotoPath: fotoPublicable({
                 ...(rutasFotos.get(p.id) ?? {
                     foto_perfil_path: null,

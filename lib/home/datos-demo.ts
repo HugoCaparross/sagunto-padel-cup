@@ -50,6 +50,7 @@ export const PRUEBAS_DEMO: PruebaHome[] = [
 function filasDemo(nombres: string[], puntosBase: number): FilaTop[] {
     return nombres.map((nombre, index) => ({
         jugadorId: `demo-${puntosBase}-${index}`,
+        jugadorSlug: null,
         posicion: index + 1,
         nombre,
         puntos: puntosBase - index * 120,

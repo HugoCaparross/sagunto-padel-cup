@@ -22,6 +22,7 @@ export type PruebaHome = {
 
 export type FilaTop = {
     jugadorId: string | null;
+    jugadorSlug: string | null;
     posicion: number;
     nombre: string;
     puntos: number;
@@ -117,6 +118,7 @@ export async function cargarDatosHome(): Promise<DatosHome> {
         const perfil = datos.perfiles.get(fila.clave);
         return {
             jugadorId: perfil?.visible ? fila.clave : null,
+            jugadorSlug: perfil?.visible ? perfil.slug : null,
             posicion: fila.posicion,
             nombre: perfil?.visible ? perfil.nombre || "Jugador" : "Jugador privado",
             puntos: fila.puntos,
