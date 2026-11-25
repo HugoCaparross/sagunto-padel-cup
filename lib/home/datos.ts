@@ -1,6 +1,8 @@
+
 import { CATEGORIAS, type Categoria, type EstadoPrueba } from "@/lib/constantes";
 import { calcularRanking, calcularRankingGeneral } from "@/lib/ranking/calcular";
 import { cargarDatosRanking, hoyEnMadrid } from "@/lib/ranking/cargar";
+import { crearSlugJugador } from "@/lib/jugadores/slug";
 import { urlsFirmadasFotos } from "@/lib/jugadores/fotos";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
@@ -66,33 +68,63 @@ export async function cargarDatosHome(): Promise<DatosHome> {
     const supabase = await crearClienteServidor();
     const hoy = hoyEnMadrid();
 
-    const [{ data: temp }, { data: pruebasData }, { data: catsData }, { data: ocupData }] =
-        await Promise.all([
-            supabase.from("temporadas").select("anio").eq("activa", true).maybeSingle(),
-            supabase
-                .from("pruebas")
-                .select(
-                    "id, slug, nombre, estado, fecha_inicio, fecha_fin, sede, precio_pareja_centimos, plazas_maximas, es_master"
-                )
-                .order("fecha_inicio", { ascending: true }),
-            supabase.from("prueba_categorias").select("prueba_id, categoria"),
-            supabase.from("v_ocupacion").select("prueba_id, ocupadas"),
-        ]);
+    const [
+        { data: temp },
+        { data: pruebasData },
+        { data: catsData },
+        { data: ocupData },
+    ] = await Promise.all([
+        supabase
+            .from("temporadas")
+            .select("anio")
+            .eq("activa", true)
+            .maybeSingle(),
+
+        supabase
+            .from("pruebas")
+            .select(
+                "id, slug, nombre, estado, fecha_inicio, fecha_fin, sede, precio_pareja_centimos, plazas_maximas, es_master"
+            )
+            .order("fecha_inicio", { ascending: true }),
+
+        supabase
+            .from("prueba_categorias")
+            .select("prueba_id, categoria"),
+
+        supabase
+            .from("v_ocupacion")
+            .select("prueba_id, ocupadas"),
+    ]);
 
     const categoriasDe = new Map<string, Categoria[]>();
-    for (const c of (catsData ?? []) as { prueba_id: string; categoria: Categoria }[]) {
+
+    for (const c of (catsData ?? []) as {
+        prueba_id: string;
+        categoria: Categoria;
+    }[]) {
         const lista = categoriasDe.get(c.prueba_id) ?? [];
+
         lista.push(c.categoria);
         categoriasDe.set(c.prueba_id, lista);
     }
 
     const ocupadasDe = new Map<string, number>();
-    for (const o of (ocupData ?? []) as { prueba_id: string; ocupadas: number }[]) {
-        ocupadasDe.set(o.prueba_id, (ocupadasDe.get(o.prueba_id) ?? 0) + o.ocupadas);
+
+    for (const o of (ocupData ?? []) as {
+        prueba_id: string;
+        ocupadas: number;
+    }[]) {
+        ocupadasDe.set(
+            o.prueba_id,
+            (ocupadasDe.get(o.prueba_id) ?? 0) + o.ocupadas
+        );
     }
 
-    const calendario: PruebaHome[] = ((pruebasData ?? []) as PruebaFila[]).map((p) => {
+    const calendario: PruebaHome[] = (
+        (pruebasData ?? []) as PruebaFila[]
+    ).map((p) => {
         const ocupadas = ocupadasDe.get(p.id) ?? 0;
+
         return {
             id: p.id,
             slug: p.slug,
@@ -103,24 +135,43 @@ export async function cargarDatosHome(): Promise<DatosHome> {
             sede: p.sede,
             precioCentimos: p.precio_pareja_centimos,
             esMaster: p.es_master,
-            categorias: CATEGORIAS.filter((c) => (categoriasDe.get(p.id) ?? []).includes(c)),
+            categorias: CATEGORIAS.filter((c) =>
+                (categoriasDe.get(p.id) ?? []).includes(c)
+            ),
             plazasLibres: Math.max(0, p.plazas_maximas - ocupadas),
             plazasMaximas: p.plazas_maximas,
         };
     });
 
     const proxima =
-        calendario.find((p) => p.estado !== "finalizada" && p.fechaFin >= hoy) ?? null;
+        calendario.find(
+            (p) => p.estado !== "finalizada" && p.fechaFin >= hoy
+        ) ?? null;
 
     const datos = await cargarDatosRanking();
+
     const ranking = {} as Record<Categoria, FilaTop[]>;
-    const aFilaTop = (fila: ReturnType<typeof calcularRanking>[number]): FilaTop => {
+
+    const aFilaTop = (
+        fila: ReturnType<typeof calcularRanking>[number]
+    ): FilaTop => {
         const perfil = datos.perfiles.get(fila.clave);
+
         return {
             jugadorId: perfil?.visible ? fila.clave : null,
-            jugadorSlug: perfil?.visible ? perfil.slug : null,
+
+            jugadorSlug:
+                perfil?.visible && perfil
+                    ? crearSlugJugador(perfil.nombre, fila.clave)
+                    : null,
+
             posicion: fila.posicion,
-            nombre: perfil?.visible ? perfil.nombre || "Jugador" : "Jugador privado",
+
+            nombre:
+                perfil?.visible
+                    ? perfil.nombre || "Jugador"
+                    : "Jugador privado",
+
             puntos: fila.puntos,
             pruebasJugadas: fila.pruebasJugadas,
             partidos: fila.partidos,
@@ -140,6 +191,7 @@ export async function cargarDatosHome(): Promise<DatosHome> {
             .slice(0, 5)
             .map(aFilaTop);
     }
+
     const rankingGeneral = calcularRankingGeneral({
         referencia: hoy,
         puntos: datos.puntos,
@@ -148,22 +200,46 @@ export async function cargarDatosHome(): Promise<DatosHome> {
         .slice(0, 5)
         .map(aFilaTop);
 
-    const filasVisibles = [...Object.values(ranking).flat(), ...rankingGeneral];
+    const filasVisibles = [
+        ...Object.values(ranking).flat(),
+        ...rankingGeneral,
+    ];
+
     const rutasPorJugador = new Map(
         filasVisibles.flatMap((fila) => {
-            const ruta = fila.jugadorId ? datos.perfiles.get(fila.jugadorId)?.fotoPath : null;
-            return ruta && fila.jugadorId ? [[fila.jugadorId, ruta] as const] : [];
+            const ruta = fila.jugadorId
+                ? datos.perfiles.get(fila.jugadorId)?.fotoPath
+                : null;
+
+            return ruta && fila.jugadorId
+                ? [[fila.jugadorId, ruta] as const]
+                : [];
         })
     );
-    const urlsPorRuta = await urlsFirmadasFotos([...rutasPorJugador.values()]);
-    const añadirFotos = (filas: FilaTop[]) =>
+
+    const urlsPorRuta = await urlsFirmadasFotos([
+        ...rutasPorJugador.values(),
+    ]);
+
+    const anadirFotos = (filas: FilaTop[]) =>
         filas.map((fila) => {
-            const ruta = fila.jugadorId ? rutasPorJugador.get(fila.jugadorId) : null;
-            return { ...fila, fotoUrl: fila.fotoUrl ?? (ruta ? urlsPorRuta.get(ruta) ?? null : null) };
+            const ruta = fila.jugadorId
+                ? rutasPorJugador.get(fila.jugadorId)
+                : null;
+
+            return {
+                ...fila,
+                fotoUrl:
+                    fila.fotoUrl ??
+                    (ruta ? urlsPorRuta.get(ruta) ?? null : null),
+            };
         });
 
-    for (const categoria of CATEGORIAS) ranking[categoria] = añadirFotos(ranking[categoria]);
-    const rankingGeneralConFotos = añadirFotos(rankingGeneral);
+    for (const categoria of CATEGORIAS) {
+        ranking[categoria] = anadirFotos(ranking[categoria]);
+    }
+
+    const rankingGeneralConFotos = anadirFotos(rankingGeneral);
 
     const jugadoresActivos = new Set([
         ...datos.puntos.map((p) => p.clave),
@@ -178,7 +254,10 @@ export async function cargarDatosHome(): Promise<DatosHome> {
         rankingGeneral: rankingGeneralConFotos,
         cifras: {
             jugadores: jugadoresActivos,
-            parejas: [...ocupadasDe.values()].reduce((total, ocupadas) => total + ocupadas, 0),
+            parejas: [...ocupadasDe.values()].reduce(
+                (total, ocupadas) => total + ocupadas,
+                0
+            ),
             pruebas: calendario.length,
             categorias: CATEGORIAS.length,
         },

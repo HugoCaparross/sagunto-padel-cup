@@ -1,3 +1,4 @@
+
 import type { Categoria } from "@/lib/constantes";
 import { cargarDatosRanking } from "@/lib/ranking/cargar";
 import { crearSlugJugador } from "@/lib/jugadores/slug";
@@ -39,24 +40,30 @@ function vacio(): Acumulado {
     };
 }
 
-// Solo jugadores con perfil público. Incluye el Máster: el historial personal lo cuenta.
+// Solo jugadores con perfil público.
+// Incluye el Máster: el historial personal lo cuenta.
 export async function listarJugadoresListado(): Promise<JugadorListado[]> {
     const datos = await cargarDatosRanking({ incluirMaster: true });
 
     const acum = new Map<string, Acumulado>();
+
     const obtener = (clave: string): Acumulado => {
         let a = acum.get(clave);
+
         if (!a) {
             a = vacio();
             acum.set(clave, a);
         }
+
         return a;
     };
 
     for (const p of datos.puntos) {
         const a = obtener(p.clave);
+
         a.puntos += p.puntos;
         a.pruebas.add(p.pruebaId);
+
         if (p.fecha > a.ultimaFecha) {
             a.ultimaFecha = p.fecha;
             a.ultimaCategoria = p.categoria;
@@ -65,8 +72,12 @@ export async function listarJugadoresListado(): Promise<JugadorListado[]> {
 
     for (const p of datos.partidos) {
         const a = obtener(p.clave);
+
         a.partidos++;
-        if (p.ganado) a.victorias++;
+
+        if (p.ganado) {
+            a.victorias++;
+        }
     }
 
     const salida: JugadorListado[] = [];
@@ -75,8 +86,11 @@ export async function listarJugadoresListado(): Promise<JugadorListado[]> {
         if (!perfil.visible) continue;
 
         const a = acum.get(id) ?? vacio();
+
         const porcentajeVictorias =
-            a.partidos > 0 ? Math.round((a.victorias / a.partidos) * 1000) / 10 : 0;
+            a.partidos > 0
+                ? Math.round((a.victorias / a.partidos) * 1000) / 10
+                : 0;
 
         const nivel = progresoDeJugador({
             puntosHistoricos: a.puntos,
@@ -87,7 +101,7 @@ export async function listarJugadoresListado(): Promise<JugadorListado[]> {
 
         salida.push({
             id,
-            slug: perfil.slug ?? crearSlugJugador(perfil.nombre, id),
+            slug: crearSlugJugador(perfil.nombre, id),
             nombre: perfil.nombre || "Jugador",
             fotoUrl: null,
             categoria: a.ultimaCategoria,
@@ -103,16 +117,25 @@ export async function listarJugadoresListado(): Promise<JugadorListado[]> {
 
     const ordenada = salida.sort(
         (x, y) =>
-            y.nivel - x.nivel || y.puntos - x.puntos || x.nombre.localeCompare(y.nombre, "es")
+            y.nivel - x.nivel ||
+            y.puntos - x.puntos ||
+            x.nombre.localeCompare(y.nombre, "es")
     );
+
     const rutas = ordenada.flatMap((jugador) => {
         const path = datos.perfiles.get(jugador.id)?.fotoPath;
+
         return path ? [path] : [];
     });
+
     const urls = await urlsFirmadasFotos(rutas);
 
     return ordenada.map((jugador) => {
         const path = datos.perfiles.get(jugador.id)?.fotoPath;
-        return { ...jugador, fotoUrl: path ? urls.get(path) ?? null : null };
+
+        return {
+            ...jugador,
+            fotoUrl: path ? urls.get(path) ?? null : null,
+        };
     });
 }
